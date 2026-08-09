@@ -9,6 +9,8 @@ required_files=(
   "PROJECT_STATE.md"
   "README.md"
   "docs/MASTER_BLUEPRINT.md"
+  "pyproject.toml"
+  "uv.lock"
 )
 
 for file in "${required_files[@]}"; do
@@ -17,6 +19,13 @@ for file in "${required_files[@]}"; do
     exit 1
   fi
 done
+
+if ! command -v uv >/dev/null 2>&1; then
+  printf 'ERROR: uv is required to install the locked Python dependencies.\n' >&2
+  exit 1
+fi
+
+uv sync --locked --no-progress
 
 mkdir -p apps/dashboard backend/api workers \
   core/data core/signals core/opportunity core/decision core/risk \

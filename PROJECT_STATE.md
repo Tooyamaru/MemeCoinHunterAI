@@ -9,28 +9,29 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P01 — Application Foundation
 - **Current task:** P01-T01 — Application Foundation Planning & Technical Baseline
-- **Current task status:** NOT STARTED
+- **Current task status:** DONE
 - **Last updated:** 2026-08-09
 
 ## Master progress
 
 - P00: DONE; T01 done; T02 done
-- P01–P12: Not started
+- P01: T01 done; T02 not started
+- P02–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime
 - **In progress:** None
 - **Blocked:** None
-- **Not started:** P01 application foundation and all later implementation phases
+- **Not started:** P01-T02 runtime/configuration expansion and all later implementation phases
 
 ## Current objective
 
-Establish a portable, auditable project map before implementing any market, AI, wallet, trading, or production functionality.
+Maintain a portable, auditable application foundation before implementing any market, AI, wallet, trading, or production functionality.
 
 ## Last verified checkpoint
 
-P00-T02 governance verification passed on 2026-08-09. The repository is ready for the next phase, but no P01 work has started.
+P01-T01 technical baseline and minimal runtime verified on 2026-08-09. No market, AI, wallet, trading, or execution functionality was added.
 
 ## Relevant files for current task
 
@@ -48,6 +49,15 @@ P00-T02 governance verification passed on 2026-08-09. The repository is ready fo
 - `docs/TESTING_STRATEGY.md`
 - `docs/CHANGELOG.md`
 - `scripts/replit_setup.sh`
+- `docs/TECHNICAL_BASELINE.md`
+- `pyproject.toml`
+- `uv.lock`
+- `backend/api/main.py`
+- `backend/core/config.py`
+- `backend/core/logging.py`
+- `backend/core/database.py`
+- `tests/test_foundation.py`
+- `.env.example`
 
 ## Optional files
 
@@ -58,21 +68,21 @@ P00-T02 governance verification passed on 2026-08-09. The repository is ready fo
 ## Do not read / out of scope
 
 - Do not scan the full repository.
-- Do not start P01-T01 without explicit user approval.
+- Do not start P01-T02 without explicit user approval.
 - Do not implement Solana, DEX, wallet, AI/ML, signals, paper trading, execution, Railway, Redis, or a full dashboard before their planned phases.
 
 ## Known issues
 
-- No known P00-T02 issues.
+- No known P01-T01 issues.
 - The current workspace contains uncommitted P00 documentation changes; no commit or push was performed by this task.
 
 ## Next action
 
-Wait for explicit approval before beginning P01-T01.
+Wait for explicit approval before beginning P01-T02.
 
 ## Next task
 
-P01-T01 — Application Foundation Planning & Technical Baseline (NOT STARTED)
+P01-T02 — Application Runtime & Configuration Foundation (NOT STARTED)
 
 ## Required secret names
 

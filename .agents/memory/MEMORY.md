@@ -1,0 +1,1 @@
+- [Python test environment](python-test-environment.md) — override optional database settings explicitly because Replit may inject DATABASE_URL into test processes.

@@ -11,6 +11,8 @@ out-tsc
 # dependencies
 node_modules
 node_modules/
+.pythonlibs/
+.venv/
 
 # secrets and credentials
 .env

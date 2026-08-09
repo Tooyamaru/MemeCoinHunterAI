@@ -15,7 +15,7 @@ Meme Coin Hunter AI is a future AI-driven crypto intelligence and trading system
 
 ## Current status
 
-P00-T01 — Project Governance Foundation is complete. This checkpoint contains documentation and a minimal portable structure only. No Solana, DEX, wallet, trading, AI/ML, paper-trading, or Railway functionality has been implemented.
+P00 is complete. P01-T01 establishes the technical baseline and a minimal Python/FastAPI runtime with a health endpoint, typed configuration, logging, a database boundary, and targeted tests. No Solana, DEX, wallet, trading, AI/ML, paper-trading, or Railway functionality has been implemented.
 
 ## Architecture summary
 
@@ -34,10 +34,20 @@ The Risk Governor has authority over the Decision Engine. Any future execution m
 5. Update documentation and `PROJECT_STATE.md`.
 6. Commit/push through the single GitHub repository when ready.
 
+### Run the P01 foundation
+
+```bash
+bash scripts/replit_setup.sh
+uv run uvicorn backend.api.main:app --host "${APP_HOST:-0.0.0.0}" --port "${PORT:-${APP_PORT:-8000}}"
+```
+
+The only endpoint currently provided by the Python foundation is `GET /health`.
+
 ## Repository structure
 
 - `apps/dashboard/` — future presentation application
 - `backend/api/` — future API boundary
+- `backend/core/` — configuration, logging, and infrastructure boundaries
 - `workers/` — future long-running workers
 - `core/` — future domain modules
 - `database/` — future database assets and migrations
@@ -45,7 +55,7 @@ The Risk Governor has authority over the Decision Engine. Any future execution m
 - `docs/` — governance and architecture source
 - `scripts/` — portability and maintenance scripts
 
-Existing workspace libraries and artifacts are retained and are not part of P00-T01 implementation.
+Existing workspace libraries and artifacts are retained. The existing TypeScript API artifact remains separate; the P01 Python baseline lives under `backend/`.
 
 ## Continuation procedure
 

@@ -34,4 +34,4 @@ The Decision Engine must never hold unrestricted fund control or call a venue di
 
 ## Future portability
 
-The initial Replit environment is for development and preview. GitHub is the source of truth. A future stable 24/7 runtime may use Railway, but Railway is explicitly out of scope for P00.
+The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastructure in `backend/core`. The initial Replit environment is for development and preview. GitHub is the source of truth. A future stable 24/7 runtime may use Railway, but Railway remains out of scope until its planned production phase.

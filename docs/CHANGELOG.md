@@ -15,3 +15,11 @@
 - **CHANGE:** Verified the P00 governance, continuation, portability, security, testing, and phase-map foundation.
 - **VERIFICATION:** Required files, P00–P12 ordering, shell syntax, setup-script safety, secret-value patterns, Git branch/remote/checkpoint, and absence of premature trading integrations passed targeted checks.
 - **COMMIT:** Not created in this workspace.
+
+## 2026-08-09
+
+- **PHASE:** P01 — Application Foundation
+- **TASK:** P01-T01 — Application Foundation Planning & Technical Baseline
+- **CHANGE:** Selected the Python/FastAPI baseline and added the minimal runtime, typed configuration, standard logging, database boundary, dependency lock, targeted tests, and portable setup support.
+- **VERIFICATION:** Application startup, `/health`, configuration defaults, logging initialization, database boundary, dependency sync, and setup-script checks passed. No future trading functionality was added.
+- **COMMIT:** Not created in this workspace.
