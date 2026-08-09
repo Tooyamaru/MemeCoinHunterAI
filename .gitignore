@@ -10,6 +10,15 @@ out-tsc
 
 # dependencies
 node_modules
+node_modules/
+
+# secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.secret
 
 # IDEs and editors
 /.idea
@@ -47,3 +56,15 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Python and generated caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Project-local heavy or sensitive files
+screenshots/
+attached_assets/
+*.log
+*.zip
