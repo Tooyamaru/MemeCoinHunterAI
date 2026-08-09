@@ -23,3 +23,11 @@
 - **CHANGE:** Selected the Python/FastAPI baseline and added the minimal runtime, typed configuration, standard logging, database boundary, dependency lock, targeted tests, and portable setup support.
 - **VERIFICATION:** Application startup, `/health`, configuration defaults, logging initialization, database boundary, dependency sync, and setup-script checks passed. No future trading functionality was added.
 - **COMMIT:** Not created in this workspace.
+
+## 2026-08-09
+
+- **PHASE:** P01 — Application Foundation
+- **TASK:** P01-T02 — Application Runtime & Configuration Foundation
+- **CHANGE:** Added FastAPI lifespan state, runtime metadata, `/ready`, request ID correlation, safe centralized internal errors, validated configuration levels, and truthful database states.
+- **VERIFICATION:** Targeted tests, Python compilation, `/health`, `/ready`, request ID behavior, safe error responses, startup/shutdown logging, dependency sync, setup-script syntax/repeatability, and secret-pattern checks passed.
+- **COMMIT:** Not created in this workspace.

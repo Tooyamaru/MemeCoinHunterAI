@@ -28,6 +28,7 @@ The current entrypoint is `backend.api.main:app`. It exposes only:
 
 ```text
 GET /health
+GET /ready
 ```
 
 Run it with:
@@ -36,7 +37,11 @@ Run it with:
 uv run uvicorn backend.api.main:app --host "${APP_HOST:-0.0.0.0}" --port "${PORT:-${APP_PORT:-8000}}"
 ```
 
-The health endpoint reports process status only. It does not fake checks for databases, blockchains, wallets, or other services that are not implemented.
+- `/health` reports process status and runtime metadata only. It does not fake checks for databases, blockchains, wallets, or other services that are not implemented.
+- `/ready` reports whether the internal application lifecycle is ready. It currently checks only the process lifecycle and is designed to gain truthful dependency checks later.
+- Every HTTP response includes an `X-Request-ID`; incoming IDs are preserved when they are short enough, otherwise a new ID is generated.
+- Unexpected API errors return a safe JSON error with the request ID while details are logged server-side.
+- Replit may inject `DATABASE_URL` into the environment. Tests explicitly override it so test behavior never depends on ambient workspace configuration.
 
 ## Database strategy
 
