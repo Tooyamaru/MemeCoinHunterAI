@@ -99,18 +99,21 @@ trading, or execution functionality was added.
 
 ## Next action
 
-Wait for review of the completed P02-T01 implementation.
+Review the proposed P02-T02 specification. Do not implement it until explicit
+approval is recorded and a concrete implementation task is opened.
 
 ## Next task
 
-No later task is authorized. The next candidate is documented for review only:
+The next candidate is documented for review only:
 
-- **P02-T01 — Data Ingestion and Normalization Contract**
-- **Status:** IMPLEMENTED — CONTRACT FOUNDATION ONLY
-- **Implementation authorized:** YES
-- **Specification:** `docs/P02-T01_SPECIFICATION.md`
+- **P02-T02 — Provider-Neutral Ingestion Orchestration and Source Health Boundary**
+- **Status:** SPECIFICATION DRAFT — NOT IMPLEMENTED
+- **Implementation authorized:** NO
+- **Specification:** `docs/P02-T02_SPECIFICATION.md`
 
-Await review of the completed contract before starting later tasks.
+P02-T01 remains complete and is the required predecessor. The draft does not
+authorize provider connectivity, ingestion workers, persistence changes, or
+later P02 capabilities.
 
 ## Required secret names
 
@@ -125,4 +128,5 @@ secrets; names will be added only when a later task requires them.
 - **P01-T04:** DONE
 - **P01-T05:** DONE
 - **P02-T01:** DONE
-- **Next implementation action:** Await review; do not start later tasks without explicit approval
+- **P02-T02:** SPECIFICATION DRAFT ONLY; NOT AUTHORIZED
+- **Next implementation action:** Await review and explicit approval; do not implement
