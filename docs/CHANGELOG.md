@@ -13,7 +13,7 @@
 - **PHASE:** V1.1 — Architecture Baseline Revision
 - **TASK:** Documentation/governance revision after independent architectural review.
 - **CHANGE:** Added the explicit AI computation boundary; point-in-time feature snapshots; expanded contract/scam safety; BUY and SELL pre-flight; independent watchdog and Exit Monitor boundaries; correlated exposure; latency budgets; constrained read-only learning; execution-aware paper/shadow trading; decision-journal provenance and retention priorities; multi-dimensional readiness; and no-durable-edge governance.
-- **VERIFICATION:** Documentation-only revision. No implementation claims were added and P01-T04 remains HOLD / NOT STARTED.
+- **VERIFICATION:** Documentation-only revision. No implementation claims were added and P01-T05 remains ON HOLD / NOT STARTED pending explicit approval.
 - **COMMIT:** Not created in this workspace.
 
 ## 2026-08-10

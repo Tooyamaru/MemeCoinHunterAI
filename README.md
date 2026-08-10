@@ -15,7 +15,7 @@ Meme Coin Hunter AI is a future AI-driven crypto intelligence and trading system
 
 ## Current status
 
-P00 is complete. P01-T01 establishes the technical baseline and a minimal Python/FastAPI runtime with a health endpoint, typed configuration, logging, a database boundary, and targeted tests. No Solana, DEX, wallet, trading, AI/ML, paper-trading, or Railway functionality has been implemented.
+The project is in P01 — Application Foundation. P01-T04 — Application Service & Worker Foundation is the latest completed task. P01-T05 — Application Service & Worker Extensions has not started and is pending explicit approval; the project is ON HOLD. P01-T05 must not begin without explicit approval. No Solana, DEX, wallet, trading, AI/ML, paper-trading, or Railway functionality has been implemented.
 
 ## Architecture summary
 

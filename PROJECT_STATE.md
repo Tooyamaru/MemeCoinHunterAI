@@ -20,10 +20,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation
 - **In progress:** None
-- **Blocked:** None
-- **On hold:** None
+- **Blocked:** P01-T05 — pending explicit user approval
+- **On hold:** Project is ON HOLD pending explicit approval for P01-T05
 - **Not started:** P01-T05 application service and worker extensions and all later implementation phases
 
 ## Current objective
@@ -81,7 +81,7 @@ No market, AI, wallet, trading, or execution functionality was added.
 ## Do not read / out of scope
 
 - Do not scan the full repository.
-- Do not start P01-T05 without explicit user approval and review of the V1.1 architecture baseline.
+- P01-T05 must not begin without explicit approval and review of the V1.1 architecture baseline.
 - Do not implement Solana, DEX, wallet, AI/ML, signals, paper trading, execution, Railway, Redis, or a full dashboard before their planned phases.
 
 ## Known issues
@@ -110,4 +110,4 @@ secrets; names will be added only when a later task requires them.
 - **Baseline:** V1.1
 - **Implementation authorized by this revision:** P01-T04 only
 - **P01-T04:** DONE
-- **Next implementation action:** P01-T05 is gated pending user review and explicit approval
+- **Next implementation action:** P01-T05 must not begin without explicit approval and review of the V1.1 architecture baseline

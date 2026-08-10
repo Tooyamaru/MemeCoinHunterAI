@@ -2,6 +2,13 @@
 
 This document maps the system. It does not implement future phases.
 
+## Current implementation status
+
+The project is in P01 — Application Foundation. P01-T04 — Application Service &
+Worker Foundation is complete. P01-T05 — Application Service & Worker Extensions
+has not started. The project is ON HOLD, and P01-T05 must not begin without
+explicit approval.
+
 ## V1.1 architectural baseline
 
 V1.1 defines the intended system as a selective, explainable, risk-first crypto
