@@ -53,6 +53,7 @@ No market, AI, wallet, trading, or execution functionality was added.
 - `docs/TESTING_STRATEGY.md`
 - `docs/CHANGELOG.md`
 - `docs/P01-T05_SPECIFICATION.md`
+- `docs/P02-T01_SPECIFICATION.md`
 - `docs/TESTING_STRATEGY.md`
 - `scripts/replit_setup.sh`
 - `docs/TECHNICAL_BASELINE.md`
@@ -98,7 +99,14 @@ Wait for audit of the completed P01-T05 implementation.
 
 ## Next task
 
-No later task is authorized. Await audit.
+No later task is authorized. The next candidate is documented for review only:
+
+- **P02-T01 — Data Ingestion and Normalization Contract**
+- **Status:** SPECIFICATION DRAFT — NOT IMPLEMENTED
+- **Implementation authorized:** NO
+- **Specification:** `docs/P02-T01_SPECIFICATION.md`
+
+Await explicit architectural approval after review of the specification.
 
 ## Required secret names
 
