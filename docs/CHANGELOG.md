@@ -5,8 +5,8 @@
 - **PHASE:** P02 — Solana / DEX Data Intelligence
 - **TASK:** P02-T03 — Provider-Neutral Source Adapter Contract
 - **CHANGE:** Added the provider-neutral source adapter protocol, stable adapter identity and capability declarations, explicit lifecycle and adapter-health semantics, deterministic fake-adapter fixtures, and P02-T02-compatible event/failure observation production. No provider, database, trading, or external I/O behavior was added.
-- **VERIFICATION:** 43 focused P02-T01/P02-T02/P02-T03 tests, full regression, Python compilation, and diff checks passed.
-- **COMMIT:** To be created after final verification.
+- **VERIFICATION:** 45 focused P02-T01/P02-T02/P02-T03 tests, 72 full regression tests, Python compilation, and diff checks passed. Full regression reported one existing Starlette/httpx deprecation warning.
+- **COMMIT:** `26a56a9` — Implement P02-T03 provider-neutral adapter contract.
 
 ## 2026-08-10
 
