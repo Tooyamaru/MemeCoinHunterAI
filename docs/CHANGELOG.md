@@ -2,6 +2,14 @@
 
 ## 2026-08-10
 
+- **PHASE:** V1.1 — Architecture Baseline Revision
+- **TASK:** Documentation/governance revision after independent architectural review.
+- **CHANGE:** Added the explicit AI computation boundary; point-in-time feature snapshots; expanded contract/scam safety; BUY and SELL pre-flight; independent watchdog and Exit Monitor boundaries; correlated exposure; latency budgets; constrained read-only learning; execution-aware paper/shadow trading; decision-journal provenance and retention priorities; multi-dimensional readiness; and no-durable-edge governance.
+- **VERIFICATION:** Documentation-only revision. No implementation claims were added and P01-T04 remains HOLD / NOT STARTED.
+- **COMMIT:** Not created in this workspace.
+
+## 2026-08-10
+
 - **PHASE:** P00 — Project Governance & Architecture
 - **TASK:** P00-T01 — Project Governance Foundation
 - **CHANGE:** Added the continuation state, permanent Replit rules, master phase blueprint, logical architecture documents, security/testing principles, portable setup foundation, and future-ready empty directory structure.
