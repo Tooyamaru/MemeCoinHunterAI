@@ -6,11 +6,13 @@ from typing import AsyncIterator
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from backend.application.service import ApplicationService
 from backend.core.config import get_settings
 from backend.core.database import DatabaseRuntime
 from backend.core.logging import configure_logging, get_logger
 from backend.core.request_id import RequestIdMiddleware, get_request_id
 from backend.core.runtime import RuntimeMetadata, RuntimeState
+from backend.core.safety import SafetyBoundary
 
 settings = get_settings()
 configure_logging(settings)
@@ -27,8 +29,13 @@ def create_lifespan(app_settings):
         database = DatabaseRuntime(app_settings)
         await database.start()
         runtime = RuntimeState(metadata=RuntimeMetadata.from_settings(app_settings), ready=True)
+        safety = SafetyBoundary()
+        service = ApplicationService(runtime=runtime, database=database, safety=safety)
+        await service.initialize()
         application.state.runtime = runtime
         application.state.database = database
+        application.state.safety = safety
+        application.state.service = service
         logger.info(
             "application.startup",
             extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
@@ -37,6 +44,7 @@ def create_lifespan(app_settings):
             yield
         finally:
             runtime.ready = False
+            await service.shutdown()
             await database.dispose()
             logger.info(
                 "application.shutdown",

@@ -1,0 +1,1 @@
+"""Explicit worker boundaries; importing this package starts no work."""

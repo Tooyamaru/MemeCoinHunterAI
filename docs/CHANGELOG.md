@@ -2,6 +2,14 @@
 
 ## 2026-08-10
 
+- **PHASE:** P01 — Application Foundation
+- **TASK:** P01-T04 — Application Service & Worker Foundation
+- **CHANGE:** Added an HTTP-independent application-service boundary, explicit cancellation-safe worker lifecycle foundation, deterministic worker identity, request-context reuse, and fail-closed watchdog/kill-switch safety state. No concrete market, trading, or external-service workers were added.
+- **VERIFICATION:** Focused service/worker lifecycle and safety tests, foundation regression tests, Python compile/import checks, health/readiness verification, dependency consistency, secret hygiene, and diff-scope checks passed.
+- **COMMIT:** Not created in this workspace.
+
+## 2026-08-10
+
 - **PHASE:** V1.1 — Architecture Baseline Revision
 - **TASK:** Documentation/governance revision after independent architectural review.
 - **CHANGE:** Added the explicit AI computation boundary; point-in-time feature snapshots; expanded contract/scam safety; BUY and SELL pre-flight; independent watchdog and Exit Monitor boundaries; correlated exposure; latency budgets; constrained read-only learning; execution-aware paper/shadow trading; decision-journal provenance and retention priorities; multi-dimensional readiness; and no-durable-edge governance.

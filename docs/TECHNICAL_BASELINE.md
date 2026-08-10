@@ -12,7 +12,9 @@
 ## Application structure
 
 - `backend/api/` — HTTP application and routes
-- `backend/core/` — configuration, logging, and infrastructure boundaries shared by the API and future workers
+- `backend/core/` — configuration, logging, safety, and infrastructure boundaries shared by the API and future workers
+- `backend/application/` — HTTP-independent application-service orchestration and request context
+- `backend/workers/` — explicit, independently testable worker lifecycle foundation; no concrete market or trading workers
 - `core/` — future domain logic such as data, signals, opportunity, decision, risk, execution, and learning; currently empty
 - `apps/dashboard/` — future dashboard surface; the visual dashboard is deferred to a later P01 task
 - `workers/` — future process entrypoints; no workers are implemented yet
@@ -51,9 +53,18 @@ The application uses a lazy async SQLAlchemy boundary with PostgreSQL/asyncpg as
 
 Configuration is environment-based with safe development defaults. `.env` is ignored by Git; `.env.example` contains names and non-secret defaults only. Current names are `APP_ENV`, `APP_HOST`, `APP_PORT`, `APP_VERSION`, `DATABASE_URL`, and `LOG_LEVEL`. No wallet, Solana, DEX, or trading secret names are needed yet.
 
-## Workers and lifecycle
+## Application services, workers, and lifecycle
 
-Early development keeps one repository and a simple API process. Future independent processes can be added without moving domain ownership: scanner, market-data, signal, decision, risk, paper/execution, and learning workers. Each future process will have its own entrypoint and reuse the infrastructure boundaries rather than becoming a microservice prematurely.
+Early development keeps one repository and a simple API process. The
+HTTP-independent application service is initialized and shut down by the API
+lifecycle, while routes remain transport adapters. The worker foundation
+provides explicit start/stop, deterministic identity, cancellation-safe
+shutdown, structured lifecycle logging, and a fail-closed safety boundary.
+Importing worker modules starts no task, and no worker performs external I/O.
+Future independent processes can be added without moving domain ownership:
+scanner, market-data, signal, decision, risk, paper/execution, and learning
+workers. Each future process will reuse the infrastructure boundaries rather
+than becoming a microservice prematurely.
 
 ## Replit and future Railway compatibility
 
