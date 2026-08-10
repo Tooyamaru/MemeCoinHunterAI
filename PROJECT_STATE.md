@@ -7,8 +7,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** P01 — Application Foundation
-- **Current task:** P01-T05 — Application Service & Worker Extensions
+- **Current phase:** P02 — Solana / DEX Data Intelligence
+- **Current task:** P02-T01 — Data Ingestion and Normalization Contract
 - **Current task status:** DONE
 - **Last updated:** 2026-08-10
 
@@ -16,26 +16,29 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - P00: DONE; T01 done; T02 done
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
-- P02–P12: Not started
+- P02: T01 done
+- P03–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** All later implementation phases
+- **Not started:** P03–P12
 
 ## Current objective
 
-Maintain a portable, auditable application foundation with explicit service,
-worker lifecycle, and fail-closed safety boundaries before implementing any
-market, AI, wallet, trading, or production functionality.
+Maintain a portable, auditable data boundary with deterministic normalization,
+explicit provenance and freshness, and fail-closed quality states before
+implementing any safety, market, AI, wallet, trading, or production
+functionality.
 
 ## Last verified checkpoint
 
-P01-T05 application service and worker extensions verified on 2026-08-10.
-No market, AI, wallet, trading, or execution functionality was added.
+P02-T01 data ingestion and normalization contract verified on 2026-08-10.
+No provider integration, external I/O, migration, market strategy, AI, wallet,
+trading, or execution functionality was added.
 
 ## Relevant files for current task
 
@@ -88,25 +91,26 @@ No market, AI, wallet, trading, or execution functionality was added.
 
 ## Known issues
 
-- No known P01-T05 issues.
-- P01-T05 adds only explicit worker coordination, lifecycle inspection, failure
-  visibility, and fail-closed safety propagation; no external integrations,
-  database migrations, trading capabilities, commit, or push were added.
+- No known P02-T01 issues.
+- P02-T01 adds only provider-neutral contracts, deterministic validation and
+  normalization, explicit quality/freshness/order state, and source
+  failure/recovery tracking; no provider, external I/O, migration, trading
+  capability, commit, or push was added.
 
 ## Next action
 
-Wait for audit of the completed P01-T05 implementation.
+Wait for review of the completed P02-T01 implementation.
 
 ## Next task
 
 No later task is authorized. The next candidate is documented for review only:
 
 - **P02-T01 — Data Ingestion and Normalization Contract**
-- **Status:** SPECIFICATION DRAFT — NOT IMPLEMENTED
-- **Implementation authorized:** NO
+- **Status:** IMPLEMENTED — CONTRACT FOUNDATION ONLY
+- **Implementation authorized:** YES
 - **Specification:** `docs/P02-T01_SPECIFICATION.md`
 
-Await explicit architectural approval after review of the specification.
+Await review of the completed contract before starting later tasks.
 
 ## Required secret names
 
@@ -117,7 +121,8 @@ secrets; names will be added only when a later task requires them.
 
 - **Status:** DONE as a documentation/governance revision
 - **Baseline:** V1.1
-- **Implementation authorized by this revision:** P01-T04; P01-T05 was separately approved against its specification
+- **Implementation authorized by this revision:** P01-T04 and P01-T05; P02-T01 was separately approved against its specification
 - **P01-T04:** DONE
 - **P01-T05:** DONE
-- **Next implementation action:** Await audit; do not start later tasks without explicit approval
+- **P02-T01:** DONE
+- **Next implementation action:** Await review; do not start later tasks without explicit approval

@@ -2,6 +2,14 @@
 
 ## 2026-08-10
 
+- **PHASE:** P02 — Solana / DEX Data Intelligence
+- **TASK:** P02-T01 — Data Ingestion and Normalization Contract
+- **CHANGE:** Added provider-neutral raw-event and normalized-state contracts with explicit timestamps, freshness, quality, identity, duplicate, ordering, contradiction, source failure/recovery, and adapter boundaries. No provider, database, trading, or external I/O behavior was added.
+- **VERIFICATION:** 17 focused contract tests, 44 full regression tests, Python compilation, and diff checks passed.
+- **COMMIT:** Not created in this workspace.
+
+## 2026-08-10
+
 - **PHASE:** P01 — Application Foundation
 - **TASK:** P01-T05 — Application Service & Worker Extensions
 - **CHANGE:** Added explicit worker registration and unregistration, deterministic inspection and enumeration, coordinated lifecycle control, aggregate status, cancellation-safe shutdown, failure visibility, and fail-closed safety propagation while preserving import safety.

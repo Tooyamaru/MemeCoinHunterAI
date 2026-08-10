@@ -12,12 +12,13 @@
 
 ## 2. Current Status
 
-**STATUS: SPECIFICATION DRAFT — NOT IMPLEMENTED**
+**STATUS: IMPLEMENTED — CONTRACT FOUNDATION ONLY**
 
-**IMPLEMENTATION AUTHORIZED: NO**
+**IMPLEMENTATION AUTHORIZED: YES**
 
-This document defines a proposed implementation contract. It does not add
-runtime behavior, connect to a provider, or authorize P02 implementation.
+This document defines the approved implementation contract. The implementation
+adds deterministic local contract behavior only; it does not connect to a
+provider or authorize later P02 work.
 
 ## 3. Objective
 
