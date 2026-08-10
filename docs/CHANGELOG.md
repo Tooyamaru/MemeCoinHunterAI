@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026-08-09
+## 2026-08-10
 
 - **PHASE:** P00 — Project Governance & Architecture
 - **TASK:** P00-T01 — Project Governance Foundation
@@ -30,4 +30,12 @@
 - **TASK:** P01-T02 — Application Runtime & Configuration Foundation
 - **CHANGE:** Added FastAPI lifespan state, runtime metadata, `/ready`, request ID correlation, safe centralized internal errors, validated configuration levels, and truthful database states.
 - **VERIFICATION:** Targeted tests, Python compilation, `/health`, `/ready`, request ID behavior, safe error responses, startup/shutdown logging, dependency sync, setup-script syntax/repeatability, and secret-pattern checks passed.
+- **COMMIT:** Not created in this workspace.
+
+## 2026-08-09
+
+- **PHASE:** P01 — Application Foundation
+- **TASK:** P01-T03 — Database & Persistence Foundation
+- **CHANGE:** Added async SQLAlchemy persistence, truthful database runtime states, a system metadata model/repository, Alembic migration scaffolding, isolated SQLite test strategy, and database-aware readiness.
+- **VERIFICATION:** Targeted persistence tests, migration metadata checks, transaction commit/rollback, URL redaction, application health/readiness, dependency sync, setup repeatability, and secret-pattern checks passed.
 - **COMMIT:** Not created in this workspace.

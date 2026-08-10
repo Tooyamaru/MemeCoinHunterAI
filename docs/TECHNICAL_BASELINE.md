@@ -38,14 +38,14 @@ uv run uvicorn backend.api.main:app --host "${APP_HOST:-0.0.0.0}" --port "${PORT
 ```
 
 - `/health` reports process status and runtime metadata only. It does not fake checks for databases, blockchains, wallets, or other services that are not implemented.
-- `/ready` reports whether the internal application lifecycle is ready. It currently checks only the process lifecycle and is designed to gain truthful dependency checks later.
+- `/ready` reports whether the internal application lifecycle and configured dependencies are ready. An unconfigured optional database is reported as `not_configured` while development remains ready; a configured but unavailable database returns HTTP 503.
 - Every HTTP response includes an `X-Request-ID`; incoming IDs are preserved when they are short enough, otherwise a new ID is generated.
 - Unexpected API errors return a safe JSON error with the request ID while details are logged server-side.
 - Replit may inject `DATABASE_URL` into the environment. Tests explicitly override it so test behavior never depends on ambient workspace configuration.
 
 ## Database strategy
 
-The application uses an explicit database configuration boundary and does not open a connection or create trading tables in P01-T01. PostgreSQL is the planned shared development and production database. A later task will select the PostgreSQL driver/ORM, migration workflow, connection/session lifecycle, and isolated test database strategy. SQLite is not the permanent architecture.
+The application uses a lazy async SQLAlchemy boundary with PostgreSQL/asyncpg as the target. No connection is opened unless `DATABASE_URL` is configured. Alembic owns schema evolution, and only the infrastructure-level `system_metadata` table exists so far. SQLite is used only for isolated tests.
 
 ## Configuration and secrets
 

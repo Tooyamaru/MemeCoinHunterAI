@@ -1,11 +1,23 @@
-from fastapi import FastAPI
+import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from backend.api.main import app, create_app
 from backend.core.config import Settings
-from backend.core.database import DatabaseState, get_database_config
+from backend.core.database import (
+    DatabaseRuntime,
+    DatabaseState,
+    get_database_config,
+    redact_database_url,
+)
 from backend.core.logging import configure_logging
+from backend.core.models import Base, SystemMetadata
+from backend.core.repositories import SystemMetadataRepository
 from backend.core.runtime import SERVICE_NAME
+
+TEST_SETTINGS = Settings(_env_file=None, app_env="test", database_url=None)
+foundation_app = create_app(TEST_SETTINGS)
 
 
 def test_application_imports() -> None:
@@ -13,7 +25,7 @@ def test_application_imports() -> None:
 
 
 def test_health_returns_process_status() -> None:
-    with TestClient(app) as client:
+    with TestClient(foundation_app) as client:
         response = client.get("/health")
 
     assert response.status_code == 200
@@ -22,16 +34,17 @@ def test_health_returns_process_status() -> None:
 
 
 def test_ready_reports_internal_runtime_readiness() -> None:
-    with TestClient(app) as client:
+    with TestClient(foundation_app) as client:
         response = client.get("/ready")
 
     assert response.status_code == 200
     assert response.json()["status"] == "ready"
     assert response.json()["checks"]["application"] == "ok"
+    assert response.json()["checks"]["database"] == "not_configured"
 
 
 def test_request_id_is_generated_and_preserved() -> None:
-    with TestClient(app) as client:
+    with TestClient(foundation_app) as client:
         generated = client.get("/health")
         supplied = client.get("/health", headers={"X-Request-ID": "request-123"})
 
@@ -84,14 +97,102 @@ def test_database_boundary_reports_configured_without_claiming_connection() -> N
     assert database.is_connected is False
 
 
-def test_internal_errors_return_safe_json_without_traceback() -> None:
-    test_app = create_app()
+def test_database_url_redaction_hides_credentials() -> None:
+    redacted = redact_database_url("postgresql+asyncpg://user:secret@db.example/app")
 
-    @test_app.get("/test-error")
+    assert redacted == "postgresql+asyncpg://user:***@db.example/app"
+    assert "secret" not in redacted
+
+
+def test_postgres_url_is_normalized_for_asyncpg() -> None:
+    from backend.core.database import async_database_url
+
+    normalized = async_database_url(
+        "postgresql://user:secret@db.example/app?sslmode=disable"
+    )
+
+    assert normalized == "postgresql+asyncpg://user:secret@db.example/app"
+
+
+@pytest_asyncio.fixture
+async def sqlite_runtime(tmp_path):
+    database_file = tmp_path / "test.db"
+    settings = Settings(
+        _env_file=None,
+        app_env="test",
+        database_url=f"sqlite+aiosqlite:///{database_file}",
+    )
+    runtime = DatabaseRuntime(settings)
+    await runtime.start()
+    assert runtime.state is DatabaseState.CONNECTED
+    assert runtime.engine is not None
+    async with runtime.engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+    try:
+        yield runtime
+    finally:
+        await runtime.dispose()
+
+
+@pytest.mark.asyncio
+async def test_engine_session_repository_commit_and_persistence(sqlite_runtime: DatabaseRuntime) -> None:
+    repository = SystemMetadataRepository()
+
+    async with sqlite_runtime.session_scope() as session:
+        await repository.set(session, "schema_version", "0001")
+
+    async with sqlite_runtime.session_scope() as session:
+        record = await repository.get(session, "schema_version")
+
+    assert record is not None
+    assert record.value == "0001"
+
+
+@pytest.mark.asyncio
+async def test_transaction_rolls_back_on_error(sqlite_runtime: DatabaseRuntime) -> None:
+    repository = SystemMetadataRepository()
+
+    with pytest.raises(RuntimeError, match="rollback"):
+        async with sqlite_runtime.session_scope() as session:
+            await repository.set(session, "temporary", "value")
+            raise RuntimeError("rollback")
+
+    async with sqlite_runtime.session_scope() as session:
+        result = await session.execute(select(SystemMetadata).where(SystemMetadata.key == "temporary"))
+
+    assert result.scalar_one_or_none() is None
+
+
+def test_migration_metadata_exists() -> None:
+    assert "system_metadata" in Base.metadata.tables
+    assert "tokens" not in Base.metadata.tables
+    assert "trades" not in Base.metadata.tables
+
+
+def test_configured_unavailable_database_is_not_ready() -> None:
+    test_settings = Settings(
+        _env_file=None,
+        app_env="test",
+        database_url="postgresql+asyncpg://invalid:invalid@127.0.0.1:1/not_available",
+    )
+    unavailable_app = create_app(test_settings)
+
+    with TestClient(unavailable_app) as client:
+        response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json()["status"] == "not_ready"
+    assert response.json()["checks"]["database"] == "unavailable"
+
+
+def test_internal_errors_return_safe_json_without_traceback() -> None:
+    error_app = create_app(TEST_SETTINGS)
+
+    @error_app.get("/test-error")
     def raise_error() -> None:
         raise RuntimeError("secret internal detail")
 
-    with TestClient(test_app, raise_server_exceptions=False) as client:
+    with TestClient(error_app, raise_server_exceptions=False) as client:
         response = client.get("/test-error")
 
     assert response.status_code == 500

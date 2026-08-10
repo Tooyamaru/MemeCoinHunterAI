@@ -33,4 +33,4 @@ mkdir -p apps/dashboard backend/api workers \
 
 printf 'Meme Coin Hunter AI foundation is ready.\n'
 printf 'Read REPLIT_RULES.md, then PROJECT_STATE.md before continuing.\n'
-printf 'No secrets, credentials, dependencies, or future trading services were configured.\n'
+printf 'No database was created or migrated; configure DATABASE_URL before deliberate migration commands.\n'

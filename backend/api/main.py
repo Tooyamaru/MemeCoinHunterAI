@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from backend.core.config import get_settings
+from backend.core.database import DatabaseRuntime
 from backend.core.logging import configure_logging, get_logger
 from backend.core.request_id import RequestIdMiddleware, get_request_id
 from backend.core.runtime import RuntimeMetadata, RuntimeState
@@ -16,34 +17,44 @@ configure_logging(settings)
 logger = get_logger()
 
 
-@asynccontextmanager
-async def lifespan(application: FastAPI) -> AsyncIterator[None]:
-    """Start and stop only internal application runtime state."""
+def create_lifespan(app_settings):
+    """Create a lifecycle manager bound to explicit application settings."""
 
-    runtime = RuntimeState(metadata=RuntimeMetadata.from_settings(settings), ready=True)
-    application.state.runtime = runtime
-    logger.info(
-        "application.startup",
-        extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
-    )
-    try:
-        yield
-    finally:
-        runtime.ready = False
+    @asynccontextmanager
+    async def lifespan(application: FastAPI) -> AsyncIterator[None]:
+        """Start and stop only internal application and database state."""
+
+        database = DatabaseRuntime(app_settings)
+        await database.start()
+        runtime = RuntimeState(metadata=RuntimeMetadata.from_settings(app_settings), ready=True)
+        application.state.runtime = runtime
+        application.state.database = database
         logger.info(
-            "application.shutdown",
+            "application.startup",
             extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
         )
+        try:
+            yield
+        finally:
+            runtime.ready = False
+            await database.dispose()
+            logger.info(
+                "application.shutdown",
+                extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
+            )
+
+    return lifespan
 
 
-def create_app() -> FastAPI:
+def create_app(app_settings=None) -> FastAPI:
     """Build the API application with its runtime-only foundation."""
 
+    active_settings = app_settings or settings
     application = FastAPI(
         title="Meme Coin Hunter AI",
-        version=settings.app_version,
+        version=active_settings.app_version,
         description="Application foundation only; market and trading features are not enabled.",
-        lifespan=lifespan,
+        lifespan=create_lifespan(active_settings),
     )
     application.add_middleware(RequestIdMiddleware)
 
@@ -81,11 +92,19 @@ def create_app() -> FastAPI:
         """Report only the internal application readiness that actually exists."""
 
         runtime: RuntimeState = application.state.runtime
-        return {
-            "status": "ready" if runtime.ready else "not_ready",
+        database: DatabaseRuntime = application.state.database
+        is_ready = runtime.ready and database.is_ready
+        response = {
+            "status": "ready" if is_ready else "not_ready",
             "service": runtime.metadata.service,
-            "checks": {"application": "ok" if runtime.ready else "not_ready"},
+            "checks": {
+                "application": "ok" if runtime.ready else "not_ready",
+                "database": database.state.value.lower(),
+            },
         }
+        if not is_ready:
+            return JSONResponse(status_code=503, content=response)
+        return response
 
     return application
 
