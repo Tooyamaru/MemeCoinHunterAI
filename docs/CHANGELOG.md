@@ -3,6 +3,14 @@
 ## 2026-08-10
 
 - **PHASE:** P01 — Application Foundation
+- **TASK:** P01-T05 — Application Service & Worker Extensions
+- **CHANGE:** Added explicit worker registration and unregistration, deterministic inspection and enumeration, coordinated lifecycle control, aggregate status, cancellation-safe shutdown, failure visibility, and fail-closed safety propagation while preserving import safety.
+- **VERIFICATION:** 27 focused P01-T04/P01-T05 and foundation tests passed; Python compilation and diff checks passed. No external I/O, domain, trading, AI, database, or dependency functionality was added.
+- **COMMIT:** Not created in this workspace.
+
+## 2026-08-10
+
+- **PHASE:** P01 — Application Foundation
 - **TASK:** P01-T04 — Application Service & Worker Foundation
 - **CHANGE:** Added an HTTP-independent application-service boundary, explicit cancellation-safe worker lifecycle foundation, deterministic worker identity, request-context reuse, and fail-closed watchdog/kill-switch safety state. No concrete market, trading, or external-service workers were added.
 - **VERIFICATION:** Focused service/worker lifecycle and safety tests, foundation regression tests, Python compile/import checks, health/readiness verification, dependency consistency, secret hygiene, and diff-scope checks passed.
@@ -13,7 +21,7 @@
 - **PHASE:** V1.1 — Architecture Baseline Revision
 - **TASK:** Documentation/governance revision after independent architectural review.
 - **CHANGE:** Added the explicit AI computation boundary; point-in-time feature snapshots; expanded contract/scam safety; BUY and SELL pre-flight; independent watchdog and Exit Monitor boundaries; correlated exposure; latency budgets; constrained read-only learning; execution-aware paper/shadow trading; decision-journal provenance and retention priorities; multi-dimensional readiness; and no-durable-edge governance.
-- **VERIFICATION:** Documentation-only revision. No implementation claims were added and P01-T05 remains ON HOLD / NOT STARTED pending explicit approval.
+- **VERIFICATION:** Documentation-only revision. At the time of this revision, P01-T05 implementation authorization remained pending.
 - **COMMIT:** Not created in this workspace.
 
 ## 2026-08-10

@@ -137,9 +137,8 @@ Journal
 
 The Decision Engine must never hold unrestricted fund control, own private
 keys, sign, broadcast, or call a venue directly. The Risk Governor has higher
-authority and can ALLOW, REDUCE, BLOCK, or EMERGENCY STOP. P01-T05 and all
-future services remain gated until explicitly authorized. P01-T05 must not begin
-without explicit approval.
+authority and can ALLOW, REDUCE, BLOCK, or EMERGENCY STOP. P01-T05 preserves
+these boundaries. Later services remain gated until explicitly authorized.
 
 ## Future portability
 

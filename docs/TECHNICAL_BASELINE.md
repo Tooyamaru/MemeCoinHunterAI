@@ -17,7 +17,7 @@
 - `backend/workers/` — explicit, independently testable worker lifecycle foundation; no concrete market or trading workers
 - `core/` — future domain logic such as data, signals, opportunity, decision, risk, execution, and learning; currently empty
 - `apps/dashboard/` — future dashboard surface; the visual dashboard is deferred to a later P01 task
-- `workers/` — future process entrypoints; no workers are implemented yet
+- `workers/` — future process entrypoints; no domain-specific workers are implemented yet
 - `database/` — future migrations and database assets
 - `tests/` — targeted foundation and future domain tests
 - `scripts/` — setup and maintenance scripts

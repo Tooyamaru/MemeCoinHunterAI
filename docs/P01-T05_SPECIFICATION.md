@@ -1,7 +1,7 @@
 # P01-T05 — Application Service & Worker Extensions
 
-**Status:** NOT STARTED  
-**Approval state:** Specification requires review and explicit approval before implementation  
+**Status:** DONE
+**Approval state:** Explicitly approved and implemented according to this contract
 **Phase:** P01 — Application Foundation  
 **Predecessor:** P01-T04 — Application Service & Worker Foundation
 
@@ -118,8 +118,8 @@ speculative files or abstractions should be created.
 
 ## Governance
 
-P01-T05 remains NOT STARTED until this specification is reviewed and explicitly
-approved as the implementation contract.
+P01-T05 implementation is complete and was performed only after this
+specification was explicitly approved as the implementation contract.
 
 **P01-T05 implementation must follow this specification and must not expand
 beyond its approved scope without explicit architectural approval.**

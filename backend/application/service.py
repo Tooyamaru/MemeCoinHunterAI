@@ -7,6 +7,11 @@ from backend.core.logging import get_logger
 from backend.core.request_id import get_request_id
 from backend.core.runtime import RuntimeState
 from backend.core.safety import SafetyBoundary, SafetyStatus
+from backend.workers.runtime import (
+    BaseWorker,
+    WorkerCoordinator,
+    WorkerCoordinatorStatus,
+)
 
 logger = get_logger()
 
@@ -34,6 +39,7 @@ class ServiceStatus:
     application_ready: bool
     database_ready: bool
     safety: SafetyStatus
+    workers: WorkerCoordinatorStatus
 
     @property
     def ready(self) -> bool:
@@ -53,6 +59,7 @@ class ApplicationService:
         self.runtime = runtime
         self.database = database
         self.safety = safety or SafetyBoundary()
+        self.workers = WorkerCoordinator(safety=self.safety)
         self.initialized = False
 
     async def initialize(self) -> None:
@@ -70,8 +77,29 @@ class ApplicationService:
     async def shutdown(self) -> None:
         """Close the service boundary deterministically."""
 
+        await self.workers.shutdown()
         self.initialized = False
         logger.info("service.shutdown", extra={"service": self.runtime.metadata.service})
+
+    def register_worker(self, worker: BaseWorker) -> None:
+        """Register a worker without starting it."""
+
+        self.workers.register(worker)
+
+    def unregister_worker(self, name: str) -> BaseWorker:
+        """Unregister a worker after it has been stopped."""
+
+        return self.workers.unregister(name)
+
+    async def start_workers(self) -> WorkerCoordinatorStatus:
+        """Start registered workers through the coordination boundary."""
+
+        return await self.workers.start_all()
+
+    async def stop_workers(self) -> WorkerCoordinatorStatus:
+        """Stop registered workers through the coordination boundary."""
+
+        return await self.workers.stop_all()
 
     def status(self, context: ServiceRequestContext | None = None) -> ServiceStatus:
         """Return application state without requiring an HTTP request."""
@@ -84,4 +112,5 @@ class ApplicationService:
             application_ready=self.runtime.ready,
             database_ready=self.database.is_ready,
             safety=self.safety.status(),
+            workers=self.workers.status(),
         )
