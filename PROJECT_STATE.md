@@ -52,6 +52,7 @@ No market, AI, wallet, trading, or execution functionality was added.
 - `docs/SECURITY.md`
 - `docs/TESTING_STRATEGY.md`
 - `docs/CHANGELOG.md`
+- `docs/P01-T05_SPECIFICATION.md`
 - `docs/TESTING_STRATEGY.md`
 - `scripts/replit_setup.sh`
 - `docs/TECHNICAL_BASELINE.md`
@@ -98,6 +99,7 @@ Wait for user review and explicit approval before beginning P01-T05.
 ## Next task
 
 P01-T05 — Application Service & Worker Extensions (NOT STARTED)
+Specification: `docs/P01-T05_SPECIFICATION.md`
 
 ## Required secret names
 
@@ -110,4 +112,4 @@ secrets; names will be added only when a later task requires them.
 - **Baseline:** V1.1
 - **Implementation authorized by this revision:** P01-T04 only
 - **P01-T04:** DONE
-- **Next implementation action:** P01-T05 must not begin without explicit approval and review of the V1.1 architecture baseline
+- **Next implementation action:** P01-T05 must not begin without explicit approval, review of the V1.1 architecture baseline, and approval of `docs/P01-T05_SPECIFICATION.md`
