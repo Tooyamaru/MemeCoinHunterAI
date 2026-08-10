@@ -3,6 +3,14 @@
 ## 2026-08-10
 
 - **PHASE:** P02 — Solana / DEX Data Intelligence
+- **TASK:** P02-T02 — Provider-Neutral Ingestion Orchestration and Source Health Boundary
+- **CHANGE:** Added provider-neutral adapter observation and ingestion-result envelopes, deterministic orchestration over the P02-T01 contracts, explicit quality and publication outcomes, source failure/recovery handling, cursor resynchronization semantics, replay-safe context, and observability-preserving local fixtures. No provider, database, trading, or external I/O behavior was added.
+- **VERIFICATION:** 34 focused P02-T01/P02-T02 tests, 61 full regression tests, Python compilation, and diff checks passed. Full regression reported one existing Starlette/httpx deprecation warning.
+- **COMMIT:** Not created in this workspace.
+
+## 2026-08-10
+
+- **PHASE:** P02 — Solana / DEX Data Intelligence
 - **TASK:** P02-T01 — Data Ingestion and Normalization Contract
 - **CHANGE:** Added provider-neutral raw-event and normalized-state contracts with explicit timestamps, freshness, quality, identity, duplicate, ordering, contradiction, source failure/recovery, and adapter boundaries. No provider, database, trading, or external I/O behavior was added.
 - **VERIFICATION:** 17 focused contract tests, 44 full regression tests, Python compilation, and diff checks passed.

@@ -15,6 +15,16 @@ from core.data.contracts import (
     normalize_raw_event,
     validate_raw_event,
 )
+from core.data.orchestration import (
+    AdapterObservation,
+    CursorContinuity,
+    IngestionContext,
+    IngestionOrchestrator,
+    IngestionOutcome,
+    IngestionPublisher,
+    IngestionResult,
+    ObservationKind,
+)
 
 __all__ = [
     "DataQuality",
@@ -30,4 +40,12 @@ __all__ = [
     "canonical_identity",
     "normalize_raw_event",
     "validate_raw_event",
+    "AdapterObservation",
+    "CursorContinuity",
+    "IngestionContext",
+    "IngestionOrchestrator",
+    "IngestionOutcome",
+    "IngestionPublisher",
+    "IngestionResult",
+    "ObservationKind",
 ]

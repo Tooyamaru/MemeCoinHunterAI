@@ -8,7 +8,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P02 — Solana / DEX Data Intelligence
-- **Current task:** P02-T01 — Data Ingestion and Normalization Contract
+- **Current task:** P02-T02 — Provider-Neutral Ingestion Orchestration and Source Health Boundary
 - **Current task status:** DONE
 - **Last updated:** 2026-08-10
 
@@ -16,12 +16,12 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - P00: DONE; T01 done; T02 done
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
-- P02: T01 done
+- P02: T01 done; T02 done
 - P03–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
@@ -36,7 +36,8 @@ functionality.
 
 ## Last verified checkpoint
 
-P02-T01 data ingestion and normalization contract verified on 2026-08-10.
+P02-T02 provider-neutral ingestion orchestration and source health boundary
+verified on 2026-08-10.
 No provider integration, external I/O, migration, market strategy, AI, wallet,
 trading, or execution functionality was added.
 
@@ -91,29 +92,22 @@ trading, or execution functionality was added.
 
 ## Known issues
 
-- No known P02-T01 issues.
-- P02-T01 adds only provider-neutral contracts, deterministic validation and
-  normalization, explicit quality/freshness/order state, and source
-  failure/recovery tracking; no provider, external I/O, migration, trading
-  capability, commit, or push was added.
+- No known P02-T02 issues.
+- P02-T02 adds only provider-neutral observation envelopes, deterministic
+  orchestration, explicit accepted/rejected outcomes, source health/recovery,
+  resynchronization, publication, and local tests; no provider, external I/O,
+  migration, trading capability, commit, or push was added.
 
 ## Next action
 
-Review the proposed P02-T02 specification. Do not implement it until explicit
-approval is recorded and a concrete implementation task is opened.
+Await review of the completed P02-T02 implementation. Do not start a later task
+without a separately approved specification and concrete implementation task.
 
 ## Next task
 
-The next candidate is documented for review only:
-
-- **P02-T02 — Provider-Neutral Ingestion Orchestration and Source Health Boundary**
-- **Status:** SPECIFICATION DRAFT — NOT IMPLEMENTED
-- **Implementation authorized:** NO
-- **Specification:** `docs/P02-T02_SPECIFICATION.md`
-
-P02-T01 remains complete and is the required predecessor. The draft does not
-authorize provider connectivity, ingestion workers, persistence changes, or
-later P02 capabilities.
+No later task is authorized. P02-T02 is complete; later provider connectivity,
+ingestion transports, persistence changes, and other P02 capabilities require
+separate specifications and approval.
 
 ## Required secret names
 
@@ -128,5 +122,5 @@ secrets; names will be added only when a later task requires them.
 - **P01-T04:** DONE
 - **P01-T05:** DONE
 - **P02-T01:** DONE
-- **P02-T02:** SPECIFICATION DRAFT ONLY; NOT AUTHORIZED
-- **Next implementation action:** Await review and explicit approval; do not implement
+- **P02-T02:** DONE
+- **Next implementation action:** Await review; do not start later tasks without explicit approval
