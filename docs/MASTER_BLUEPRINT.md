@@ -6,13 +6,14 @@ This document maps the system. It does not implement future phases.
 
 The project is in P02 — Solana / DEX Data Intelligence. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
-Extensions are complete. P02-T01 through P02-T05 are implemented and verified.
-P02-T05 is the deterministic discovery-to-orchestration integration boundary:
-it validates accepted P02-T04 output, preserves provenance and classification,
-and delegates to the existing P02-T02 orchestration input/publication contract.
-No provider, network, persistence, AI, wallet, trading, or execution
-integration was introduced. P02-T06 and P03 remain not started and
-unauthorized. Later tasks remain gated until explicitly authorized.
+Extensions are complete. P02-T01 through P02-T06 are implemented and verified.
+P02-T06 is the deterministic provider-neutral token-universe
+state/materialization boundary: it consumes accepted P02-T04/P02-T05 discovery
+results, preserves provenance and currentness, and produces a local
+read-oriented current view with fail-closed rejection semantics. No provider,
+network, persistence, AI, wallet, trading, or execution integration was
+introduced. P02-T07 and P03 remain not started and unauthorized. Later tasks
+remain gated until explicitly authorized.
 
 ## V1.1 architectural baseline
 
@@ -151,6 +152,16 @@ STOP, PAUSE, or change market.
 - **Exit criteria:** Reproducible normalized market state with freshness and recovery evidence.
 - **Major risks:** Provider outages, stale/duplicated data, incomplete coverage, rate limits.
 - **Deliverables:** Data adapters, normalized events/state, health and recovery controls.
+
+#### P02 implementation sequence
+
+- **P02-T01:** Provider-neutral data ingestion and normalization contract — DONE
+- **P02-T02:** Provider-neutral ingestion orchestration and source health boundary — DONE
+- **P02-T03:** Provider-neutral source adapter contract — DONE
+- **P02-T04:** Provider-neutral token universe / discovery contract — DONE
+- **P02-T05:** Discovery-to-orchestration integration boundary — DONE
+- **P02-T06:** Provider-neutral token-universe state / materialization boundary — DONE
+- **P02-T07 and later:** NOT STARTED / NOT AUTHORIZED
 
 ### P03 — TOKEN SAFETY & RISK INTELLIGENCE
 - **Objective:** Reject dangerous or untradable tokens before expensive analysis.

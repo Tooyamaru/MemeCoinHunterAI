@@ -56,6 +56,15 @@ from core.data.discovery_orchestration import (
     DiscoveryOrchestrationResult,
     DiscoveryToOrchestrationBoundary,
 )
+from core.data.materialization import (
+    MaterializationContext,
+    MaterializationOutcome,
+    MaterializationResult,
+    TokenUniverseEntry,
+    TokenUniverseKey,
+    TokenUniverseMaterializer,
+    TokenUniverseState,
+)
 
 __all__ = [
     "DataQuality",
@@ -104,4 +113,11 @@ __all__ = [
     "DiscoveryOrchestrationOutcome",
     "DiscoveryOrchestrationResult",
     "DiscoveryToOrchestrationBoundary",
+    "MaterializationContext",
+    "MaterializationOutcome",
+    "MaterializationResult",
+    "TokenUniverseEntry",
+    "TokenUniverseKey",
+    "TokenUniverseMaterializer",
+    "TokenUniverseState",
 ]
