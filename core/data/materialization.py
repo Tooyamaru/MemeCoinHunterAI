@@ -493,9 +493,6 @@ def _validate_record(record: TokenDiscoveryRecord, result: DiscoveryResult) -> t
     if _aware(provenance.discovery_time) and _aware(provenance.received_time):
         if provenance.discovery_time > provenance.received_time:
             errors.append("provenance discovery_time must not be later than received_time")
-    if _aware(provenance.received_time) and _aware(provenance.observation_time):
-        if provenance.received_time > provenance.observation_time:
-            errors.append("provenance received_time must not be later than observation_time")
     if _aware(provenance.discovery_time) and provenance.discovery_time > result.reference_time:
         errors.append("provenance discovery_time must not be later than reference_time")
     if not _valid_sequence(provenance.sequence):

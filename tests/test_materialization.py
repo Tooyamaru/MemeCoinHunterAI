@@ -44,15 +44,17 @@ def discovery(
     kind: DiscoveryKind = DiscoveryKind.DISCOVERED,
     metadata: dict[str, str] | None = None,
     discovery_time: datetime = EVENT_TIME,
+    observation_time: datetime = OBSERVED_TIME,
+    received_time: datetime = RECEIVED_TIME,
 ):
     item = DiscoveryObservation(
         source_id="fixture-source",
         kind=kind,
         token_identity=token_identity,
         chain_id="solana",
-        observation_time=OBSERVED_TIME,
+        observation_time=observation_time,
         discovery_time=discovery_time,
-        received_time=RECEIVED_TIME,
+        received_time=received_time,
         source_event_id=source_event_id,
         sequence=sequence,
         discovery_reason="P02_T06_FIXTURE",
@@ -96,6 +98,39 @@ def test_discovered_result_creates_current_entry_with_provenance() -> None:
     assert result.entry.provenance.source_event_id == "event-1"
     assert result.entry.discovery_contract_version == "p02-t04-test"
     assert result.materializer_contract_version == "p02-t06-test"
+
+
+def test_observation_before_receipt_is_materialized_as_current() -> None:
+    source = discovery(
+        discovery_boundary(),
+        source_event_id="observed-before-received",
+        observation_time=EVENT_TIME,
+        received_time=RECEIVED_TIME,
+    )
+
+    result = process(materializer(), source)
+
+    assert result.outcome is MaterializationOutcome.MATERIALIZED
+    assert result.current_view_present is True
+    assert result.current_view_changed is True
+    assert result.entry is not None
+    assert result.entry.provenance.observation_time == EVENT_TIME
+    assert result.entry.provenance.received_time == RECEIVED_TIME
+
+
+def test_discovery_after_receipt_remains_rejected() -> None:
+    source = discovery(
+        discovery_boundary(),
+        source_event_id="discovery-after-received",
+        discovery_time=RECEIVED_TIME + timedelta(seconds=1),
+        received_time=RECEIVED_TIME,
+    )
+
+    result = process(materializer(), source)
+
+    assert result.outcome is MaterializationOutcome.INVALID
+    assert result.current_view_changed is False
+    assert result.current_view == ()
 
 
 def test_metadata_update_replaces_only_discovery_derived_entry() -> None:
