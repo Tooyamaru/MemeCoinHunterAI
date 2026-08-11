@@ -41,6 +41,7 @@ def discovery(
     discovery_time: datetime = DISCOVERY_TIME,
     continuity: CursorContinuity = CursorContinuity.NOT_PROVIDED,
     metadata: Any = {"symbol": "MINT"},
+    received_time: datetime | None = None,
 ) -> DiscoveryObservation:
     return DiscoveryObservation(
         source_id=source_id,
@@ -49,6 +50,7 @@ def discovery(
         chain_id=chain_id,
         observation_time=DISCOVERY_TIME,
         discovery_time=discovery_time,
+        received_time=received_time,
         source_event_id=source_event_id,
         sequence=sequence,
         cursor_continuity=continuity,
@@ -194,6 +196,253 @@ def test_cursor_discontinuity_requires_explicit_resynchronization() -> None:
     assert resynced.resynchronization_required is False
 
 
+def test_rejected_resync_does_not_change_ordering_state() -> None:
+    runner = boundary()
+    process(runner, discovery(sequence=7, source_event_id="event-7"))
+
+    rejected = process(
+        runner,
+        discovery(
+            kind=DiscoveryKind.RESYNC,
+            sequence=2,
+            source_event_id="resync-stale",
+            continuity=CursorContinuity.CONTINUOUS,
+            discovery_time=SOURCE_TIME - timedelta(minutes=2),
+        ),
+    )
+
+    assert rejected.outcome is DiscoveryOutcome.STALE
+    assert runner.context.last_sequence_by_source == {"fixture-source": 7}
+    subsequent = process(
+        runner,
+        discovery(sequence=6, source_event_id="event-6"),
+    )
+    assert subsequent.outcome is DiscoveryOutcome.OUT_OF_ORDER
+
+
+def test_malformed_and_contradictory_resync_do_not_change_ordering_state() -> None:
+    runner = boundary()
+    process(runner, discovery(sequence=7, source_event_id="event-7"))
+
+    malformed = process(
+        runner,
+        discovery(
+            kind=DiscoveryKind.RESYNC,
+            sequence=2,
+            source_event_id="resync-malformed",
+            continuity=CursorContinuity.DISCONTINUOUS,
+            metadata={"unsupported": object()},
+        ),
+    )
+    assert malformed.outcome is DiscoveryOutcome.INVALID
+    assert runner.context.last_sequence_by_source == {"fixture-source": 7}
+
+    process(
+        runner,
+        discovery(
+            kind=DiscoveryKind.RESYNC,
+            sequence=8,
+            source_event_id="resync-known",
+            continuity=CursorContinuity.CONTINUOUS,
+        ),
+    )
+    contradictory = process(
+        runner,
+        discovery(
+            kind=DiscoveryKind.RESYNC,
+            token="mint-contradiction",
+            sequence=9,
+            source_event_id="resync-known",
+            continuity=CursorContinuity.CONTINUOUS,
+        ),
+    )
+
+    assert contradictory.outcome is DiscoveryOutcome.CONTRADICTORY
+    assert runner.context.last_sequence_by_source == {"fixture-source": 8}
+
+
+def test_accepted_resync_changes_ordering_state_only_after_acceptance() -> None:
+    runner = boundary()
+    process(runner, discovery(sequence=7, source_event_id="event-7"))
+
+    accepted = process(
+        runner,
+        discovery(
+            kind=DiscoveryKind.RESYNC,
+            sequence=2,
+            source_event_id="resync-accepted",
+            continuity=CursorContinuity.CONTINUOUS,
+        ),
+    )
+
+    assert accepted.outcome is DiscoveryOutcome.ACCEPTED
+    assert runner.context.last_sequence_by_source == {"fixture-source": 2}
+    assert process(
+        runner,
+        discovery(sequence=3, source_event_id="event-3"),
+    ).outcome is DiscoveryOutcome.ACCEPTED
+
+
+def test_raw_and_adapter_provenance_are_preserved_and_stable() -> None:
+    raw_event = RawEvent(
+        source_id="fixture-source",
+        source_event_id="event-provenance",
+        payload={
+            "token_identity": "mint-provenance",
+            "chain_id": "solana",
+            "discovery_kind": DiscoveryKind.DISCOVERED.value,
+            "discovery_reason": "PROVENANCE_FIXTURE",
+            "metadata": {"symbol": "PRV"},
+        },
+        event_time=SOURCE_TIME,
+        received_time=DISCOVERY_TIME,
+        sequence=11,
+        source_metadata={"raw_layer": "raw"},
+    )
+    observation = AdapterObservation(
+        source_id="fixture-source",
+        kind=ObservationKind.EVENT,
+        observed_time=DISCOVERY_TIME,
+        raw_event=raw_event,
+        cursor=11,
+        source_metadata={"adapter_layer": "adapter"},
+    )
+
+    left = process(boundary(), observation)
+    right = process(boundary(), observation)
+
+    assert left == right
+    assert left.record is not None
+    assert left.record.provenance.source_id == raw_event.source_id
+    assert left.record.provenance.discovery_time == raw_event.event_time
+    assert left.record.provenance.received_time == raw_event.received_time
+    assert left.record.provenance.source_metadata == {
+        "raw_event": {"raw_layer": "raw"},
+        "adapter": {"adapter_layer": "adapter"},
+    }
+
+
+@pytest.mark.parametrize(
+    "kind, payload_kind",
+    [
+        (ObservationKind.EVENT, DiscoveryKind.DISCOVERED),
+        (ObservationKind.RECOVERY, DiscoveryKind.METADATA_UPDATED),
+        (ObservationKind.RESYNC, DiscoveryKind.RESYNC),
+    ],
+)
+def test_supported_adapter_observation_kinds_map_explicitly(
+    kind: ObservationKind,
+    payload_kind: DiscoveryKind,
+) -> None:
+    raw_event = RawEvent(
+        source_id="fixture-source",
+        source_event_id=f"event-{kind.value}",
+        payload={
+            "token_identity": "mint-mapped",
+            "chain_id": "solana",
+            "discovery_kind": payload_kind.value,
+            "discovery_reason": "MAPPING_FIXTURE",
+        },
+        event_time=SOURCE_TIME,
+        received_time=DISCOVERY_TIME,
+        sequence=20,
+    )
+    result = process(
+        boundary(),
+        AdapterObservation(
+            source_id="fixture-source",
+            kind=kind,
+            observed_time=DISCOVERY_TIME,
+            raw_event=raw_event,
+            cursor=20,
+            cursor_continuity=(
+                CursorContinuity.CONTINUOUS
+                if kind is ObservationKind.RESYNC
+                else CursorContinuity.NOT_PROVIDED
+            ),
+        ),
+    )
+
+    assert result.outcome is DiscoveryOutcome.ACCEPTED
+    assert result.record is not None
+    assert result.record.discovery_kind is payload_kind
+
+
+def test_failure_and_resync_required_adapter_kinds_keep_their_semantics() -> None:
+    failure = process(
+        boundary(),
+        AdapterObservation(
+            source_id="fixture-source",
+            kind=ObservationKind.FAILURE,
+            observed_time=DISCOVERY_TIME,
+            failure_reason="fixture unavailable",
+        ),
+    )
+    required = process(
+        boundary(),
+        AdapterObservation(
+            source_id="fixture-source",
+            kind=ObservationKind.RESYNC_REQUIRED,
+            observed_time=DISCOVERY_TIME,
+        ),
+    )
+
+    assert failure.outcome is DiscoveryOutcome.UNAVAILABLE
+    assert required.outcome is DiscoveryOutcome.RESYNC_REQUIRED
+
+
+@pytest.mark.parametrize(
+    "kind, payload",
+    [
+        (ObservationKind.EVENT, {}),
+        (
+            ObservationKind.RESYNC,
+            {
+                "token_identity": "mint-invalid-resync",
+                "chain_id": "solana",
+                "discovery_kind": DiscoveryKind.DISCOVERED.value,
+            },
+        ),
+        (
+            ObservationKind.RECOVERY,
+            {
+                "token_identity": "mint-invalid-recovery",
+                "chain_id": "solana",
+                "discovery_kind": DiscoveryKind.RESYNC.value,
+            },
+        ),
+    ],
+)
+def test_invalid_adapter_discovery_combinations_are_rejected(
+    kind: ObservationKind,
+    payload: dict[str, str],
+) -> None:
+    result = process(
+        boundary(),
+        AdapterObservation(
+            source_id="fixture-source",
+            kind=kind,
+            observed_time=DISCOVERY_TIME,
+            raw_event=RawEvent(
+                source_id="fixture-source",
+                source_event_id=f"invalid-{kind.value}",
+                payload=payload,
+                event_time=SOURCE_TIME,
+                received_time=DISCOVERY_TIME,
+            ),
+            cursor=21,
+            cursor_continuity=(
+                CursorContinuity.CONTINUOUS
+                if kind is ObservationKind.RESYNC
+                else CursorContinuity.NOT_PROVIDED
+            ),
+        ),
+    )
+
+    assert result.outcome is DiscoveryOutcome.INVALID
+    assert result.published_as_current is False
+
+
 def test_unavailable_adapter_observation_is_not_valid_discovery() -> None:
     result = process(
         boundary(),
@@ -217,6 +466,7 @@ def test_p02_t03_adapter_output_feeds_discovery_boundary() -> None:
         payload={
             "token_identity": "mint-adapter",
             "chain_id": "solana",
+            "discovery_kind": DiscoveryKind.DISCOVERED.value,
             "discovery_reason": "ADAPTER_FIXTURE",
             "metadata": {"symbol": "ADP"},
         },

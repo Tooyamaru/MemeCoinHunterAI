@@ -9,7 +9,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P02 — Solana / DEX Data Intelligence
 - **Current task:** P02-T04 — Provider-Neutral Token Universe / Discovery Contract
-- **Current task status:** IMPLEMENTED / VERIFIED
+- **Current task status:** IMPLEMENTED / VERIFIED — corrective patch applied
 - **Last updated:** 2026-08-11
 
 ## Master progress
@@ -95,7 +95,8 @@ trading, or execution functionality was added.
 
 ## Known issues
 
-- No known P02-T04 issues.
+- P02-T04 corrective patch applied after architectural audit; P02-T04 remains
+  complete and verified, and P02-T05 remains not started.
 - P02-T04 adds only provider-neutral token discovery observation and record
   contracts, deterministic duplicate/contradiction/stale/out-of-order handling,
   cursor resynchronization semantics, bounded provenance, local publication,

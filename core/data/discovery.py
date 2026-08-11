@@ -26,6 +26,7 @@ from core.data.orchestration import (
     AdapterObservation,
     CursorContinuity,
     ObservationKind,
+    _validate_observation as _validate_adapter_observation,
 )
 
 
@@ -70,12 +71,17 @@ class DiscoveryObservation:
     chain_id: str
     observation_time: datetime
     discovery_time: datetime
+    received_time: datetime | None = None
     source_event_id: str | None = None
     sequence: SequenceValue = None
     cursor_continuity: CursorContinuity = CursorContinuity.NOT_PROVIDED
     discovery_reason: str = "UNSPECIFIED"
     metadata: Mapping[str, JsonValue] = field(default_factory=dict)
     source_metadata: Mapping[str, JsonValue] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.received_time is None:
+            object.__setattr__(self, "received_time", self.discovery_time)
 
 
 @dataclass(frozen=True)
@@ -86,6 +92,7 @@ class DiscoveryProvenance:
     source_event_id: str | None
     observation_time: datetime
     discovery_time: datetime
+    received_time: datetime
     sequence: SequenceValue
     source_metadata: Mapping[str, JsonValue]
 
@@ -195,6 +202,18 @@ class TokenDiscoveryBoundary:
             )
 
         if isinstance(observation, AdapterObservation):
+            adapter_errors = _validate_adapter_observation(observation)
+            if adapter_errors:
+                return self._emit(
+                    self._invalid(
+                        _observation_id(observation),
+                        _source_text(observation.source_id),
+                        observation.cursor,
+                        processing_time,
+                        reference_time,
+                        adapter_errors,
+                    )
+                )
             if observation.kind is ObservationKind.FAILURE:
                 return self._emit(
                     self._result(
@@ -302,7 +321,6 @@ class TokenDiscoveryBoundary:
 
         if observation.kind is DiscoveryKind.RESYNC:
             ordering = DiscoveryOrdering.FIRST
-            self.context.last_sequence_by_source.pop(observation.source_id, None)
         else:
             ordering = self._ordering(observation)
 
@@ -378,7 +396,12 @@ class TokenDiscoveryBoundary:
             )
 
         self.context.normalization.seen_identities[discovery_id] = fingerprint
-        if isinstance(observation.sequence, int):
+        if observation.kind is DiscoveryKind.RESYNC:
+            if isinstance(observation.sequence, int):
+                self.context.last_sequence_by_source[observation.source_id] = observation.sequence
+            else:
+                self.context.last_sequence_by_source.pop(observation.source_id, None)
+        elif isinstance(observation.sequence, int):
             self.context.last_sequence_by_source[observation.source_id] = observation.sequence
         if observation.kind is DiscoveryKind.RESYNC:
             self.context.resynchronization_required.discard(observation.source_id)
@@ -438,6 +461,7 @@ class TokenDiscoveryBoundary:
                 source_event_id=observation.source_event_id,
                 observation_time=observation.observation_time,
                 discovery_time=observation.discovery_time,
+                received_time=observation.received_time,
                 sequence=observation.sequence,
                 source_metadata=deepcopy(dict(observation.source_metadata)),
             ),
@@ -503,7 +527,9 @@ def _from_adapter_observation(observation: AdapterObservation) -> DiscoveryObser
     payload = observation.raw_event.payload
     if not isinstance(payload, Mapping):
         raise ValueError("raw event payload must be a mapping")
-    kind_value = payload.get("discovery_kind", DiscoveryKind.DISCOVERED.value)
+    kind_value = payload.get("discovery_kind")
+    if kind_value is None:
+        raise ValueError("discovery_kind is required for adapter discovery conversion")
     try:
         kind = DiscoveryKind(kind_value)
     except ValueError as exc:
@@ -520,6 +546,14 @@ def _from_adapter_observation(observation: AdapterObservation) -> DiscoveryObser
         raise ValueError("token_identity is required")
     if not isinstance(reason, str) or not reason.strip():
         raise ValueError("discovery_reason must be a non-empty string")
+    if observation.kind is ObservationKind.RESYNC and kind is not DiscoveryKind.RESYNC:
+        raise ValueError("RESYNC adapter observations require DiscoveryKind.RESYNC")
+    if observation.kind in {ObservationKind.EVENT, ObservationKind.RECOVERY} and (
+        kind is DiscoveryKind.RESYNC
+    ):
+        raise ValueError(
+            "EVENT and RECOVERY adapter observations must not carry DiscoveryKind.RESYNC"
+        )
     return DiscoveryObservation(
         source_id=observation.source_id,
         kind=kind,
@@ -527,6 +561,7 @@ def _from_adapter_observation(observation: AdapterObservation) -> DiscoveryObser
         chain_id=chain_id,
         observation_time=observation.observed_time,
         discovery_time=observation.raw_event.event_time,
+        received_time=observation.raw_event.received_time,
         source_event_id=observation.raw_event.source_event_id,
         sequence=observation.cursor
         if observation.cursor is not None
@@ -534,7 +569,10 @@ def _from_adapter_observation(observation: AdapterObservation) -> DiscoveryObser
         cursor_continuity=observation.cursor_continuity,
         discovery_reason=reason,
         metadata=metadata,
-        source_metadata=observation.source_metadata,
+        source_metadata=_merge_source_metadata(
+            observation.raw_event.source_metadata,
+            observation.source_metadata,
+        ),
     )
 
 
@@ -554,6 +592,12 @@ def _validate_observation(observation: DiscoveryObservation) -> tuple[str, ...]:
         errors.append("observation_time must be timezone-aware")
     if not _aware(observation.discovery_time):
         errors.append("discovery_time must be timezone-aware")
+    if not _aware(observation.received_time):
+        errors.append("received_time must be timezone-aware")
+    elif _aware(observation.discovery_time) and (
+        observation.discovery_time > observation.received_time
+    ):
+        errors.append("discovery_time must not be later than received_time")
     if not isinstance(observation.cursor_continuity, CursorContinuity):
         errors.append("cursor_continuity must be a CursorContinuity")
     if observation.sequence is not None and not isinstance(observation.sequence, (int, str)):
@@ -649,3 +693,15 @@ def _aware(value: Any) -> bool:
 
 def _source_text(value: Any) -> str:
     return value if isinstance(value, str) else "<invalid-source>"
+
+
+def _merge_source_metadata(
+    raw_event_metadata: Mapping[str, JsonValue],
+    adapter_metadata: Mapping[str, JsonValue],
+) -> Mapping[str, JsonValue]:
+    """Preserve both metadata layers with stable provider-neutral labels."""
+
+    return {
+        "raw_event": deepcopy(dict(raw_event_metadata)),
+        "adapter": deepcopy(dict(adapter_metadata)),
+    }

@@ -4,9 +4,11 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project is in P01 — Application Foundation. P01-T04 — Application Service &
-Worker Foundation and P01-T05 — Application Service & Worker Extensions are
-complete. Later tasks remain gated until explicitly authorized.
+The project is in P02 — Solana / DEX Data Intelligence. P01-T04 — Application
+Service & Worker Foundation and P01-T05 — Application Service & Worker
+Extensions are complete. P02-T01 through P02-T04 are implemented, with the
+P02-T04 corrective patch required/under review. P02-T05 is not started. Later
+tasks remain gated until explicitly authorized.
 
 ## V1.1 architectural baseline
 
