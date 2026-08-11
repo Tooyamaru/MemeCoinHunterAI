@@ -65,6 +65,21 @@ from core.data.materialization import (
     TokenUniverseMaterializer,
     TokenUniverseState,
 )
+from core.data.market_state import (
+    CurrentMarketState,
+    MarketState,
+    MarketStateContext,
+    MarketStateEntry,
+    MarketStateKey,
+    MarketStateMaterializer,
+    MarketStateOutcome,
+    MarketStateProcessingContext,
+    MarketStateProcessor,
+    MarketStateReason,
+    MarketStateResult,
+    P02_T08_CONTRACT_VERSION,
+    materialize_market_state,
+)
 
 __all__ = [
     "DataQuality",
@@ -120,4 +135,17 @@ __all__ = [
     "TokenUniverseKey",
     "TokenUniverseMaterializer",
     "TokenUniverseState",
+    "CurrentMarketState",
+    "MarketState",
+    "MarketStateContext",
+    "MarketStateEntry",
+    "MarketStateKey",
+    "MarketStateMaterializer",
+    "MarketStateOutcome",
+    "MarketStateProcessingContext",
+    "MarketStateProcessor",
+    "MarketStateReason",
+    "MarketStateResult",
+    "P02_T08_CONTRACT_VERSION",
+    "materialize_market_state",
 ]
