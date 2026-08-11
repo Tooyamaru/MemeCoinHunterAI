@@ -7,8 +7,10 @@
 - **CHANGE:** Delayed resynchronization ordering-state mutation until accepted
   resync, preserved raw-event received time and both raw/adapter metadata
   layers, and added explicit adapter observation-kind validation and mapping.
-  Documentation status was synchronized with `PROJECT_STATE.md`. No provider,
-  database, trading, or external I/O behavior was added.
+  Documentation status was synchronized with `PROJECT_STATE.md`; the available
+  corrective-patch verification evidence passed. At the audit checkpoint, HEAD
+  and origin/main were both `365f6eb` and the working tree was clean. No
+  provider, database, trading, or external I/O behavior was added.
 - **VERIFICATION:** 27 focused P02-T04 tests, 72 focused P02 tests, 99 full
   regression tests, Python compilation, and diff checks passed. Full regression
   reported one existing Starlette/httpx deprecation warning.

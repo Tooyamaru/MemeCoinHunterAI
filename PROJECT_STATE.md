@@ -37,7 +37,9 @@ functionality.
 ## Last verified checkpoint
 
 P02-T04 provider-neutral token universe / discovery contract
-verified on 2026-08-11.
+verified on 2026-08-11, including the corrective patch's available
+verification evidence. At the audit checkpoint, HEAD and origin/main were
+both `365f6eb` and the working tree was clean.
 The discovery boundary, deterministic outcomes, freshness and ordering
 semantics, provenance preservation, source isolation, invalid-publication
 safety, P02-T03 adapter integration, and local tests were verified. No
@@ -96,7 +98,8 @@ trading, or execution functionality was added.
 ## Known issues
 
 - P02-T04 corrective patch applied after architectural audit; P02-T04 remains
-  complete and verified, and P02-T05 remains not started.
+  complete and verified, and P02-T05 remains not started and not authorized
+  pending verification of this documentation-only correction.
 - P02-T04 adds only provider-neutral token discovery observation and record
   contracts, deterministic duplicate/contradiction/stale/out-of-order handling,
   cursor resynchronization semantics, bounded provenance, local publication,
@@ -113,14 +116,14 @@ trading, or execution functionality was added.
 
 ## Next action
 
-Await review of the completed P02-T04 implementation. Do not start a later task
-without a separately approved specification and concrete implementation task.
+Verify this documentation-only correction. Do not start P02-T05 or any later
+task without separate authorization.
 
 ## Next task
 
-No later task is authorized. P02-T04 is complete; later provider connectivity,
-ingestion transports, persistence changes, and other P02 capabilities require
-separate specifications and approval.
+P02-T05 — NOT STARTED / NOT AUTHORIZED. Later provider connectivity, ingestion
+transports, persistence changes, and other P02 capabilities require separate
+specifications and approval.
 
 ## Required secret names
 
@@ -138,4 +141,4 @@ secrets; names will be added only when a later task requires them.
 - **P02-T02:** DONE
 - **P02-T03:** DONE
 - **P02-T04:** DONE
-- **Next implementation action:** Await review; do not start later tasks without explicit approval
+- **Next implementation action:** Verify this documentation-only correction; P02-T05 remains NOT STARTED / NOT AUTHORIZED
