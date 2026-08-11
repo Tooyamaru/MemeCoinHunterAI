@@ -472,6 +472,25 @@ class MarketObservationProcessor:
 
         subject_key = candidate.source_subject
         previous = self.context.accepted_evidence.get(subject_key)
+        ordering = OrderingStatus.NOT_PROVIDED
+        if isinstance(candidate.sequence, int) and not isinstance(candidate.sequence, bool):
+            old_sequence = self.context.latest_sequence_by_subject.get(subject_key)
+            if old_sequence is None:
+                ordering = OrderingStatus.FIRST
+            elif candidate.sequence <= old_sequence:
+                return self._rejected(
+                    candidate,
+                    identity=identity,
+                    outcome=MarketObservationOutcome.OUT_OF_ORDER,
+                    quality=DataQuality.OUT_OF_ORDER,
+                    reasons=(MarketObservationReason.OUT_OF_ORDER_SEQUENCE.value,),
+                    processing_time=processing_time,
+                    reference_time=reference_time,
+                    before=before,
+                )
+            else:
+                ordering = OrderingStatus.IN_ORDER
+
         if candidate.observation_kind is MarketObservationKind.UPDATED and previous is None:
             return self._rejected(
                 candidate,
@@ -494,25 +513,6 @@ class MarketObservationProcessor:
                 reference_time=reference_time,
                 before=before,
             )
-
-        ordering = OrderingStatus.NOT_PROVIDED
-        if isinstance(candidate.sequence, int) and not isinstance(candidate.sequence, bool):
-            old_sequence = self.context.latest_sequence_by_subject.get(subject_key)
-            if old_sequence is None:
-                ordering = OrderingStatus.FIRST
-            elif candidate.sequence <= old_sequence:
-                return self._rejected(
-                    candidate,
-                    identity=identity,
-                    outcome=MarketObservationOutcome.OUT_OF_ORDER,
-                    quality=DataQuality.OUT_OF_ORDER,
-                    reasons=(MarketObservationReason.OUT_OF_ORDER_SEQUENCE.value,),
-                    processing_time=processing_time,
-                    reference_time=reference_time,
-                    before=before,
-                )
-            else:
-                ordering = OrderingStatus.IN_ORDER
 
         data_age = reference_time - candidate.observation_time
         provenance = MarketObservationProvenance(
@@ -698,7 +698,7 @@ def _validate_candidate(
             DataQuality.INVALID,
             MarketObservationReason.INVALID_TIMESTAMP.value,
         )
-    if candidate.observation_time > candidate.received_time or candidate.observation_time > reference_time:
+    if candidate.observation_time > candidate.received_time:
         return (
             MarketObservationOutcome.INVALID,
             DataQuality.INVALID,
