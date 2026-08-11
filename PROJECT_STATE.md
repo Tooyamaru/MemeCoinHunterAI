@@ -8,20 +8,20 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P02 — Solana / DEX Data Intelligence
-- **Current task:** P02-T04 — Provider-Neutral Token Universe / Discovery Contract
-- **Current task status:** IMPLEMENTED / VERIFIED — corrective patch applied
+- **Current task:** P02-T05 — Discovery-to-Orchestration Integration Boundary
+- **Current task status:** IMPLEMENTED / VERIFIED
 - **Last updated:** 2026-08-11
 
 ## Master progress
 
 - P00: DONE; T01 done; T02 done
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
-- P02: T01 done; T02 done; T03 done; T04 done
+- P02: T01 done; T02 done; T03 done; T04 done; T05 done
 - P03–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
@@ -36,15 +36,15 @@ functionality.
 
 ## Last verified checkpoint
 
-P02-T04 provider-neutral token universe / discovery contract
-verified on 2026-08-11, including the corrective patch's available
-verification evidence. At the audit checkpoint, HEAD and origin/main were
-both `365f6eb` and the working tree was clean.
-The discovery boundary, deterministic outcomes, freshness and ordering
-semantics, provenance preservation, source isolation, invalid-publication
-safety, P02-T03 adapter integration, and local tests were verified. No
-provider integration, external I/O, migration, market strategy, AI, wallet,
-trading, or execution functionality was added.
+P02-T05 discovery-to-orchestration integration boundary
+verified on 2026-08-11. Focused P02-T05 tests, all P02 tests, the full
+regression suite, Python compilation, and diff checks passed. The boundary
+validates accepted P02-T04 discovery output, preserves point-in-time
+provenance and classification, converts deterministically to the existing
+P02-T02 orchestration input, and delegates publication through the existing
+publisher protocol. No provider, network, RPC, DEX, wallet, AI/model,
+trading, execution, database, persistence, migration, or dependency
+integration was added.
 
 ## Relevant files for current task
 
@@ -97,9 +97,8 @@ trading, or execution functionality was added.
 
 ## Known issues
 
-- P02-T04 corrective patch applied after architectural audit; P02-T04 remains
-  complete and verified, and P02-T05 remains not started and not authorized
-  pending verification of this documentation-only correction.
+- P02-T04 corrective patch remains complete and verified. P02-T05 is complete
+  and verified against its controlled scope.
 - P02-T04 adds only provider-neutral token discovery observation and record
   contracts, deterministic duplicate/contradiction/stale/out-of-order handling,
   cursor resynchronization semantics, bounded provenance, local publication,
@@ -116,14 +115,15 @@ trading, or execution functionality was added.
 
 ## Next action
 
-Verify this documentation-only correction. Do not start P02-T05 or any later
-task without separate authorization.
+Await review of the completed P02-T05 implementation. Do not start P02-T06 or
+any later task without separate authorization.
 
 ## Next task
 
-P02-T05 — NOT STARTED / NOT AUTHORIZED. Later provider connectivity, ingestion
-transports, persistence changes, and other P02 capabilities require separate
-specifications and approval.
+P02-T06 — NOT STARTED / NOT AUTHORIZED. P03 and all later tasks are also not
+started or authorized. Provider connectivity, ingestion transports, persistence
+changes, and other later P02 capabilities require separate specifications and
+approval.
 
 ## Required secret names
 
@@ -141,4 +141,5 @@ secrets; names will be added only when a later task requires them.
 - **P02-T02:** DONE
 - **P02-T03:** DONE
 - **P02-T04:** DONE
-- **Next implementation action:** Verify this documentation-only correction; P02-T05 remains NOT STARTED / NOT AUTHORIZED
+- **P02-T05:** DONE
+- **Next implementation action:** Await review; P02-T06 and P03 remain NOT STARTED / NOT AUTHORIZED

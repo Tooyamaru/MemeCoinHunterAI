@@ -3,6 +3,28 @@
 ## 2026-08-11
 
 - **PHASE:** P02 — Solana / DEX Data Intelligence
+- **TASK:** P02-T05 — Discovery-to-Orchestration Integration Boundary
+- **CHANGE:** Added the smallest deterministic boundary from accepted P02-T04
+  discovery results into the existing P02-T02 orchestration input. The boundary
+  validates discovery identity, provenance, timestamps, ordering/resync state,
+  quality, and accepted classification; preserves source and point-in-time
+  metadata; rejects malformed, non-current, duplicate, contradictory, stale,
+  invalid, and unsupported discovery outcomes without forwarding or mutating
+  orchestration state; and reuses the existing publisher protocol.
+- **FILES:** `core/data/discovery_orchestration.py`,
+  `core/data/__init__.py`, `tests/test_discovery_orchestration.py`,
+  `PROJECT_STATE.md`, `docs/MASTER_BLUEPRINT.md`, and `docs/CHANGELOG.md`.
+  No other files were changed.
+- **VERIFICATION:** 19 focused P02-T05 tests, 72 full P02 tests, 118 full
+  regression tests, Python compilation, and diff checks passed. Full regression
+  reported one existing Starlette/httpx deprecation warning.
+- **SCOPE:** No provider, network, RPC, DEX, wallet, AI/model, trading,
+  execution, database, persistence, migration, external service, dependency,
+  or workflow integration was introduced. P02-T06 and P03 were not started.
+
+## 2026-08-11
+
+- **PHASE:** P02 — Solana / DEX Data Intelligence
 - **TASK:** P02-T04 — Corrective Patch
 - **CHANGE:** Delayed resynchronization ordering-state mutation until accepted
   resync, preserved raw-event received time and both raw/adapter metadata

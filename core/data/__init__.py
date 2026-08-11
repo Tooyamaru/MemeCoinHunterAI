@@ -50,6 +50,12 @@ from core.data.orchestration import (
     IngestionResult,
     ObservationKind,
 )
+from core.data.discovery_orchestration import (
+    DiscoveryOrchestrationConversion,
+    DiscoveryOrchestrationOutcome,
+    DiscoveryOrchestrationResult,
+    DiscoveryToOrchestrationBoundary,
+)
 
 __all__ = [
     "DataQuality",
@@ -94,4 +100,8 @@ __all__ = [
     "IngestionPublisher",
     "IngestionResult",
     "ObservationKind",
+    "DiscoveryOrchestrationConversion",
+    "DiscoveryOrchestrationOutcome",
+    "DiscoveryOrchestrationResult",
+    "DiscoveryToOrchestrationBoundary",
 ]

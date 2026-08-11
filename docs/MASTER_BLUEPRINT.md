@@ -6,12 +6,13 @@ This document maps the system. It does not implement future phases.
 
 The project is in P02 — Solana / DEX Data Intelligence. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
-Extensions are complete. P02-T01 through P02-T04 are implemented, and the
-P02-T04 corrective patch passed the available verification evidence. At the
-audit checkpoint, HEAD and origin/main were both `365f6eb`, and the working
-tree was clean. P02-T05 is not started and remains unauthorized pending
-verification of this documentation-only correction. Later tasks remain gated
-until explicitly authorized.
+Extensions are complete. P02-T01 through P02-T05 are implemented and verified.
+P02-T05 is the deterministic discovery-to-orchestration integration boundary:
+it validates accepted P02-T04 output, preserves provenance and classification,
+and delegates to the existing P02-T02 orchestration input/publication contract.
+No provider, network, persistence, AI, wallet, trading, or execution
+integration was introduced. P02-T06 and P03 remain not started and
+unauthorized. Later tasks remain gated until explicitly authorized.
 
 ## V1.1 architectural baseline
 
