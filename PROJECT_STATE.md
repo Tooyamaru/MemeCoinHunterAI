@@ -37,8 +37,8 @@ functionality.
 ## Last verified checkpoint
 
 P02-T06 provider-neutral token-universe state / materialization boundary
-verified on 2026-08-11. Twelve focused P02-T06 tests, 103 complete P02 tests,
-130 full regression tests, Python compilation, and diff checks passed. The
+verified on 2026-08-11. Fourteen focused P02-T06 tests, 105 complete P02 tests,
+132 full regression tests, Python compilation, and diff checks passed. The
 boundary consumes accepted P02-T04/P02-T05 discovery results, materializes a
 deterministic local read-oriented current view, preserves provenance and
 currentness, and fails closed for rejected, stale, duplicate, contradictory,
