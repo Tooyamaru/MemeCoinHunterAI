@@ -37,6 +37,7 @@ def discovery(
     source_event_id: str | None = "event-1",
     sequence: int | str | None = 1,
     kind: DiscoveryKind = DiscoveryKind.DISCOVERED,
+    chain_id: str = "solana",
     discovery_time: datetime = DISCOVERY_TIME,
     continuity: CursorContinuity = CursorContinuity.NOT_PROVIDED,
     metadata: Any = {"symbol": "MINT"},
@@ -45,7 +46,7 @@ def discovery(
         source_id=source_id,
         kind=kind,
         token_identity=token,
-        chain_id="solana",
+        chain_id=chain_id,
         observation_time=DISCOVERY_TIME,
         discovery_time=discovery_time,
         source_event_id=source_event_id,
@@ -94,7 +95,7 @@ def test_valid_token_discovery_is_accepted_with_provenance() -> None:
     "item, expected_reason",
     [
         (discovery(token=""), "token_identity is required"),
-        (discovery(chain_id="solana") if False else object(), "observation must be"),
+        (object(), "observation must be"),
     ],
 )
 def test_malformed_discovery_is_invalid(item, expected_reason: str) -> None:

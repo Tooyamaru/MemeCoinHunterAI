@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-08-11
+
+- **PHASE:** P02 — Solana / DEX Data Intelligence
+- **TASK:** P02-T04 — Provider-Neutral Token Universe / Discovery Contract
+- **CHANGE:** Added the provider-neutral token discovery observation, provenance,
+  record, result, context, and publication contracts; deterministic accepted,
+  duplicate, contradictory, stale, invalid, out-of-order, unavailable, and
+  resynchronization-required outcomes; explicit freshness and cursor ordering;
+  source-isolated replay behavior; and P02-T03 adapter-observation integration.
+  Invalid, stale, contradictory, unavailable, and ordering-failed records are
+  observable without being published as current valid discovery. No provider,
+  database, trading, or external I/O behavior was added.
+- **VERIFICATION:** 16 focused P02-T04 tests, 61 focused P02 tests, 88 full
+  regression tests, Python compilation, and diff checks passed. Full regression
+  reported one existing Starlette/httpx deprecation warning.
+- **COMMIT:** `Implement P02-T04 provider-neutral token discovery contract.`
+
 ## 2026-08-10
 
 - **PHASE:** P02 — Solana / DEX Data Intelligence

@@ -8,20 +8,20 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P02 — Solana / DEX Data Intelligence
-- **Current task:** P02-T03 — Provider-Neutral Source Adapter Contract
+- **Current task:** P02-T04 — Provider-Neutral Token Universe / Discovery Contract
 - **Current task status:** IMPLEMENTED / VERIFIED
-- **Last updated:** 2026-08-10
+- **Last updated:** 2026-08-11
 
 ## Master progress
 
 - P00: DONE; T01 done; T02 done
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
-- P02: T01 done; T02 done; T03 done
+- P02: T01 done; T02 done; T03 done; T04 done
 - P03–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
@@ -36,12 +36,13 @@ functionality.
 
 ## Last verified checkpoint
 
-P02-T03 provider-neutral source adapter contract
-verified on 2026-08-10.
-The adapter boundary, lifecycle/capability metadata, deterministic fake adapter,
-P02-T02 integration, and local tests were verified. No provider integration,
-external I/O, migration, market strategy, AI, wallet, trading, or execution
-functionality was added.
+P02-T04 provider-neutral token universe / discovery contract
+verified on 2026-08-11.
+The discovery boundary, deterministic outcomes, freshness and ordering
+semantics, provenance preservation, source isolation, invalid-publication
+safety, P02-T03 adapter integration, and local tests were verified. No
+provider integration, external I/O, migration, market strategy, AI, wallet,
+trading, or execution functionality was added.
 
 ## Relevant files for current task
 
@@ -94,7 +95,12 @@ functionality was added.
 
 ## Known issues
 
-- No known P02-T03 issues.
+- No known P02-T04 issues.
+- P02-T04 adds only provider-neutral token discovery observation and record
+  contracts, deterministic duplicate/contradiction/stale/out-of-order handling,
+  cursor resynchronization semantics, bounded provenance, local publication,
+  and P02-T03 adapter observation consumption; no provider, external I/O,
+  migration, trading capability, or dependency was added.
 - P02-T03 adds only provider-neutral adapter identity, capability, lifecycle,
   health observation, deterministic fake-adapter behavior, P02-T02 observation
   production, and local integration tests; no provider, external I/O,
@@ -106,12 +112,12 @@ functionality was added.
 
 ## Next action
 
-Await review of the completed P02-T03 implementation. Do not start a later task
+Await review of the completed P02-T04 implementation. Do not start a later task
 without a separately approved specification and concrete implementation task.
 
 ## Next task
 
-No later task is authorized. P02-T03 is complete; later provider connectivity,
+No later task is authorized. P02-T04 is complete; later provider connectivity,
 ingestion transports, persistence changes, and other P02 capabilities require
 separate specifications and approval.
 
@@ -130,4 +136,5 @@ secrets; names will be added only when a later task requires them.
 - **P02-T01:** DONE
 - **P02-T02:** DONE
 - **P02-T03:** DONE
+- **P02-T04:** DONE
 - **Next implementation action:** Await review; do not start later tasks without explicit approval

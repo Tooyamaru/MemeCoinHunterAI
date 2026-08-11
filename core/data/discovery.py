@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum
 import hashlib
 import json
@@ -305,22 +305,9 @@ class TokenDiscoveryBoundary:
             self.context.last_sequence_by_source.pop(observation.source_id, None)
         else:
             ordering = self._ordering(observation)
-            if ordering is DiscoveryOrdering.OUT_OF_ORDER:
-                return self._emit(
-                    self._record_result(
-                        observation,
-                        discovery_id,
-                        DiscoveryOutcome.OUT_OF_ORDER,
-                        DataQuality.OUT_OF_ORDER,
-                        ordering,
-                        processing_time,
-                        reference_time,
-                        ("sequence is not greater than the last accepted sequence",),
-                    )
-                )
 
         data_age = reference_time - observation.discovery_time
-        if data_age < data_age * 0:
+        if data_age < timedelta(0):
             return self._emit(
                 self._record_result(
                     observation,
@@ -373,6 +360,20 @@ class TokenDiscoveryBoundary:
                         if previous == fingerprint
                         else "discovery identity maps to different token identity",
                     ),
+                )
+            )
+
+        if ordering is DiscoveryOrdering.OUT_OF_ORDER:
+            return self._emit(
+                self._record_result(
+                    observation,
+                    discovery_id,
+                    DiscoveryOutcome.OUT_OF_ORDER,
+                    DataQuality.OUT_OF_ORDER,
+                    ordering,
+                    processing_time,
+                    reference_time,
+                    ("sequence is not greater than the last accepted sequence",),
                 )
             )
 
@@ -479,6 +480,15 @@ class TokenDiscoveryBoundary:
         )
 
     def _result(self, **kwargs: Any) -> DiscoveryResult:
+        kwargs.setdefault("accepted", kwargs.get("outcome") is DiscoveryOutcome.ACCEPTED)
+        kwargs.setdefault(
+            "published_as_current",
+            kwargs.get("outcome") is DiscoveryOutcome.ACCEPTED,
+        )
+        kwargs.setdefault(
+            "resynchronization_required",
+            kwargs.get("outcome") is DiscoveryOutcome.RESYNC_REQUIRED,
+        )
         return DiscoveryResult(**kwargs)
 
     def _emit(self, result: DiscoveryResult) -> DiscoveryResult:
