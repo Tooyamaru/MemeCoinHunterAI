@@ -214,6 +214,32 @@ def test_contradictory_identity_does_not_replace_prior_evidence() -> None:
     ] == "fixture"
 
 
+def test_repeated_observed_same_subject_is_duplicate_or_contradictory() -> None:
+    runner = processor()
+    first = process(runner, candidate(source_event_id="first", sequence=None))
+    before = runner.context.state_digest()
+
+    equivalent = process(runner, candidate(source_event_id="second", sequence=None))
+    conflicting = process(
+        runner,
+        candidate(
+            source_event_id="third",
+            sequence=None,
+            observation_metadata={"symbol": "CHANGED", "venue": "fixture"},
+        ),
+    )
+
+    assert first.outcome is MarketObservationOutcome.OBSERVED
+    assert first.accepted is True
+    assert equivalent.outcome is MarketObservationOutcome.DUPLICATE
+    assert equivalent.accepted is False
+    assert equivalent.local_state_digest == before
+    assert conflicting.outcome is MarketObservationOutcome.CONTRADICTORY
+    assert conflicting.accepted is False
+    assert conflicting.local_state_digest == before
+    assert runner.context.state_digest() == before
+
+
 def test_out_of_order_integer_sequence_does_not_advance_ordering() -> None:
     runner = processor()
     process(runner, candidate(source_event_id="new", sequence=3))
@@ -295,9 +321,11 @@ def test_source_unavailable_and_resynchronization_do_not_accept_or_advance() -> 
     resync = process(runner, candidate(source_event_id="resync", resynchronization_required=True))
     assert resync.outcome is MarketObservationOutcome.RESYNCHRONIZATION_REQUIRED
     assert resync.state_changed is False
+    assert resync.local_state_digest == before
+    assert runner.context.state_digest() == before
     assert runner.context.accepted_evidence == {}
     assert runner.context.latest_sequence_by_subject == {}
-    assert "market-source" in runner.context.resynchronization_required
+    assert runner.context.resynchronization_required == set()
 
 
 def test_unsupported_kind_and_measurements_are_rejected() -> None:

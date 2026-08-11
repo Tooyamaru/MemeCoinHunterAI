@@ -385,9 +385,6 @@ class MarketObservationProcessor:
                 before=before,
             )
         if candidate.resynchronization_required:
-            self.context.resynchronization_required.add(source_id or "<invalid-source>")
-            # The local condition is intentionally observable but is not
-            # cleared or otherwise used as an automatic recovery protocol.
             return self._rejected(
                 candidate,
                 identity=identity,
@@ -503,12 +500,29 @@ class MarketObservationProcessor:
                 before=before,
             )
         if candidate.observation_kind is MarketObservationKind.OBSERVED and previous is not None:
+            previous_content = _evidence_content_fingerprint(previous)
+            candidate_content = _candidate_content_fingerprint(
+                candidate,
+                normalized_metadata,
+                normalized_source_metadata,
+            )
+            if previous_content == candidate_content:
+                return self._rejected(
+                    candidate,
+                    identity=identity,
+                    outcome=MarketObservationOutcome.DUPLICATE,
+                    quality=DataQuality.DUPLICATE,
+                    reasons=(MarketObservationReason.DUPLICATE_OBSERVATION.value,),
+                    processing_time=processing_time,
+                    reference_time=reference_time,
+                    before=before,
+                )
             return self._rejected(
                 candidate,
                 identity=identity,
-                outcome=MarketObservationOutcome.REJECTED,
-                quality=DataQuality.INCOMPLETE,
-                reasons=(MarketObservationReason.OBSERVED_REQUIRES_NEW_SUBJECT.value,),
+                outcome=MarketObservationOutcome.CONTRADICTORY,
+                quality=DataQuality.CONTRADICTORY,
+                reasons=(MarketObservationReason.CONTRADICTORY_OBSERVATION.value,),
                 processing_time=processing_time,
                 reference_time=reference_time,
                 before=before,
@@ -832,6 +846,48 @@ def _candidate_fingerprint(
             "contract_version": candidate.contract_version,
             "quality": candidate.quality.value,
             "source_event_id": candidate.source_event_id,
+        }
+    )
+
+
+def _candidate_content_fingerprint(
+    candidate: MarketObservationCandidate,
+    metadata: dict[str, Any],
+    source_metadata: dict[str, Any],
+) -> str:
+    return _digest(
+        {
+            "source_id": candidate.source_id,
+            "chain_id": candidate.chain_id,
+            "token_identity": candidate.token_identity,
+            "market_subject_id": candidate.market_subject_id,
+            "observation_kind": _enum_value(candidate.observation_kind),
+            "observation_time": _timestamp(candidate.observation_time),
+            "received_time": _timestamp(candidate.received_time),
+            "sequence": candidate.sequence,
+            "observation_metadata": metadata,
+            "source_metadata": source_metadata,
+            "contract_version": candidate.contract_version,
+            "quality": candidate.quality.value,
+        }
+    )
+
+
+def _evidence_content_fingerprint(evidence: AcceptedMarketObservationEvidence) -> str:
+    return _digest(
+        {
+            "source_id": evidence.source_id,
+            "chain_id": evidence.chain_id,
+            "token_identity": evidence.token_identity,
+            "market_subject_id": evidence.market_subject_id,
+            "observation_kind": _enum_value(evidence.observation_kind),
+            "observation_time": _timestamp(evidence.observation_time),
+            "received_time": _timestamp(evidence.received_time),
+            "sequence": evidence.sequence,
+            "observation_metadata": evidence.observation_metadata,
+            "source_metadata": evidence.source_metadata,
+            "contract_version": evidence.candidate_contract_version,
+            "quality": evidence.quality.value,
         }
     )
 
