@@ -8,8 +8,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P02 — Solana / DEX Data Intelligence
-- **Current task:** None
-- **Current task status:** No task in progress
+- **Current task:** P03-T01 — Token Safety Evidence & Eligibility Contract
+- **Current task status:** AUTHORIZED — NOT STARTED
 - **Last updated:** 2026-08-12
 
 ## Master progress
@@ -25,7 +25,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P03–P12
+- **Not started:** P03 implementation phase; P04–P12
 
 ## Current objective
 
@@ -123,12 +123,13 @@ functionality was introduced.
 
 ## Next action
 
-Documentation/state synchronization is complete; await explicit architecture
-review and authorization before starting P03.
+P03 architecture review is PASS. P03-T01 is explicitly authorized as the next
+implementation action; no P03 implementation has started.
 
 ## Next task
 
-P03 — NOT STARTED / NOT AUTHORIZED. Provider connectivity, ingestion transports,
+P03 — NOT STARTED as an implementation phase. P03-T01 is AUTHORIZED; P03-T02
+and P03-T03 remain NOT AUTHORIZED. Provider connectivity, ingestion transports,
 persistence changes, market-state collection, and other later capabilities
 require separate specifications and approval.
 
@@ -153,4 +154,8 @@ secrets; names will be added only when a later task requires them.
 - **P02-T07:** DONE
 - **P02-T08:** DONE
 - **P02-T09:** DONE — ARCHITECTURE GATE PASS
-- **Next implementation action:** Await explicit architecture review and authorization before starting P03; P03 remains NOT STARTED / NOT AUTHORIZED
+- **P03 architecture review:** PASS
+- **P03-T01:** AUTHORIZED — next implementation action
+- **P03-T02:** NOT AUTHORIZED
+- **P03-T03:** NOT AUTHORIZED
+- **Next implementation action:** Implement P03-T01 only; P03 remains NOT STARTED
