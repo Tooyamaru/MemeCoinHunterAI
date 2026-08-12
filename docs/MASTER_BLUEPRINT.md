@@ -4,7 +4,7 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project is in P03 — Token Safety & Risk Intelligence. P01-T04 — Application
+The project is in P04 — Market & Signal Intelligence. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
 Extensions are complete. P02-T01 through P02-T09 are implemented and verified.
 P02-T06 is the deterministic provider-neutral token-universe
@@ -16,11 +16,14 @@ identity/contradiction correction. P03-T01 is technically implemented and
 audited with a PASS WITH NON-BLOCKING OBSERVATIONS result. P03 overall is not
 complete. P03-T02 is implemented, its corrective fix is completed, it is
 audited / verified, and it is formally closed; P03-T03 is implemented,
-audited, verified, and formally closed.
-No provider, network,
-persistence, AI, wallet, trading, or execution integration was introduced. The
-next task is not selected here; later phases remain gated until explicitly
-authorized.
+audited, verified, and formally closed. P04-T01 through P04-T04 are complete
+contract-layer signal processing boundaries: Signal Evidence Contract, Signal
+Evidence Normalization, Signal Evidence Quality, and Signal Evidence
+Evaluation. P04-T05 — Signal Evidence Aggregation is NOT STARTED and is the
+current active development boundary; no later P04 task has started. No provider,
+network, persistence, AI, wallet, trading, or execution integration was
+introduced. Signal aggregation, opportunity detection, decision making,
+trading, execution, and AI functionality remain future boundaries.
 
 ## V1.1 architectural baseline
 
@@ -193,6 +196,14 @@ STOP, PAUSE, or change market.
 - **Exit criteria:** Features/signals are reproducible without blind dependence on traditional indicators.
 - **Major risks:** Look-ahead bias, noisy features, regime instability, data leakage.
 - **Deliverables:** Feature definitions, signal outputs, snapshot history.
+
+#### P04 implementation sequence
+
+- **P04-T01:** Signal Evidence Contract — DONE
+- **P04-T02:** Signal Evidence Normalization — DONE
+- **P04-T03:** Signal Evidence Quality — DONE
+- **P04-T04:** Signal Evidence Evaluation — DONE
+- **P04-T05:** Signal Evidence Aggregation — NOT STARTED
 
 ### P05 — OPPORTUNITY ENGINE
 - **Objective:** Fuse signals and rank candidate opportunities.

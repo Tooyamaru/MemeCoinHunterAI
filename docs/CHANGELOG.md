@@ -2,6 +2,18 @@
 
 ## 2026-08-12
 
+- **PHASE:** P04 — Market & Signal Intelligence
+- **TASK:** P04-T01 through P04-T04 — Contract-Layer Signal Processing
+- **CHANGE:** Completed the provider-neutral, immutable signal evidence
+  contract progression through normalization, quality validation, and
+  evidence-based evaluation.
+- **COMMITS:** `0f950cc`, `98dd60b`, `728e1ab`, `002909b`
+- **SCOPE:** P04-T01 through P04-T04 are complete. P04-T05 — Signal Evidence
+  Aggregation remains NOT STARTED; no later P04 task or provider, trading,
+  execution, wallet, network, AI, or persistence functionality was introduced.
+
+## 2026-08-12
+
 - **PHASE:** P03 — Token Safety & Risk Intelligence
 - **TASK:** P03-T03 — Token Safety Eligibility Derivation Closure
 - **CHANGE:** Synchronized the governance record to formally close the
