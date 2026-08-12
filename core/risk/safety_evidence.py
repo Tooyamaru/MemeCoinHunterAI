@@ -258,10 +258,9 @@ class DerivedEligibilityOutput:
         _require_text(self.evaluator_id, "evaluator_id")
         _require_aware_datetime(self.evaluated_at, "evaluated_at")
         references = tuple(self.evidence_references)
-        if not references or any(not isinstance(value, str) or not value.strip() for value in references):
+        if any(not isinstance(value, str) or not value.strip() for value in references):
             raise ValueError("evidence_references must contain non-empty references")
-        if len(set(references)) != len(references):
-            raise ValueError("evidence_references must be unique")
+        object.__setattr__(self, "evidence_references", references)
         _require_text(self.contract_version, "contract_version")
 
     @property

@@ -255,3 +255,38 @@ def test_caller_eligible_value_is_only_a_non_authoritative_future_output():
 
     assert output.status is EligibilityStatus.ELIGIBLE
     assert output.is_authoritative is False
+
+
+def test_derived_eligibility_output_accepts_empty_evidence_references():
+    output = DerivedEligibilityOutput(
+        status=EligibilityStatus.UNKNOWN,
+        evaluator_id="future-evaluator",
+        evaluated_at=OBSERVED_AT,
+        evidence_references=(),
+    )
+
+    assert output.evidence_references == ()
+
+
+def test_derived_eligibility_output_preserves_duplicate_evidence_references():
+    output = DerivedEligibilityOutput(
+        status=EligibilityStatus.UNKNOWN,
+        evaluator_id="future-evaluator",
+        evaluated_at=OBSERVED_AT,
+        evidence_references=("duplicate", "duplicate"),
+    )
+
+    assert output.evidence_references == ("duplicate", "duplicate")
+
+
+def test_derived_eligibility_output_normalizes_references_and_remains_immutable():
+    output = DerivedEligibilityOutput(
+        status=EligibilityStatus.UNKNOWN,
+        evaluator_id="future-evaluator",
+        evaluated_at=OBSERVED_AT,
+        evidence_references=["reference"],
+    )
+
+    assert output.evidence_references == ("reference",)
+    with pytest.raises(FrozenInstanceError):
+        output.evidence_references = ("changed",)
