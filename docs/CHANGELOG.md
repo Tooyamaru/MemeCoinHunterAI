@@ -3,6 +3,23 @@
 ## 2026-08-12
 
 - **PHASE:** P04 — Market & Signal Intelligence
+- **TASK:** P04-T05 — Signal Evidence Aggregation Closure
+- **CHANGE:** Completed and formally closed the deterministic, immutable,
+  provider-neutral signal evidence aggregation boundary.
+- **VERIFICATION:** 56 focused P04 signal tests passed; 330 full regression
+  tests passed; `python -m compileall -q core tests` passed; and
+  `git diff --check` passed.
+- **AUDIT:** No production-code fix was required. The incorrect blocked-
+  evaluation test setup was corrected without changing P04-T05 aggregation
+  semantics.
+- **SCOPE:** No scoring, ranking, prediction, authorization, trading,
+  execution, wallet, provider, AI/ML, persistence, or production behavior was
+  introduced. P04-T06 remains NOT STARTED / NOT AUTHORIZED. P04 overall
+  remains NOT COMPLETE.
+
+## 2026-08-12
+
+- **PHASE:** P04 — Market & Signal Intelligence
 - **TASK:** P04-T01 through P04-T04 — Contract-Layer Signal Processing
 - **CHANGE:** Completed the provider-neutral, immutable signal evidence
   contract progression through normalization, quality validation, and

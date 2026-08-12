@@ -9,7 +9,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P04 — Market & Signal Intelligence
 - **Current task:** P04-T05 — Signal Evidence Aggregation
-- **Current task status:** NOT STARTED
+- **Current task status:** COMPLETE / CLOSED
 - **Last updated:** 2026-08-12
 
 ## Master progress
@@ -18,40 +18,39 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
-- P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 not started; P04 overall remains not complete
+- P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; P04 overall remains not complete
 - P05–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P04-T05 Signal Evidence Aggregation; P04-T06 and later P04 tasks; P05–P12
+- **Not started:** P04-T06 and later P04 tasks; P05–P12
 
 ## Current objective
 
 Maintain a portable, auditable signal evidence boundary with deterministic
 normalization, explicit provenance and freshness, fail-closed quality states,
-and explicit evaluation outcomes before implementing signal evidence
-aggregation or later market, AI, wallet, trading, or production functionality.
+explicit evaluation outcomes, and deterministic aggregation before implementing
+P04-T06 or later market, AI, wallet, trading, or production functionality.
 
 ## Last verified checkpoint
 
-P04-T04 implementation and governance checkpoint synchronization completed on
-2026-08-12 at commit `51449c7`. P04-T01 through P04-T04 are implemented and
-complete. P04-T05 — Signal Evidence Aggregation — has not started. No P04-T06
-or later task has started.
+P04-T05 implementation and verification completed on 2026-08-12. P04-T01
+through P04-T05 are implemented, verified, and complete / closed. P04-T06 and
+later tasks remain not started and separately unauthorized.
 
-At the verified checkpoint, the working tree was clean and `HEAD` and
-`origin/main` were both `51449c7`. P04-T01 through P04-T04 were implemented,
-verified, and complete. This continuation performs governance synchronization
-only; P04-T05 implementation has not begun.
+The P04-T05 verification passed with no production-code fix required. The
+blocked-evaluation test setup was corrected without changing aggregation
+semantics. This continuation performs governance synchronization only;
+P04-T06 implementation is not authorized unless separately approved.
 P03-T01 remains implemented, audited, and technically complete. P03-T02
 remains implemented, audited / verified, and formally closed. P03-T03 is
 implemented, audited, verified, and formally closed. P03 overall remains not
-complete. P04-T01 through P04-T04 are complete. P04-T05 remains not started,
-and P04 overall remains not complete.
+complete. P04-T01 through P04-T05 are complete / closed. P04-T06 remains not
+started / not authorized, and P04 overall remains not complete.
 
 Final P02-T09 verification for the provider-neutral market intelligence
 boundary, completed on 2026-08-12 at Git baseline `8958ed2` (HEAD and
@@ -146,15 +145,17 @@ functionality was introduced.
 
 ## Next action
 
-The next implementation boundary is P04-T05 — Signal Evidence Aggregation.
-Implementation has not started. P04-T06 and later tasks have not started.
+The next implementation boundary is P04-T06 — Signal Evidence Snapshot
+Contract. P04-T06 is not authorized unless separately approved. Later tasks
+have not started.
 
 ## Next task
 
-P04-T05 is NOT STARTED. P04 overall remains NOT COMPLETE. P04-T01 through
-P04-T04 are complete. P04-T06 and later tasks have not started. Provider
-connectivity, ingestion transports, persistence changes, market-state
-collection, and later phases require separate specifications and approval.
+P04-T05 is COMPLETE / CLOSED. P04 overall remains NOT COMPLETE. P04-T01
+through P04-T05 are complete. P04-T06 is the next implementation boundary but
+remains NOT STARTED / NOT AUTHORIZED. Provider connectivity, ingestion
+transports, persistence changes, market-state collection, and later phases
+require separate specifications and approval.
 
 ## Required secret names
 
@@ -185,5 +186,5 @@ secrets; names will be added only when a later task requires them.
 - **P04-T02:** COMPLETE — Signal Evidence Normalization
 - **P04-T03:** COMPLETE — Signal Evidence Quality
 - **P04-T04:** COMPLETE — Signal Evidence Evaluation
-- **P04-T05:** NOT STARTED — Signal Evidence Aggregation
-- **Next implementation action:** P04-T05 — Signal Evidence Aggregation; implementation has not started
+- **P04-T05:** COMPLETE / CLOSED — Signal Evidence Aggregation
+- **Next implementation action:** P04-T06 — Signal Evidence Snapshot Contract; NOT AUTHORIZED unless separately approved
