@@ -1,0 +1,228 @@
+from dataclasses import FrozenInstanceError
+from datetime import datetime, timezone
+from types import MappingProxyType
+
+import pytest
+
+from core.signals.signal_aggregation import aggregate_signal_evidence
+from core.signals.signal_evaluation import evaluate_signal_evidence
+from core.signals.signal_evidence import (
+    SignalEvidence,
+    SignalEvidenceCollection,
+    SignalProvenance,
+)
+from core.signals.signal_normalization import normalize_signal_evidence
+from core.signals.signal_quality import assess_signal_evidence_quality
+from core.signals.signal_snapshot import (
+    P04_T06_CONTRACT_VERSION,
+    SignalEvidenceSnapshotCollection,
+    create_signal_evidence_snapshot,
+    snapshot_signal_evidence,
+)
+
+
+UTC = timezone.utc
+OBSERVED_AT = datetime(2026, 8, 12, 12, 0, tzinfo=UTC)
+
+
+def _evidence(
+    *,
+    source_id: str = "signal-source",
+    evidence_reference: str = "evidence-1",
+    signal_type: str = "momentum",
+    signal_status: str = "observed",
+    observed_at: datetime = OBSERVED_AT,
+    metadata: dict | None = None,
+) -> SignalEvidence:
+    return SignalEvidence(
+        chain_id="solana",
+        token_identity="mint-A",
+        signal_type=signal_type,
+        signal_status=signal_status,
+        observed_at=observed_at,
+        source_id=source_id,
+        evidence_reference=evidence_reference,
+        reason_codes=("MOMENTUM_OBSERVED",),
+        confidence=0.75,
+        provenance=SignalProvenance(
+            source_id=source_id,
+            method="bounded-market-observation",
+            observed_at=observed_at,
+            metadata=metadata or {"source": "fixture"},
+        ),
+    )
+
+
+def _aggregation(*items: SignalEvidence):
+    normalized = normalize_signal_evidence(
+        SignalEvidenceCollection(
+            chain_id="solana",
+            token_identity="mint-A",
+            evidence=tuple(items),
+        )
+    )
+    quality = assess_signal_evidence_quality(normalized)
+    evaluation = evaluate_signal_evidence(normalized, quality)
+    return aggregate_signal_evidence(evaluation)
+
+
+def test_snapshot_preserves_the_evidence_chain():
+    result = _aggregation(
+        _evidence(source_id="source-a", evidence_reference="first"),
+        _evidence(
+            source_id="source-b",
+            evidence_reference="second",
+            signal_type="trend",
+            signal_status="confirmed",
+            observed_at=datetime(2026, 8, 12, 8, 0, tzinfo=UTC),
+        ),
+    )
+
+    snapshot = snapshot_signal_evidence(result)
+
+    assert snapshot.chain_id == "solana"
+    assert snapshot.token_identity == "mint-A"
+    assert snapshot.evidence_references == ("first", "second")
+    assert snapshot.signal_statuses == ("observed", "confirmed")
+    assert snapshot.reason_codes == result.reason_codes
+    assert snapshot.provenance == result.provenance
+    assert snapshot.observation_timestamps == (
+        OBSERVED_AT,
+        datetime(2026, 8, 12, 8, 0, tzinfo=UTC),
+    )
+    assert snapshot.quality_status is result.quality_status
+    assert snapshot.evaluation_status is result.evaluation_status
+    assert snapshot.normalized_evidence_digest == result.normalized_evidence_digest
+    assert snapshot.aggregation_digest == result.representation_digest
+    assert snapshot.aggregation_contract_version == result.contract_version
+    assert snapshot.contract_version == P04_T06_CONTRACT_VERSION
+
+
+def test_snapshot_and_nested_representation_are_immutable():
+    snapshot = snapshot_signal_evidence(_aggregation(_evidence()))
+
+    with pytest.raises(FrozenInstanceError):
+        snapshot.aggregated = False
+    with pytest.raises(TypeError):
+        snapshot.canonical_representation["new"] = "value"
+    assert isinstance(snapshot.canonical_representation, MappingProxyType)
+    with pytest.raises(TypeError):
+        snapshot.canonical_representation["provenance"][0]["metadata"]["new"] = 1
+
+
+def test_snapshot_factory_alias_is_deterministic():
+    first = snapshot_signal_evidence(_aggregation(_evidence()))
+    second = create_signal_evidence_snapshot(_aggregation(_evidence()))
+
+    assert first == second
+    assert first.canonical_representation == second.canonical_representation
+    assert first.representation_digest == second.representation_digest
+    assert first.digest == first.representation_digest
+
+
+def test_collection_is_immutable_and_deterministically_ordered():
+    first = snapshot_signal_evidence(
+        _aggregation(_evidence(evidence_reference="first"))
+    )
+    second = snapshot_signal_evidence(
+        _aggregation(
+            _evidence(
+                evidence_reference="second",
+                signal_type="trend",
+            )
+        )
+    )
+
+    left = SignalEvidenceSnapshotCollection.from_snapshots([second, first])
+    right = SignalEvidenceSnapshotCollection.from_snapshots([first, second])
+
+    assert left == right
+    assert left.snapshots == right.snapshots
+    with pytest.raises(FrozenInstanceError):
+        left.snapshots = ()
+    with pytest.raises(TypeError):
+        left.canonical_representation["new"] = "value"
+
+
+def test_duplicate_records_are_preserved_without_deduplication():
+    snapshot = snapshot_signal_evidence(
+        _aggregation(
+            _evidence(source_id="source-a", evidence_reference="duplicate"),
+            _evidence(source_id="source-b", evidence_reference="duplicate"),
+        )
+    )
+
+    assert snapshot.evidence_references == ("duplicate", "duplicate")
+    assert tuple(item.source_id for item in snapshot.provenance) == (
+        "source-a",
+        "source-b",
+    )
+    collection = SignalEvidenceSnapshotCollection.from_snapshots(
+        [snapshot, snapshot]
+    )
+    assert collection.snapshot_count == 2
+    assert collection.snapshots == (snapshot, snapshot)
+
+
+def test_empty_snapshot_collection_is_deterministic():
+    collection = SignalEvidenceSnapshotCollection.from_snapshots([])
+
+    assert collection.snapshots == ()
+    assert collection.snapshot_count == 0
+    assert collection.canonical_representation["snapshots"] == ()
+    assert collection.representation_digest == (
+        SignalEvidenceSnapshotCollection.from_snapshots([]).representation_digest
+    )
+
+
+def test_digest_changes_when_semantic_content_changes():
+    first = snapshot_signal_evidence(
+        _aggregation(_evidence(evidence_reference="first"))
+    )
+    second = snapshot_signal_evidence(
+        _aggregation(_evidence(evidence_reference="changed"))
+    )
+
+    assert first.representation_digest != second.representation_digest
+
+
+def test_dictionary_insertion_order_does_not_change_digest():
+    first = snapshot_signal_evidence(
+        _aggregation(_evidence(metadata={"z": 1, "a": {"b": 2, "a": 1}}))
+    )
+    second = snapshot_signal_evidence(
+        _aggregation(_evidence(metadata={"a": {"a": 1, "b": 2}, "z": 1}))
+    )
+
+    assert first.canonical_representation == second.canonical_representation
+    assert first.representation_digest == second.representation_digest
+
+
+def test_snapshot_requires_timezone_aware_observation_timestamps():
+    result = _aggregation(_evidence())
+    with pytest.raises(ValueError, match="timezone-aware"):
+        type(snapshot_signal_evidence(result))(
+            chain_id=result.chain_id,
+            token_identity=result.token_identity,
+            aggregation_status=result.aggregation_status,
+            aggregated=result.aggregated,
+            evaluation_status=result.evaluation_status,
+            quality_status=result.quality_status,
+            signal_statuses=result.signal_statuses,
+            reason_codes=result.reason_codes,
+            evidence_references=result.evidence_references,
+            provenance=result.provenance,
+            observation_timestamps=(datetime(2026, 8, 12, 12, 0),),
+            normalized_evidence_digest=result.normalized_evidence_digest,
+            evaluation_digest=result.evaluation_digest,
+            aggregation_digest=result.representation_digest,
+            aggregation_contract_version=result.contract_version,
+        )
+
+
+def test_snapshot_does_not_add_a_current_time():
+    snapshot = snapshot_signal_evidence(_aggregation(_evidence()))
+
+    assert snapshot.observation_timestamps == (OBSERVED_AT,)
+    assert not hasattr(snapshot, "snapshot_at")
+    assert not hasattr(snapshot, "created_at")
