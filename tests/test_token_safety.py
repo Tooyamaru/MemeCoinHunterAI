@@ -34,6 +34,7 @@ def _evidence(
     reason_codes: tuple[str, ...] = (),
     token_identity: str = "mint-A",
     observed_at: datetime = OBSERVED_AT,
+    p02_reference: P02StateReference | None = None,
 ):
     return TokenSafetyEvidence(
         chain_id="solana",
@@ -57,10 +58,14 @@ def _evidence(
             if evidence_context is None and status is SafetyStatus.PASS
             else evidence_context or {}
         ),
-        p02_reference=P02StateReference(
-            state_version="p02-state-v1",
-            state_digest="p02-digest",
-            contract_version="p02-t09-v1",
+        p02_reference=(
+            p02_reference
+            if p02_reference is not None
+            else P02StateReference(
+                state_version="p02-state-v1",
+                state_digest="p02-digest",
+                contract_version="p02-t09-v1",
+            )
         ),
         reason_codes=reason_codes,
     )
@@ -232,7 +237,7 @@ def test_upstream_p02_reference_is_not_mutated():
         contract_version="p02-t09-v1",
         evaluation_id="evaluation",
     )
-    evidence = _evidence()
+    evidence = _evidence(p02_reference=reference)
     before = reference
 
     assert evidence.p02_reference == before
