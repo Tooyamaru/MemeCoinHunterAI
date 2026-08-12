@@ -70,6 +70,15 @@ def _empty_evaluation():
     return evaluate_signal_evidence(normalized, quality)
 
 
+def _quality_blocked_evaluation():
+    normalized = normalize_signal_evidence(
+        SignalEvidenceCollection.from_evidence([_evidence()])
+    )
+    object.__setattr__(normalized.evidence[0], "confidence", 1.5)
+    quality = assess_signal_evidence_quality(normalized)
+    return evaluate_signal_evidence(normalized, quality)
+
+
 def test_aggregation_preserves_trace_and_is_immutable():
     evaluation = _evaluated(
         _evidence(source_id="source-a", evidence_reference="first"),
@@ -157,9 +166,12 @@ def test_empty_input_is_explicit_and_fail_closed():
 
 
 def test_blocked_evaluation_is_not_aggregated():
-    result = aggregate_signal_evidence(_empty_evaluation())
+    evaluation = _quality_blocked_evaluation()
+    result = aggregate_signal_evidence(evaluation)
 
+    assert evaluation.evaluation_status is SignalEvaluationStatus.QUALITY_BLOCKED
     assert result.evaluation_status is SignalEvaluationStatus.QUALITY_BLOCKED
+    assert result.aggregation_status is SignalAggregationStatus.EVALUATION_BLOCKED
     assert result.quality_status is not None
     assert result.aggregated is False
 
