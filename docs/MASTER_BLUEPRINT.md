@@ -15,7 +15,8 @@ gate, including the stale-data validation correction and explicit source-event
 identity/contradiction correction. P03-T01 is technically implemented and
 audited with a PASS WITH NON-BLOCKING OBSERVATIONS result. P03 overall is not
 complete. P03-T02 is implemented, its corrective fix is completed, it is
-audited / verified, and it is formally closed; P03-T03 remains NOT AUTHORIZED.
+audited / verified, and it is formally closed; P03-T03 is implemented,
+audited, verified, and formally closed.
 No provider, network,
 persistence, AI, wallet, trading, or execution integration was introduced. The
 next task is not selected here; later phases remain gated until explicitly
@@ -172,7 +173,7 @@ STOP, PAUSE, or change market.
 - **P02-T09:** Provider-neutral market intelligence boundary — DONE / ARCHITECTURE GATE PASS
 - **P03-T01:** IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE
 - **P03-T02:** IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED
-- **P03-T03:** NOT AUTHORIZED
+- **P03-T03:** IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED
 - **P03 overall:** NOT COMPLETE
 
 ### P03 — TOKEN SAFETY & RISK INTELLIGENCE

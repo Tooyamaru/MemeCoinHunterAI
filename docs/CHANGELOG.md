@@ -3,6 +3,26 @@
 ## 2026-08-12
 
 - **PHASE:** P03 — Token Safety & Risk Intelligence
+- **TASK:** P03-T03 — Token Safety Eligibility Derivation Closure
+- **CHANGE:** Synchronized the governance record to formally close the
+  already-implemented deterministic, provider-neutral eligibility derivation at
+  commit `fb728b7`.
+- **VERIFICATION:** 50 focused tests passed; 264 full regression tests passed
+  with one existing deprecation warning; `python -m compileall -q core tests`
+  passed; `git diff --check` passed.
+- **AUDIT:** Implementation, safety/fail-closed behavior, and scope passed.
+  The initial governance audit could not close P03-T03 because the governance
+  documentation was stale. This synchronization resolves that documentation
+  gap.
+- **SCOPE:** T03 consumes the immutable T02 evaluation context. The existing
+  `DerivedEligibilityOutput` contract does not expose a separate provenance
+  field; this remains a non-blocking contract observation. No external I/O or
+  later-phase implementation was introduced. P03-T03 is formally closed. P03
+  remains not complete.
+
+## 2026-08-12
+
+- **PHASE:** P03 — Token Safety & Risk Intelligence
 - **TASK:** P03-T02 — Safety Evaluation Boundary Closure
 - **CHANGE:** Completed the corrective implementation so future-dated evidence
   can no longer produce a positive safety result, and added focused regression
