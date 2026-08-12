@@ -432,6 +432,8 @@ def validate_decision_ready_candidate(
             reasons.append(DecisionReadyReason.QUALITY_INCONSISTENT.value)
         if quality_status is DataQuality.INCOMPLETE and quality.completeness:
             reasons.append(DecisionReadyReason.QUALITY_INCONSISTENT.value)
+        if DataQuality.STALE in {quality_status, freshness_status}:
+            reasons.append(DecisionReadyReason.STALE_DATA.value)
 
     if _assessment_status(safety.safety_status) is None:
         reasons.append(DecisionReadyReason.INVALID_SAFETY_STATUS.value)
