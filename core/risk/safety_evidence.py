@@ -251,6 +251,7 @@ class DerivedEligibilityOutput:
     evaluated_at: datetime
     evidence_references: tuple[str, ...]
     contract_version: str = P03_T01_CONTRACT_VERSION
+    reason_codes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         status = _enum_value(self.status, EligibilityStatus, "status")
@@ -262,6 +263,8 @@ class DerivedEligibilityOutput:
             raise ValueError("evidence_references must contain non-empty references")
         object.__setattr__(self, "evidence_references", references)
         _require_text(self.contract_version, "contract_version")
+        reasons = _normalise_reason_codes(self.reason_codes)
+        object.__setattr__(self, "reason_codes", tuple(sorted(reasons)))
 
     @property
     def is_authoritative(self) -> bool:
