@@ -13,9 +13,9 @@ evidence; P02-T08 materializes current market state; and P02-T09 provides the
 provider-neutral market intelligence boundary. P02-T09 passed its architecture
 gate, including the stale-data validation correction and explicit source-event
 identity/contradiction correction. No provider, network, persistence, AI,
-wallet, trading, or execution integration was introduced. P02-T10 and later
-tasks remain not started and unauthorized. The next task is not selected here;
-later tasks remain gated until explicitly authorized.
+wallet, trading, or execution integration was introduced. P03 and later tasks
+remain not started and unauthorized. The next task is not selected here; later
+phases remain gated until explicitly authorized.
 
 ## V1.1 architectural baseline
 
@@ -166,7 +166,7 @@ STOP, PAUSE, or change market.
 - **P02-T07:** Provider-neutral token-scoped market observation evidence contract — DONE
 - **P02-T08:** Provider-neutral market state materialization — DONE
 - **P02-T09:** Provider-neutral market intelligence boundary — DONE / ARCHITECTURE GATE PASS
-- **P02-T10 and later:** NOT STARTED / NOT AUTHORIZED
+- **P03 and later:** NOT STARTED / NOT AUTHORIZED
 
 ### P03 — TOKEN SAFETY & RISK INTELLIGENCE
 - **Objective:** Reject dangerous or untradable tokens before expensive analysis.
