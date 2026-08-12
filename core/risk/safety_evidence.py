@@ -9,7 +9,7 @@ aggregate approval or trading authorization.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields, is_dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 import hashlib
 import json
@@ -390,7 +390,7 @@ def _canonical_general(value: Any) -> Any:
     if isinstance(value, StrEnum):
         return value.value
     if isinstance(value, datetime):
-        return value.isoformat()
+        return value.astimezone(timezone.utc).isoformat()
     if isinstance(value, timedelta):
         return value.total_seconds()
     if isinstance(value, Mapping):
@@ -403,6 +403,19 @@ def _canonical_general(value: Any) -> Any:
             items,
             key=lambda item: json.dumps(item, sort_keys=True, separators=(",", ":")),
         )
+    if isinstance(value, SafetyEvidenceCollection):
+        evidence = [_canonical_general(item) for item in value.evidence]
+        evidence.sort(
+            key=lambda item: json.dumps(
+                item, sort_keys=True, separators=(",", ":")
+            )
+        )
+        return {
+            "token_identity": value.token_identity,
+            "chain_id": value.chain_id,
+            "evidence": evidence,
+            "contract_version": value.contract_version,
+        }
     if is_dataclass(value):
         return {
             item.name: _canonical_general(getattr(value, item.name))

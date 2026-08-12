@@ -33,6 +33,7 @@ def _evidence(
     evidence_context: dict | None = None,
     reason_codes: tuple[str, ...] = (),
     token_identity: str = "mint-A",
+    observed_at: datetime = OBSERVED_AT,
 ):
     return TokenSafetyEvidence(
         chain_id="solana",
@@ -40,14 +41,14 @@ def _evidence(
         domain=domain,
         status=status,
         source_id=source_id,
-        observed_at=OBSERVED_AT,
+        observed_at=observed_at,
         quality=quality,
         freshness_status=freshness_status,
         data_age=data_age,
         provenance=SafetyProvenance(
             source_id=source_id,
             method="bounded-observation",
-            observed_at=OBSERVED_AT,
+            observed_at=observed_at,
             metadata={"source": "fixture", "nested": {"stable": True}},
         ),
         evidence_reference=evidence_reference,
@@ -197,6 +198,31 @@ def test_equivalent_inputs_have_deterministic_representations():
     assert SafetyEvidenceCollection.from_evidence([left]).representation_digest == (
         SafetyEvidenceCollection.from_evidence([right]).representation_digest
     )
+
+
+def test_timezone_equivalent_timestamps_have_identical_digests():
+    utc_evidence = _evidence()
+    offset_evidence = _evidence(
+        observed_at=datetime(2026, 8, 12, 8, 0, tzinfo=timezone(timedelta(hours=-4)))
+    )
+
+    assert utc_evidence.representation_digest == offset_evidence.representation_digest
+
+
+def test_reordered_collection_evidence_has_identical_digest():
+    passed = _evidence(evidence_reference="pass")
+    failed = _evidence(
+        status=SafetyStatus.FAIL,
+        evidence_reference="fail",
+        reason_codes=("NEGATIVE_EVIDENCE",),
+        evidence_context={"observation": "explicit negative fact"},
+    )
+    first = SafetyEvidenceCollection.from_evidence([passed, failed])
+    reordered = SafetyEvidenceCollection.from_evidence([failed, passed])
+
+    assert first.evidence == (passed, failed)
+    assert reordered.evidence == (failed, passed)
+    assert first.representation_digest == reordered.representation_digest
 
 
 def test_upstream_p02_reference_is_not_mutated():
