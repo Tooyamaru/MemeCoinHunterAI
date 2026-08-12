@@ -8,20 +8,20 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P02 — Solana / DEX Data Intelligence
-- **Current task:** None
-- **Current task status:** No task in progress
-- **Last updated:** 2026-08-11
+- **Current task:** P02-T09 — Provider-Neutral Market Intelligence Boundary
+- **Current task status:** COMPLETED / VERIFIED / ARCHITECTURE GATE PASS
+- **Last updated:** 2026-08-12
 
 ## Master progress
 
 - P00: DONE; T01 done; T02 done
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
-- P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done
+- P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary — FINAL
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
@@ -36,16 +36,16 @@ functionality.
 
 ## Last verified checkpoint
 
-Final P02-T06 audit for the provider-neutral token-universe state /
-materialization boundary, verified on 2026-08-11. The timestamp-validation
-correction was completed and finally audited PASS. 102 focused P02 tests, 158
-full regression tests, Python compilation, `git diff --check`, and repository
-hygiene passed; one existing Starlette/httpx deprecation warning remains. The
-boundary consumes accepted P02-T04/P02-T05 discovery results, materializes a
-deterministic local read-oriented current view, preserves provenance and
-currentness, and fails closed for rejected, stale, duplicate, contradictory,
-out-of-order, unavailable, and resynchronization-required inputs. No provider,
-RPC, DEX, wallet, AI/ML, trading, execution, persistence, or production
+Final P02-T09 verification for the provider-neutral market intelligence
+boundary, completed on 2026-08-12 at Git baseline `8958ed2` (HEAD and
+origin/main). P02-T06, P02-T07, P02-T08, and P02-T09 are completed and
+verified; the P02-T09 architecture gate is PASS. The P02-T09 stale-data
+validation fix and explicit source-event identity/contradiction fix are
+complete and committed. The authorized focused verification passed with 11
+decision-ready tests and 17 market-intelligence tests, 28 combined. The
+boundary preserves timestamp/provenance context, remains deterministic and
+fail-closed, and produces decision-ready information only. No provider, RPC,
+DEX, wallet, AI/ML, trading, execution, persistence, or production
 functionality was introduced.
 
 ## Relevant files for current task
@@ -115,18 +115,24 @@ functionality was introduced.
   orchestration, explicit accepted/rejected outcomes, source health/recovery,
   resynchronization, publication, and local tests; no provider, external I/O,
   migration, trading capability, commit, or push was added.
+- P02-T09 is complete and ready for the next officially gated task. Its
+  architecture gate passed with the stale-data correction, explicit
+  source-event identity/contradiction semantics, deterministic decision-ready
+  validation, UNKNOWN-state preservation, and point-in-time provenance intact.
+  No future task was started or invented.
 
 ## Next action
 
-Await explicit authorization/review for P02-T07. Do not start P02-T07 or any
-later task without separate authorization.
+P02-T09 is complete and ready for the next officially gated task. Do not
+invent or start a future task without the existing roadmap and separate
+authorization.
 
 ## Next task
 
-P02-T07 — NOT STARTED / NOT AUTHORIZED. P03 onward — NOT STARTED / NOT
-AUTHORIZED. Provider connectivity, ingestion transports, persistence changes,
-market-state collection, and other later P02 capabilities require separate
-specifications and approval.
+No next task is selected in this synchronization. P02-T10 and later tasks,
+and P03 onward, are NOT STARTED / NOT AUTHORIZED. Provider connectivity,
+ingestion transports, persistence changes, market-state collection, and other
+later P02 capabilities require separate specifications and approval.
 
 ## Required secret names
 
@@ -146,4 +152,7 @@ secrets; names will be added only when a later task requires them.
 - **P02-T04:** DONE
 - **P02-T05:** DONE
 - **P02-T06:** DONE
-- **Next implementation action:** Await review; P02-T07 and P03 remain NOT STARTED / NOT AUTHORIZED
+- **P02-T07:** DONE
+- **P02-T08:** DONE
+- **P02-T09:** DONE — ARCHITECTURE GATE PASS
+- **Next implementation action:** Await the next officially gated task; no future task is selected or authorized here

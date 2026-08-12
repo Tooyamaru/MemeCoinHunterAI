@@ -6,14 +6,16 @@ This document maps the system. It does not implement future phases.
 
 The project is in P02 — Solana / DEX Data Intelligence. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
-Extensions are complete. P02-T01 through P02-T06 are implemented and verified.
+Extensions are complete. P02-T01 through P02-T09 are implemented and verified.
 P02-T06 is the deterministic provider-neutral token-universe
-state/materialization boundary: it consumes accepted P02-T04/P02-T05 discovery
-results, preserves provenance and currentness, and produces a local
-read-oriented current view with fail-closed rejection semantics. No provider,
-network, persistence, AI, wallet, trading, or execution integration was
-introduced. P02-T07 and P03 remain not started and unauthorized. Later tasks
-remain gated until explicitly authorized.
+state/materialization boundary; P02-T07 admits token-scoped market observation
+evidence; P02-T08 materializes current market state; and P02-T09 provides the
+provider-neutral market intelligence boundary. P02-T09 passed its architecture
+gate, including the stale-data validation correction and explicit source-event
+identity/contradiction correction. No provider, network, persistence, AI,
+wallet, trading, or execution integration was introduced. P02-T10 and later
+tasks remain not started and unauthorized. The next task is not selected here;
+later tasks remain gated until explicitly authorized.
 
 ## V1.1 architectural baseline
 
@@ -161,7 +163,10 @@ STOP, PAUSE, or change market.
 - **P02-T04:** Provider-neutral token universe / discovery contract — DONE
 - **P02-T05:** Discovery-to-orchestration integration boundary — DONE
 - **P02-T06:** Provider-neutral token-universe state / materialization boundary — DONE
-- **P02-T07 and later:** NOT STARTED / NOT AUTHORIZED
+- **P02-T07:** Provider-neutral token-scoped market observation evidence contract — DONE
+- **P02-T08:** Provider-neutral market state materialization — DONE
+- **P02-T09:** Provider-neutral market intelligence boundary — DONE / ARCHITECTURE GATE PASS
+- **P02-T10 and later:** NOT STARTED / NOT AUTHORIZED
 
 ### P03 — TOKEN SAFETY & RISK INTELLIGENCE
 - **Objective:** Reject dangerous or untradable tokens before expensive analysis.
