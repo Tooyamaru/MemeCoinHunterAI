@@ -15,8 +15,10 @@ from core.signals.signal_normalization import normalize_signal_evidence
 from core.signals.signal_quality import assess_signal_evidence_quality
 from core.signals.signal_snapshot import (
     P04_T06_CONTRACT_VERSION,
+    SignalSnapshotStatus,
     SignalEvidenceSnapshotCollection,
     create_signal_evidence_snapshot,
+    snapshot_signal_evidence_result,
     snapshot_signal_evidence,
 )
 
@@ -226,3 +228,76 @@ def test_snapshot_does_not_add_a_current_time():
     assert snapshot.observation_timestamps == (OBSERVED_AT,)
     assert not hasattr(snapshot, "snapshot_at")
     assert not hasattr(snapshot, "created_at")
+
+
+def test_valid_snapshot_result_preserves_upstream_context():
+    aggregation = _aggregation(_evidence())
+
+    result = snapshot_signal_evidence_result(aggregation)
+
+    assert result.status is SignalSnapshotStatus.SNAPSHOTTED
+    assert result.valid is True
+    assert result.snapshot is not None
+    assert result.upstream_aggregation_status is aggregation.aggregation_status
+    assert result.upstream_evaluation_status is aggregation.evaluation_status
+    assert result.upstream_quality_status is aggregation.quality_status
+    assert result.aggregation_digest == aggregation.representation_digest
+
+
+def test_invalid_snapshot_input_fails_closed():
+    result = snapshot_signal_evidence_result(object())
+
+    assert result.status is SignalSnapshotStatus.INVALID_INPUT
+    assert result.snapshotted is False
+    assert result.snapshot is None
+    assert result.reason_codes == ("INVALID_AGGREGATION_RESULT",)
+    assert result.canonical_representation["snapshot"] is None
+
+
+def test_empty_snapshot_input_fails_closed():
+    result = snapshot_signal_evidence_result(_aggregation())
+
+    assert result.status is SignalSnapshotStatus.EMPTY_INPUT
+    assert result.valid is False
+    assert result.snapshot is None
+    assert result.reason_codes == ("NO_EVIDENCE",)
+    assert result.upstream_aggregation_status.value == "EMPTY_INPUT"
+
+
+def test_blocked_upstream_evaluation_fails_closed():
+    normalized = normalize_signal_evidence(
+        SignalEvidenceCollection.from_evidence([_evidence()])
+    )
+    object.__setattr__(normalized.evidence[0], "confidence", 1.5)
+    quality = assess_signal_evidence_quality(normalized)
+    evaluation = evaluate_signal_evidence(normalized, quality)
+    aggregation = aggregate_signal_evidence(evaluation)
+
+    result = snapshot_signal_evidence_result(aggregation)
+
+    assert result.status is SignalSnapshotStatus.UPSTREAM_BLOCKED
+    assert result.snapshot is None
+    assert result.reason_codes == ("INVALID_CONFIDENCE",)
+    assert result.upstream_evaluation_status.value == "QUALITY_BLOCKED"
+
+
+def test_snapshot_result_is_immutable_and_deterministic():
+    first = snapshot_signal_evidence_result(_aggregation(_evidence()))
+    second = snapshot_signal_evidence_result(_aggregation(_evidence()))
+
+    assert first == second
+    assert first.representation_digest == second.representation_digest
+    with pytest.raises(FrozenInstanceError):
+        first.snapshotted = False
+    with pytest.raises(TypeError):
+        first.canonical_representation["new"] = "value"
+
+
+def test_snapshot_creation_does_not_mutate_upstream_aggregation():
+    aggregation = _aggregation(_evidence(metadata={"source": "fixture"}))
+    before = aggregation.canonical_representation
+
+    result = snapshot_signal_evidence_result(aggregation)
+
+    assert result.snapshot is not None
+    assert aggregation.canonical_representation == before

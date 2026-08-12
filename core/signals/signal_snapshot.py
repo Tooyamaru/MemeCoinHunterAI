@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import StrEnum
 import hashlib
 import json
 from types import MappingProxyType
@@ -26,6 +27,21 @@ from core.signals.signal_quality import SignalQualityStatus
 
 
 P04_T06_CONTRACT_VERSION = "p04-t06-v1"
+
+
+class SignalSnapshotStatus(StrEnum):
+    """Snapshot outcomes without market or trading meaning."""
+
+    SNAPSHOTTED = "SNAPSHOTTED"
+    EMPTY_INPUT = "EMPTY_INPUT"
+    UPSTREAM_BLOCKED = "UPSTREAM_BLOCKED"
+    INSUFFICIENT_INPUT = "INSUFFICIENT_INPUT"
+    INVALID_INPUT = "INVALID_INPUT"
+
+    CREATED = "SNAPSHOTTED"
+    EMPTY = "EMPTY_INPUT"
+    BLOCKED = "UPSTREAM_BLOCKED"
+    INVALID = "INVALID_INPUT"
 
 
 @dataclass(frozen=True)
@@ -231,6 +247,269 @@ class SignalEvidenceSnapshot:
 
 
 @dataclass(frozen=True)
+class SignalEvidenceSnapshotResult:
+    """Explicit fail-closed outcome for snapshot creation."""
+
+    snapshot_status: SignalSnapshotStatus
+    snapshotted: bool
+    snapshot: SignalEvidenceSnapshot | None
+    reason_codes: tuple[str, ...]
+    upstream_aggregation_status: SignalAggregationStatus | None
+    upstream_evaluation_status: SignalEvaluationStatus | None
+    upstream_quality_status: SignalQualityStatus | None
+    normalized_evidence_digest: str
+    evaluation_digest: str
+    aggregation_digest: str
+    contract_version: str = P04_T06_CONTRACT_VERSION
+
+    @classmethod
+    def from_aggregation(
+        cls,
+        aggregation: SignalEvidenceAggregationResult | object,
+    ) -> SignalEvidenceSnapshotResult:
+        if not isinstance(aggregation, SignalEvidenceAggregationResult):
+            return cls._invalid(("INVALID_AGGREGATION_RESULT",))
+
+        try:
+            aggregation_status = _aggregation_status(aggregation.aggregation_status)
+            evaluation_status = (
+                None
+                if aggregation.evaluation_status is None
+                else _evaluation_status(aggregation.evaluation_status)
+            )
+            quality_status = (
+                None
+                if aggregation.quality_status is None
+                else _quality_status(aggregation.quality_status)
+            )
+        except ValueError:
+            return cls._invalid(
+                ("INVALID_UPSTREAM_STATUS",),
+                aggregation=aggregation,
+            )
+
+        if aggregation_status is SignalAggregationStatus.EMPTY_INPUT:
+            return cls._blocked(
+                aggregation,
+                status=SignalSnapshotStatus.EMPTY_INPUT,
+                reason_codes=aggregation.reason_codes or ("NO_EVIDENCE",),
+                evaluation_status=evaluation_status,
+                quality_status=quality_status,
+            )
+        if aggregation_status is SignalAggregationStatus.EVALUATION_BLOCKED:
+            return cls._blocked(
+                aggregation,
+                status=SignalSnapshotStatus.UPSTREAM_BLOCKED,
+                reason_codes=aggregation.reason_codes or ("UPSTREAM_BLOCKED",),
+                evaluation_status=evaluation_status,
+                quality_status=quality_status,
+            )
+        if aggregation_status is not SignalAggregationStatus.AGGREGATED:
+            return cls._invalid(
+                ("INVALID_UPSTREAM_AGGREGATION_STATUS",),
+                aggregation=aggregation,
+                evaluation_status=evaluation_status,
+                quality_status=quality_status,
+            )
+        if not aggregation.evidence_references:
+            return cls._blocked(
+                aggregation,
+                status=SignalSnapshotStatus.INSUFFICIENT_INPUT,
+                reason_codes=("NO_EVIDENCE",),
+                evaluation_status=evaluation_status,
+                quality_status=quality_status,
+            )
+
+        try:
+            snapshot = SignalEvidenceSnapshot.from_aggregation(aggregation)
+        except (TypeError, ValueError):
+            return cls._invalid(
+                ("INVALID_UPSTREAM_AGGREGATION",),
+                aggregation=aggregation,
+                evaluation_status=evaluation_status,
+                quality_status=quality_status,
+            )
+        return cls(
+            snapshot_status=SignalSnapshotStatus.SNAPSHOTTED,
+            snapshotted=True,
+            snapshot=snapshot,
+            reason_codes=(),
+            upstream_aggregation_status=aggregation_status,
+            upstream_evaluation_status=evaluation_status,
+            upstream_quality_status=quality_status,
+            normalized_evidence_digest=aggregation.normalized_evidence_digest,
+            evaluation_digest=aggregation.evaluation_digest,
+            aggregation_digest=aggregation.representation_digest,
+        )
+
+    @classmethod
+    def _blocked(
+        cls,
+        aggregation: SignalEvidenceAggregationResult,
+        *,
+        status: SignalSnapshotStatus,
+        reason_codes: tuple[str, ...],
+        evaluation_status: SignalEvaluationStatus | None,
+        quality_status: SignalQualityStatus | None,
+    ) -> SignalEvidenceSnapshotResult:
+        return cls(
+            snapshot_status=status,
+            snapshotted=False,
+            snapshot=None,
+            reason_codes=reason_codes,
+            upstream_aggregation_status=_aggregation_status(
+                aggregation.aggregation_status
+            ),
+            upstream_evaluation_status=evaluation_status,
+            upstream_quality_status=quality_status,
+            normalized_evidence_digest=aggregation.normalized_evidence_digest,
+            evaluation_digest=aggregation.evaluation_digest,
+            aggregation_digest=aggregation.representation_digest,
+        )
+
+    @classmethod
+    def _invalid(
+        cls,
+        reason_codes: tuple[str, ...],
+        *,
+        aggregation: SignalEvidenceAggregationResult | None = None,
+        evaluation_status: SignalEvaluationStatus | None = None,
+        quality_status: SignalQualityStatus | None = None,
+    ) -> SignalEvidenceSnapshotResult:
+        if aggregation is None:
+            return cls(
+                snapshot_status=SignalSnapshotStatus.INVALID_INPUT,
+                snapshotted=False,
+                snapshot=None,
+                reason_codes=reason_codes,
+                upstream_aggregation_status=None,
+                upstream_evaluation_status=None,
+                upstream_quality_status=None,
+                normalized_evidence_digest="invalid-normalized-evidence",
+                evaluation_digest="invalid-evaluation",
+                aggregation_digest="invalid-aggregation",
+            )
+        return cls(
+            snapshot_status=SignalSnapshotStatus.INVALID_INPUT,
+            snapshotted=False,
+            snapshot=None,
+            reason_codes=reason_codes,
+            upstream_aggregation_status=_safe_aggregation_status(
+                aggregation.aggregation_status
+            ),
+            upstream_evaluation_status=evaluation_status,
+            upstream_quality_status=quality_status,
+            normalized_evidence_digest=_safe_text(
+                aggregation.normalized_evidence_digest,
+                "invalid-normalized-evidence",
+            ),
+            evaluation_digest=_safe_text(
+                aggregation.evaluation_digest,
+                "invalid-evaluation",
+            ),
+            aggregation_digest=_safe_digest(
+                aggregation,
+                "invalid-aggregation",
+            ),
+        )
+
+    def __post_init__(self) -> None:
+        status = _snapshot_status(self.snapshot_status)
+        object.__setattr__(self, "snapshot_status", status)
+        if self.snapshotted is not (status is SignalSnapshotStatus.SNAPSHOTTED):
+            raise ValueError("snapshotted must match snapshot_status")
+        if self.snapshotted and self.snapshot is None:
+            raise ValueError("a SNAPSHOTTED result requires a snapshot")
+        if not self.snapshotted and self.snapshot is not None:
+            raise ValueError("non-successful result cannot contain a snapshot")
+
+        reasons = tuple(self.reason_codes)
+        if any(not _is_text(value) for value in reasons):
+            raise ValueError("reason_codes must contain non-empty strings")
+        object.__setattr__(
+            self,
+            "reason_codes",
+            tuple(sorted(dict.fromkeys(reasons))),
+        )
+
+        if self.upstream_aggregation_status is not None:
+            object.__setattr__(
+                self,
+                "upstream_aggregation_status",
+                _aggregation_status(self.upstream_aggregation_status),
+            )
+        if self.upstream_evaluation_status is not None:
+            object.__setattr__(
+                self,
+                "upstream_evaluation_status",
+                _evaluation_status(self.upstream_evaluation_status),
+            )
+        if self.upstream_quality_status is not None:
+            object.__setattr__(
+                self,
+                "upstream_quality_status",
+                _quality_status(self.upstream_quality_status),
+            )
+        for value, name in (
+            (self.normalized_evidence_digest, "normalized_evidence_digest"),
+            (self.evaluation_digest, "evaluation_digest"),
+            (self.aggregation_digest, "aggregation_digest"),
+            (self.contract_version, "contract_version"),
+        ):
+            _require_text(value, name)
+
+    @property
+    def status(self) -> SignalSnapshotStatus:
+        return self.snapshot_status
+
+    @property
+    def valid(self) -> bool:
+        return self.snapshotted
+
+    @property
+    def canonical_representation(self) -> Mapping[str, Any]:
+        return _freeze(
+            {
+                "snapshot_status": self.snapshot_status.value,
+                "snapshotted": self.snapshotted,
+                "snapshot": (
+                    None
+                    if self.snapshot is None
+                    else self.snapshot.canonical_representation
+                ),
+                "reason_codes": self.reason_codes,
+                "upstream_aggregation_status": (
+                    None
+                    if self.upstream_aggregation_status is None
+                    else self.upstream_aggregation_status.value
+                ),
+                "upstream_evaluation_status": (
+                    None
+                    if self.upstream_evaluation_status is None
+                    else self.upstream_evaluation_status.value
+                ),
+                "upstream_quality_status": (
+                    None
+                    if self.upstream_quality_status is None
+                    else self.upstream_quality_status.value
+                ),
+                "normalized_evidence_digest": self.normalized_evidence_digest,
+                "evaluation_digest": self.evaluation_digest,
+                "aggregation_digest": self.aggregation_digest,
+                "contract_version": self.contract_version,
+            }
+        )
+
+    @property
+    def representation_digest(self) -> str:
+        return _digest(self.canonical_representation)
+
+    @property
+    def digest(self) -> str:
+        return self.representation_digest
+
+
+@dataclass(frozen=True)
 class SignalEvidenceSnapshotCollection:
     """Immutable, canonically ordered snapshots with duplicates preserved."""
 
@@ -317,6 +596,17 @@ def snapshot_signal_evidence(
 create_signal_evidence_snapshot = snapshot_signal_evidence
 
 
+def snapshot_signal_evidence_result(
+    aggregation: SignalEvidenceAggregationResult | object,
+) -> SignalEvidenceSnapshotResult:
+    """Return an explicit fail-closed outcome for any upstream input."""
+
+    return SignalEvidenceSnapshotResult.from_aggregation(aggregation)
+
+
+create_signal_evidence_snapshot_result = snapshot_signal_evidence_result
+
+
 def snapshot_signal_evidence_collection(
     aggregations: tuple[SignalEvidenceAggregationResult, ...]
     | list[SignalEvidenceAggregationResult],
@@ -333,6 +623,24 @@ def _aggregation_status(
         raise ValueError(
             "aggregation_status must be a SignalAggregationStatus"
         ) from error
+
+
+def _snapshot_status(value: SignalSnapshotStatus | str) -> SignalSnapshotStatus:
+    try:
+        return SignalSnapshotStatus(value)
+    except (TypeError, ValueError) as error:
+        raise ValueError(
+            "snapshot_status must be a SignalSnapshotStatus"
+        ) from error
+
+
+def _safe_aggregation_status(
+    value: SignalAggregationStatus | str,
+) -> SignalAggregationStatus | None:
+    try:
+        return _aggregation_status(value)
+    except ValueError:
+        return None
 
 
 def _evaluation_status(
@@ -373,6 +681,17 @@ def _canonical_json(value: Any) -> str:
 
 def _digest(value: Any) -> str:
     return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def _safe_digest(value: Any, fallback: str) -> str:
+    try:
+        return _digest(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _safe_text(value: Any, fallback: str) -> str:
+    return value if _is_text(value) else fallback
 
 
 def _canonicalize(value: Any) -> Any:
