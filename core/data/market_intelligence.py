@@ -92,6 +92,463 @@ class MarketIntelligenceReason(StrEnum):
     UNCOMPUTABLE_DIGEST = "UNCOMPUTABLE_DIGEST"
 
 
+P02_T09_CONTRACT_VERSION = "p02-t09-v1"
+
+
+class DecisionReadyAssessmentStatus(StrEnum):
+    UNKNOWN = "UNKNOWN"
+    KNOWN = "KNOWN"
+    PASS = "PASS"
+    FAIL = "FAIL"
+
+
+class DecisionReadyEligibilityStatus(StrEnum):
+    ELIGIBLE = "ELIGIBLE"
+    INELIGIBLE = "INELIGIBLE"
+    UNKNOWN = "UNKNOWN"
+
+
+class DecisionReadyOutcome(StrEnum):
+    ACCEPTED = "ACCEPTED"
+    INCOMPLETE = "INCOMPLETE"
+    STALE = "STALE"
+    INVALID = "INVALID"
+    REJECTED = "REJECTED"
+
+
+class DecisionReadyReason(StrEnum):
+    INVALID_CANDIDATE = "INVALID_CANDIDATE"
+    INCOMPLETE_IDENTITY = "INCOMPLETE_IDENTITY"
+    INVALID_IDENTITY = "INVALID_IDENTITY"
+    MISSING_MARKET_SNAPSHOT = "MISSING_MARKET_SNAPSHOT"
+    INVALID_MARKET_SNAPSHOT = "INVALID_MARKET_SNAPSHOT"
+    INCOMPLETE_MARKET_DATA = "INCOMPLETE_MARKET_DATA"
+    INVALID_TIMESTAMP = "INVALID_TIMESTAMP"
+    TIMESTAMP_MISMATCH = "TIMESTAMP_MISMATCH"
+    INVALID_EVIDENCE = "INVALID_EVIDENCE"
+    INCOMPLETE_EVIDENCE = "INCOMPLETE_EVIDENCE"
+    EVIDENCE_SOURCE_MISMATCH = "EVIDENCE_SOURCE_MISMATCH"
+    INVALID_QUALITY = "INVALID_QUALITY"
+    QUALITY_INCONSISTENT = "QUALITY_INCONSISTENT"
+    STALE_DATA = "STALE_DATA"
+    INVALID_SAFETY_STATUS = "INVALID_SAFETY_STATUS"
+    INVALID_SELLABILITY_STATUS = "INVALID_SELLABILITY_STATUS"
+    INVALID_ELIGIBILITY_STATUS = "INVALID_ELIGIBILITY_STATUS"
+    ELIGIBILITY_REASON_REQUIRED = "ELIGIBILITY_REASON_REQUIRED"
+    INVALID_UPSTREAM_REFERENCE = "INVALID_UPSTREAM_REFERENCE"
+
+
+@dataclass(frozen=True)
+class DecisionReadyIdentity:
+    """Explicit asset identity; optional display fields are never inferred."""
+
+    chain_id: str | None
+    token_identity: str | None
+    source_id: str | None
+    symbol: str | None = None
+    decimals: int | None = None
+    market_subject_id: str | None = None
+    market_group_id: str | None = None
+    exposure_identity: str | None = None
+
+
+@dataclass(frozen=True)
+class DecisionReadyEvidence:
+    """One auditable field observation with bounded provenance."""
+
+    source_id: str | None
+    observed_at: datetime | None
+    field: str | None
+    value: Any
+    provenance: Mapping[str, Any]
+    observation_id: str | None = None
+    upstream_state_version: str | None = None
+    upstream_state_digest: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "value", _freeze(_canonical_value(self.value)))
+        object.__setattr__(
+            self,
+            "provenance",
+            _freeze(_canonical_mapping(self.provenance)),
+        )
+
+
+@dataclass(frozen=True)
+class DecisionReadyMarketSnapshot:
+    """Point-in-time values carried forward from the P02 market layers."""
+
+    observed_at: datetime | None
+    values: Mapping[str, Any]
+    source_id: str | None = None
+    upstream: MarketIntelligenceStateReference | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "values", _freeze(_canonical_mapping(self.values)))
+
+
+@dataclass(frozen=True)
+class DecisionReadyLiquidity:
+    status: DecisionReadyAssessmentStatus | str = DecisionReadyAssessmentStatus.UNKNOWN
+    observed_at: datetime | None = None
+    values: Mapping[str, Any] = field(default_factory=dict)
+    evidence_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "values", _freeze(_canonical_mapping(self.values)))
+
+
+@dataclass(frozen=True)
+class DecisionReadyMarketActivity:
+    observed_at: datetime | None = None
+    values: Mapping[str, Any] = field(default_factory=dict)
+    evidence_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "values", _freeze(_canonical_mapping(self.values)))
+
+
+@dataclass(frozen=True)
+class DecisionReadySafety:
+    """Safety boundary only; unknown remains unknown until evidence exists."""
+
+    safety_status: DecisionReadyAssessmentStatus | str = DecisionReadyAssessmentStatus.UNKNOWN
+    liquidity_status: DecisionReadyAssessmentStatus | str = DecisionReadyAssessmentStatus.UNKNOWN
+    contract_status: DecisionReadyAssessmentStatus | str = DecisionReadyAssessmentStatus.UNKNOWN
+    holder_concentration_status: DecisionReadyAssessmentStatus | str = (
+        DecisionReadyAssessmentStatus.UNKNOWN
+    )
+    evidence_ids: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DecisionReadySellability:
+    """Exit evidence boundary; this does not simulate or execute a sale."""
+
+    sellability_status: DecisionReadyAssessmentStatus | str = (
+        DecisionReadyAssessmentStatus.UNKNOWN
+    )
+    exit_evidence_status: DecisionReadyAssessmentStatus | str = (
+        DecisionReadyAssessmentStatus.UNKNOWN
+    )
+    evidence_ids: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DecisionReadyDataQuality:
+    overall_status: DataQuality | str
+    completeness: bool
+    freshness_status: DataQuality | str
+    source_count: int
+    latest_observed_at: datetime | None
+    reasons: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DecisionReadyEligibility:
+    status: DecisionReadyEligibilityStatus | str
+    reasons: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DecisionReadyCandidate:
+    """Validated evidence container, not a signal or trading decision."""
+
+    identity: DecisionReadyIdentity | None
+    market_snapshot: DecisionReadyMarketSnapshot | None
+    liquidity: DecisionReadyLiquidity
+    market_activity: DecisionReadyMarketActivity
+    safety: DecisionReadySafety
+    sellability: DecisionReadySellability
+    data_quality: DecisionReadyDataQuality
+    evidence: tuple[DecisionReadyEvidence, ...]
+    observed_at: datetime | None
+    eligibility: DecisionReadyEligibility
+    contract_version: str = P02_T09_CONTRACT_VERSION
+
+
+@dataclass(frozen=True)
+class DecisionReadyValidationResult:
+    candidate: DecisionReadyCandidate | None
+    outcome: DecisionReadyOutcome
+    quality: DataQuality
+    reason_codes: tuple[str, ...]
+    accepted: bool
+
+    @property
+    def reasons(self) -> tuple[str, ...]:
+        return self.reason_codes
+
+
+def validate_decision_ready_candidate(
+    candidate: DecisionReadyCandidate | object,
+) -> DecisionReadyValidationResult:
+    """Validate the P02-T09 boundary without deriving a trading decision."""
+
+    if not isinstance(candidate, DecisionReadyCandidate):
+        return _decision_ready_rejection(
+            None,
+            DecisionReadyOutcome.INVALID,
+            DataQuality.INVALID,
+            DecisionReadyReason.INVALID_CANDIDATE.value,
+        )
+
+    reasons: list[str] = []
+    identity = candidate.identity
+    liquidity = candidate.liquidity
+    market_activity = candidate.market_activity
+    safety = candidate.safety
+    sellability = candidate.sellability
+    if not isinstance(liquidity, DecisionReadyLiquidity):
+        reasons.append(DecisionReadyReason.INVALID_CANDIDATE.value)
+        liquidity = DecisionReadyLiquidity()
+    if not isinstance(market_activity, DecisionReadyMarketActivity):
+        reasons.append(DecisionReadyReason.INVALID_CANDIDATE.value)
+        market_activity = DecisionReadyMarketActivity()
+    if not isinstance(safety, DecisionReadySafety):
+        reasons.append(DecisionReadyReason.INVALID_SAFETY_STATUS.value)
+        safety = DecisionReadySafety()
+    if not isinstance(sellability, DecisionReadySellability):
+        reasons.append(DecisionReadyReason.INVALID_SELLABILITY_STATUS.value)
+        sellability = DecisionReadySellability()
+    if not isinstance(identity, DecisionReadyIdentity):
+        reasons.append(DecisionReadyReason.INCOMPLETE_IDENTITY.value)
+    else:
+        required = (identity.chain_id, identity.token_identity, identity.source_id)
+        if any(value is None for value in required):
+            reasons.append(DecisionReadyReason.INCOMPLETE_IDENTITY.value)
+        elif any(not _non_empty(value) for value in required):
+            reasons.append(DecisionReadyReason.INVALID_IDENTITY.value)
+        if identity.symbol is not None and not _non_empty(identity.symbol):
+            reasons.append(DecisionReadyReason.INVALID_IDENTITY.value)
+        if identity.decimals is not None and (
+            not isinstance(identity.decimals, int)
+            or isinstance(identity.decimals, bool)
+            or identity.decimals < 0
+        ):
+            reasons.append(DecisionReadyReason.INVALID_IDENTITY.value)
+        for optional_identity in (
+            identity.market_subject_id,
+            identity.market_group_id,
+            identity.exposure_identity,
+        ):
+            if optional_identity is not None and not _non_empty(optional_identity):
+                reasons.append(DecisionReadyReason.INVALID_IDENTITY.value)
+
+    if not _aware(candidate.observed_at):
+        reasons.append(
+            DecisionReadyReason.INVALID_TIMESTAMP.value
+            if candidate.observed_at is not None
+            else DecisionReadyReason.INCOMPLETE_MARKET_DATA.value
+        )
+
+    snapshot = candidate.market_snapshot
+    if not isinstance(snapshot, DecisionReadyMarketSnapshot):
+        reasons.append(DecisionReadyReason.MISSING_MARKET_SNAPSHOT.value)
+    else:
+        if not _aware(snapshot.observed_at):
+            reasons.append(
+                DecisionReadyReason.INVALID_TIMESTAMP.value
+                if snapshot.observed_at is not None
+                else DecisionReadyReason.INVALID_MARKET_SNAPSHOT.value
+            )
+        elif _aware(candidate.observed_at) and snapshot.observed_at != candidate.observed_at:
+            reasons.append(DecisionReadyReason.TIMESTAMP_MISMATCH.value)
+        if not snapshot.values and not liquidity.values and not market_activity.values:
+            reasons.append(DecisionReadyReason.INCOMPLETE_MARKET_DATA.value)
+        if snapshot.upstream is None:
+            reasons.append(DecisionReadyReason.INVALID_UPSTREAM_REFERENCE.value)
+        elif isinstance(identity, DecisionReadyIdentity):
+            if (
+                snapshot.upstream.source_id != identity.source_id
+                or snapshot.upstream.chain_id != identity.chain_id
+                or snapshot.upstream.token_identity != identity.token_identity
+            ):
+                reasons.append(DecisionReadyReason.INVALID_UPSTREAM_REFERENCE.value)
+            if snapshot.source_id is not None and snapshot.source_id != identity.source_id:
+                reasons.append(DecisionReadyReason.INVALID_UPSTREAM_REFERENCE.value)
+
+    if not isinstance(candidate.evidence, tuple) or not candidate.evidence:
+        reasons.append(DecisionReadyReason.INCOMPLETE_EVIDENCE.value)
+        evidence_sources: set[str] = set()
+        latest_evidence_time: datetime | None = None
+    else:
+        evidence_sources = set()
+        latest_evidence_time = None
+        for evidence in candidate.evidence:
+            if not isinstance(evidence, DecisionReadyEvidence):
+                reasons.append(DecisionReadyReason.INVALID_EVIDENCE.value)
+                continue
+            if not _non_empty(evidence.source_id):
+                reasons.append(DecisionReadyReason.INCOMPLETE_EVIDENCE.value)
+            else:
+                evidence_sources.add(evidence.source_id)
+            if not _aware(evidence.observed_at):
+                reasons.append(DecisionReadyReason.INVALID_TIMESTAMP.value)
+            elif _aware(candidate.observed_at) and evidence.observed_at > candidate.observed_at:
+                reasons.append(DecisionReadyReason.TIMESTAMP_MISMATCH.value)
+            if not _non_empty(evidence.field):
+                reasons.append(DecisionReadyReason.INCOMPLETE_EVIDENCE.value)
+            if not evidence.provenance:
+                reasons.append(DecisionReadyReason.INCOMPLETE_EVIDENCE.value)
+            if (
+                isinstance(identity, DecisionReadyIdentity)
+                and _non_empty(evidence.source_id)
+                and evidence.source_id != identity.source_id
+            ):
+                reasons.append(DecisionReadyReason.EVIDENCE_SOURCE_MISMATCH.value)
+            if _aware(evidence.observed_at) and (
+                latest_evidence_time is None or evidence.observed_at > latest_evidence_time
+            ):
+                latest_evidence_time = evidence.observed_at
+
+    quality = candidate.data_quality
+    if not isinstance(quality, DecisionReadyDataQuality):
+        reasons.append(DecisionReadyReason.INVALID_QUALITY.value)
+        quality_status = None
+        freshness_status = None
+    else:
+        quality_status = _data_quality(quality.overall_status)
+        freshness_status = _data_quality(quality.freshness_status)
+        allowed_quality = {
+            DataQuality.VALID,
+            DataQuality.STALE,
+            DataQuality.INCOMPLETE,
+            DataQuality.INVALID,
+        }
+        if quality_status not in allowed_quality or freshness_status not in allowed_quality:
+            reasons.append(DecisionReadyReason.INVALID_QUALITY.value)
+        if not isinstance(quality.completeness, bool):
+            reasons.append(DecisionReadyReason.INVALID_QUALITY.value)
+        if not isinstance(quality.source_count, int) or isinstance(quality.source_count, bool) or quality.source_count < 0:
+            reasons.append(DecisionReadyReason.INVALID_QUALITY.value)
+        elif evidence_sources and quality.source_count != len(evidence_sources):
+            reasons.append(DecisionReadyReason.QUALITY_INCONSISTENT.value)
+        if not _aware(quality.latest_observed_at):
+            reasons.append(DecisionReadyReason.INVALID_TIMESTAMP.value)
+        elif latest_evidence_time is not None and quality.latest_observed_at != latest_evidence_time:
+            reasons.append(DecisionReadyReason.QUALITY_INCONSISTENT.value)
+        if quality_status is DataQuality.VALID and not quality.completeness:
+            reasons.append(DecisionReadyReason.QUALITY_INCONSISTENT.value)
+        if quality_status is DataQuality.INCOMPLETE and quality.completeness:
+            reasons.append(DecisionReadyReason.QUALITY_INCONSISTENT.value)
+
+    if _assessment_status(safety.safety_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_SAFETY_STATUS.value)
+    if _assessment_status(safety.liquidity_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_SAFETY_STATUS.value)
+    if _assessment_status(safety.contract_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_SAFETY_STATUS.value)
+    if _assessment_status(safety.holder_concentration_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_SAFETY_STATUS.value)
+    if _assessment_status(sellability.sellability_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_SELLABILITY_STATUS.value)
+    if _assessment_status(sellability.exit_evidence_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_SELLABILITY_STATUS.value)
+
+    eligibility = candidate.eligibility
+    eligibility_status = (
+        eligibility.status
+        if isinstance(eligibility, DecisionReadyEligibility)
+        else None
+    )
+    if _eligibility_status(eligibility_status) is None:
+        reasons.append(DecisionReadyReason.INVALID_ELIGIBILITY_STATUS.value)
+    elif (
+        _eligibility_status(eligibility_status)
+        in {DecisionReadyEligibilityStatus.UNKNOWN, DecisionReadyEligibilityStatus.INELIGIBLE}
+        and not eligibility.reasons
+    ):
+        reasons.append(DecisionReadyReason.ELIGIBILITY_REASON_REQUIRED.value)
+
+    if reasons:
+        unique_reasons = tuple(dict.fromkeys(reasons))
+        if DataQuality.STALE in {quality_status, freshness_status}:
+            return _decision_ready_rejection(
+                candidate,
+                DecisionReadyOutcome.STALE,
+                DataQuality.STALE,
+                *unique_reasons,
+            )
+        outcome = (
+            DecisionReadyOutcome.INCOMPLETE
+            if any(
+                reason
+                in {
+                    DecisionReadyReason.INCOMPLETE_IDENTITY.value,
+                    DecisionReadyReason.MISSING_MARKET_SNAPSHOT.value,
+                    DecisionReadyReason.INCOMPLETE_MARKET_DATA.value,
+                    DecisionReadyReason.INCOMPLETE_EVIDENCE.value,
+                }
+                for reason in unique_reasons
+            )
+            else DecisionReadyOutcome.INVALID
+        )
+        return _decision_ready_rejection(
+            candidate,
+            outcome,
+            DataQuality.INCOMPLETE if outcome is DecisionReadyOutcome.INCOMPLETE else DataQuality.INVALID,
+            *unique_reasons,
+        )
+
+    assert quality_status is not None
+    return DecisionReadyValidationResult(
+        candidate=candidate,
+        outcome=DecisionReadyOutcome.ACCEPTED,
+        quality=quality_status,
+        reason_codes=(),
+        accepted=True,
+    )
+
+
+def _decision_ready_rejection(
+    candidate: DecisionReadyCandidate | None,
+    outcome: DecisionReadyOutcome,
+    quality: DataQuality,
+    *reasons: str,
+) -> DecisionReadyValidationResult:
+    return DecisionReadyValidationResult(
+        candidate=candidate,
+        outcome=outcome,
+        quality=quality,
+        reason_codes=tuple(dict.fromkeys(reasons)),
+        accepted=False,
+    )
+
+
+def _data_quality(value: Any) -> DataQuality | None:
+    if isinstance(value, DataQuality):
+        return value
+    if isinstance(value, str):
+        try:
+            return DataQuality(value)
+        except ValueError:
+            return None
+    return None
+
+
+def _assessment_status(value: Any) -> DecisionReadyAssessmentStatus | None:
+    if isinstance(value, DecisionReadyAssessmentStatus):
+        return value
+    if isinstance(value, str):
+        try:
+            return DecisionReadyAssessmentStatus(value)
+        except ValueError:
+            return None
+    return None
+
+
+def _eligibility_status(value: Any) -> DecisionReadyEligibilityStatus | None:
+    if isinstance(value, DecisionReadyEligibilityStatus):
+        return value
+    if isinstance(value, str):
+        try:
+            return DecisionReadyEligibilityStatus(value)
+        except ValueError:
+            return None
+    return None
+
+
 @dataclass(frozen=True)
 class MarketIntelligenceCategoryContract:
     """An explicit representation-shape contract, not a measurement schema."""
@@ -1093,6 +1550,21 @@ def _sensitive_key(key: str) -> bool:
 
 __all__ = [
     "AcceptedMarketIntelligenceObservation",
+    "DecisionReadyAssessmentStatus",
+    "DecisionReadyCandidate",
+    "DecisionReadyDataQuality",
+    "DecisionReadyEligibility",
+    "DecisionReadyEligibilityStatus",
+    "DecisionReadyEvidence",
+    "DecisionReadyIdentity",
+    "DecisionReadyLiquidity",
+    "DecisionReadyMarketActivity",
+    "DecisionReadyMarketSnapshot",
+    "DecisionReadyOutcome",
+    "DecisionReadyReason",
+    "DecisionReadySafety",
+    "DecisionReadySellability",
+    "DecisionReadyValidationResult",
     "MarketIntelligenceCategory",
     "MarketIntelligenceCategoryContract",
     "MarketIntelligenceContext",
@@ -1108,7 +1580,9 @@ __all__ = [
     "MarketIntelligenceStateReference",
     "MarketIntelligenceSubjectKey",
     "MarketIntelligenceValueKind",
+    "P02_T09_CONTRACT_VERSION",
     "P02_MARKET_INTELLIGENCE_CONTRACT_VERSION",
     "MarketIntelligenceMaterializer",
     "represent_market_intelligence",
+    "validate_decision_ready_candidate",
 ]
