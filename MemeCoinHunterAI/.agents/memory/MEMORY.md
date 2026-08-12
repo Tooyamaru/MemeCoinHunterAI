@@ -1,0 +1,3 @@
+- [Python test environment](python-test-environment.md) — override optional database settings explicitly because Replit may inject DATABASE_URL into test processes.
+- [Database URL normalization](database-url-normalization.md) — translate Replit PostgreSQL URL options before asyncpg connection attempts.
+- [Python 3.13 runtime](python-313-runtime.md) — this project requires Python 3.13; use the available base runtime when uv cannot download interpreters.

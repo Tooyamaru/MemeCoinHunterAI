@@ -1,0 +1,1 @@
+"""Application-service boundaries independent from HTTP transport."""
