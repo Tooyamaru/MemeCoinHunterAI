@@ -125,30 +125,45 @@ def evaluate_safety_evidence(
     _require_aware_datetime(evaluation_timestamp, "evaluation_timestamp")
 
     by_domain: dict[SafetyDomain, list[TokenSafetyEvidence]] = {}
+    future_by_domain: dict[SafetyDomain, list[TokenSafetyEvidence]] = {}
     for item in evidence.evidence:
-        by_domain.setdefault(item.domain, []).append(item)
+        target = (
+            future_by_domain
+            if item.observed_at > evaluation_timestamp
+            else by_domain
+        )
+        target.setdefault(item.domain, []).append(item)
 
     domain_results: dict[SafetyDomain, SafetyStatus] = {}
     reason_codes: set[str] = set()
     if not evidence.evidence:
         reason_codes.add("NO_EVIDENCE")
 
-    for domain in sorted(by_domain, key=lambda value: value.value):
-        records = by_domain[domain]
-        statuses = {item.status for item in records}
+    for domain in sorted(
+        set(by_domain) | set(future_by_domain),
+        key=lambda value: value.value,
+    ):
+        records = by_domain.get(domain, [])
+        future_records = future_by_domain.get(domain, [])
 
-        if SafetyStatus.UNKNOWN in statuses:
+        if not records:
             result = SafetyStatus.UNKNOWN
-            reason = "UNKNOWN_EVIDENCE"
-        elif SafetyStatus.PASS in statuses and SafetyStatus.FAIL in statuses:
-            result = SafetyStatus.UNKNOWN
-            reason = "CONTRADICTORY_EVIDENCE"
-        elif SafetyStatus.PASS in statuses:
-            result = SafetyStatus.PASS
-            reason = "PASS_EVIDENCE"
+            reason = "FUTURE_DATED_EVIDENCE"
         else:
-            result = SafetyStatus.FAIL
-            reason = "FAIL_EVIDENCE"
+            statuses = {item.status for item in records}
+
+            if SafetyStatus.UNKNOWN in statuses:
+                result = SafetyStatus.UNKNOWN
+                reason = "UNKNOWN_EVIDENCE"
+            elif SafetyStatus.PASS in statuses and SafetyStatus.FAIL in statuses:
+                result = SafetyStatus.UNKNOWN
+                reason = "CONTRADICTORY_EVIDENCE"
+            elif SafetyStatus.PASS in statuses:
+                result = SafetyStatus.PASS
+                reason = "PASS_EVIDENCE"
+            else:
+                result = SafetyStatus.FAIL
+                reason = "FAIL_EVIDENCE"
 
         domain_results[domain] = result
         reason_codes.add(reason)
@@ -156,6 +171,9 @@ def evaluate_safety_evidence(
         for item in records:
             for item_reason in item.reason_codes:
                 reason_codes.add(f"{domain.value}:{item_reason}")
+        if future_records:
+            reason_codes.add("FUTURE_DATED_EVIDENCE")
+            reason_codes.add(f"{domain.value}:FUTURE_DATED_EVIDENCE")
 
     return SafetyEvaluationResult(
         chain_id=evidence.chain_id,

@@ -187,6 +187,52 @@ def test_stale_evidence_represented_as_unknown_stays_unknown():
     assert result.domain_results[SafetyDomain.LIQUIDITY_QUALITY] is SafetyStatus.UNKNOWN
 
 
+def test_future_dated_pass_evidence_produces_unknown_not_pass():
+    result = evaluate_safety_evidence(
+        _collection(
+            _evidence(
+                observed_at=EVALUATED_AT + timedelta(seconds=1),
+            )
+        ),
+        evaluation_timestamp=EVALUATED_AT,
+    )
+
+    assert result.domain_results[SafetyDomain.LIQUIDITY_QUALITY] is SafetyStatus.UNKNOWN
+    assert "FUTURE_DATED_EVIDENCE" in result.reason_codes
+
+
+def test_future_dated_pass_cannot_override_current_fail():
+    result = evaluate_safety_evidence(
+        _collection(
+            _evidence(
+                status=SafetyStatus.FAIL,
+                evidence_reference="current-fail",
+                reason_codes=("NEGATIVE_EVIDENCE",),
+                evidence_context={},
+            ),
+            _evidence(
+                evidence_reference="future-pass",
+                observed_at=EVALUATED_AT + timedelta(seconds=1),
+            ),
+        ),
+        evaluation_timestamp=EVALUATED_AT,
+    )
+
+    assert result.domain_results[SafetyDomain.LIQUIDITY_QUALITY] is SafetyStatus.FAIL
+    assert result.evidence_references == ("current-fail", "future-pass")
+
+
+def test_evidence_at_evaluation_timestamp_remains_eligible():
+    result = evaluate_safety_evidence(
+        _collection(
+            _evidence(observed_at=EVALUATED_AT),
+        ),
+        evaluation_timestamp=EVALUATED_AT,
+    )
+
+    assert result.domain_results[SafetyDomain.LIQUIDITY_QUALITY] is SafetyStatus.PASS
+
+
 def test_duplicate_evidence_is_preserved():
     first = _evidence(evidence_reference="duplicate", source_id="source-a")
     second = _evidence(evidence_reference="duplicate", source_id="source-b")
