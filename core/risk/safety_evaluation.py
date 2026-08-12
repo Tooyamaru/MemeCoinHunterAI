@@ -7,7 +7,7 @@ decision, or perform any external I/O.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from datetime import datetime, timezone
 from enum import StrEnum
 import hashlib
@@ -16,7 +16,6 @@ from types import MappingProxyType
 from typing import Any, Mapping
 
 from core.risk.safety_evidence import (
-    P02StateReference,
     SafetyDomain,
     SafetyEvidenceCollection,
     SafetyProvenance,
@@ -70,7 +69,6 @@ class SafetyEvaluationResult:
         references = tuple(self.evidence_references)
         if any(not isinstance(value, str) or not value.strip() for value in references):
             raise ValueError("evidence_references must contain non-empty references")
-        object.__setattr__(self, "evidence_references", tuple(sorted(references)))
 
         reasons = tuple(self.reason_codes)
         if any(not isinstance(value, str) or not value.strip() for value in reasons):
@@ -80,10 +78,25 @@ class SafetyEvaluationResult:
         provenance = tuple(self.provenance)
         if not all(isinstance(value, SafetyProvenance) for value in provenance):
             raise ValueError("provenance must contain SafetyProvenance values")
+        if len(references) != len(provenance):
+            raise ValueError(
+                "evidence_references and provenance must have equal lengths"
+            )
+        traceable_records = tuple(
+            sorted(
+                zip(references, provenance),
+                key=lambda pair: (pair[0], _provenance_sort_key(pair[1])),
+            )
+        )
+        object.__setattr__(
+            self,
+            "evidence_references",
+            tuple(reference for reference, _ in traceable_records),
+        )
         object.__setattr__(
             self,
             "provenance",
-            tuple(sorted(provenance, key=_provenance_sort_key)),
+            tuple(provenance for _, provenance in traceable_records),
         )
 
     @property

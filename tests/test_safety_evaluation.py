@@ -188,8 +188,9 @@ def test_stale_evidence_represented_as_unknown_stays_unknown():
 
 
 def test_duplicate_evidence_is_preserved():
-    item = _evidence(evidence_reference="duplicate")
-    collection = _collection(item, item)
+    first = _evidence(evidence_reference="duplicate", source_id="source-a")
+    second = _evidence(evidence_reference="duplicate", source_id="source-b")
+    collection = _collection(first, second)
 
     result = evaluate_safety_evidence(
         collection,
@@ -197,6 +198,10 @@ def test_duplicate_evidence_is_preserved():
     )
 
     assert result.evidence_references == ("duplicate", "duplicate")
+    assert tuple(item.source_id for item in result.provenance) == (
+        "source-a",
+        "source-b",
+    )
     assert len(result.provenance) == 2
 
 
@@ -269,6 +274,32 @@ def test_provenance_and_evidence_references_remain_traceable():
     assert result.input_evidence_digest
 
 
+def test_reference_and_provenance_sorting_preserves_traceability():
+    first = _evidence(
+        evidence_reference="z-reference",
+        source_id="a-source",
+    )
+    second = _evidence(
+        evidence_reference="a-reference",
+        source_id="z-source",
+    )
+
+    result = evaluate_safety_evidence(
+        _collection(first, second),
+        evaluation_timestamp=EVALUATED_AT,
+    )
+
+    assert tuple(
+        zip(
+            result.evidence_references,
+            (item.source_id for item in result.provenance),
+        )
+    ) == (
+        ("a-reference", "z-source"),
+        ("z-reference", "a-source"),
+    )
+
+
 def test_equivalent_inputs_produce_identical_output_digests():
     left = _evidence(
         evidence_reference="same",
@@ -289,6 +320,30 @@ def test_equivalent_inputs_produce_identical_output_digests():
     )
 
     assert first.representation_digest == second.representation_digest
+
+
+def test_timezone_equivalent_evaluation_inputs_have_identical_digests():
+    utc_result = evaluate_safety_evidence(
+        _collection(_evidence()),
+        evaluation_timestamp=EVALUATED_AT,
+    )
+    offset_result = evaluate_safety_evidence(
+        _collection(
+            _evidence(
+                observed_at=datetime(
+                    2026,
+                    8,
+                    12,
+                    8,
+                    0,
+                    tzinfo=timezone(timedelta(hours=-4)),
+                )
+            )
+        ),
+        evaluation_timestamp=EVALUATED_AT,
+    )
+
+    assert utc_result.representation_digest == offset_result.representation_digest
 
 
 def test_input_order_does_not_change_logical_output_digest():
