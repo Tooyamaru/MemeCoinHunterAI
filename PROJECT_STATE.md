@@ -8,8 +8,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P03 — Token Safety & Risk Intelligence
-- **Current task:** P03-T01 — Token Safety Evidence & Eligibility Contract
-- **Current task status:** IMPLEMENTED — AUDITED — PASS WITH NON-BLOCKING OBSERVATIONS — TECHNICALLY COMPLETE
+- **Current task:** P03-T02 — Safety Evaluation Boundary
+- **Current task status:** IMPLEMENTED — CORRECTIVE FIX COMPLETED — AUDITED / VERIFIED — FORMALLY CLOSED
 - **Last updated:** 2026-08-12
 
 ## Master progress
@@ -17,12 +17,12 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P00: DONE; T01 done; T02 done
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
-- P03: T01 implemented, audited, and technically complete; T02 code exists but is NOT AUTHORIZED / NOT formally closed; T03 not authorized
+- P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 not authorized
 - P04–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
@@ -37,11 +37,19 @@ functionality.
 
 ## Last verified checkpoint
 
-P03-T01 technical audit completed on 2026-08-12 with a PASS WITH
-NON-BLOCKING OBSERVATIONS result. The focused P03-T01 suite passed with 16
-tests. No implementation boundary violations were found. P03-T02 code exists
-in the repository but is NOT AUTHORIZED and NOT formally closed; it requires a
-separate governance decision.
+P03-T02 corrective implementation and governance closure completed on
+2026-08-12. The focused verification passed with 20 tests using the managed
+Python environment:
+
+```bash
+UV_PYTHON_DOWNLOADS=automatic UV_PYTHON_PREFERENCE=managed uv run pytest -q tests/test_safety_evaluation.py
+```
+
+`git diff --check` passed, the working tree was clean, and `HEAD` and
+`origin/main` were both `facb1cd`. The environment initially lacked `pytest`,
+but the focused suite was subsequently executed successfully with the managed
+Python environment. P03-T01 remains implemented, audited, and technically
+complete. P03-T03 remains NOT AUTHORIZED.
 
 Final P02-T09 verification for the provider-neutral market intelligence
 boundary, completed on 2026-08-12 at Git baseline `8958ed2` (HEAD and
@@ -131,17 +139,16 @@ functionality was introduced.
 ## Next action
 
 No automatic next implementation action is selected. P03-T01 is technically
-complete and audited. P03-T02 code exists in the repository but remains NOT
-AUTHORIZED / NOT formally closed and requires a separate governance decision.
-P03-T03 remains NOT AUTHORIZED.
+complete and audited. P03-T02 is implemented, audited / verified, and formally
+closed. P03-T03 remains NOT AUTHORIZED.
 
 ## Next task
 
 P03 is NOT COMPLETE. P03-T01 is implemented, audited, and technically
-complete. P03-T02 code exists but is NOT AUTHORIZED / NOT formally closed.
-P03-T03 remains NOT AUTHORIZED. Provider connectivity, ingestion transports,
-persistence changes, market-state collection, and other later capabilities
-require separate specifications and approval.
+complete. P03-T02 is implemented, corrective fix completed, audited / verified,
+and formally closed. P03-T03 remains NOT AUTHORIZED. Provider connectivity,
+ingestion transports, persistence changes, market-state collection, and other
+later capabilities require separate specifications and approval.
 
 ## Required secret names
 
@@ -166,6 +173,6 @@ secrets; names will be added only when a later task requires them.
 - **P02-T09:** DONE — ARCHITECTURE GATE PASS
 - **P03 architecture review:** PASS
 - **P03-T01:** IMPLEMENTED — AUDITED — PASS WITH NON-BLOCKING OBSERVATIONS — TECHNICALLY COMPLETE
-- **P03-T02:** CODE EXISTS — NOT AUTHORIZED / NOT FORMALLY CLOSED
+- **P03-T02:** IMPLEMENTED — CORRECTIVE FIX COMPLETED — AUDITED / VERIFIED — FORMALLY CLOSED
 - **P03-T03:** NOT AUTHORIZED
-- **Next implementation action:** None selected automatically; P03-T02 requires a separate governance decision and P03 remains NOT COMPLETE
+- **Next implementation action:** None selected automatically; P03-T03 remains NOT AUTHORIZED and P03 remains NOT COMPLETE

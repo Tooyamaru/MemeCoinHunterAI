@@ -3,6 +3,19 @@
 ## 2026-08-12
 
 - **PHASE:** P03 — Token Safety & Risk Intelligence
+- **TASK:** P03-T02 — Safety Evaluation Boundary Closure
+- **CHANGE:** Completed the corrective implementation so future-dated evidence
+  can no longer produce a positive safety result, and added focused regression
+  coverage for future, mixed-time, and boundary-timestamp evidence.
+- **VERIFICATION:** 20 focused tests passed in 0.13s; `git diff --check`
+  passed; the working tree was clean; commit `facb1cd` was pushed to
+  `origin/main`.
+- **SCOPE:** P03-T02 is formally closed. P03-T03 remains NOT AUTHORIZED. P03
+  remains not complete.
+
+## 2026-08-12
+
+- **PHASE:** P03 — Token Safety & Risk Intelligence
 - **TASK:** P03-T01 — Token Safety Evidence & Eligibility Contract
 - **CHANGE:** Recorded P03-T01 as implemented, audited, and technically complete.
 - **VERIFICATION:** Audit result was PASS WITH NON-BLOCKING OBSERVATIONS; 16
