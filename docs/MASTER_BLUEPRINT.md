@@ -4,7 +4,7 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project is in P02 — Solana / DEX Data Intelligence. P01-T04 — Application
+The project is in P03 — Token Safety & Risk Intelligence. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
 Extensions are complete. P02-T01 through P02-T09 are implemented and verified.
 P02-T06 is the deterministic provider-neutral token-universe
@@ -12,10 +12,13 @@ state/materialization boundary; P02-T07 admits token-scoped market observation
 evidence; P02-T08 materializes current market state; and P02-T09 provides the
 provider-neutral market intelligence boundary. P02-T09 passed its architecture
 gate, including the stale-data validation correction and explicit source-event
-identity/contradiction correction. No provider, network, persistence, AI,
-wallet, trading, or execution integration was introduced. P03 and later tasks
-remain not started and unauthorized. The next task is not selected here; later
-phases remain gated until explicitly authorized.
+identity/contradiction correction. P03-T01 is technically implemented and
+audited with a PASS WITH NON-BLOCKING OBSERVATIONS result. P03 overall is not
+complete. P03-T02 code exists in the repository but remains NOT AUTHORIZED /
+NOT formally closed; P03-T03 remains NOT AUTHORIZED. No provider, network,
+persistence, AI, wallet, trading, or execution integration was introduced. The
+next task is not selected here; later phases remain gated until explicitly
+authorized.
 
 ## V1.1 architectural baseline
 
@@ -166,7 +169,10 @@ STOP, PAUSE, or change market.
 - **P02-T07:** Provider-neutral token-scoped market observation evidence contract — DONE
 - **P02-T08:** Provider-neutral market state materialization — DONE
 - **P02-T09:** Provider-neutral market intelligence boundary — DONE / ARCHITECTURE GATE PASS
-- **P03 and later:** NOT STARTED / NOT AUTHORIZED
+- **P03-T01:** IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE
+- **P03-T02:** CODE EXISTS / NOT AUTHORIZED / NOT FORMALLY CLOSED
+- **P03-T03:** NOT AUTHORIZED
+- **P03 overall:** NOT COMPLETE
 
 ### P03 — TOKEN SAFETY & RISK INTELLIGENCE
 - **Objective:** Reject dangerous or untradable tokens before expensive analysis.
