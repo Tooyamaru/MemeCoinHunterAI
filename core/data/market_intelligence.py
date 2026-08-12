@@ -1264,6 +1264,13 @@ def _canonical_observation_id(
     value: Any,
     metadata: Mapping[str, Any],
 ) -> str:
+    if _non_empty(observation.source_event_id):
+        return "mi:" + _digest(
+            {
+                "source_id": observation.source_id,
+                "source_event_id": observation.source_event_id,
+            }
+        )
     return "mi:" + _digest(
         {
             "source_id": observation.source_id,
