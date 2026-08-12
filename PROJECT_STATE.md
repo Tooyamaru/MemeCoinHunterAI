@@ -7,9 +7,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** P03 — Token Safety & Risk Intelligence
-- **Current task:** P03-T03 — Token Safety Eligibility Derivation
-- **Current task status:** IMPLEMENTED — AUDITED / VERIFIED — FORMALLY CLOSED
+- **Current phase:** P04 — Market & Signal Intelligence
+- **Current task:** P04-T05 — Signal Evidence Aggregation
+- **Current task status:** NOT STARTED
 - **Last updated:** 2026-08-12
 
 ## Master progress
@@ -18,45 +18,40 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
-- P04–P12: Not started
+- P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 not started; P04 overall remains not complete
+- P05–P12: Not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P04–P12; no additional P03 implementation task is authorized
+- **Not started:** P04-T05 Signal Evidence Aggregation; P04-T06 and later P04 tasks; P05–P12
 
 ## Current objective
 
-Maintain a portable, auditable data boundary with deterministic normalization,
-explicit provenance and freshness, fail-closed quality states, and explicit
-safety eligibility outcomes before implementing later market, AI, wallet,
-trading, or production functionality.
+Maintain a portable, auditable signal evidence boundary with deterministic
+normalization, explicit provenance and freshness, fail-closed quality states,
+and explicit evaluation outcomes before implementing signal evidence
+aggregation or later market, AI, wallet, trading, or production functionality.
 
 ## Last verified checkpoint
 
-P03-T03 implementation and governance closure synchronization completed on
-2026-08-12 at commit `fb728b7`. The focused verification passed with 50 tests,
-and the full regression suite passed with 264 tests and one existing
-deprecation warning:
+P04-T04 implementation and governance checkpoint synchronization completed on
+2026-08-12 at commit `51449c7`. P04-T01 through P04-T04 are implemented and
+complete. P04-T05 — Signal Evidence Aggregation — has not started. No P04-T06
+or later task has started.
 
-```bash
-UV_PYTHON_DOWNLOADS=automatic UV_PYTHON_PREFERENCE=managed uv run pytest -q tests/test_token_safety.py tests/test_safety_evaluation.py tests/test_safety_eligibility.py
-UV_PYTHON_DOWNLOADS=automatic UV_PYTHON_PREFERENCE=managed uv run pytest -q
-python -m compileall -q core tests
-```
-
-`git diff --check` passed, the working tree was clean, and `HEAD` and
-`origin/main` were both `fb728b7`. The implementation, safety/fail-closed
-behavior, and scope audits passed. T03 consumes the immutable T02 evaluation
-context; the existing `DerivedEligibilityOutput` contract does not expose a
-separate provenance field, recorded as a non-blocking contract observation.
+At the verified checkpoint, the working tree was clean and `HEAD` and
+`origin/main` were both `51449c7`. P04-T01 through P04-T04 were implemented,
+verified, and complete. This continuation performs governance synchronization
+only; P04-T05 implementation has not begun.
 P03-T01 remains implemented, audited, and technically complete. P03-T02
 remains implemented, audited / verified, and formally closed. P03-T03 is
 implemented, audited, verified, and formally closed. P03 overall remains not
-complete.
+complete. P04-T01 through P04-T04 are complete. P04-T05 remains not started,
+and P04 overall remains not complete.
 
 Final P02-T09 verification for the provider-neutral market intelligence
 boundary, completed on 2026-08-12 at Git baseline `8958ed2` (HEAD and
@@ -151,17 +146,13 @@ functionality was introduced.
 
 ## Next action
 
-No automatic next implementation action is selected. P03-T01 is technically
-complete and audited. P03-T02 is implemented, audited / verified, and formally
-closed. P03-T03 is implemented, audited, verified, and formally closed. P03
-overall remains not complete.
+The next implementation boundary is P04-T05 — Signal Evidence Aggregation.
+Implementation has not started. P04-T06 and later tasks have not started.
 
 ## Next task
 
-P03 is NOT COMPLETE. P03-T01 is implemented, audited, and technically
-complete. P03-T02 is implemented, corrective fix completed, audited / verified,
-and formally closed. P03-T03 is implemented, audited, verified, and formally
-closed. No additional P03 implementation task is authorized. Provider
+P04-T05 is NOT STARTED. P04 overall remains NOT COMPLETE. P04-T01 through
+P04-T04 are complete. P04-T06 and later tasks have not started. Provider
 connectivity, ingestion transports, persistence changes, market-state
 collection, and later phases require separate specifications and approval.
 
@@ -190,4 +181,9 @@ secrets; names will be added only when a later task requires them.
 - **P03-T01:** IMPLEMENTED — AUDITED — PASS WITH NON-BLOCKING OBSERVATIONS — TECHNICALLY COMPLETE
 - **P03-T02:** IMPLEMENTED — CORRECTIVE FIX COMPLETED — AUDITED / VERIFIED — FORMALLY CLOSED
 - **P03-T03:** IMPLEMENTED — AUDITED — VERIFIED — FORMALLY CLOSED
-- **Next implementation action:** None selected automatically; P03 remains NOT COMPLETE and no additional P03 implementation task is authorized
+- **P04-T01:** COMPLETE — Signal Evidence Contract
+- **P04-T02:** COMPLETE — Signal Evidence Normalization
+- **P04-T03:** COMPLETE — Signal Evidence Quality
+- **P04-T04:** COMPLETE — Signal Evidence Evaluation
+- **P04-T05:** NOT STARTED — Signal Evidence Aggregation
+- **Next implementation action:** P04-T05 — Signal Evidence Aggregation; implementation has not started
