@@ -1,0 +1,41 @@
+"""Deterministic P04 feature-calculation contracts."""
+
+from core.features.price_features import (
+    FeatureCalculationContext,
+    FeatureCalculationResult,
+    FeatureCalculationStatus,
+    FeatureDefinition,
+    FeatureInputReference,
+    FeatureReason,
+    FeatureSnapshotLinkage,
+    FeatureUpstreamReference,
+    FeatureCalculator,
+    P04_T09_CONTRACT_VERSION,
+    PRICE_ACCELERATION,
+    PRICE_ACCELERATION_DEFINITION,
+    PRICE_VELOCITY,
+    PRICE_VELOCITY_DEFINITION,
+    calculate_feature,
+    calculate_price_acceleration,
+    calculate_price_velocity,
+)
+
+__all__ = [
+    "FeatureCalculationContext",
+    "FeatureCalculationResult",
+    "FeatureCalculationStatus",
+    "FeatureDefinition",
+    "FeatureInputReference",
+    "FeatureReason",
+    "FeatureSnapshotLinkage",
+    "FeatureUpstreamReference",
+    "FeatureCalculator",
+    "P04_T09_CONTRACT_VERSION",
+    "PRICE_ACCELERATION",
+    "PRICE_ACCELERATION_DEFINITION",
+    "PRICE_VELOCITY",
+    "PRICE_VELOCITY_DEFINITION",
+    "calculate_feature",
+    "calculate_price_acceleration",
+    "calculate_price_velocity",
+]
