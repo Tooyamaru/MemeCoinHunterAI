@@ -121,12 +121,12 @@ class SignalEvidenceSnapshot:
         if self.aggregated is not True:
             raise ValueError("aggregated must be True for a snapshot")
 
-        if self.evaluation_status is not None:
-            object.__setattr__(
-                self,
-                "evaluation_status",
-                _evaluation_status(self.evaluation_status),
-            )
+        if self.evaluation_status is None:
+            raise ValueError("snapshot requires an EVALUATED evaluation_status")
+        evaluation_status = _evaluation_status(self.evaluation_status)
+        if evaluation_status is not SignalEvaluationStatus.EVALUATED:
+            raise ValueError("snapshot requires an EVALUATED evaluation_status")
+        object.__setattr__(self, "evaluation_status", evaluation_status)
         if self.quality_status is not None:
             object.__setattr__(
                 self,
@@ -153,6 +153,8 @@ class SignalEvidenceSnapshot:
             raise ValueError(
                 "evidence_references must contain non-empty strings"
             )
+        if not evidence_references:
+            raise ValueError("snapshot requires at least one evidence reference")
         object.__setattr__(self, "evidence_references", evidence_references)
 
         provenance = tuple(self.provenance)
@@ -554,6 +556,19 @@ class SignalEvidenceSnapshotCollection:
             raise ValueError(
                 "snapshots must contain SignalEvidenceSnapshot values"
             )
+        for item in values:
+            if item.aggregation_status is not SignalAggregationStatus.AGGREGATED:
+                raise ValueError("collection contains a non-aggregated snapshot")
+            if item.aggregated is not True:
+                raise ValueError("collection contains an unaggregated snapshot")
+            if item.evaluation_status is not SignalEvaluationStatus.EVALUATED:
+                raise ValueError(
+                    "collection contains a snapshot without EVALUATED status"
+                )
+            if not item.evidence_references:
+                raise ValueError(
+                    "collection contains a snapshot without evidence"
+                )
         object.__setattr__(
             self,
             "snapshots",

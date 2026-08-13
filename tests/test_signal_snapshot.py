@@ -70,6 +70,26 @@ def _aggregation(*items: SignalEvidence):
     return aggregate_signal_evidence(evaluation)
 
 
+def _snapshot_kwargs(result):
+    return {
+        "chain_id": result.chain_id,
+        "token_identity": result.token_identity,
+        "aggregation_status": result.aggregation_status,
+        "aggregated": result.aggregated,
+        "evaluation_status": result.evaluation_status,
+        "quality_status": result.quality_status,
+        "signal_statuses": result.signal_statuses,
+        "reason_codes": result.reason_codes,
+        "evidence_references": result.evidence_references,
+        "provenance": result.provenance,
+        "observation_timestamps": result.observation_timestamps,
+        "normalized_evidence_digest": result.normalized_evidence_digest,
+        "evaluation_digest": result.evaluation_digest,
+        "aggregation_digest": result.representation_digest,
+        "aggregation_contract_version": result.contract_version,
+    }
+
+
 def test_snapshot_preserves_the_evidence_chain():
     result = _aggregation(
         _evidence(source_id="source-a", evidence_reference="first"),
@@ -356,6 +376,55 @@ def test_direct_snapshot_construction_fails_closed_for_invalid_input():
 
     with pytest.raises(ValueError, match="INVALID_AGGREGATION_RESULT"):
         SignalEvidenceSnapshotCollection.from_aggregations([object()])
+
+
+def test_direct_snapshot_construction_rejects_empty_evidence():
+    result = _aggregation(_evidence())
+    kwargs = _snapshot_kwargs(result)
+    kwargs.update(
+        signal_statuses=(),
+        evidence_references=(),
+        provenance=(),
+        observation_timestamps=(),
+    )
+
+    with pytest.raises(ValueError, match="evidence"):
+        SignalEvidenceSnapshot(**kwargs)
+
+
+def test_direct_snapshot_construction_rejects_missing_evaluation_status():
+    result = _aggregation(_evidence())
+    kwargs = _snapshot_kwargs(result)
+    kwargs["evaluation_status"] = None
+
+    with pytest.raises(ValueError, match="EVALUATED"):
+        SignalEvidenceSnapshot(**kwargs)
+
+
+@pytest.mark.parametrize(
+    "evaluation_status",
+    (
+        "QUALITY_BLOCKED",
+        "INVALID_INPUT",
+    ),
+)
+def test_direct_snapshot_construction_rejects_blocked_or_invalid_evaluation(
+    evaluation_status,
+):
+    result = _aggregation(_evidence())
+    kwargs = _snapshot_kwargs(result)
+    kwargs["evaluation_status"] = evaluation_status
+
+    with pytest.raises(ValueError, match="EVALUATED"):
+        SignalEvidenceSnapshot(**kwargs)
+
+
+def test_snapshot_collection_rejects_malformed_snapshot():
+    malformed = snapshot_signal_evidence(_aggregation(_evidence()))
+    object.__setattr__(malformed, "evidence_references", ())
+
+    with pytest.raises(ValueError, match="without evidence"):
+        SignalEvidenceSnapshotCollection.from_snapshots([malformed])
 
 
 def test_snapshot_from_aggregation_snapshot_alias_preserves_valid_behavior():
