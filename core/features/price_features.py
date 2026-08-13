@@ -34,7 +34,6 @@ from core.data.market_intelligence import (
     AcceptedMarketIntelligenceObservation,
     MarketIntelligenceCategory,
     P02_MARKET_INTELLIGENCE_CONTRACT_VERSION,
-    P02_T09_CONTRACT_VERSION,
 )
 from core.data.market_state import P02_T08_CONTRACT_VERSION
 
@@ -389,7 +388,7 @@ def _calculate(
             continue
         assert isinstance(item, AcceptedMarketIntelligenceObservation)
         value, numeric_reason = _numeric_value(item.value)
-        metadata = item.observation_metadata
+        metadata = item.provenance.observation_metadata
         unit = _semantic(metadata, "unit")
         quote = _semantic(metadata, "quote_asset")
         if numeric_reason is not None:
@@ -490,14 +489,14 @@ def _validate_input(
     if not isinstance(item, AcceptedMarketIntelligenceObservation):
         return {FeatureReason.INVALID_REQUEST.value}
     if item.intelligence_category is not MarketIntelligenceCategory.PRICE:
-        reasons.add(FeatureReason.UNSUPPORTED_CATEGORY.value)
+        return {FeatureReason.UNSUPPORTED_CATEGORY.value}
     if item.quality is not DataQuality.VALID or item.accepted is not True:
         reasons.add(
             FeatureReason.STALE_INPUT.value
             if item.quality is DataQuality.STALE
             else FeatureReason.UPSTREAM_NOT_ACCEPTED.value
         )
-    if item.contract_version != P02_T09_CONTRACT_VERSION or (
+    if item.contract_version != P02_MARKET_INTELLIGENCE_CONTRACT_VERSION or (
         item.category_contract_version != P02_MARKET_INTELLIGENCE_CONTRACT_VERSION
     ):
         reasons.add(FeatureReason.UNSUPPORTED_INPUT_VERSION.value)
@@ -585,11 +584,10 @@ def _identity_and_duplicate_reasons(
         content = _content_key(item, value, unit, quote)
         prior = by_id.get(item.observation_id)
         if prior is not None:
-            reasons.add(
-                FeatureReason.DUPLICATE_INPUT.value
-                if prior == content
-                else FeatureReason.CONTRADICTORY_INPUT.value
-            )
+            if prior == content:
+                reasons.add(FeatureReason.DUPLICATE_INPUT.value)
+            elif prior[2] != content[2]:
+                reasons.add(FeatureReason.CONTRADICTORY_INPUT.value)
         by_id[item.observation_id] = content
         fact = (
             _subject(item),
@@ -677,8 +675,11 @@ def _result(
         observation_ids=tuple(item.observation_id for item in refs if item.observation_id is not None),
         upstream_references=upstream_refs,
         p02_contract_version=(
-            P02_T09_CONTRACT_VERSION
-            if any(item.p02_contract_version == P02_T09_CONTRACT_VERSION for item in refs)
+            P02_MARKET_INTELLIGENCE_CONTRACT_VERSION
+            if any(
+                item.p02_contract_version == P02_MARKET_INTELLIGENCE_CONTRACT_VERSION
+                for item in refs
+            )
             else None
         ),
         feature_representation_digest=representation_digest,
@@ -712,7 +713,7 @@ def _result(
 def _input_reference(value: object) -> FeatureInputReference:
     if not isinstance(value, AcceptedMarketIntelligenceObservation):
         return FeatureInputReference(None, None, None, None, None, None, None, None, None, None, None, None, None, None)
-    metadata = value.observation_metadata
+    metadata = value.provenance.observation_metadata
     numeric, _ = _numeric_value(value.value)
     return FeatureInputReference(
         observation_id=value.observation_id if _text(value.observation_id) else None,
@@ -949,6 +950,8 @@ def _status_for_reasons(reasons: set[str]) -> FeatureCalculationStatus:
         FeatureReason.INVALID_TIMESTAMP_ORDER.value,
         FeatureReason.ZERO_ELAPSED_TIME.value,
         FeatureReason.INVALID_NUMERIC_VALUE.value,
+        FeatureReason.FUTURE_OBSERVATION.value,
+        FeatureReason.NOT_AVAILABLE_AT_REFERENCE_TIME.value,
         FeatureReason.UPSTREAM_IDENTITY_MISMATCH.value,
     )):
         return FeatureCalculationStatus.INVALID

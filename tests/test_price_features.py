@@ -38,26 +38,43 @@ def _price(
 ):
     observed = BASE + timedelta(seconds=seconds)
     received = observed + timedelta(seconds=1)
+    defaults = {
+        "source_event_id": source_event_id or f"price-{seconds}",
+        "sequence": seconds + 1,
+        "value": value,
+        "observation_time": observed,
+        "received_time": received,
+        "reference_time": REFERENCE,
+        "data_age": REFERENCE - observed,
+        "observation_metadata": {
+            "measurement": "price",
+            "unit": "USD",
+            "quote_asset": "USDC",
+        },
+    }
+    values = dict(defaults)
+    values.update(overrides)
+    safe_values = dict(values)
+    for field in ("observation_time", "received_time", "reference_time", "data_age"):
+        safe_values[field] = defaults[field]
     accepted = _processor().process(
-        _observation(
-            source_event_id=source_event_id or f"price-{seconds}",
-            sequence=seconds + 1,
-            value=value,
-            observation_time=observed,
-            received_time=received,
-            reference_time=REFERENCE,
-            data_age=REFERENCE - observed,
-            observation_metadata={
-                "measurement": "price",
-                "unit": "USD",
-                "quote_asset": "USDC",
-            },
-            **overrides,
-        )
+        _observation(**safe_values)
     ).observation
     assert accepted is not None
+    accepted = replace(
+        accepted,
+        **{
+            field: values[field]
+            for field in ("observation_time", "received_time", "reference_time", "data_age")
+            if field in overrides
+        },
+    )
     if observation_id is not None:
-        accepted = replace(accepted, observation_id=observation_id)
+        accepted = replace(
+            accepted,
+            observation_id=observation_id,
+            provenance=replace(accepted.provenance, observation_id=observation_id),
+        )
     return accepted
 
 
