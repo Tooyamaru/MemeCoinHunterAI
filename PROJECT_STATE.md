@@ -8,9 +8,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P04 — Market & Signal Intelligence
-- **Current task:** P04-T05 — Signal Evidence Aggregation
-- **Current task status:** COMPLETE / CLOSED
-- **Last updated:** 2026-08-12
+- **Current task:** P04-T07 — Signal Evidence Snapshot History Boundary
+- **Current task status:** NEXT IMPLEMENTATION BOUNDARY
+- **Last updated:** 2026-08-13
 
 ## Master progress
 
@@ -18,7 +18,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01: T01 done; T02 done; T03 done; T04 done; T05 done
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
-- P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; P04 overall remains not complete
+- P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; P04 overall remains not complete
 - P05–P12: Not started
 
 ## Phase status
@@ -27,30 +27,34 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P04-T06 and later P04 tasks; P05–P12
+- **Not started:** P04-T07 and later P04 tasks; P05–P12
 
 ## Current objective
 
 Maintain a portable, auditable signal evidence boundary with deterministic
 normalization, explicit provenance and freshness, fail-closed quality states,
-explicit evaluation outcomes, and deterministic aggregation before implementing
-P04-T06 or later market, AI, wallet, trading, or production functionality.
+explicit evaluation outcomes, deterministic aggregation, and immutable snapshot
+contracts before implementing P04-T07 or later market, AI, wallet, trading, or
+production functionality.
 
 ## Last verified checkpoint
 
-P04-T05 implementation and verification completed on 2026-08-12. P04-T01
-through P04-T05 are implemented, verified, and complete / closed. P04-T06 and
-later tasks remain not started and separately unauthorized.
+P04-T06 implementation, corrective fixes, focused regression coverage, and
+audit completed on 2026-08-13 at Git baseline `3062e05` (HEAD and origin/main).
+P04-T01 through P04-T06 are implemented, verified, and complete / closed, with
+P04-T06 audited PASS. The snapshot boundary preserves fail-closed construction,
+provenance, timestamps, deterministic canonical representations and digests,
+immutability, and upstream non-mutation. P04 overall remains not complete.
 
-The P04-T05 verification passed with no production-code fix required. The
-blocked-evaluation test setup was corrected without changing aggregation
-semantics. This continuation performs governance synchronization only;
-P04-T06 implementation is not authorized unless separately approved.
+No provider, network, persistence, AI, wallet, trading, execution, or production
+functionality was introduced. P04-T07 is the next implementation boundary for
+the provider-neutral signal snapshot-history deliverable indicated by the
+architecture; its exact contract requires separate task specification and
+approval.
 P03-T01 remains implemented, audited, and technically complete. P03-T02
 remains implemented, audited / verified, and formally closed. P03-T03 is
 implemented, audited, verified, and formally closed. P03 overall remains not
-complete. P04-T01 through P04-T05 are complete / closed. P04-T06 remains not
-started / not authorized, and P04 overall remains not complete.
+complete.
 
 Final P02-T09 verification for the provider-neutral market intelligence
 boundary, completed on 2026-08-12 at Git baseline `8958ed2` (HEAD and
@@ -145,15 +149,17 @@ functionality was introduced.
 
 ## Next action
 
-The next implementation boundary is P04-T06 — Signal Evidence Snapshot
-Contract. P04-T06 is not authorized unless separately approved. Later tasks
-have not started.
+The next implementation boundary is P04-T07 — Signal Evidence Snapshot
+History Boundary. It is limited to the provider-neutral snapshot-history
+deliverable indicated by the P04 architecture; detailed behavior requires a
+separate specification and approval. Later tasks have not started.
 
 ## Next task
 
-P04-T05 is COMPLETE / CLOSED. P04 overall remains NOT COMPLETE. P04-T01
-through P04-T05 are complete. P04-T06 is the next implementation boundary but
-remains NOT STARTED / NOT AUTHORIZED. Provider connectivity, ingestion
+P04-T06 is COMPLETE / CLOSED / AUDITED PASS. P04 overall remains NOT
+COMPLETE. P04-T01 through P04-T06 are complete. P04-T07 is the next
+implementation boundary for the provider-neutral signal snapshot-history
+deliverable indicated by the architecture. Provider connectivity, ingestion
 transports, persistence changes, market-state collection, and later phases
 require separate specifications and approval.
 
@@ -187,4 +193,5 @@ secrets; names will be added only when a later task requires them.
 - **P04-T03:** COMPLETE — Signal Evidence Quality
 - **P04-T04:** COMPLETE — Signal Evidence Evaluation
 - **P04-T05:** COMPLETE / CLOSED — Signal Evidence Aggregation
-- **Next implementation action:** P04-T06 — Signal Evidence Snapshot Contract; NOT AUTHORIZED unless separately approved
+- **P04-T06:** COMPLETE / CLOSED / AUDITED PASS — Signal Evidence Snapshot Contract
+- **Next implementation action:** P04-T07 — Signal Evidence Snapshot History Boundary

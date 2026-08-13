@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-13
+
+- **PHASE:** P04 — Market & Signal Intelligence
+- **TASK:** P04-T06 — Signal Evidence Snapshot Contract
+- **CHANGE:** Completed and audited the immutable, deterministic snapshot
+  contract with fail-closed behavior, direct-construction guards, collection
+  validation, provenance/timestamp preservation, and canonical digest
+  invariants.
+- **AUDIT:** PASS. No provider, network, trading, execution, wallet, AI/ML,
+  persistence, or production behavior was introduced. P04-T07 is the next
+  implementation boundary; P04 overall remains NOT COMPLETE.
+
 ## 2026-08-12
 
 - **PHASE:** P04 — Market & Signal Intelligence
