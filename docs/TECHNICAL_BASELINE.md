@@ -2,12 +2,12 @@
 
 ## Selected stack
 
-- **Runtime:** Python 3.13
+- **Runtime:** Python 3.13, pinned by `.python-version`; Replit's system Python is not authoritative
 - **API:** FastAPI served by Uvicorn
 - **Configuration and validation:** Pydantic Settings
 - **Logging:** Standard-library Python logging with timestamp, level, logger name, and message
 - **Testing:** pytest and FastAPI-compatible `TestClient`
-- **Dependency management:** One root `pyproject.toml` with `uv.lock`; development-only test tools are kept in the dev dependency group
+- **Dependency management:** One root `pyproject.toml` with `uv.lock`; uv manages the project environment and development-only test tools are kept in the dev dependency group
 
 ## Application structure
 
@@ -44,6 +44,28 @@ uv run uvicorn backend.api.main:app --host "${APP_HOST:-0.0.0.0}" --port "${PORT
 - Every HTTP response includes an `X-Request-ID`; incoming IDs are preserved when they are short enough, otherwise a new ID is generated.
 - Unexpected API errors return a safe JSON error with the request ID while details are logged server-side.
 - Replit may inject `DATABASE_URL` into the environment. Tests explicitly override it so test behavior never depends on ambient workspace configuration.
+
+## Python environment and test execution
+
+The project Python baseline is controlled by `.python-version` and the
+`requires-python` declaration in `pyproject.toml`. Replit's system Python
+version is not the source of truth. uv creates and uses the project environment
+from `pyproject.toml` and `uv.lock`; pytest is declared in the development
+dependency group and must be invoked through that environment.
+
+Run the read-only environment diagnostic before debugging Python or test
+failures:
+
+```bash
+bash scripts/python_env_diagnostic.sh
+```
+
+The canonical test commands are:
+
+```bash
+uv run pytest -q
+uv run pytest -q --collect-only
+```
 
 ## Database strategy
 

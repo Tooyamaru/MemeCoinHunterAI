@@ -49,6 +49,26 @@ uv run uvicorn backend.api.main:app --host "${APP_HOST:-0.0.0.0}" --port "${PORT
 
 The only endpoint currently provided by the Python foundation is `GET /health`.
 
+### Python environment and tests
+
+Replit's system Python is not the project source of truth. The project baseline
+is pinned to Python 3.13 in `.python-version`, and uv manages the project
+environment from `pyproject.toml` and `uv.lock`.
+
+Run the read-only environment diagnostic before debugging Python or test
+failures:
+
+```bash
+bash scripts/python_env_diagnostic.sh
+```
+
+Run tests through the project environment, not a globally installed pytest:
+
+```bash
+uv run pytest -q
+uv run pytest -q --collect-only
+```
+
 ## Repository structure
 
 - `apps/dashboard/` — future presentation application

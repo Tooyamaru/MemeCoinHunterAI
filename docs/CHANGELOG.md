@@ -3,6 +3,21 @@
 ## 2026-08-13
 
 - **PHASE:** P04 — Market & Signal Intelligence
+- **TASK:** P04-T08 — Python Environment Stabilization
+- **CHANGE:** Established Python 3.13 as the project baseline, configured the
+  Replit runtime accordingly, and made uv the reproducible project environment
+  manager. Added a read-only environment diagnostic and documented canonical
+  uv-based pytest commands.
+- **VERIFICATION:** `uv run python --version` reported Python 3.13.11;
+  `uv run pytest --version` reported pytest 9.1.1; 354 tests were collected and
+  354 tests passed with one existing Starlette/httpx deprecation warning;
+  `git diff --check` passed.
+- **SCOPE:** No P04 signal implementation or signal test files were modified.
+  P04-T08 changed environment/tooling only; P04 overall remains NOT COMPLETE.
+
+## 2026-08-13
+
+- **PHASE:** P04 — Market & Signal Intelligence
 - **TASK:** P04-T07 — Signal Evidence Snapshot History Boundary
 - **CHANGE:** Synchronized project-control documentation to record the already
   implemented P04-T07 boundary as complete and formally closed.
