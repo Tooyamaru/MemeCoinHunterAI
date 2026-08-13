@@ -3,6 +3,19 @@
 ## 2026-08-13
 
 - **PHASE:** P04 — Market & Signal Intelligence
+- **TASK:** P04-T07 — Signal Evidence Snapshot History Boundary
+- **CHANGE:** Synchronized project-control documentation to record the already
+  implemented P04-T07 boundary as complete and formally closed.
+- **AUDIT:** PASS WITH NON-BLOCKING OBSERVATIONS. The architectural audit
+  approved closure at Git baseline `b627aa7`.
+- **SCOPE:** P04 overall remains NOT COMPLETE. P04-T08 is not explicitly defined
+  in the current architecture; any next P04 task requires a separate
+  specification and approval. No source, test, dependency, runtime, or later
+  P04 implementation was changed or started.
+
+## 2026-08-13
+
+- **PHASE:** P04 — Market & Signal Intelligence
 - **TASK:** P04-T06 — Signal Evidence Snapshot Contract
 - **CHANGE:** Completed and audited the immutable, deterministic snapshot
   contract with fail-closed behavior, direct-construction guards, collection

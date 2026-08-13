@@ -21,8 +21,10 @@ contract-layer signal processing boundaries: Signal Evidence Contract, Signal
 Evidence Normalization, Signal Evidence Quality, and Signal Evidence
 Evaluation. P04-T05 — Signal Evidence Aggregation is DONE / CLOSED. P04-T06 —
 Signal Evidence Snapshot Contract is DONE / CLOSED / AUDITED PASS. P04-T07 is
-the next implementation boundary for the provider-neutral snapshot-history
-deliverable indicated by the P04 architecture; no later P04 task has started.
+COMPLETE / CLOSED / AUDITED PASS, with an architectural audit verdict of PASS
+WITH NON-BLOCKING OBSERVATIONS. No later P04 task has started. P04-T08 is not
+explicitly defined in the current architecture; any next P04 task requires a
+separate specification and approval.
 No provider, network, persistence, AI, wallet, trading, or execution integration
 was introduced. Signal aggregation, opportunity detection, decision making,
 trading, execution, and AI functionality remain future boundaries.
@@ -206,8 +208,9 @@ STOP, PAUSE, or change market.
 - **P04-T03:** Signal Evidence Quality — DONE
 - **P04-T04:** Signal Evidence Evaluation — DONE
 - **P04-T05:** Signal Evidence Aggregation — DONE / CLOSED
-- **P04-T06:** Signal Evidence Snapshot Contract — DONE / CLOSED
-- **P04-T07:** Signal Evidence Snapshot History Boundary — NEXT IMPLEMENTATION BOUNDARY
+- **P04-T06:** Signal Evidence Snapshot Contract — DONE / CLOSED / AUDITED PASS
+- **P04-T07:** Signal Evidence Snapshot History Boundary — DONE / CLOSED / AUDITED PASS
+- **P04 next task:** P04-T08 is not explicitly defined in the current architecture; any next P04 task requires a separate specification and approval
 
 ### P05 — OPPORTUNITY ENGINE
 - **Objective:** Fuse signals and rank candidate opportunities.
