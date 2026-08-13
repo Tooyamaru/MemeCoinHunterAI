@@ -1,10 +1,11 @@
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timezone
 from types import MappingProxyType
 
 import pytest
 
 from core.signals.signal_aggregation import aggregate_signal_evidence
+from core.signals.signal_aggregation import SignalAggregationStatus
 from core.signals.signal_evaluation import evaluate_signal_evidence
 from core.signals.signal_evidence import (
     SignalEvidence,
@@ -16,6 +17,7 @@ from core.signals.signal_quality import assess_signal_evidence_quality
 from core.signals.signal_snapshot import (
     P04_T06_CONTRACT_VERSION,
     SignalSnapshotStatus,
+    SignalEvidenceSnapshot,
     SignalEvidenceSnapshotCollection,
     create_signal_evidence_snapshot,
     snapshot_signal_evidence_result,
@@ -301,3 +303,65 @@ def test_snapshot_creation_does_not_mutate_upstream_aggregation():
 
     assert result.snapshot is not None
     assert aggregation.canonical_representation == before
+
+
+def test_direct_snapshot_construction_fails_closed_for_empty_input():
+    aggregation = _aggregation()
+
+    with pytest.raises(ValueError, match="EMPTY_INPUT"):
+        SignalEvidenceSnapshot.from_aggregation(aggregation)
+
+    with pytest.raises(ValueError, match="EMPTY_INPUT"):
+        SignalEvidenceSnapshotCollection.from_aggregations([aggregation])
+
+
+def test_direct_snapshot_construction_fails_closed_for_blocked_input():
+    normalized = normalize_signal_evidence(
+        SignalEvidenceCollection.from_evidence([_evidence()])
+    )
+    object.__setattr__(normalized.evidence[0], "confidence", 1.5)
+    aggregation = aggregate_signal_evidence(
+        evaluate_signal_evidence(
+            normalized,
+            assess_signal_evidence_quality(normalized),
+        )
+    )
+
+    with pytest.raises(ValueError, match="UPSTREAM_BLOCKED"):
+        SignalEvidenceSnapshot.from_aggregation(aggregation)
+
+    with pytest.raises(ValueError, match="UPSTREAM_BLOCKED"):
+        SignalEvidenceSnapshotCollection.from_aggregations([aggregation])
+
+
+def test_direct_snapshot_construction_fails_closed_for_insufficient_input():
+    aggregation = replace(
+        _aggregation(_evidence()),
+        signal_statuses=(),
+        evidence_references=(),
+        provenance=(),
+        observation_timestamps=(),
+    )
+
+    with pytest.raises(ValueError, match="INSUFFICIENT_INPUT"):
+        SignalEvidenceSnapshot.from_aggregation(aggregation)
+
+    with pytest.raises(ValueError, match="INSUFFICIENT_INPUT"):
+        SignalEvidenceSnapshotCollection.from_aggregations([aggregation])
+
+
+def test_direct_snapshot_construction_fails_closed_for_invalid_input():
+    with pytest.raises(ValueError, match="INVALID_AGGREGATION_RESULT"):
+        SignalEvidenceSnapshot.from_aggregation(object())
+
+    with pytest.raises(ValueError, match="INVALID_AGGREGATION_RESULT"):
+        SignalEvidenceSnapshotCollection.from_aggregations([object()])
+
+
+def test_snapshot_from_aggregation_snapshot_alias_preserves_valid_behavior():
+    aggregation = _aggregation(_evidence())
+
+    snapshot = SignalEvidenceSnapshot.from_aggregation_snapshot(aggregation)
+
+    assert snapshot == SignalEvidenceSnapshot.from_aggregation(aggregation)
+    assert aggregation.aggregation_status is SignalAggregationStatus.AGGREGATED

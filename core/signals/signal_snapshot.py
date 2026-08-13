@@ -70,7 +70,17 @@ class SignalEvidenceSnapshot:
         cls,
         aggregation: SignalEvidenceAggregationResult,
     ) -> SignalEvidenceSnapshot:
-        """Capture a P04-T05 result without recalculating any state."""
+        """Capture only a successfully aggregated P04-T05 result."""
+
+        result = SignalEvidenceSnapshotResult.from_aggregation(aggregation)
+        return _require_snapshot(result)
+
+    @classmethod
+    def _from_valid_aggregation(
+        cls,
+        aggregation: SignalEvidenceAggregationResult,
+    ) -> SignalEvidenceSnapshot:
+        """Build a snapshot after the result boundary has accepted it."""
 
         if not isinstance(aggregation, SignalEvidenceAggregationResult):
             raise ValueError(
@@ -94,7 +104,7 @@ class SignalEvidenceSnapshot:
             aggregation_contract_version=aggregation.contract_version,
         )
 
-    from_aggregation_result = from_aggregation
+    from_aggregation_snapshot = from_aggregation
 
     def __post_init__(self) -> None:
         if self.chain_id is not None:
@@ -104,10 +114,12 @@ class SignalEvidenceSnapshot:
 
         aggregation_status = _aggregation_status(self.aggregation_status)
         object.__setattr__(self, "aggregation_status", aggregation_status)
-        if self.aggregated is not (
-            aggregation_status is SignalAggregationStatus.AGGREGATED
-        ):
-            raise ValueError("aggregated must match aggregation_status")
+        if aggregation_status is not SignalAggregationStatus.AGGREGATED:
+            raise ValueError(
+                "a SignalEvidenceSnapshot requires AGGREGATED input"
+            )
+        if self.aggregated is not True:
+            raise ValueError("aggregated must be True for a snapshot")
 
         if self.evaluation_status is not None:
             object.__setattr__(
@@ -321,7 +333,7 @@ class SignalEvidenceSnapshotResult:
             )
 
         try:
-            snapshot = SignalEvidenceSnapshot.from_aggregation(aggregation)
+            snapshot = SignalEvidenceSnapshot._from_valid_aggregation(aggregation)
         except (TypeError, ValueError):
             return cls._invalid(
                 ("INVALID_UPSTREAM_AGGREGATION",),
@@ -530,12 +542,11 @@ class SignalEvidenceSnapshotCollection:
         aggregations: tuple[SignalEvidenceAggregationResult, ...]
         | list[SignalEvidenceAggregationResult],
     ) -> SignalEvidenceSnapshotCollection:
-        return cls(
-            snapshots=tuple(
-                SignalEvidenceSnapshot.from_aggregation(item)
-                for item in aggregations
-            )
+        snapshots = tuple(
+            _require_snapshot(SignalEvidenceSnapshotResult.from_aggregation(item))
+            for item in aggregations
         )
+        return cls(snapshots=snapshots)
 
     def __post_init__(self) -> None:
         values = tuple(self.snapshots)
@@ -612,6 +623,18 @@ def snapshot_signal_evidence_collection(
     | list[SignalEvidenceAggregationResult],
 ) -> SignalEvidenceSnapshotCollection:
     return SignalEvidenceSnapshotCollection.from_aggregations(aggregations)
+
+
+def _require_snapshot(
+    result: SignalEvidenceSnapshotResult,
+) -> SignalEvidenceSnapshot:
+    if not result.valid or result.snapshot is None:
+        reason = ", ".join(result.reason_codes) or "UNSPECIFIED"
+        raise ValueError(
+            f"cannot create a SignalEvidenceSnapshot: "
+            f"{result.snapshot_status.value} ({reason})"
+        )
+    return result.snapshot
 
 
 def _aggregation_status(
