@@ -92,9 +92,9 @@ class OpportunityCandidate:
     chain_id: str
     token_identity: str
     reference_time: datetime
-    state: OpportunityCandidateState
     eligibility: DerivedEligibilityOutput
     signal_snapshot: SignalEvidenceSnapshot
+    state: OpportunityCandidateState = OpportunityCandidateState.VALID
     feature_snapshots: tuple[FeatureCalculationSnapshot, ...] = ()
     reason_codes: tuple[str, ...] = ()
     analytical_context: Mapping[str, Any] = field(default_factory=dict)
@@ -268,7 +268,18 @@ class OpportunityCandidate:
     ) -> OpportunityCandidate:
         """Build a candidate state from already-created upstream contracts."""
 
+        if not isinstance(eligibility, DerivedEligibilityOutput):
+            raise ValueError("eligibility must be a DerivedEligibilityOutput")
+        if not isinstance(signal_snapshot, SignalEvidenceSnapshot):
+            raise ValueError("signal_snapshot must be a SignalEvidenceSnapshot")
         features = tuple(feature_snapshots)
+        if not all(
+            isinstance(value, FeatureCalculationSnapshot)
+            for value in features
+        ):
+            raise ValueError(
+                "feature_snapshots must contain FeatureCalculationSnapshot values"
+            )
         reasons: set[str] = set()
         if eligibility.status is not EligibilityStatus.ELIGIBLE:
             reasons.add("UPSTREAM_NOT_ELIGIBLE")
