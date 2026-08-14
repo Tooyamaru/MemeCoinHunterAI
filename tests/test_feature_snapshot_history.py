@@ -1,4 +1,6 @@
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
+
+import pytest
 
 from core.features import (
     FeatureCalculationSnapshotHistory,
@@ -67,6 +69,23 @@ def test_history_deduplicates_by_snapshot_digest():
     assert history.snapshot_count == 1
 
 
+def test_history_deduplicates_separate_equivalent_snapshot_objects_by_digest():
+    first_snapshot = _snapshot(2, 14, "equivalent")
+    second_snapshot = _snapshot(2, 14, "equivalent")
+    history = FeatureCalculationSnapshotHistory()
+
+    first = history.append(first_snapshot)
+    duplicate = history.append(second_snapshot)
+
+    assert first_snapshot is not second_snapshot
+    assert first_snapshot == second_snapshot
+    assert first_snapshot.digest == second_snapshot.digest
+    assert first.outcome is FeatureSnapshotHistoryOutcome.STORED
+    assert duplicate.outcome is FeatureSnapshotHistoryOutcome.DUPLICATE
+    assert duplicate.snapshot is first_snapshot
+    assert history.retrieve() == (first_snapshot,)
+
+
 def test_empty_history_is_safe_and_deterministic():
     left = FeatureCalculationSnapshotHistory()
     right = FeatureCalculationSnapshotHistory.from_snapshots([])
@@ -75,6 +94,31 @@ def test_empty_history_is_safe_and_deterministic():
     assert left.history == ()
     assert left.snapshot_count == 0
     assert left.digest == right.digest
+
+
+def test_history_result_and_read_view_are_immutable():
+    result = FeatureCalculationSnapshotHistory().append(_snapshot(2, 14, "immutable"))
+
+    with pytest.raises(FrozenInstanceError):
+        result.outcome = FeatureSnapshotHistoryOutcome.INVALID_INPUT
+    with pytest.raises(FrozenInstanceError):
+        result.snapshots = ()
+    with pytest.raises(TypeError):
+        result.snapshots[0].canonical_representation["tampered"] = True
+
+
+def test_same_snapshot_set_has_the_same_history_digest_across_instances():
+    left = FeatureCalculationSnapshotHistory(
+        [_snapshot(2, 14, "digest-a"), _snapshot(5, 20, "digest-b")]
+    )
+    right = FeatureCalculationSnapshotHistory(
+        [_snapshot(5, 20, "digest-b"), _snapshot(2, 14, "digest-a")]
+    )
+
+    assert left.retrieve() == right.retrieve()
+    assert left.history_digest == right.history_digest
+    assert left.history_digest == left.representation_digest
+    assert right.history_digest == right.digest
 
 
 def test_invalid_insertion_does_not_mutate_history():
