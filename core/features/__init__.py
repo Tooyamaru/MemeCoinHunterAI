@@ -19,6 +19,25 @@ from core.features.price_features import (
     calculate_price_acceleration,
     calculate_price_velocity,
 )
+from core.features.feature_snapshot import (
+    FeatureCalculationSnapshot,
+    FeatureCalculationSnapshotResult,
+    FeatureCalculationSnapshotStatus,
+    FeatureSnapshotStatus,
+    P04_T10_CONTRACT_VERSION,
+    create_feature_calculation_snapshot,
+    create_feature_calculation_snapshot_result,
+    snapshot_feature_calculation,
+    snapshot_feature_calculation_result,
+)
+from core.features.feature_snapshot_history import (
+    FeatureCalculationSnapshotHistory,
+    FeatureCalculationSnapshotHistoryOutcome,
+    FeatureCalculationSnapshotHistoryResult,
+    FeatureCalculationSnapshotHistoryStatus,
+    FeatureSnapshotHistory,
+    FeatureSnapshotHistoryOutcome,
+)
 
 __all__ = [
     "FeatureCalculationContext",
@@ -38,4 +57,19 @@ __all__ = [
     "calculate_feature",
     "calculate_price_acceleration",
     "calculate_price_velocity",
+    "FeatureCalculationSnapshot",
+    "FeatureCalculationSnapshotResult",
+    "FeatureCalculationSnapshotStatus",
+    "FeatureSnapshotStatus",
+    "P04_T10_CONTRACT_VERSION",
+    "create_feature_calculation_snapshot",
+    "create_feature_calculation_snapshot_result",
+    "snapshot_feature_calculation",
+    "snapshot_feature_calculation_result",
+    "FeatureCalculationSnapshotHistory",
+    "FeatureCalculationSnapshotHistoryOutcome",
+    "FeatureCalculationSnapshotHistoryResult",
+    "FeatureCalculationSnapshotHistoryStatus",
+    "FeatureSnapshotHistory",
+    "FeatureSnapshotHistoryOutcome",
 ]
