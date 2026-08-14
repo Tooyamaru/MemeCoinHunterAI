@@ -8,9 +8,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P04 — Market & Signal Intelligence
-- **Current task:** P04-T08 — Python Environment Stabilization
-- **Current task status:** COMPLETE / CLOSED
-- **Last updated:** 2026-08-13
+- **Current task:** P04-T10 — Feature Snapshot History Boundary
+- **Current task status:** COMPLETE / CLOSED / AUDITED PASS
+- **Last updated:** 2026-08-14
 
 ## Master progress
 
@@ -23,7 +23,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
@@ -39,10 +39,9 @@ wallet, trading, or production functionality.
 
 ## Last verified checkpoint
 
-P04-T07 implementation and architectural audit completed on 2026-08-13 at Git
-baseline `b627aa7` (HEAD and origin/main). P04-T01 through P04-T07 are
-implemented, verified, and complete / closed, with P04-T06 and P04-T07 audited
-PASS. P04-T07 received a PASS WITH NON-BLOCKING OBSERVATIONS audit verdict.
+P04-T10 implementation and architectural audit completed on 2026-08-14 at Git
+baseline `2883e2a`. P04-T01 through P04-T10 are implemented, verified, and
+complete / closed, with P04-T06, P04-T07, and P04-T10 audited PASS.
 P04 overall remains not complete.
 
 No provider, network, persistence, AI, wallet, trading, execution, or production
@@ -147,14 +146,14 @@ functionality was introduced.
 
 ## Next action
 
-P04-T08 Python Environment Stabilization is COMPLETE / CLOSED. The project
+P04-T10 Feature Snapshot History Boundary is COMPLETE / CLOSED / AUDITED PASS. The project
 environment uses the Python 3.13 baseline and uv-managed dependencies. Any next
 P04 signal task requires a separate specification and approval; later signal
 tasks have not started.
 
 ## Next task
 
-P04-T08 Python Environment Stabilization is COMPLETE / CLOSED. P04 overall
+P04-T10 Feature Snapshot History Boundary is COMPLETE / CLOSED / AUDITED PASS. P04 overall
 remains NOT COMPLETE. P04-T01 through P04-T07 signal contracts are complete.
 P04-T08 did not add a signal boundary. Any next P04 signal task requires a
 separate specification and approval. Provider connectivity, ingestion
