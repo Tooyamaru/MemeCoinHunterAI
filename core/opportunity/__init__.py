@@ -14,6 +14,13 @@ from core.opportunity.opportunity_candidate import (
     create_opportunity_candidate,
     create_opportunity_candidate_result,
 )
+from core.opportunity.opportunity_normalization import (
+    NormalizedOpportunityCandidate,
+    OpportunityCandidateNormalization,
+    P05_T02_CONTRACT_VERSION,
+    normalize_candidate,
+    normalize_opportunity_candidate,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -28,4 +35,9 @@ __all__ = [
     "build_opportunity_candidate_result",
     "create_opportunity_candidate",
     "create_opportunity_candidate_result",
+    "NormalizedOpportunityCandidate",
+    "OpportunityCandidateNormalization",
+    "P05_T02_CONTRACT_VERSION",
+    "normalize_candidate",
+    "normalize_opportunity_candidate",
 ]
