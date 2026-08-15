@@ -185,6 +185,7 @@ def test_missing_required_identity_is_rejected(changes):
         "chain_id": "solana",
         "token_identity": "mint-A",
         "reference_time": REFERENCE_TIME,
+        "state": OpportunityCandidateState.VALID,
         "eligibility": _eligibility(),
         "signal_snapshot": _signal_snapshot(),
     }
