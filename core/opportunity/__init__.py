@@ -21,6 +21,16 @@ from core.opportunity.opportunity_normalization import (
     normalize_candidate,
     normalize_opportunity_candidate,
 )
+from core.opportunity.opportunity_risk import (
+    CandidateRiskEvaluation,
+    CandidateRiskFlag,
+    CandidateViabilityStatus,
+    HardRiskEvaluation,
+    P05_T03_CONTRACT_VERSION,
+    P05_T03_EVALUATOR_VERSION,
+    evaluate_candidate_risk,
+    evaluate_hard_risks,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -40,4 +50,12 @@ __all__ = [
     "P05_T02_CONTRACT_VERSION",
     "normalize_candidate",
     "normalize_opportunity_candidate",
+    "CandidateRiskEvaluation",
+    "CandidateRiskFlag",
+    "CandidateViabilityStatus",
+    "HardRiskEvaluation",
+    "P05_T03_CONTRACT_VERSION",
+    "P05_T03_EVALUATOR_VERSION",
+    "evaluate_candidate_risk",
+    "evaluate_hard_risks",
 ]
