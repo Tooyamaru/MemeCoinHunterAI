@@ -86,10 +86,26 @@ class CandidateFeatureEvaluation:
         )
         if not isinstance(self.risk_evaluation, CandidateRiskEvaluation):
             raise ValueError("risk_evaluation must be a CandidateRiskEvaluation")
+        if self.risk_evaluation.contract_version != P05_T03_CONTRACT_VERSION:
+            raise ValueError("unsupported P05-T03 risk contract version")
+        if self.risk_evaluation.evaluator_version != P05_T03_EVALUATOR_VERSION:
+            raise ValueError("unsupported P05-T03 risk evaluator version")
+        if not isinstance(
+            self.risk_evaluation.viability_status,
+            CandidateViabilityStatus,
+        ):
+            raise ValueError("risk evaluation viability status is invalid")
+        if self.risk_evaluation.viability_status is not CandidateViabilityStatus.ELIGIBLE:
+            raise ValueError("P05-T03 viability gate is closed")
         if self.risk_evaluation.candidate_id != self.candidate_id:
             raise ValueError("risk evaluation candidate identity does not match")
         if self.risk_evaluation.input_candidate_digest != self.input_candidate_digest:
             raise ValueError("risk evaluation candidate digest does not match")
+        if (
+            self.risk_evaluation.canonical_representation
+            != self.risk_evaluation.deterministic_representation
+        ):
+            raise ValueError("risk evaluation representation is not deterministic")
         if not isinstance(self.signal_snapshot, SignalEvidenceSnapshot):
             raise ValueError("signal_snapshot must be a SignalEvidenceSnapshot")
         if (
@@ -103,6 +119,8 @@ class CandidateFeatureEvaluation:
             raise ValueError(
                 "feature_snapshots must contain FeatureCalculationSnapshot values"
             )
+        for snapshot in snapshots:
+            _validate_snapshot(snapshot)
         object.__setattr__(self, "feature_snapshots", snapshots)
 
         references = tuple(self.upstream_references)
@@ -238,6 +256,33 @@ def _validate_snapshot(snapshot: FeatureCalculationSnapshot) -> None:
         != snapshot.result_representation_digest
     ):
         raise ValueError("feature snapshot is not canonical")
+    validated = FeatureCalculationSnapshot(
+        calculation_result_id=snapshot.calculation_result_id,
+        status=snapshot.status,
+        reason_codes=snapshot.reason_codes,
+        feature_id=snapshot.feature_id,
+        feature_version=snapshot.feature_version,
+        calculation_contract_version=snapshot.calculation_contract_version,
+        value=snapshot.value,
+        value_unit=snapshot.value_unit,
+        price_unit=snapshot.price_unit,
+        quote_asset=snapshot.quote_asset,
+        source_id=snapshot.source_id,
+        chain_id=snapshot.chain_id,
+        token_identity=snapshot.token_identity,
+        market_subject_id=snapshot.market_subject_id,
+        reference_time=snapshot.reference_time,
+        freshness_policy=snapshot.freshness_policy,
+        evaluation_id=snapshot.evaluation_id,
+        inputs=snapshot.inputs,
+        upstream_references=snapshot.upstream_references,
+        input_set_digest=snapshot.input_set_digest,
+        snapshot_linkage=snapshot.snapshot_linkage,
+        result_representation_digest=snapshot.result_representation_digest,
+        contract_version=snapshot.contract_version,
+    )
+    if validated != snapshot or validated.digest != snapshot.digest:
+        raise ValueError("feature snapshot provenance is not canonical")
 
 
 def _digest(value: Any) -> str:

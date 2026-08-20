@@ -137,6 +137,55 @@ def test_identity_and_digest_mismatches_fail_closed():
         )
 
 
+@pytest.mark.parametrize(
+    "status",
+    [EligibilityStatus.INELIGIBLE, EligibilityStatus.UNKNOWN],
+)
+def test_direct_construction_rejects_closed_p05_t03_gates(status):
+    candidate, risk = _inputs(status)
+
+    with pytest.raises(ValueError, match="viability gate is closed"):
+        CandidateFeatureEvaluation(
+            candidate_id=candidate.candidate_id,
+            chain_id=candidate.chain_id,
+            token_identity=candidate.token_identity,
+            reference_time=candidate.reference_time,
+            evaluated_at=risk.evaluated_at,
+            input_candidate_digest=candidate.representation_digest,
+            risk_evaluation=risk,
+            feature_snapshots=candidate.feature_snapshots,
+            signal_snapshot=candidate.signal_snapshot,
+            upstream_references=candidate.upstream_references,
+        )
+
+
+def test_direct_construction_rejects_tampered_p04_t10_provenance():
+    candidate, risk = _inputs()
+    tampered = replace(candidate.feature_snapshots[0])
+    object.__setattr__(
+        tampered,
+        "snapshot_linkage",
+        replace(
+            tampered.snapshot_linkage,
+            feature_representation_digest="tampered-digest",
+        ),
+    )
+
+    with pytest.raises(ValueError, match="canonical"):
+        CandidateFeatureEvaluation(
+            candidate_id=candidate.candidate_id,
+            chain_id=candidate.chain_id,
+            token_identity=candidate.token_identity,
+            reference_time=candidate.reference_time,
+            evaluated_at=risk.evaluated_at,
+            input_candidate_digest=candidate.representation_digest,
+            risk_evaluation=risk,
+            feature_snapshots=(tampered,),
+            signal_snapshot=candidate.signal_snapshot,
+            upstream_references=candidate.upstream_references,
+        )
+
+
 def test_repeated_evaluation_is_deterministic_and_uses_reference_time_by_default():
     candidate, risk = _inputs()
     first = evaluate_candidate_features(candidate, risk)
