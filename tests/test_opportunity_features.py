@@ -88,17 +88,49 @@ def test_non_calculated_authorized_snapshot_is_preserved():
     assert result.feature_snapshots[0].status is FeatureCalculationStatus.UNKNOWN
 
 
-def test_unauthorized_feature_pair_is_rejected():
+def test_unauthorized_valid_feature_pair_is_preserved_without_reinterpretation():
     snapshot = replace(
         _feature_snapshot(),
+        status=FeatureCalculationStatus.UNSUPPORTED,
+        reason_codes=("UNSUPPORTED_FEATURE",),
         feature_id="volume",
         feature_version="volume-v1",
+        value=None,
+        value_unit=None,
     )
     candidate = _candidate(feature_snapshots=[snapshot])
     normalized = NormalizedOpportunityCandidate.from_candidate(candidate)
     risk = evaluate_hard_risks(normalized)
+    result = evaluate_candidate_features(normalized, risk)
 
-    with pytest.raises(ValueError, match="unsupported feature pair"):
+    assert result.feature_snapshots == (snapshot,)
+    assert result.feature_snapshots[0] is snapshot
+    assert result.feature_snapshots[0].feature_id == "volume"
+    assert result.feature_snapshots[0].feature_version == "volume-v1"
+    assert result.feature_snapshots[0].status is FeatureCalculationStatus.UNSUPPORTED
+    assert result.feature_snapshots[0].value is None
+    assert result.feature_snapshots[0].value_unit is None
+    assert result.feature_snapshots[0].reason_codes == ("UNSUPPORTED_FEATURE",)
+    assert result.feature_snapshots[0].canonical_representation == (
+        snapshot.canonical_representation
+    )
+
+
+def test_malformed_snapshot_provenance_still_fails_closed():
+    malformed = _feature_snapshot()
+    object.__setattr__(
+        malformed,
+        "snapshot_linkage",
+        replace(
+            malformed.snapshot_linkage,
+            feature_representation_digest="tampered-digest",
+        ),
+    )
+    candidate = _candidate(feature_snapshots=[malformed])
+    normalized = NormalizedOpportunityCandidate.from_candidate(candidate)
+    risk = evaluate_hard_risks(normalized)
+
+    with pytest.raises(ValueError, match="canonical"):
         evaluate_candidate_features(normalized, risk)
 
 

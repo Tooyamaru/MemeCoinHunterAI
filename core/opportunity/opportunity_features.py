@@ -103,11 +103,6 @@ class CandidateFeatureEvaluation:
             raise ValueError(
                 "feature_snapshots must contain FeatureCalculationSnapshot values"
             )
-        if any(
-            (value.feature_id, value.feature_version) not in AUTHORIZED_FEATURES
-            for value in snapshots
-        ):
-            raise ValueError("unsupported feature pair")
         object.__setattr__(self, "feature_snapshots", snapshots)
 
         references = tuple(self.upstream_references)
@@ -168,8 +163,6 @@ def evaluate_candidate_features(
     _validate_risk(candidate, risk_evaluation)
     for snapshot in candidate.feature_snapshots:
         _validate_snapshot(snapshot)
-        if (snapshot.feature_id, snapshot.feature_version) not in AUTHORIZED_FEATURES:
-            raise ValueError("unsupported feature pair")
 
     timestamp = candidate.reference_time if evaluated_at is None else evaluated_at
     return CandidateFeatureEvaluation(
