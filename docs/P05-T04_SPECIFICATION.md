@@ -144,13 +144,13 @@ The gate is closed for every P05-T03 result other than
 
 When the gate is closed, P05-T04 must:
 
-- return `BLOCKED_BY_RISK`;
-- preserve the complete matching P05-T03 result digest, status, flags, and
-  rejection reason;
+- preserve the complete matching P05-T03 result object, including its digest,
+  viability status, flags, rejection reason, evidence references, timestamps,
+  evaluator version, and contract version;
 - preserve candidate and upstream provenance;
 - not recalculate, reinterpret, or promote any feature value; and
-- not turn `DISQUALIFIED` or `INSUFFICIENT_EVIDENCE` into a feature-quality
-  success.
+- not treat a non-eligible P05-T03 result as permission to use the feature
+  snapshots as an evaluated opportunity input.
 
 P05-T04 does not reevaluate safety evidence and does not derive a second
 eligibility result. The P05-T03 result remains the sole hard-risk gate.
@@ -248,23 +248,35 @@ P05-T04 does not repeat either formula. The authoritative formulas, numeric
 conversion, precision, timestamp selection, freshness checks, and input
 selection remain P04-T09 behavior.
 
-If a candidate contains a valid snapshot for a feature ID outside this
-authorized set, P05-T04 must not infer its meaning. It must preserve the
-snapshot and report `UNSUPPORTED_FEATURE` in the quality reason set.
+Authorization is the exact pair `(feature_id, feature_version)`. A candidate
+feature snapshot is authorized only when it matches one of these pairs:
 
-### 6.2 Deterministic quality evaluation
+```text
+("price_velocity", "price-velocity-v1")
+("price_acceleration", "price-acceleration-v1")
+```
+
+A matching feature ID with a different version is not authorized. If a
+candidate contains a valid snapshot outside these exact pairs, P05-T04 must
+not infer its meaning. It must preserve the snapshot and preserve its existing
+upstream `UNSUPPORTED_FEATURE` reason when that reason is already present.
+
+### 6.2 Deterministic feature availability evaluation
 
 P05-T04 may deterministically evaluate only these non-numeric conditions:
 
 1. the P05-T03 gate is open;
 2. every supplied feature snapshot is a valid immutable P04-T10 snapshot;
-3. a supplied feature snapshot has an authorized feature identity;
+3. a supplied feature snapshot has an authorized `(feature_id,
+   feature_version)` pair;
 4. a supplied feature snapshot has `CALCULATED` status and therefore a
    validated finite `Decimal` value and value unit; and
 5. the snapshot's existing reason codes and provenance are preserved.
 
-These checks describe availability of existing feature results. They are not a
-quality score, confidence value, ranking value, or prediction.
+These checks describe availability of existing feature results. They do not
+produce an aggregate P05-T04 status, quality score, confidence value, ranking,
+or prediction. The existing `FeatureCalculationStatus` on each preserved
+snapshot remains the only feature-result status.
 
 ### 6.3 Features not computable from existing contracts
 
@@ -289,23 +301,29 @@ The P04-T09 specification explicitly defers transaction frequency and broader
 feature families. P05-T04 must report the limitation rather than invent a
 formula, data source, window, threshold, or hidden dependency.
 
-## 7. Feature-quality status
+## 7. Feature availability interpretation
 
-The P05-T04 result defines the following candidate-level status values:
+P05-T04 does not introduce a candidate-level feature-quality status. The
+existing statuses remain authoritative:
 
-| Status | Meaning |
-|---|---|
-| `EVALUATED` | The P05-T03 gate is open and the candidate contains at least one valid, authorized, `CALCULATED` feature snapshot. No new feature value was calculated. |
-| `BLOCKED_BY_RISK` | The matching P05-T03 result is `DISQUALIFIED` or `INSUFFICIENT_EVIDENCE`. |
-| `INSUFFICIENT_EVIDENCE` | The risk gate is open, but no authorized calculated feature value is available, or one or more supplied feature snapshots are non-calculated or unsupported. |
+- `CandidateViabilityStatus` describes the P05-T03 hard-risk gate;
+- `FeatureCalculationStatus` describes each feature snapshot; and
+- existing signal status and quality enums describe the signal snapshot.
 
-`EVALUATED` means only that existing feature results passed this
-availability/quality boundary. It does not mean that the candidate is ranked,
-preferred, predicted, or actionable.
+When the P05-T03 viability status is `ELIGIBLE`, P05-T04 may inspect the
+feature snapshots for availability. A snapshot is available as an upstream
+feature result only when its exact authorized feature pair is present, its
+existing status is `CALCULATED`, and its immutable snapshot contract is valid.
 
-P05-T04 must not silently drop a non-calculated snapshot to obtain
-`EVALUATED`. If any supplied snapshot has `UNKNOWN`, `INVALID`, or
-`UNSUPPORTED` status, the result must retain that snapshot and its reason codes.
+When the P05-T03 viability status is not `ELIGIBLE`, P05-T04 preserves the
+matching risk result and feature snapshots but does not admit any feature
+snapshot as an evaluated opportunity input. It does not emit a replacement
+aggregate status.
+
+An empty `feature_snapshots` tuple is valid and remains empty. It does not
+produce a synthetic status or reason code. A snapshot with `UNKNOWN`, `INVALID`,
+or `UNSUPPORTED` status remains present with its existing status and reason
+codes; it is never silently dropped or converted into a calculated result.
 
 ## 8. Exact output contract
 
@@ -320,14 +338,9 @@ exactly these fields:
 | `reference_time` | `datetime` | Candidate point-in-time reference, normalized to UTC. |
 | `evaluated_at` | `datetime` | P05-T04 evaluation time, normalized to UTC. |
 | `input_candidate_digest` | `str` | Exact `candidate.representation_digest`. |
-| `risk_evaluation_digest` | `str` | Exact `risk_evaluation.representation_digest`. |
-| `risk_viability_status` | `CandidateViabilityStatus` | The matching P05-T03 status, copied without reinterpretation. |
-| `evaluation_status` | `CandidateFeatureQualityStatus` | One of `EVALUATED`, `BLOCKED_BY_RISK`, or `INSUFFICIENT_EVIDENCE`. |
+| `risk_evaluation` | `CandidateRiskEvaluation` | The complete matching immutable P05-T03 result, including its digest, viability status, flags, rejection reason, evidence references, timestamp, evaluator version, and contract version. |
 | `feature_snapshots` | `tuple[FeatureCalculationSnapshot, ...]` | Exact immutable candidate snapshots, in their existing candidate order. |
-| `signal_snapshot_digest` | `str` | Digest of the candidate's `SignalEvidenceSnapshot`. |
-| `signal_quality_status` | `SignalQualityStatus \| None` | Existing signal snapshot quality status, copied; `None` remains `None`. |
-| `signal_evidence_references` | `tuple[str, ...]` | Existing signal-snapshot evidence references, preserved as immutable values. |
-| `reason_codes` | `tuple[str, ...]` | Sorted, unique, non-empty quality/gate reasons from the accepted upstream contracts and this boundary. |
+| `signal_snapshot` | `SignalEvidenceSnapshot` | The complete matching immutable P04-T06 signal snapshot, including its digest, evidence references, provenance, observation timestamps, status fields, and contract/version information. |
 | `upstream_references` | `tuple[OpportunityUpstreamReference, ...]` | Candidate's immutable P03/P04 upstream references. |
 | `evaluator_version` | `str` | Exactly `p05-t04-features-v1`. |
 | `contract_version` | `str` | Exactly `p05-t04-v1`. |
@@ -344,32 +357,25 @@ The output must not contain:
 
 The existing `FeatureCalculationSnapshot.value` fields are preserved only as
 already-calculated upstream analytical values. P05-T04 does not create or
-alter them.
+alter them. The nested `CandidateRiskEvaluation` and
+`SignalEvidenceSnapshot` objects are preserved directly rather than
+reconstructed from partial digest fields.
 
-## 9. Output reason-code behavior
+## 9. Reason-code behavior
 
-The result's `reason_codes` must be sorted and deduplicated. P05-T04 may
-preserve the following existing upstream reason values:
+P05-T04 does not define an aggregate `reason_codes` field. Reason codes remain
+on their existing immutable upstream objects and are preserved without
+reinterpretation. In particular, P05-T04 may preserve:
 
 - P05-T03 risk flags and rejection reason;
 - candidate reason codes;
 - feature-snapshot reason codes; and
 - the existing P04-T09 reason `UNSUPPORTED_FEATURE`.
 
-The following P05-T04 boundary reason is required when applicable:
-
-```text
-NO_FEATURE_SNAPSHOTS
-```
-
-It means that the risk gate was open but the candidate supplied no
-P04-T10 feature snapshot. It is not a market fact and must not be treated as
-zero, neutral quality, or a score.
-
-For a closed risk gate, the result must preserve the P05-T03 rejection reason
-and risk flags. For a non-calculated or unsupported snapshot, it must preserve
-that snapshot's existing reason codes and must not replace them with a
-successful fallback.
+Existing upstream `reason_codes` may be empty for a successful or available
+result. P05-T04 must not require them to be non-empty and must not create
+synthetic fallback reasons. A missing feature snapshot is represented by the
+valid empty tuple already present on the candidate.
 
 ## 10. Fail-closed behavior
 
@@ -392,21 +398,23 @@ external lookup to make it valid.
 
 ### 10.2 Data-level non-success
 
-When the input contracts are valid but the evidence is not sufficient, the
-evaluator must return an immutable non-success result:
+When the input contracts are valid but the upstream evidence is not available
+for feature use, P05-T04 must preserve the upstream objects without creating an
+aggregate replacement status:
 
-- closed P05-T03 gate → `BLOCKED_BY_RISK`;
-- no feature snapshots → `INSUFFICIENT_EVIDENCE` with
-  `NO_FEATURE_SNAPSHOTS`;
-- non-calculated feature snapshot → `INSUFFICIENT_EVIDENCE`, preserving its
-  status and reason codes;
-- unsupported feature identity → `INSUFFICIENT_EVIDENCE` with
-  `UNSUPPORTED_FEATURE`;
-- missing optional signal quality → preserve `None`; never treat it as
+- a closed P05-T03 gate preserves the matching risk result and does not admit
+  its feature snapshots as an evaluated opportunity input;
+- no feature snapshots preserves the valid empty tuple already supplied by the
+  candidate;
+- a non-calculated feature snapshot preserves its existing status and reason
+  codes;
+- an unauthorized feature pair preserves the snapshot and any existing
+  upstream `UNSUPPORTED_FEATURE` reason; and
+- missing optional signal quality preserves `None` and is never treated as
   acceptable quality or as a numeric feature.
 
 No non-success condition may produce a new numeric value, a default value,
-zero, or a successful fallback.
+zero, a synthetic reason code, or a successful fallback.
 
 ## 11. Versioning and provenance
 
@@ -415,13 +423,15 @@ Every result must preserve:
 - P05-T04 contract version `p05-t04-v1`;
 - P05-T04 evaluator version `p05-t04-features-v1`;
 - P05-T02 input candidate digest and contract version through the candidate;
-- P05-T03 risk-result digest, contract version, evaluator version, status,
-  flags, rejection reason, and evidence references;
+- the complete immutable P05-T03 risk result, including its digest, contract
+  version, evaluator version, status, flags, rejection reason, evidence
+  references, and timestamp;
 - each P04-T10 feature snapshot and its own calculation/snapshot versions;
 - each feature snapshot's result, input-set, snapshot-linkage, and upstream
   state digests;
-- P04 signal snapshot digest, quality status, evidence references, and
-  provenance;
+- the complete immutable P04 signal snapshot, including its digest, quality
+  status, evidence references, provenance, observation timestamps, evaluation
+  and aggregation digests, and contract/version information;
 - candidate upstream P03/P04 references; and
 - candidate/reference and evaluation timestamps.
 
@@ -447,9 +457,8 @@ reference time or observation timestamp.
 Equivalent candidate/risk inputs and the same effective evaluation timestamp
 must produce the same:
 
-- status;
-- reason-code tuple;
-- copied feature and signal provenance;
+- the same upstream statuses and reason codes;
+- the same feature and signal provenance;
 - canonical representation; and
 - representation digest.
 
@@ -465,8 +474,9 @@ canonical mapping exposed by the result must be an immutable read view.
 
 The result must expose a deterministic canonical representation and digest.
 The canonical representation must include all output fields in this
-specification, including both P05-T04 version fields, the P05-T03 risk-result
-digest, feature snapshot representations, and signal provenance references.
+specification, including both P05-T04 version fields and the complete
+canonical representations of the nested P05-T03 risk result, feature
+snapshots, and P04 signal snapshot.
 
 Creating or reading the result must not mutate:
 
@@ -530,12 +540,12 @@ that:
    required;
 2. candidate/risk identity and digest mismatches fail closed;
 3. only P05-T03 `ELIGIBLE` opens the feature gate;
-4. `DISQUALIFIED` and `INSUFFICIENT_EVIDENCE` never produce an evaluated
-   feature-quality success;
+4. `DISQUALIFIED` and `INSUFFICIENT_EVIDENCE` never permit the feature
+   snapshots to be used as an evaluated opportunity input;
 5. existing P04-T10 calculated `price_velocity` and
    `price_acceleration` snapshots are preserved without recalculation;
-6. no feature snapshot produces a deterministic
-   `INSUFFICIENT_EVIDENCE` result with `NO_FEATURE_SNAPSHOTS`;
+6. an empty feature snapshot tuple remains valid and produces no synthetic
+   status or reason code;
 7. unknown, invalid, unsupported, or malformed feature snapshots never produce
    a new numeric value;
 8. signal quality, evidence references, timestamps, digests, and provenance
