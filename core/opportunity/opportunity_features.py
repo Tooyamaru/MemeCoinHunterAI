@@ -86,14 +86,28 @@ class CandidateFeatureEvaluation:
         )
         if not isinstance(self.risk_evaluation, CandidateRiskEvaluation):
             raise ValueError("risk_evaluation must be a CandidateRiskEvaluation")
+        if self.risk_evaluation.candidate_id != self.candidate_id:
+            raise ValueError("risk evaluation candidate identity does not match")
+        if self.risk_evaluation.input_candidate_digest != self.input_candidate_digest:
+            raise ValueError("risk evaluation candidate digest does not match")
         if not isinstance(self.signal_snapshot, SignalEvidenceSnapshot):
             raise ValueError("signal_snapshot must be a SignalEvidenceSnapshot")
+        if (
+            self.signal_snapshot.chain_id != self.chain_id
+            or self.signal_snapshot.token_identity != self.token_identity
+        ):
+            raise ValueError("signal snapshot identity does not match")
 
         snapshots = tuple(self.feature_snapshots)
         if not all(isinstance(value, FeatureCalculationSnapshot) for value in snapshots):
             raise ValueError(
                 "feature_snapshots must contain FeatureCalculationSnapshot values"
             )
+        if any(
+            (value.feature_id, value.feature_version) not in AUTHORIZED_FEATURES
+            for value in snapshots
+        ):
+            raise ValueError("unsupported feature pair")
         object.__setattr__(self, "feature_snapshots", snapshots)
 
         references = tuple(self.upstream_references)
