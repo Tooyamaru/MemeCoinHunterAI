@@ -79,15 +79,7 @@ def test_non_calculated_authorized_snapshot_is_preserved():
         value_unit=None,
         reason_codes=("INSUFFICIENT_PRICE_OBSERVATIONS",),
     )
-    candidate = _candidate(
-        feature_snapshots=(),
-    )
-    candidate = replace(
-        candidate,
-        state=candidate.state.BLOCKED,
-        reason_codes=("NON_CALCULATED_FEATURE",),
-        feature_snapshots=(snapshot,),
-    )
+    candidate = _candidate(feature_snapshots=[snapshot])
     normalized = NormalizedOpportunityCandidate.from_candidate(candidate)
     risk = evaluate_hard_risks(normalized)
     result = evaluate_candidate_features(normalized, risk)
