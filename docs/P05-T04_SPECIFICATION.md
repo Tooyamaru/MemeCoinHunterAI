@@ -422,7 +422,9 @@ Every result must preserve:
 
 - P05-T04 contract version `p05-t04-v1`;
 - P05-T04 evaluator version `p05-t04-features-v1`;
-- P05-T02 input candidate digest and contract version through the candidate;
+- P05-T02 input candidate digest through `input_candidate_digest`; this digest
+  is provenance only and does not expose or preserve the candidate contract
+  version in the P05-T04 output;
 - the complete immutable P05-T03 risk result, including its digest, contract
   version, evaluator version, status, flags, rejection reason, evidence
   references, and timestamp;
