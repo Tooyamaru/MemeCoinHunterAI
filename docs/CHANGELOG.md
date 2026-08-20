@@ -1,8 +1,12 @@
 ## 2026-08-20
 
 - P05-T03 COMPLETE / CLOSED / AUDITED PASS.
-- P05-T04 specification ready; implementation not started.
-- Next authorized work: P05-T04 only.
+- P05-T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS.
+- P05-T04 remains the deterministic, provider-neutral, fail-closed
+  per-candidate feature and quality evaluation boundary. It preserves P04-T10
+  snapshots and provenance behind the mandatory P05-T03 ELIGIBLE gate, with no
+  scoring, ranking, decision, authorization, execution, AI, or external I/O.
+- P05-T05 is the next authorized task; implementation has not started.
 
 # Changelog
 

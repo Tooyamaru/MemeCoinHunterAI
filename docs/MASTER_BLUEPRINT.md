@@ -4,7 +4,14 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project has advanced to P05 — Opportunity Engine. P05-T01 and P05-T02 are complete. P05-T03 is COMPLETE / CLOSED / AUDITED PASS. P05-T04 is the current authorized task and implementation has not started. P01-T04 — Application
+The project has advanced to P05 — Opportunity Engine. P05-T01 and P05-T02 are
+complete. P05-T03 is COMPLETE / CLOSED / AUDITED PASS. P05-T04 is COMPLETE /
+CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS. P05-T04 remains the
+per-candidate feature and quality evaluation boundary: deterministic,
+provider-neutral, fail-closed, and free of scoring, ranking, decision,
+authorization, execution, AI, or external I/O. P05-T03 remains the mandatory
+ELIGIBLE hard-risk gate. P05-T05 is the next authorized task and implementation
+has not started. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
 Extensions are complete. P02-T01 through P02-T09 are implemented and verified.
 P02-T06 is the deterministic provider-neutral token-universe

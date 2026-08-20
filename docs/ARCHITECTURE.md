@@ -146,4 +146,11 @@ The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastr
 
 
 ## P05 Current Boundary
-P05-T03 is the deterministic hard-risk/disqualification boundary. P05-T04 is the next authorized per-candidate feature and quality evaluation boundary. P05-T04 must preserve existing P04-T10 snapshots and provenance, apply the P05-T03 eligibility gate, and perform no recalculation, scoring, ranking, decision, execution, or external I/O.
+P05-T03 is the deterministic hard-risk/disqualification boundary and remains
+the mandatory ELIGIBLE gate. P05-T04 is COMPLETE / CLOSED / AUDITED PASS WITH
+NON-BLOCKING OBSERVATIONS as the per-candidate feature and quality evaluation
+boundary. It preserves existing P04-T10 snapshots and provenance, applies the
+P05-T03 eligibility gate, and performs no recalculation, scoring, ranking,
+decision, execution, authorization, AI, or external I/O. P05-T05 is the next
+authorized task; its implementation has not started. P05 remains deterministic,
+provider-neutral, and fail-closed.
