@@ -48,16 +48,15 @@ def test_eligible_candidate_preserves_authorized_feature_and_provenance():
     "status",
     [EligibilityStatus.INELIGIBLE, EligibilityStatus.UNKNOWN],
 )
-def test_closed_p05_t03_gates_preserve_features_without_reinterpreting_them(status):
+def test_closed_p05_t03_gates_fail_closed_without_admitting_features(status):
     candidate, risk = _inputs(status)
-    result = evaluate_candidate_features(candidate, risk)
 
     assert risk.viability_status in {
         CandidateViabilityStatus.DISQUALIFIED,
         CandidateViabilityStatus.INSUFFICIENT_EVIDENCE,
     }
-    assert result.risk_evaluation is risk
-    assert result.feature_snapshots == candidate.feature_snapshots
+    with pytest.raises(ValueError, match="viability gate is closed"):
+        evaluate_candidate_features(candidate, risk)
 
 
 def test_empty_feature_snapshots_remain_empty_without_synthetic_status_or_reasons():
@@ -70,7 +69,7 @@ def test_empty_feature_snapshots_remain_empty_without_synthetic_status_or_reason
     assert not hasattr(result, "status")
 
 
-def test_non_calculated_authorized_snapshot_is_preserved():
+def test_non_calculated_authorized_snapshot_is_not_admitted_when_gate_is_closed():
     snapshot = _feature_snapshot()
     snapshot = replace(
         snapshot,
@@ -82,13 +81,12 @@ def test_non_calculated_authorized_snapshot_is_preserved():
     candidate = _candidate(feature_snapshots=[snapshot])
     normalized = NormalizedOpportunityCandidate.from_candidate(candidate)
     risk = evaluate_hard_risks(normalized)
-    result = evaluate_candidate_features(normalized, risk)
+    assert risk.viability_status is CandidateViabilityStatus.INSUFFICIENT_EVIDENCE
+    with pytest.raises(ValueError, match="viability gate is closed"):
+        evaluate_candidate_features(normalized, risk)
 
-    assert result.feature_snapshots == (snapshot,)
-    assert result.feature_snapshots[0].status is FeatureCalculationStatus.UNKNOWN
 
-
-def test_unauthorized_valid_feature_pair_is_preserved_without_reinterpretation():
+def test_unauthorized_feature_pair_is_not_admitted_when_gate_is_closed():
     snapshot = replace(
         _feature_snapshot(),
         status=FeatureCalculationStatus.UNSUPPORTED,
@@ -101,19 +99,9 @@ def test_unauthorized_valid_feature_pair_is_preserved_without_reinterpretation()
     candidate = _candidate(feature_snapshots=[snapshot])
     normalized = NormalizedOpportunityCandidate.from_candidate(candidate)
     risk = evaluate_hard_risks(normalized)
-    result = evaluate_candidate_features(normalized, risk)
-
-    assert result.feature_snapshots == (snapshot,)
-    assert result.feature_snapshots[0] is snapshot
-    assert result.feature_snapshots[0].feature_id == "volume"
-    assert result.feature_snapshots[0].feature_version == "volume-v1"
-    assert result.feature_snapshots[0].status is FeatureCalculationStatus.UNSUPPORTED
-    assert result.feature_snapshots[0].value is None
-    assert result.feature_snapshots[0].value_unit is None
-    assert result.feature_snapshots[0].reason_codes == ("UNSUPPORTED_FEATURE",)
-    assert result.feature_snapshots[0].canonical_representation == (
-        snapshot.canonical_representation
-    )
+    assert risk.viability_status is CandidateViabilityStatus.INSUFFICIENT_EVIDENCE
+    with pytest.raises(ValueError, match="viability gate is closed"):
+        evaluate_candidate_features(normalized, risk)
 
 
 def test_malformed_snapshot_provenance_still_fails_closed():

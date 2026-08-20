@@ -214,6 +214,8 @@ def _validate_risk(
         raise ValueError("risk evaluation candidate digest does not match")
     if not isinstance(risk_evaluation.viability_status, CandidateViabilityStatus):
         raise ValueError("risk evaluation viability status is invalid")
+    if risk_evaluation.viability_status is not CandidateViabilityStatus.ELIGIBLE:
+        raise ValueError("P05-T03 viability gate is closed")
     _require_text(risk_evaluation.representation_digest, "risk evaluation digest")
     if (
         risk_evaluation.canonical_representation
