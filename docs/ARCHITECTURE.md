@@ -143,3 +143,7 @@ these boundaries. Later services remain gated until explicitly authorized.
 ## Future portability
 
 The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastructure in `backend/core`. The initial Replit environment is for development and preview. GitHub is the source of truth. A future stable 24/7 runtime may use Railway, but Railway remains out of scope until its planned production phase.
+
+
+## P05 Current Boundary
+P05-T03 is the deterministic hard-risk/disqualification boundary. P05-T04 is the next authorized per-candidate feature and quality evaluation boundary. P05-T04 must preserve existing P04-T10 snapshots and provenance, apply the P05-T03 eligibility gate, and perform no recalculation, scoring, ranking, decision, execution, or external I/O.

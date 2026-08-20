@@ -1,3 +1,9 @@
+## 2026-08-20
+
+- P05-T03 COMPLETE / CLOSED / AUDITED PASS.
+- P05-T04 specification ready; implementation not started.
+- Next authorized work: P05-T04 only.
+
 # Changelog
 
 ## 2026-08-13
