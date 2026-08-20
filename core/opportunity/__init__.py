@@ -31,6 +31,13 @@ from core.opportunity.opportunity_risk import (
     evaluate_candidate_risk,
     evaluate_hard_risks,
 )
+from core.opportunity.opportunity_features import (
+    AUTHORIZED_FEATURES,
+    CandidateFeatureEvaluation,
+    P05_T04_CONTRACT_VERSION,
+    P05_T04_EVALUATOR_VERSION,
+    evaluate_candidate_features,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -58,4 +65,9 @@ __all__ = [
     "P05_T03_EVALUATOR_VERSION",
     "evaluate_candidate_risk",
     "evaluate_hard_risks",
+    "AUTHORIZED_FEATURES",
+    "CandidateFeatureEvaluation",
+    "P05_T04_CONTRACT_VERSION",
+    "P05_T04_EVALUATOR_VERSION",
+    "evaluate_candidate_features",
 ]
