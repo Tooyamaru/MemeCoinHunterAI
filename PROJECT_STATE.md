@@ -7,10 +7,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** P04 — Market & Signal Intelligence
-- **Current task:** P04-T10 — Feature Snapshot History Boundary
-- **Current task status:** COMPLETE / CLOSED / AUDITED PASS
-- **Last updated:** 2026-08-14
+- **Current phase:** P05 — Opportunity Engine
+- **Current task:** P05-T04 — Per-Candidate Feature and Quality Evaluation
+- **Current task status:** SPECIFICATION READY / IMPLEMENTATION NOT STARTED
+- **Last updated:** 2026-08-20
 
 ## Master progress
 
@@ -19,30 +19,30 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05–P12: Not started
+- P05: T01 complete; T02 complete; T03 COMPLETE / CLOSED / AUDITED PASS; T04 specification ready / implementation not started; P06–P12 not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** None
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS
+- **In progress:** P05-T04 — Per-Candidate Feature and Quality Evaluation
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** Any later P04 signal task; P05–P12
+- **Not started:** P05-T04 implementation; P05-T05 onward; P06–P12
 
 ## Current objective
 
-Maintain a portable, auditable signal evidence boundary with deterministic
-normalization, explicit provenance and freshness, fail-closed quality states,
-explicit evaluation outcomes, deterministic aggregation, and immutable snapshot
-contracts, and closed snapshot-history governance before any later market, AI,
-wallet, trading, or production functionality.
+Implement P05-T04 as the narrow per-candidate feature and quality evaluation
+boundary. Consume P05-T02 normalized candidates plus matching P05-T03 hard-risk
+results, validate existing P04-T10 feature snapshots and signal provenance,
+preserve immutable evidence/provenance, and fail closed without recalculation,
+scoring, ranking, decision, action, execution, or external I/O.
 
 ## Last verified checkpoint
 
-P04-T10 implementation and architectural audit completed on 2026-08-14 at Git
-baseline `2883e2a`. P04-T01 through P04-T10 are implemented, verified, and
-complete / closed, with P04-T06, P04-T07, and P04-T10 audited PASS.
-P04 overall remains not complete.
+P05-T03 implementation and architectural audit completed on 2026-08-20 at
+Git baseline `cd97f82`. P05-T03 focused tests: 14 passed; full suite: 460 passed.
+P05-T03 is COMPLETE / CLOSED / AUDITED PASS. P05-T04 specification is ready;
+implementation has not started. Next authorized work is P05-T04 only.
 
 No provider, network, persistence, AI, wallet, trading, execution, or production
 functionality was introduced. P04-T08 changed only Python environment/tooling
