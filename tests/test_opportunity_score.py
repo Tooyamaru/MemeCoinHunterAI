@@ -11,6 +11,7 @@ from core.features import (
 )
 from core.opportunity import (
     CandidateFeatureEvaluation,
+    CandidateViabilityStatus,
     DEFAULT_SCORING_RULESET,
     OpportunityScore,
     P05_T05_CONTRACT_VERSION,
@@ -61,9 +62,7 @@ def test_score_preserves_t04_and_calculates_versioned_bounded_score():
     assert result.evaluator_version == P05_T05_EVALUATOR_VERSION
     assert result.contract_version == P05_T05_CONTRACT_VERSION
     assert Decimal("0") <= result.score <= Decimal("100")
-    assert result.score == Decimal(
-        "80.555555555555555555555555555555555555555555555555556"
-    )
+    assert result.score == Decimal("80.55555555555555555555555556")
 
 
 def test_score_is_deterministic_and_defaults_to_reference_time():
@@ -91,29 +90,19 @@ def test_score_requires_both_calculated_authorized_features():
 
 
 def test_score_rejects_non_calculated_required_feature():
-    velocity = replace(
-        _feature_snapshot(),
-        status=FeatureCalculationStatus.UNKNOWN,
-        value=None,
-        value_unit=None,
-        reason_codes=("INSUFFICIENT_PRICE_OBSERVATIONS",),
-    )
-    acceleration = create_feature_calculation_snapshot(
-        calculate_price_acceleration(
-            [_price(0, 10), _price(1, 12), _price(2, 15)],
-            context=_context(reference_time=datetime(2026, 8, 11, 12, 0, 10, tzinfo=timezone.utc)),
-        )
-    )
-    normalized = _candidate(
-        feature_snapshots=[velocity, acceleration]
-    )
-    normalized = NormalizedOpportunityCandidate.from_candidate(normalized)
-    evaluation = evaluate_candidate_features(
-        normalized,
-        evaluate_hard_risks(normalized),
+    evaluation = _evaluation()
+    tampered = replace(evaluation.feature_snapshots[0])
+    object.__setattr__(tampered, "status", FeatureCalculationStatus.UNKNOWN)
+    object.__setattr__(tampered, "value", None)
+    object.__setattr__(tampered, "value_unit", None)
+    object.__setattr__(tampered, "reason_codes", ("INSUFFICIENT_PRICE_OBSERVATIONS",))
+    object.__setattr__(
+        evaluation,
+        "feature_snapshots",
+        (tampered, evaluation.feature_snapshots[1]),
     )
 
-    with pytest.raises(ValueError, match="not calculated"):
+    with pytest.raises(ValueError, match="scoreable feature snapshot is not calculated"):
         evaluate_opportunity_score(evaluation)
 
 
@@ -122,17 +111,18 @@ def test_score_rejects_closed_t03_gate_and_direct_t04_tampering():
         eligibility=_eligibility(),
         feature_snapshots=[],
     )
-    normalized = candidate.normalize()
+    normalized = NormalizedOpportunityCandidate.from_candidate(candidate)
     evaluation = evaluate_candidate_features(
         normalized,
         evaluate_hard_risks(normalized),
     )
     tampered = replace(evaluation)
-    object.__setattr__(tampered, "risk_evaluation", replace(
+    object.__setattr__(
         tampered.risk_evaluation,
-        viability_status="DISQUALIFIED",
-        rejection_reason="closed",
-    ))
+        "viability_status",
+        CandidateViabilityStatus.DISQUALIFIED,
+    )
+    object.__setattr__(tampered.risk_evaluation, "rejection_reason", "closed")
 
     with pytest.raises(ValueError):
         evaluate_opportunity_score(tampered)
