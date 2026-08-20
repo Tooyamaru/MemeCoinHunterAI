@@ -38,6 +38,15 @@ from core.opportunity.opportunity_features import (
     P05_T04_EVALUATOR_VERSION,
     evaluate_candidate_features,
 )
+from core.opportunity.opportunity_score import (
+    DEFAULT_SCORING_RULESET,
+    OpportunityScore,
+    OpportunityScoringRuleset,
+    P05_T05_CONTRACT_VERSION,
+    P05_T05_EVALUATOR_VERSION,
+    P05_T05_RULESET_VERSION,
+    evaluate_opportunity_score,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -70,4 +79,11 @@ __all__ = [
     "P05_T04_CONTRACT_VERSION",
     "P05_T04_EVALUATOR_VERSION",
     "evaluate_candidate_features",
+    "DEFAULT_SCORING_RULESET",
+    "OpportunityScore",
+    "OpportunityScoringRuleset",
+    "P05_T05_CONTRACT_VERSION",
+    "P05_T05_EVALUATOR_VERSION",
+    "P05_T05_RULESET_VERSION",
+    "evaluate_opportunity_score",
 ]
