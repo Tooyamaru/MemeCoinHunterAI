@@ -18,6 +18,14 @@ from core.decision.decision_evaluation import (
     evaluate_decision,
     evaluate_decision_intent,
 )
+from core.decision.bounded_analysis import (
+    BoundedAnalysis,
+    BoundedAnalysisObservation,
+    BoundedDeepAnalysis,
+    P06_T03_CONTRACT_VERSION,
+    P06_T03_EVALUATOR_VERSION,
+    create_bounded_deep_analysis,
+)
 
 __all__ = [
     "DecisionAction",
@@ -34,4 +42,10 @@ __all__ = [
     "materialize_decision_intent",
     "evaluate_decision",
     "evaluate_decision_intent",
+    "BoundedAnalysis",
+    "BoundedAnalysisObservation",
+    "BoundedDeepAnalysis",
+    "P06_T03_CONTRACT_VERSION",
+    "P06_T03_EVALUATOR_VERSION",
+    "create_bounded_deep_analysis",
 ]

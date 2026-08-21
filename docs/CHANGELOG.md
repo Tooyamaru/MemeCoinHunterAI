@@ -1,5 +1,14 @@
 ## 2026-08-21
 
+- P06-T03 COMPLETE / CLOSED.
+- Added the immutable, bounded, provider-neutral `BoundedDeepAnalysis`
+  contract with explicit provenance, supplied-time freshness validation,
+  observation/generated-narrative separation, canonical representation, and
+  deterministic SHA-256 digest.
+- P06-T02 remains authoritative and is unchanged when analysis is absent. No
+  LLM, provider I/O, ranking, authorization, capital, execution, wallet, RPC,
+  DEX, signing, broadcast, or transaction behavior was added.
+
 - P06-T02 COMPLETE / CLOSED / AUDITED PASS.
 - Added the deterministic evaluation boundary from one validated P05-T08
   `OpportunityContext` to one immutable P06-T01 `DecisionIntent`.

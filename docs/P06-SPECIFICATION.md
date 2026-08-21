@@ -1,6 +1,6 @@
 # P06 — Deterministic Decision Engine Architecture Gate
 
-**Status:** P06-T01 COMPLETE / CLOSED / AUDITED PASS
+**Status:** P06-T03 COMPLETE / CLOSED
 **Phase:** P06 — AI Decision Engine
 **Implementation status:** No P06 runtime implementation authorized
 **Provider posture:** Provider-neutral; deterministic hot path; no execution I/O
@@ -201,3 +201,17 @@ evidence fails closed. The evaluator uses only supplied point-in-time context
 and configuration; it never reads an uncontrolled wall clock. No ranking,
 comparison, authorization, capital allocation, execution, wallet, RPC, DEX,
 signing, broadcast, or LLM behavior is included.
+
+## 11. P06-T03 bounded deep-analysis closure
+
+P06-T03 adds the optional standalone `BoundedDeepAnalysis` record described in
+`docs/P06-T03_SPECIFICATION.md`. It is immutable, versioned as `p06-t03-v1`,
+bounded, provenance-preserving, canonical, and deterministically digested.
+Supplied observations and generated narrative are represented separately.
+Stale, future, incomplete, unsupported, non-canonical, tampered, and oversized
+records are rejected using caller-supplied timestamps only.
+
+The record is non-authoritative analytical context. P06-T02 remains the sole
+authority for deterministic evaluation, and its result is unchanged when this
+optional record is absent. No action, ranking, authorization, capital,
+execution, provider I/O, or LLM behavior was added.
