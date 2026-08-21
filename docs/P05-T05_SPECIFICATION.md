@@ -1,6 +1,6 @@
 # P05-T05 — Per-Candidate Opportunity Score (Fast Pre-Score)
 
-**Status:** IMPLEMENTATION IN PROGRESS  
+**Status:** IMPLEMENTED / PENDING FINAL AUDIT CLOSURE
 **Phase:** P05 — Opportunity Engine  
 **Task:** P05-T05  
 **Provider posture:** Provider-neutral; deterministic; local; no external I/O  

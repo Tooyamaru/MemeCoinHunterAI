@@ -51,8 +51,8 @@ threshold is authorized by this ruleset.
 P05-T01 Candidate Boundary — COMPLETE
 P05-T02 Normalization / Evidence Contract — COMPLETE
 P05-T03 Hard-Risk / Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS
-P05-T04 Per-Candidate Feature and Quality Evaluation — CURRENT / implementation pending
-P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — NEXT
+P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS
+P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — CURRENT / IMPLEMENTED / PENDING FINAL AUDIT CLOSURE
 
 P05 closes after T05.
 
