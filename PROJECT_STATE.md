@@ -7,9 +7,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** P06 — AI Decision Engine
-- **Current task:** P06-T03 — Bounded Deep Analysis Contract
-- **Current task status:** COMPLETE / CLOSED
+- **Current phase:** P07 — Paper Trading Engine
+- **Current task:** P07 specification
+- **Current task status:** SPECIFICATION READY FOR ARCHITECTURE REVIEW — IMPLEMENTATION NOT AUTHORIZED
 - **Last updated:** 2026-08-21
 
 ## Master progress
@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P06 runtime and P07–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 SPECIFICATION PREPARED — IMPLEMENTATION NOT AUTHORIZED; P06 runtime and P07–P12 not started
 
 ## Phase status
 
@@ -27,9 +27,14 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P06 runtime; P07–P12
+- **Not started:** P06 runtime; P07 implementation; P08–P12
 
 ## Current objective
+
+P07 specification is prepared and ready for architecture review. It defines
+provider-neutral, reproducible paper simulation after P06 and independent Risk
+/ Capital Authorization, with no live execution, wallet, signing, broadcast,
+RPC, DEX, provider, persistence, or P08/P09 implementation authority.
 
 P06-T02 is COMPLETE / CLOSED / AUDITED PASS as the deterministic evaluation
 boundary, and P06-T03 is COMPLETE / CLOSED as an optional non-authoritative
