@@ -5,31 +5,31 @@
 
 ## Determination
 
-There is no required or authorized P06 task after the completed P06-T02
-deterministic evaluation boundary. The approved P06 architecture closes at:
+There is no required or authorized P06 task after the completed P06-T03
+bounded deep-analysis contract. The approved P06 implementation state closes at:
 
 ```text
 P05-T08 OpportunityContext
         ↓
 P06 deterministic DecisionIntent
         ↓
-separate future governance boundary
+optional bounded deep analysis (non-authoritative)
+        ↓
+P06 implementation closed
+        ↓
+separate future Risk / Capital Authorization boundary
 ```
 
-No P06-T03 identifier is assigned by this proposal.
+P06-T03 is already COMPLETE / CLOSED and is not a new or pending task.
 
 ## Candidate boundaries requiring separate approval
 
 The architecture mentions two future possibilities, neither of which is
 currently authorized:
 
-1. **Optional bounded deep analysis input** — a non-authoritative,
-   versioned, auditable analysis contract that consumes the existing
-   point-in-time context and cannot change risk state or independently trigger
-   an action. This would require a separate specification before any code.
-2. **Independent Risk / Capital Authorization** — a boundary after P06, not a
-   P06 runtime task. It must remain separate from decision intent and is
-   outside the current implementation scope.
+1. **Independent Risk / Capital Authorization** — a future boundary after
+   P06. It must remain separate from DecisionIntent and is outside the current
+   implementation scope.
 
 These are architectural candidates, not approved work items. No task should be
 created or implemented from them without explicit specification and approval.
@@ -38,7 +38,7 @@ created or implemented from them without explicit specification and approval.
 
 - P06-T01: COMPLETE / CLOSED / AUDITED PASS
 - P06-T02: COMPLETE / CLOSED / AUDITED PASS
-- P06-T03: **not defined**
+- P06-T03: COMPLETE / CLOSED
 - P06 runtime continuation: **not authorized**
 - P07: **not started and out of scope**
 
