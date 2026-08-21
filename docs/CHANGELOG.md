@@ -1,5 +1,14 @@
 ## 2026-08-21
 
+- P07 specification prepared for architecture review.
+- Synchronized the paper-trading boundary as simulation-only after P06 and
+  independent Risk / Capital Authorization, with paper fills, positions,
+  exposure, reconciliation, ledger provenance, deterministic replay, and
+  fail-closed semantics defined at the governance level.
+- P07-T01 is not started and no P07 implementation is authorized. No source
+  code, dependency, database, provider, wallet, signing, broadcast, live
+  execution, P08, or P09 work was added.
+
 - P06-T03 COMPLETE / CLOSED.
 - Added the immutable, bounded, provider-neutral `BoundedDeepAnalysis`
   contract with explicit provenance, supplied-time freshness validation,

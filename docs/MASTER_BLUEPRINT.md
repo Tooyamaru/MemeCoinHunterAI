@@ -241,7 +241,7 @@ STOP, PAUSE, or change market.
   contract, and evaluation criteria. Runtime implementation requires a later
   explicit authorization.
 
-### P07 — PAPER TRADING ENGINE
+### P07 — PAPER TRADING ENGINE — SPECIFICATION PREPARED / ARCHITECTURE REVIEW PENDING
 - **Objective:** Test decisions with realistic simulated execution.
 - **Major components:** BUY and SELL simulation, fees, spread, slippage, price impact, latency, liquidity, quote drift, priority fees, MEV effects, failed execution, partial fills, positions, exposure, and reconciliation.
 - **Dependencies:** P05, P06.
@@ -249,6 +249,9 @@ STOP, PAUSE, or change market.
 - **Exit criteria:** Paper results include frictions and support reproducible simulation.
 - **Major risks:** Perfect-fill assumptions, simulation mismatch, misleading performance.
 - **Deliverables:** Paper ledger, simulator, reconciliation, performance reports.
+- **Governance status:** Specification prepared; architecture review pending;
+  implementation not authorized. P07 is simulation-only, has no authority to
+  trade, and does not start P08 or P09 automatically.
 
 ### P08 — OUTCOME LEARNING
 - **Objective:** Learn from decisions and outcomes without uncontrolled strategy changes.
