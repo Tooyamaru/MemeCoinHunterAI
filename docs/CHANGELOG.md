@@ -6,7 +6,11 @@
   per-candidate feature and quality evaluation boundary. It preserves P04-T10
   snapshots and provenance behind the mandatory P05-T03 ELIGIBLE gate, with no
   scoring, ranking, decision, authorization, execution, AI, or external I/O.
-- P05-T05 is the next authorized task; implementation has not started.
+- P05-T05 COMPLETE / CLOSED / AUDITED PASS.
+- P05-T05 remains the deterministic, provider-neutral, pure per-candidate
+  opportunity pre-score boundary with no ranking, decision, authorization,
+  execution, AI, or external I/O.
+- P05-T06 is the next authorized task; implementation has not started.
 
 # Changelog
 

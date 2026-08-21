@@ -151,6 +151,8 @@ the mandatory ELIGIBLE gate. P05-T04 is COMPLETE / CLOSED / AUDITED PASS WITH
 NON-BLOCKING OBSERVATIONS as the per-candidate feature and quality evaluation
 boundary. It preserves existing P04-T10 snapshots and provenance, applies the
 P05-T03 eligibility gate, and performs no recalculation, scoring, ranking,
-decision, execution, authorization, AI, or external I/O. P05-T05 is the next
-authorized task; its implementation has not started. P05 remains deterministic,
-provider-neutral, and fail-closed.
+decision, execution, authorization, AI, or external I/O. P05-T05 is COMPLETE /
+CLOSED / AUDITED PASS as the deterministic, provider-neutral, pure per-candidate
+opportunity pre-score boundary. P05-T06 is the next authorized task; its
+implementation has not started. P05 remains deterministic, provider-neutral,
+and fail-closed.

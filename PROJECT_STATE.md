@@ -8,9 +8,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P05 — Opportunity Engine
-- **Current task:** P05-T05 — Per-Candidate Opportunity Score (Fast Pre-Score)
+- **Current task:** P05-T06 — Next authorized task after P05-T05 closure
 - **Current task status:** NEXT AUTHORIZED TASK / IMPLEMENTATION NOT STARTED
-- **Last updated:** 2026-08-20
+- **Last updated:** 2026-08-21
 
 ## Master progress
 
@@ -19,33 +19,32 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 next authorized / implementation not started; P06–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 next authorized / implementation not started; P06–P12 not started
 
 ## Phase status
 
-- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS
+- **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P05-T05 implementation; P05-T06 onward; P06–P12
+- **Not started:** P05-T06 onward; P06–P12
 
 ## Current objective
 
-P05-T04 remains the narrow per-candidate feature and quality evaluation boundary.
-It consumes P05-T02 normalized candidates plus matching P05-T03 hard-risk
-results, validates existing P04-T10 feature snapshots and signal provenance,
-preserves immutable evidence/provenance, and fails closed without recalculation,
-scoring, ranking, decision, action, execution, or external I/O. P05-T03 remains
-the mandatory ELIGIBLE hard-risk gate. P05-T05 is the next authorized task;
-implementation has not started.
+P05-T05 is COMPLETE / CLOSED / AUDITED PASS as the deterministic,
+provider-neutral, pure per-candidate opportunity pre-score boundary. It consumes
+one validated P05-T04 evaluation and the authorized versioned ruleset, preserves
+feature and provenance context, and performs no ranking, decision, authorization,
+execution, AI, or external I/O. P05-T06 is the next authorized task and has not
+been implemented.
 
 ## Last verified checkpoint
 
-P05-T04 implementation and final architectural audit completed on 2026-08-20.
-P05-T04 is COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS.
-Focused tests: 14 passed; full suite: 463 passed; `git diff --check` passed.
-P05-T03 remains COMPLETE / CLOSED / AUDITED PASS. P05-T05 is the next
-authorized task and implementation has not started.
+P05-T05 final architectural audit completed on 2026-08-21.
+P05-T05 is COMPLETE / CLOSED / AUDITED PASS. Targeted tests: 8 passed; full
+suite: 471 passed; `git diff --check` passed. P05-T04 remains COMPLETE / CLOSED
+/ AUDITED PASS WITH NON-BLOCKING OBSERVATIONS. P05-T06 is the next authorized
+task and implementation has not started.
 
 No provider, network, persistence, AI, wallet, trading, execution, or production
 functionality was introduced. P04-T08 changed only Python environment/tooling
@@ -149,15 +148,14 @@ functionality was introduced.
 
 ## Next action
 
-P05-T05 — Per-Candidate Opportunity Score (Fast Pre-Score) is the next
-authorized task. Its implementation has not started. P05 remains deterministic,
-provider-neutral, fail-closed, and free of external I/O; P05-T04 introduced no
-scoring, ranking, decision, authorization, execution, or AI behavior.
+P05-T06 is the next authorized task. It has not been implemented. P05 remains
+deterministic, provider-neutral, fail-closed, and free of external I/O; P05-T05
+introduced no ranking, decision, authorization, execution, or AI behavior.
 
 ## Next task
 
-P05-T05 — Per-Candidate Opportunity Score (Fast Pre-Score). P05-T04 is formally
-closed. P05-T05 implementation has not started and is the next authorized task.
+P05-T06 is the next authorized task. P05-T05 is formally closed and no P05-T06
+implementation has started.
 P04 overall remains NOT COMPLETE; any future P04 signal task requires a separate
 specification and approval. Provider connectivity, ingestion transports,
 persistence changes, market-state collection, and later phases require separate
