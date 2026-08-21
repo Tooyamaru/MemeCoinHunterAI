@@ -8,7 +8,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P06 — AI Decision Engine
-- **Current task:** P06-T01 — Deterministic Decision Intent Contract
+- **Current task:** P06-T02 — Deterministic Decision Evaluation Boundary
 - **Current task status:** COMPLETE / CLOSED / AUDITED PASS
 - **Last updated:** 2026-08-21
 
@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06 runtime and P07–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06 runtime and P07–P12 not started
 
 ## Phase status
 
@@ -31,11 +31,13 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 ## Current objective
 
-P06-T01 is COMPLETE / CLOSED / AUDITED PASS as the immutable, deterministic,
-provider-neutral Decision Intent contract. It consumes exactly one validated
-P05-T08 OpportunityContext, preserves complete evidence-first provenance, and
-produces analytical intent only. It adds no ranking, authorization, execution,
-wallet, RPC, DEX, signing, broadcast, or LLM behavior. P05-T05 is COMPLETE /
+P06-T02 is COMPLETE / CLOSED / AUDITED PASS as the deterministic evaluation
+boundary. It consumes exactly one validated P05-T08 OpportunityContext, applies
+an immutable versioned ruleset, and produces one P06-T01 DecisionIntent with
+fail-closed thresholds and preserved provenance. It adds no ranking,
+authorization, execution, wallet, RPC, DEX, signing, broadcast, or LLM
+behavior. P06-T01 is COMPLETE / CLOSED / AUDITED PASS as the immutable,
+deterministic, provider-neutral Decision Intent contract. P05-T05 is COMPLETE /
 CLOSED / AUDITED PASS as the deterministic,
 provider-neutral, pure per-candidate opportunity pre-score boundary. It consumes
 one validated P05-T04 evaluation and the authorized versioned ruleset, preserves
@@ -48,9 +50,10 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-P06-T01 final contract verification completed on 2026-08-21.
-P06-T01 is COMPLETE / CLOSED / AUDITED PASS. P05-T06, P05-T07, and P05-T08
-remain COMPLETE / CLOSED / AUDITED PASS after the evidence-first revisions.
+P06-T02 final boundary verification completed on 2026-08-21.
+P06-T01 and P06-T02 are COMPLETE / CLOSED / AUDITED PASS. P05-T06, P05-T07,
+and P05-T08 remain COMPLETE / CLOSED / AUDITED PASS after the evidence-first
+revisions.
 P05-T04 remains COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS.
 
 No provider, network, persistence, AI, wallet, trading, execution, or production
@@ -155,9 +158,9 @@ functionality was introduced.
 
 ## Next action
 
-P06-T01 is COMPLETE / CLOSED / AUDITED PASS. The next P06 boundary is not
-defined or authorized in the current architecture; it requires a separate
-specification and explicit approval. P05-T08 remains the final deterministic
+P06-T01 and P06-T02 are COMPLETE / CLOSED / AUDITED PASS. The next P06
+boundary is not defined or authorized in the current architecture; it requires
+a separate specification and explicit approval. P05-T08 remains the final deterministic
 local evidence-first opportunity context boundary before P06. P05 remains
 deterministic, provider-neutral, fail-closed, and free of external I/O; P06
 must preserve that evidence-first context and keep deterministic decision intent

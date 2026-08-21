@@ -18,6 +18,8 @@ from core.opportunity.opportunity_risk import CandidateViabilityStatus
 P06_T01_CONTRACT_VERSION = "p06-t01-v1"
 P06_T01_RULESET_VERSION = "p06-t01-rules-v1"
 P06_T01_EVALUATOR_VERSION = "p06-t01-intent-v1"
+P06_T02_RULESET_VERSION = "p06-t02-rules-v1"
+P06_T02_EVALUATOR_VERSION = "p06-t02-evaluator-v1"
 
 
 class DecisionAction(StrEnum):
@@ -70,14 +72,24 @@ class DecisionIntent:
             raise ValueError("unsupported entry posture") from error
         object.__setattr__(self, "entry_posture", posture)
 
-        for value, name, expected in (
-            (self.ruleset_version, "ruleset_version", P06_T01_RULESET_VERSION),
-            (self.evaluator_version, "evaluator_version", P06_T01_EVALUATOR_VERSION),
-            (self.contract_version, "contract_version", P06_T01_CONTRACT_VERSION),
+        for value, name in (
+            (self.ruleset_version, "ruleset_version"),
+            (self.evaluator_version, "evaluator_version"),
+            (self.contract_version, "contract_version"),
         ):
             _require_text(value, name)
-            if value != expected:
-                raise ValueError(f"unsupported P06-T01 {name}")
+        if self.ruleset_version not in {
+            P06_T01_RULESET_VERSION,
+            P06_T02_RULESET_VERSION,
+        }:
+            raise ValueError(f"unsupported P06-T01 {self.ruleset_version}")
+        if self.evaluator_version not in {
+            P06_T01_EVALUATOR_VERSION,
+            P06_T02_EVALUATOR_VERSION,
+        }:
+            raise ValueError(f"unsupported P06-T01 {self.evaluator_version}")
+        if self.contract_version != P06_T01_CONTRACT_VERSION:
+            raise ValueError("unsupported P06-T01 contract_version")
 
         for value, name in (
             (self.expected_edge_assumptions, "expected_edge_assumptions"),
@@ -338,6 +350,8 @@ __all__ = [
     "P06_T01_CONTRACT_VERSION",
     "P06_T01_EVALUATOR_VERSION",
     "P06_T01_RULESET_VERSION",
+    "P06_T02_EVALUATOR_VERSION",
+    "P06_T02_RULESET_VERSION",
     "create_decision_intent",
     "materialize_decision_intent",
 ]

@@ -1,5 +1,15 @@
 ## 2026-08-21
 
+- P06-T02 COMPLETE / CLOSED / AUDITED PASS.
+- Added the deterministic evaluation boundary from one validated P05-T08
+  `OpportunityContext` to one immutable P06-T01 `DecisionIntent`.
+- Added immutable versioned ruleset `p06-t02-rules-v1` with explicit BUY/WATCH
+  thresholds and deterministic fail-closed `NO_TRADE` behavior for stale,
+  invalid, uncertain, future, unsupported, or tampered evidence.
+- No ranking, comparison, prioritization, authorization, capital allocation,
+  execution, wallet, RPC, DEX, signing, broadcast, or LLM behavior was
+  implemented. No subsequent P06 task is authorized yet.
+
 - P06-T01 COMPLETE / CLOSED / AUDITED PASS.
 - Added the immutable, deterministic, provider-neutral `DecisionIntent`
   contract for exactly one validated P05-T08 `OpportunityContext`.

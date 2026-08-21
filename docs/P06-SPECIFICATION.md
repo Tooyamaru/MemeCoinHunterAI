@@ -187,3 +187,17 @@ time, canonical representation, and a deterministic SHA-256 digest. It has no
 ranking, authorization, execution, wallet, RPC, DEX, signing, broadcast, or
 LLM fields or behavior. Uncertain or invalid evidence can only produce
 `NO_TRADE`; no evidence is invented or downgraded.
+
+## 10. P06-T02 evaluation closure
+
+P06-T02 defines the deterministic evaluation boundary that consumes exactly one
+validated P05-T08 `OpportunityContext` and reuses the P06-T01 `DecisionIntent`
+contract. Its immutable ruleset is `p06-t02-rules-v1` and its evaluator version
+is `p06-t02-evaluator-v1`.
+
+The default thresholds are `BUY >= 75`, `WATCH >= 50`, and `NO_TRADE` below
+`50`. Stale, future, invalid, unsupported, uncertain, invalidated, or tampered
+evidence fails closed. The evaluator uses only supplied point-in-time context
+and configuration; it never reads an uncontrolled wall clock. No ranking,
+comparison, authorization, capital allocation, execution, wallet, RPC, DEX,
+signing, broadcast, or LLM behavior is included.
