@@ -4,7 +4,8 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project has advanced to P05 — Opportunity Engine. P05-T01 and P05-T02 are
+The project has advanced to the P06 architecture/specification gate. P05-T01
+through P05-T08 are
 complete. P05-T03 is COMPLETE / CLOSED / AUDITED PASS. P05-T04 is COMPLETE /
 CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS. P05-T04 remains the
 per-candidate feature and quality evaluation boundary: deterministic,
@@ -32,8 +33,9 @@ WITH NON-BLOCKING OBSERVATIONS. No later P04 task has started. P04-T08 is not
 explicitly defined in the current architecture; any next P04 task requires a
 separate specification and approval.
 No provider, network, persistence, AI, wallet, trading, or execution integration
-was introduced. Signal aggregation, opportunity detection, decision making,
-trading, execution, and AI functionality remain future boundaries.
+was introduced. P06 runtime implementation remains unauthorized while the
+architecture/specification gate is in progress. Trading, execution, and any
+wallet behavior remain future boundaries.
 
 ## V1.1 architectural baseline
 
@@ -227,14 +229,16 @@ STOP, PAUSE, or change market.
 - **Major risks:** Overweighting one signal, score gaming, unstable rankings.
 - **Deliverables:** Opportunity records, phase states, ranking evaluation.
 
-### P06 — AI DECISION ENGINE
+### P06 — AI DECISION ENGINE — ARCHITECTURE GATE IN PROGRESS
 - **Objective:** Produce bounded, evidence-backed trade intents with deterministic hot-path decisions.
 - **Major components:** Deterministic rules, optional statistical/classical or bounded ML analysis, BUY, WATCH, HOLD, TAKE PROFIT, REDUCE, EXIT, AVOID, confidence, evidence, risk, invalidation, expected edge, uncertainty, entry quality, phase, NO TRADE, and point-in-time feature snapshots.
 - **Dependencies:** P03, P05.
 - **Entry criteria:** Opportunity records and risk context are available.
 - **Exit criteria:** Decisions preserve time-of-decision evidence, separate intent from authorization and entry, and do not depend on an LLM.
 - **Major risks:** Overconfidence, data leakage, hallucinated evidence, treating confidence as profit probability, and analysis latency.
-- **Deliverables:** Versioned decision records and evaluation criteria.
+- **Deliverables:** Approved P06 specification, versioned decision-record
+  contract, and evaluation criteria. Runtime implementation requires a later
+  explicit authorization.
 
 ### P07 — PAPER TRADING ENGINE
 - **Objective:** Test decisions with realistic simulated execution.

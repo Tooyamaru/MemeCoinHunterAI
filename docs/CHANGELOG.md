@@ -1,5 +1,13 @@
 ## 2026-08-21
 
+- P06 architecture/specification gate started.
+- Added the approved P06 boundary specification and synchronized the Decision
+  Engine, Architecture, Master Blueprint, and project-state governance records.
+- P06 is limited to one validated P05-T08 context → deterministic analytical
+  decision intent; Risk/Capital Authorization and Execution remain separate.
+- No P06 runtime, AI/LLM, wallet, RPC, signing, broadcast, or execution code was
+  added. P05-T01 through P05-T08 remain closed and untouched.
+
 - P05-T08 COMPLETE / CLOSED / AUDITED PASS.
 - Added the final deterministic evidence-first opportunity context boundary,
   linking one validated P05-T06 record to its P05-T07 history.
