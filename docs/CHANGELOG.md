@@ -10,7 +10,7 @@
 - P05-T05 remains the deterministic, provider-neutral, pure per-candidate
   opportunity pre-score boundary with no ranking, decision, authorization,
   execution, AI, or external I/O.
-- P05-T06 is the next authorized task; implementation has not started.
+- P05-T06 was implemented and is COMPLETE / CLOSED / AUDITED PASS.
 
 # Changelog
 

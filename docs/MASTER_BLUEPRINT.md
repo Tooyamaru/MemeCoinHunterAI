@@ -10,8 +10,7 @@ CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS. P05-T04 remains the
 per-candidate feature and quality evaluation boundary: deterministic,
 provider-neutral, fail-closed, and free of scoring, ranking, decision,
 authorization, execution, AI, or external I/O. P05-T03 remains the mandatory
-ELIGIBLE hard-risk gate. P05-T05 is COMPLETE / CLOSED / AUDITED PASS. P05-T06
-is the next authorized task and implementation has not started. P01-T04 — Application
+ELIGIBLE hard-risk gate. P05-T05 is COMPLETE / CLOSED / AUDITED PASS. P05-T06 is COMPLETE / CLOSED / AUDITED PASS. P01-T04 — Application
 Service & Worker Foundation and P01-T05 — Application Service & Worker
 Extensions are complete. P02-T01 through P02-T09 are implemented and verified.
 P02-T06 is the deterministic provider-neutral token-universe

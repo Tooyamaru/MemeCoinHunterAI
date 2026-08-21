@@ -1,10 +1,10 @@
 # P05-T06 — Opportunity Record Materialization
 
-**Status:** IMPLEMENTATION IN PROGRESS  
-**Phase:** P05 — Opportunity Engine  
-**Task:** P05-T06  
-**Provider posture:** Provider-neutral; deterministic; local; no external I/O  
-**Contract version:** `p05-t06-v1`  
+**Status:** COMPLETE / CLOSED / AUDITED PASS
+**Phase:** P05 — Opportunity Engine
+**Task:** P05-T06
+**Provider posture:** Provider-neutral; deterministic; local; no external I/O
+**Contract version:** `p05-t06-v1`
 **Evaluator version:** `p05-t06-record-v1`
 
 ## 1. Purpose and scope

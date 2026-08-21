@@ -54,7 +54,7 @@ P05-T03 Hard-Risk / Disqualification Boundary — COMPLETE / CLOSED / AUDITED PA
 P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS
 P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — CURRENT / IMPLEMENTED / PENDING FINAL AUDIT CLOSURE
 
-P05 closes after T05.
+P05-T06 is the final authorized P05 boundary and is COMPLETE / CLOSED / AUDITED PASS.
 
 ## Explicit Non-Scope
 
