@@ -133,3 +133,17 @@ def test_score_output_is_immutable():
 
     with pytest.raises(FrozenInstanceError):
         result.score = Decimal("1")
+
+
+def test_direct_construction_rejects_altered_velocity():
+    result = evaluate_opportunity_score(_evaluation())
+
+    with pytest.raises(ValueError, match="price_velocity does not match"):
+        replace(result, price_velocity=result.price_velocity + Decimal("1"))
+
+
+def test_direct_construction_rejects_altered_acceleration():
+    result = evaluate_opportunity_score(_evaluation())
+
+    with pytest.raises(ValueError, match="price_acceleration does not match"):
+        replace(result, price_acceleration=result.price_acceleration + Decimal("1"))

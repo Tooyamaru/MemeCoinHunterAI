@@ -10,6 +10,42 @@ P05-T05 is deterministic, provider-neutral, pure, and has no external I/O.
 
 P05-T05 does not perform feature recalculation, risk re-evaluation, candidate comparison, ranking, trading decision, authorization, execution, LLM judgment, or autonomous behavior.
 
+### Authorized P05-T05 v1 scoring ruleset
+
+The authorized ruleset is `p05-t05-rules-v1`. It is versioned, deterministic,
+provider-neutral, immutable, and defines a bounded analytical pre-score only; it
+is not a trading decision, authorization, or execution instruction.
+
+For each required P04 feature value `x` and its positive ruleset scale `s`:
+
+```text
+bounded(x, s) = x / (s + abs(x))
+```
+
+The v1 parameters are:
+
+```text
+velocity_scale = 1
+acceleration_scale = 1
+velocity_weight = 2
+acceleration_weight = 1
+```
+
+The weighted signal and final score are:
+
+```text
+weighted_signal =
+    (2 * bounded(price_velocity, 1)
+     + 1 * bounded(price_acceleration, 1)) / 3
+
+score = 50 * (1 + weighted_signal)
+```
+
+The score range is inclusive `[0, 100]`. Calculations use finite `Decimal`
+arithmetic with deterministic local precision of 50 digits and
+`ROUND_HALF_EVEN` rounding. No additional feature, parameter, data source, or
+threshold is authorized by this ruleset.
+
 ## Fixed P05 Sequence
 
 P05-T01 Candidate Boundary — COMPLETE

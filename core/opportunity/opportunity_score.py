@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from decimal import Decimal, localcontext
+from decimal import Decimal, ROUND_HALF_EVEN, localcontext
 from enum import StrEnum
 import hashlib
 import json
@@ -141,6 +141,7 @@ class OpportunityScore:
             raise ValueError("feature evaluation identity does not match")
         if not isinstance(self.ruleset, OpportunityScoringRuleset):
             raise ValueError("ruleset must be an OpportunityScoringRuleset")
+        source_values = _scoreable_values(self.feature_evaluation)
         for value, name in (
             (self.price_velocity, "price_velocity"),
             (self.price_acceleration, "price_acceleration"),
@@ -149,6 +150,10 @@ class OpportunityScore:
             (self.score, "score"),
         ):
             _require_decimal(value, name)
+        if self.price_velocity != source_values[PRICE_VELOCITY]:
+            raise ValueError("price_velocity does not match T04 feature snapshot")
+        if self.price_acceleration != source_values[PRICE_ACCELERATION]:
+            raise ValueError("price_acceleration does not match T04 feature snapshot")
         expected = _calculate_values(
             self.price_velocity, self.price_acceleration, self.ruleset
         )
@@ -291,6 +296,7 @@ def _calculate_values(
         raise ValueError("ruleset must be an OpportunityScoringRuleset")
     with localcontext() as context:
         context.prec = 50
+        context.rounding = ROUND_HALF_EVEN
         velocity_signal = _bounded(velocity, ruleset.velocity_scale)
         acceleration_signal = _bounded(acceleration, ruleset.acceleration_scale)
         total_weight = ruleset.velocity_weight + ruleset.acceleration_weight

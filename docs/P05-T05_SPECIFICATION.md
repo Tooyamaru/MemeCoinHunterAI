@@ -47,6 +47,10 @@ Missing, duplicate, malformed, or non-calculated required features fail closed.
 
 ## 3. Versioned scoring ruleset
 
+This section is the implementation contract for the ruleset explicitly
+authorized in `docs/P05-T05_ARCHITECTURAL_DECISION.md`. It introduces no
+additional parameters or scoring behavior.
+
 The initial immutable ruleset is `p05-t05-rules-v1`:
 
 ```text
@@ -73,9 +77,9 @@ score = 50 * (1 + weighted_signal)
 ```
 
 The score is a finite `Decimal` in the inclusive range `[0, 100]`. Decimal
-arithmetic is used throughout; no binary floating-point conversion,
-recalculation of upstream features, threshold lookup, or external data is
-allowed.
+arithmetic uses deterministic local precision of 50 digits and
+`ROUND_HALF_EVEN` rounding; no binary floating-point conversion, recalculation
+of upstream features, threshold lookup, or external data is allowed.
 
 The ruleset's scales and weights are part of the canonical ruleset
 representation and therefore part of the output provenance.
