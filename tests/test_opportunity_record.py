@@ -25,6 +25,9 @@ def test_materializes_one_score_and_preserves_complete_provenance():
     assert record.input_score_digest == score.digest
     assert record.candidate_id == score.candidate_id
     assert record.reference_time == score.reference_time
+    assert record.feature_evaluation is score.feature_evaluation
+    assert record.risk_evaluation is score.feature_evaluation.risk_evaluation
+    assert record.signal_snapshot is score.feature_evaluation.signal_snapshot
     assert record.contract_version == P05_T06_CONTRACT_VERSION
     assert record.evaluator_version == P05_T06_EVALUATOR_VERSION
 
@@ -96,6 +99,25 @@ def test_tampered_nested_score_provenance_fails_closed():
     tampered = replace(score.feature_evaluation)
     object.__setattr__(tampered, "input_candidate_digest", "tampered")
     object.__setattr__(score, "feature_evaluation", tampered)
+
+    with pytest.raises(ValueError):
+        materialize_opportunity_record(score)
+
+
+def test_unsupported_extra_feature_identity_fails_closed():
+    from dataclasses import replace
+    from core.opportunity import evaluate_opportunity_score
+
+    score = evaluate_opportunity_score(_evaluation())
+    tampered_evaluation = replace(score.feature_evaluation)
+    extra = replace(tampered_evaluation.feature_snapshots[0])
+    object.__setattr__(extra, "feature_id", "unsupported_feature")
+    object.__setattr__(
+        tampered_evaluation,
+        "feature_snapshots",
+        (*tampered_evaluation.feature_snapshots, extra),
+    )
+    object.__setattr__(score, "feature_evaluation", tampered_evaluation)
 
     with pytest.raises(ValueError):
         materialize_opportunity_record(score)

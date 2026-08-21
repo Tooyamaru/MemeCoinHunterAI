@@ -18,6 +18,12 @@ from core.opportunity.opportunity_score import (
     P05_T05_RULESET_VERSION,
     P05_T05_CONTRACT_VERSION,
 )
+from core.opportunity.opportunity_features import (
+    AUTHORIZED_FEATURES,
+    CandidateFeatureEvaluation,
+)
+from core.opportunity.opportunity_risk import CandidateRiskEvaluation
+from core.signals.signal_snapshot import SignalEvidenceSnapshot
 
 
 P05_T06_CONTRACT_VERSION = "p05-t06-v1"
@@ -26,7 +32,12 @@ P05_T06_EVALUATOR_VERSION = "p05-t06-record-v1"
 
 @dataclass(frozen=True)
 class OpportunityRecord:
-    """Immutable one-to-one record preserving one validated P05-T05 score."""
+    """Immutable evidence-first record for one validated P05-T05 score.
+
+    The direct upstream references are intentionally retained alongside the
+    score.  They are not reconstructed from digests and add no decision
+    semantics.
+    """
 
     candidate_id: str
     chain_id: str
@@ -34,6 +45,9 @@ class OpportunityRecord:
     reference_time: datetime
     input_score_digest: str
     opportunity_score: OpportunityScore
+    feature_evaluation: CandidateFeatureEvaluation | None = None
+    risk_evaluation: CandidateRiskEvaluation | None = None
+    signal_snapshot: SignalEvidenceSnapshot | None = None
     evaluator_version: str = P05_T06_EVALUATOR_VERSION
     contract_version: str = P05_T06_CONTRACT_VERSION
 
@@ -57,6 +71,39 @@ class OpportunityRecord:
             _to_utc(self.reference_time, "reference_time"),
         )
         _validate_score(self.opportunity_score)
+        score_evaluation = self.opportunity_score.feature_evaluation
+        feature_evaluation = (
+            score_evaluation
+            if self.feature_evaluation is None
+            else self.feature_evaluation
+        )
+        risk_evaluation = (
+            score_evaluation.risk_evaluation
+            if self.risk_evaluation is None
+            else self.risk_evaluation
+        )
+        signal_snapshot = (
+            score_evaluation.signal_snapshot
+            if self.signal_snapshot is None
+            else self.signal_snapshot
+        )
+        if not isinstance(feature_evaluation, CandidateFeatureEvaluation):
+            raise ValueError("feature_evaluation must be a CandidateFeatureEvaluation")
+        if not isinstance(risk_evaluation, CandidateRiskEvaluation):
+            raise ValueError("risk_evaluation must be a CandidateRiskEvaluation")
+        if not isinstance(signal_snapshot, SignalEvidenceSnapshot):
+            raise ValueError("signal_snapshot must be a SignalEvidenceSnapshot")
+        if feature_evaluation is not score_evaluation:
+            raise ValueError("feature evaluation provenance does not match score")
+        if risk_evaluation is not score_evaluation.risk_evaluation:
+            raise ValueError("risk evaluation provenance does not match score")
+        if signal_snapshot is not score_evaluation.signal_snapshot:
+            raise ValueError("signal snapshot provenance does not match score")
+        _validate_feature_identity(feature_evaluation)
+        _validate_provenance(feature_evaluation, risk_evaluation, signal_snapshot)
+        object.__setattr__(self, "feature_evaluation", feature_evaluation)
+        object.__setattr__(self, "risk_evaluation", risk_evaluation)
+        object.__setattr__(self, "signal_snapshot", signal_snapshot)
         if self.input_score_digest != self.opportunity_score.digest:
             raise ValueError("opportunity score digest does not match")
         if (
@@ -76,6 +123,9 @@ class OpportunityRecord:
                 "token_identity": self.token_identity,
                 "reference_time": self.reference_time.isoformat(),
                 "input_score_digest": self.input_score_digest,
+                "risk_evaluation": self.risk_evaluation.canonical_representation,
+                "feature_evaluation": self.feature_evaluation.canonical_representation,
+                "signal_snapshot": self.signal_snapshot.canonical_representation,
                 "opportunity_score": self.opportunity_score.canonical_representation,
                 "evaluator_version": self.evaluator_version,
                 "contract_version": self.contract_version,
@@ -108,6 +158,9 @@ def materialize_opportunity_record(
         reference_time=opportunity_score.reference_time,
         input_score_digest=opportunity_score.digest,
         opportunity_score=opportunity_score,
+        feature_evaluation=opportunity_score.feature_evaluation,
+        risk_evaluation=opportunity_score.feature_evaluation.risk_evaluation,
+        signal_snapshot=opportunity_score.feature_evaluation.signal_snapshot,
     )
 
 
@@ -159,6 +212,45 @@ def _validate_score(opportunity_score: OpportunityScore) -> None:
         )
     except (AttributeError, TypeError, ValueError) as error:
         raise ValueError("opportunity score is invalid") from error
+
+
+def _validate_feature_identity(
+    feature_evaluation: CandidateFeatureEvaluation,
+) -> None:
+    pairs = tuple(
+        (snapshot.feature_id, snapshot.feature_version)
+        for snapshot in feature_evaluation.feature_snapshots
+    )
+    if len(pairs) != len(set(pairs)):
+        raise ValueError("feature identity is duplicated")
+    if set(pairs) != set(AUTHORIZED_FEATURES):
+        raise ValueError("feature identity is unsupported or incomplete")
+
+
+def _validate_provenance(
+    feature_evaluation: CandidateFeatureEvaluation,
+    risk_evaluation: CandidateRiskEvaluation,
+    signal_snapshot: SignalEvidenceSnapshot,
+) -> None:
+    if (
+        feature_evaluation.canonical_representation
+        != feature_evaluation.deterministic_representation
+        or feature_evaluation.digest
+        != _digest(feature_evaluation.canonical_representation)
+    ):
+        raise ValueError("feature evaluation provenance is not canonical")
+    if (
+        risk_evaluation.canonical_representation
+        != risk_evaluation.deterministic_representation
+        or risk_evaluation.digest != _digest(risk_evaluation.canonical_representation)
+    ):
+        raise ValueError("risk evaluation provenance is not canonical")
+    if (
+        signal_snapshot.canonical_representation
+        != signal_snapshot.deterministic_representation
+        or signal_snapshot.digest != _digest(signal_snapshot.canonical_representation)
+    ):
+        raise ValueError("signal snapshot provenance is not canonical")
 
 
 def _digest(value: Any) -> str:
