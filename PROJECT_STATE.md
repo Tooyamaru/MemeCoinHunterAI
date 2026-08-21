@@ -165,24 +165,24 @@ functionality was introduced.
 
 ## Next action
 
-P06-T01, P06-T02, and P06-T03 are COMPLETE / CLOSED. The next P06
-boundary is not defined or authorized in the current architecture; it requires
-a separate specification and explicit approval. P05-T08 remains the final deterministic
-local evidence-first opportunity context boundary before P06. P05 remains
-deterministic, provider-neutral, fail-closed, and free of external I/O; P06
-must preserve that evidence-first context and keep deterministic decision intent
-separate from Risk/Capital Authorization and Execution.
+P07 specification is prepared and requires architecture review before any
+implementation. The review must confirm the paper-simulation boundary,
+Risk/Capital Authorization dependency boundary, paper-state and ledger
+identity semantics, deterministic friction/fill/failure rules, persistence
+boundary, and verification plan. No P07 runtime implementation is authorized
+until that review passes.
 
 ## Next task
 
-No subsequent P06 task is authorized yet. The next P06 task must be separately
-specified and approved from the existing architecture. P06 runtime
-implementation, AI/LLM integration, authorization, execution, wallet, RPC,
-signing, and broadcast behavior remain outside this completed T01 boundary.
-P04 overall remains NOT COMPLETE; any future P04 signal task requires a separate
-specification and approval. Provider connectivity, ingestion transports,
-persistence changes, market-state collection, and later phases require separate
-specifications and approval.
+P07 architecture review is the next authorized governance action. No P07
+runtime implementation, database change, provider integration, wallet,
+signing, broadcast, live execution, P08 learning, or P09 execution work is
+authorized until the P07 specification is approved and the first P07
+implementation boundary receives its own explicit authorization.
+P04 overall remains NOT COMPLETE; any future P04 signal task requires a
+separate specification and approval. Provider connectivity, ingestion
+transports, persistence changes, market-state collection, and later phases
+require separate specifications and approval.
 
 ## Required secret names
 
