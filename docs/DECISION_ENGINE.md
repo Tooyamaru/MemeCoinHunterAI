@@ -1,6 +1,6 @@
 # Decision Engine Principles
 
-**P06 gate status:** ARCHITECTURE / SPECIFICATION GATE IN PROGRESS  
+**P06 gate status:** ARCHITECTURE / SPECIFICATION GATE IN PROGRESS
 **Runtime status:** No P06 implementation is authorized by this document
 
 ## V1.1 computation model

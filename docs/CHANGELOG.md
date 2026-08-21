@@ -1,5 +1,17 @@
 ## 2026-08-21
 
+- P06 architecture/specification gate COMPLETE / CLOSED / APPROVED.
+- Verified the P06 contract: one validated P05-T08 `OpportunityContext` input;
+  deterministic Decision Engine authority; immutable/versioned Decision Intent;
+  evidence-first provenance; fail-closed behavior; and `NO_TRADE` for
+  insufficient, uncertain, or invalid evidence.
+- Confirmed that P06 does not rank or prioritize candidates, authorize capital,
+  own wallets/private keys, sign or broadcast, own RPC/DEX/execution
+  infrastructure, or implement an LLM. P06-T01 — Deterministic Decision Intent
+  Contract is NEXT / READY / AUTHORIZED.
+- No P06 runtime files, DecisionIntent Python implementation, P05 changes,
+  P07 work, dependency installation, commit, or push were performed.
+
 - P06 architecture/specification gate started.
 - Added the approved P06 boundary specification and synchronized the Decision
   Engine, Architecture, Master Blueprint, and project-state governance records.

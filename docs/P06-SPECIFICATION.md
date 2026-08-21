@@ -1,9 +1,9 @@
 # P06 — Deterministic Decision Engine Architecture Gate
 
-**Status:** ARCHITECTURE / SPECIFICATION GATE IN PROGRESS  
-**Phase:** P06 — AI Decision Engine  
-**Implementation status:** No P06 runtime implementation authorized  
-**Provider posture:** Provider-neutral; deterministic hot path; no execution I/O  
+**Status:** ARCHITECTURE / SPECIFICATION GATE IN PROGRESS
+**Phase:** P06 — AI Decision Engine
+**Implementation status:** No P06 runtime implementation authorized
+**Provider posture:** Provider-neutral; deterministic hot path; no execution I/O
 **Authority:** V1.1 architecture, Decision Engine principles, and evidence-first
 P05-T06 through P05-T08 contracts
 
