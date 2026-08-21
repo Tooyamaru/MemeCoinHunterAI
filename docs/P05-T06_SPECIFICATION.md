@@ -1,6 +1,6 @@
 # P05-T06 — Evidence-First Opportunity Record
 
-**Status:** ARCHITECTURAL REVISION IN PROGRESS
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P05 — Opportunity Engine
 **Task:** P05-T06
 **Provider posture:** Provider-neutral; deterministic; local; no external I/O
@@ -11,9 +11,8 @@
 
 P05-T06 is the evidence-first materialization boundary. It preserves the
 validated upstream objects directly rather than reducing them to digest-only
-fields. It does not calculate another score, compare candidates, rank
-candidates, reduce a candidate set, classify a market phase, aggregate quality,
-or produce an action.
+fields. This specification closes the approved T06 revision; later P05-T07 and
+P05-T08 boundaries retain this context without adding decisions.
 
 The boundary is intentionally one-to-one:
 

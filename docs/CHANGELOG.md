@@ -1,5 +1,13 @@
 ## 2026-08-21
 
+- P05-T08 COMPLETE / CLOSED / AUDITED PASS.
+- Added the final deterministic evidence-first opportunity context boundary,
+  linking one validated P05-T06 record to its P05-T07 history.
+- Complete risk, feature, signal, score, record, history, timestamp, digest,
+  version, uncertainty, and invalidation context remains preserved without
+  ranking, decision, authorization, execution, AI, or I/O.
+- P06 remains untouched and unauthorized pending its own architecture gate.
+
 - P05-T07 COMPLETE / CLOSED / AUDITED PASS.
 - Added the deterministic, provider-neutral, in-memory evidence-first history
   boundary for validated P05-T06 opportunity records.
