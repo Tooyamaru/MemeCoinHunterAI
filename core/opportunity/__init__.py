@@ -47,6 +47,13 @@ from core.opportunity.opportunity_score import (
     P05_T05_RULESET_VERSION,
     evaluate_opportunity_score,
 )
+from core.opportunity.opportunity_record import (
+    OpportunityRecord,
+    P05_T06_CONTRACT_VERSION,
+    P05_T06_EVALUATOR_VERSION,
+    create_opportunity_record,
+    materialize_opportunity_record,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -86,4 +93,9 @@ __all__ = [
     "P05_T05_EVALUATOR_VERSION",
     "P05_T05_RULESET_VERSION",
     "evaluate_opportunity_score",
+    "OpportunityRecord",
+    "P05_T06_CONTRACT_VERSION",
+    "P05_T06_EVALUATOR_VERSION",
+    "create_opportunity_record",
+    "materialize_opportunity_record",
 ]
