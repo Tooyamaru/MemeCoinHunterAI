@@ -54,6 +54,14 @@ from core.opportunity.opportunity_record import (
     create_opportunity_record,
     materialize_opportunity_record,
 )
+from core.opportunity.opportunity_record_history import (
+    OpportunityHistory,
+    OpportunityRecordHistory,
+    OpportunityRecordHistoryOutcome,
+    OpportunityRecordHistoryResult,
+    OpportunityRecordHistoryStatus,
+    P05_T07_CONTRACT_VERSION,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -98,4 +106,10 @@ __all__ = [
     "P05_T06_EVALUATOR_VERSION",
     "create_opportunity_record",
     "materialize_opportunity_record",
+    "OpportunityHistory",
+    "OpportunityRecordHistory",
+    "OpportunityRecordHistoryOutcome",
+    "OpportunityRecordHistoryResult",
+    "OpportunityRecordHistoryStatus",
+    "P05_T07_CONTRACT_VERSION",
 ]

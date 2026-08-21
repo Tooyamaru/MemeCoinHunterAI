@@ -1,3 +1,13 @@
+## 2026-08-21
+
+- P05-T07 COMPLETE / CLOSED / AUDITED PASS.
+- Added the deterministic, provider-neutral, in-memory evidence-first history
+  boundary for validated P05-T06 opportunity records.
+- History preserves complete upstream risk, feature, signal, score, timestamp,
+  digest, contract-version, evaluator-version, uncertainty, and invalidation
+  context without ranking, decisions, authorization, execution, AI, or I/O.
+- P05-T08 is the next task; P06 remains untouched and unauthorized.
+
 ## 2026-08-20
 
 - P05-T03 COMPLETE / CLOSED / AUDITED PASS.
