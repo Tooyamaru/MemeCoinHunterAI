@@ -1,7 +1,7 @@
 # P07 — Paper Trading Engine Specification
 
-**Status:** SPECIFICATION READY FOR ARCHITECTURE REVIEW — IMPLEMENTATION NOT
-AUTHORIZED  
+**Status:** ARCHITECTURE GATE PASSED — P07-T01 SPECIFICATION IN REVIEW —
+IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P07 — Paper Trading Engine  
 **Purpose:** Reproducibly simulate execution consequences without moving real
 capital or connecting to live execution infrastructure.
@@ -386,5 +386,6 @@ promote a strategy, or establish live execution readiness by themselves.
 
 ## Governance conclusion
 
-P07 is **SPECIFICATION READY FOR ARCHITECTURE REVIEW — IMPLEMENTATION NOT
-AUTHORIZED**.
+P07 architecture gate is **PASSED**. P07-T01 is the first implementation
+boundary under audit; no P07 runtime implementation is authorized until its
+specification is audited and explicitly approved.

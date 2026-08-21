@@ -1,5 +1,15 @@
 ## 2026-08-21
 
+- P07 architecture gate recorded as PASSED and P07-T01 canonical specification
+  prepared for audit. The specification defines only the immutable
+  PaperSimulationInput / ExecutionContext contract, P06 identity linkage,
+  independent authorization observation, point-in-time execution observation,
+  configuration/state/replay identities, canonical validation, UNKNOWN
+  handling, and fail-closed rules.
+- No P07-T01 runtime code, tests, dependencies, database, migration, provider,
+  network, wallet, signing, broadcast, ledger, position mutation, or future P07
+  task was added. Implementation remains NOT AUTHORIZED pending audit.
+
 - P07 specification prepared for architecture review.
 - Synchronized the paper-trading boundary as simulation-only after P06 and
   independent Risk / Capital Authorization, with paper fills, positions,

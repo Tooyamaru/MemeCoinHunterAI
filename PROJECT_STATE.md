@@ -8,8 +8,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P07 — Paper Trading Engine
-- **Current task:** P07 specification
-- **Current task status:** SPECIFICATION READY FOR ARCHITECTURE REVIEW — IMPLEMENTATION NOT AUTHORIZED
+- **Current task:** P07-T01 — Paper Simulation Input / Execution Context Contract
+- **Current task status:** SPECIFICATION PREPARED FOR AUDIT — IMPLEMENTATION NOT AUTHORIZED
 - **Last updated:** 2026-08-21
 
 ## Master progress
@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 SPECIFICATION PREPARED — IMPLEMENTATION NOT AUTHORIZED; P06 runtime and P07–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 SPECIFICATION PREPARED FOR AUDIT — IMPLEMENTATION NOT AUTHORIZED; P06 runtime and P07–P12 not started
 
 ## Phase status
 
@@ -31,10 +31,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 ## Current objective
 
-P07 specification is prepared and ready for architecture review. It defines
-provider-neutral, reproducible paper simulation after P06 and independent Risk
-/ Capital Authorization, with no live execution, wallet, signing, broadcast,
-RPC, DEX, provider, persistence, or P08/P09 implementation authority.
+P07 architecture review has passed. P07-T01 defines the immutable,
+provider-neutral, reproducible paper-simulation input boundary after P06 and
+independent Risk / Capital Authorization. It grants no live execution, wallet,
+signing, broadcast, RPC, DEX, provider, persistence, or P08/P09 authority.
 
 P06-T02 is COMPLETE / CLOSED / AUDITED PASS as the deterministic evaluation
 boundary, and P06-T03 is COMPLETE / CLOSED as an optional non-authoritative
@@ -165,20 +165,19 @@ functionality was introduced.
 
 ## Next action
 
-P07 specification is prepared and requires architecture review before any
-implementation. The review must confirm the paper-simulation boundary,
-Risk/Capital Authorization dependency boundary, paper-state and ledger
-identity semantics, deterministic friction/fill/failure rules, persistence
-boundary, and verification plan. No P07 runtime implementation is authorized
-until that review passes.
+P07 architecture review has passed. P07-T01 is prepared for audit and defines
+the input/provenance boundary, independent authorization observation,
+point-in-time execution context, configuration/state identity, replay
+identity, deterministic validation, and fail-closed rules. No P07 runtime
+implementation is authorized until P07-T01 is audited and explicitly approved.
 
 ## Next task
 
-P07 architecture review is the next authorized governance action. No P07
+P07-T01 specification audit is the next authorized governance action. No P07
 runtime implementation, database change, provider integration, wallet,
 signing, broadcast, live execution, P08 learning, or P09 execution work is
-authorized until the P07 specification is approved and the first P07
-implementation boundary receives its own explicit authorization.
+authorized until the P07-T01 specification is audited and its implementation
+boundary receives explicit authorization.
 P04 overall remains NOT COMPLETE; any future P04 signal task requires a
 separate specification and approval. Provider connectivity, ingestion
 transports, persistence changes, market-state collection, and later phases
