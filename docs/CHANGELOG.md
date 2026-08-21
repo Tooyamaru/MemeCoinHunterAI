@@ -1,5 +1,16 @@
 ## 2026-08-21
 
+- P06-T01 COMPLETE / CLOSED / AUDITED PASS.
+- Added the immutable, deterministic, provider-neutral `DecisionIntent`
+  contract for exactly one validated P05-T08 `OpportunityContext`.
+- Preserved complete P05 provenance, canonical representation, SHA-256 digest,
+  explicit versions, separate entry posture, bounded analytical confidence,
+  uncertainty, invalidation conditions, and deterministic `NO_TRADE` behavior.
+- No ranking, candidate prioritization, portfolio aggregation, capital
+  authorization, Risk Governor, wallet, private-key, signing, broadcast, RPC,
+  DEX, transaction, execution, live-trading, autonomous AI, or LLM behavior was
+  implemented. No subsequent P06 task is authorized yet.
+
 - P06 architecture/specification gate COMPLETE / CLOSED / APPROVED.
 - Verified the P06 contract: one validated P05-T08 `OpportunityContext` input;
   deterministic Decision Engine authority; immutable/versioned Decision Intent;

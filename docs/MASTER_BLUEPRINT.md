@@ -4,7 +4,8 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project has advanced to the P06 architecture/specification gate. P05-T01
+The project has completed the P06 architecture/specification gate and P06-T01.
+P05-T01
 through P05-T08 are
 complete. P05-T03 is COMPLETE / CLOSED / AUDITED PASS. P05-T04 is COMPLETE /
 CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS. P05-T04 remains the
@@ -33,9 +34,9 @@ WITH NON-BLOCKING OBSERVATIONS. No later P04 task has started. P04-T08 is not
 explicitly defined in the current architecture; any next P04 task requires a
 separate specification and approval.
 No provider, network, persistence, AI, wallet, trading, or execution integration
-was introduced. P06 runtime implementation remains unauthorized while the
-architecture/specification gate is in progress. Trading, execution, and any
-wallet behavior remain future boundaries.
+was introduced. P06 runtime implementation remains unauthorized after the
+completed architecture/specification gate and P06-T01 contract. Trading,
+execution, and any wallet behavior remain future boundaries.
 
 ## V1.1 architectural baseline
 
@@ -229,7 +230,7 @@ STOP, PAUSE, or change market.
 - **Major risks:** Overweighting one signal, score gaming, unstable rankings.
 - **Deliverables:** Opportunity records, phase states, ranking evaluation.
 
-### P06 — AI DECISION ENGINE — ARCHITECTURE GATE IN PROGRESS
+### P06 — AI DECISION ENGINE — ARCHITECTURE GATE COMPLETE / P06-T01 CLOSED
 - **Objective:** Produce bounded, evidence-backed trade intents with deterministic hot-path decisions.
 - **Major components:** Deterministic rules, optional statistical/classical or bounded ML analysis, BUY, WATCH, HOLD, TAKE PROFIT, REDUCE, EXIT, AVOID, confidence, evidence, risk, invalidation, expected edge, uncertainty, entry quality, phase, NO TRADE, and point-in-time feature snapshots.
 - **Dependencies:** P03, P05.

@@ -1,6 +1,6 @@
 # P06 — Deterministic Decision Engine Architecture Gate
 
-**Status:** ARCHITECTURE / SPECIFICATION GATE IN PROGRESS
+**Status:** P06-T01 COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P06 — AI Decision Engine
 **Implementation status:** No P06 runtime implementation authorized
 **Provider posture:** Provider-neutral; deterministic hot path; no execution I/O
@@ -170,3 +170,20 @@ This document authorizes architecture/specification work only. It does not
 authorize P06 runtime code, AI/LLM integration, model installation, database
 changes, provider integration, paper trading, wallet integration, RPC, DEX
 routing, transaction submission, signing, broadcasting, or live trading.
+
+## 9. P06-T01 contract closure
+
+P06-T01 defines the immutable, provider-neutral `DecisionIntent` contract for
+one validated P05-T08 `OpportunityContext`. The contract uses:
+
+- `p06-t01-v1` as its contract version;
+- `p06-t01-rules-v1` as its deterministic ruleset version; and
+- `p06-t01-intent-v1` as its evaluator version.
+
+The intent preserves the complete P05-T08 context by identity, adds only
+analytical action, separate entry posture, explicit assumptions, uncertainty,
+invalidation conditions, bounded analytical confidence, point-in-time decision
+time, canonical representation, and a deterministic SHA-256 digest. It has no
+ranking, authorization, execution, wallet, RPC, DEX, signing, broadcast, or
+LLM fields or behavior. Uncertain or invalid evidence can only produce
+`NO_TRADE`; no evidence is invented or downgraded.
