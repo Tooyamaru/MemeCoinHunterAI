@@ -183,9 +183,16 @@ files explicitly approved by the P07-T01 specification were created:
 `core/execution/__init__.py`, and
 `tests/test_paper_simulation_input.py`.
 
-No P07-T02, paper-fill engine, position mutation, ledger, reconciliation,
-provider, network, wallet, signing, broadcast, live execution, P08, or P09
-work is authorized by this approval.
+P07-T02 specification is COMPLETE / CLOSED / AUDITED PASS.
+P07-T02 implementation remains NOT AUTHORIZED pending explicit implementation
+authorization.
+
+Only the following future implementation files are proposed for T02:
+`core/execution/paper_fill_outcome.py`
+and `tests/test_paper_fill_outcome.py`.
+
+No position, exposure, ledger, reconciliation, provider, network, wallet,
+signing, broadcast, live execution, P08, or P09 work is authorized.
 P04 overall remains NOT COMPLETE; any future P04 signal task requires a
 separate specification and approval. Provider connectivity, ingestion
 transports, persistence changes, market-state collection, and later phases
