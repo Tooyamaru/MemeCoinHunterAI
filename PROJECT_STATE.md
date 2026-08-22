@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION AUTHORIZED; P06 runtime and P07–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION VERIFIED; P06 runtime and P07–P12 not started
 
 ## Phase status
 
@@ -177,8 +177,8 @@ semantics.
 
 ## Next task
 
-P07-T01 implementation is now the next authorized task. Only the implementation
-files explicitly approved by the P07-T01 specification may be created:
+P07-T01 implementation has been completed and audited. Only the implementation
+files explicitly approved by the P07-T01 specification were created:
 `core/execution/paper_simulation_input.py`,
 `core/execution/__init__.py`, and
 `tests/test_paper_simulation_input.py`.
