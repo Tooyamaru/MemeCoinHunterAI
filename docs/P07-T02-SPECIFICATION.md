@@ -1,6 +1,6 @@
 # P07-T02 — Paper Fill Model / Outcome Contract
 
-**Status:** SPECIFICATION COMPLETE — AUDIT PENDING — IMPLEMENTATION NOT AUTHORIZED
+**Status:** SPECIFICATION COMPLETE — AUDITED PASS — IMPLEMENTATION AUTHORIZED
 **Phase:** P07 — Paper Trading Engine
 **Task:** P07-T02 — Deterministic Paper Fill Model / Outcome Contract
 
@@ -352,9 +352,8 @@ No other implementation files are authorized by this specification.
 
 ## 21. Governance conclusion
 
-P07-T02 is a specification-only boundary at this stage.
-Implementation is NOT AUTHORIZED until this specification passes audit
-and explicit implementation authorization is recorded in project state.
+P07-T02 specification has passed audit.
+Implementation is AUTHORIZED only for the explicitly approved files below.
 
 P07-T02 must remain deterministic, provider-neutral, simulation-only,
 fail-closed, immutable, and independent from position mutation, ledger,
