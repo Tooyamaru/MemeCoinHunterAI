@@ -1,4 +1,4 @@
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from datetime import timedelta
 from decimal import Decimal
 
@@ -89,10 +89,23 @@ def _transition(outcome, state=None, valuation=None, accounting=None):
     )
 
 
+def _non_success(status):
+    outcome = _evaluate()
+    return replace(
+        outcome,
+        status=status,
+        filled_quantity=Decimal("0"),
+        remaining_quantity=outcome.requested_quantity,
+        reason_codes=(status.value,),
+        outcome_digest=None,
+    )
+
+
 def test_buy_full_fill_updates_quantity_cost_and_exposure():
     outcome = _evaluate(
         side=TradeSide.BUY, requested_quantity=Decimal("2"),
         executable_liquidity=Decimal("2"),
+        reference_quote_price=Decimal("99.66"),
     )
     result = _transition(outcome)
     assert result.transition_status is TransitionStatus.APPLIED
@@ -106,6 +119,7 @@ def test_sell_partial_fill_removes_only_filled_quantity_and_cost():
     outcome = _evaluate(
         side=TradeSide.SELL, requested_quantity=Decimal("4"),
         executable_liquidity=Decimal("2"), available_inventory=Decimal("10"),
+        reference_quote_price=Decimal("10.34"),
     )
     result = _transition(outcome)
     assert result.transition_status is TransitionStatus.APPLIED
@@ -125,7 +139,7 @@ def test_sell_partial_fill_removes_only_filled_quantity_and_cost():
     ],
 )
 def test_non_success_outcomes_do_not_mutate_state(status, expected):
-    outcome = _evaluate(status=status)
+    outcome = _non_success(status)
     result = _transition(outcome)
     assert result.transition_status is expected
     if expected is TransitionStatus.NO_CHANGE:

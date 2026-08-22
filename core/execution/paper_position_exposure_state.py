@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal, ROUND_HALF_EVEN
+from datetime import datetime, timezone
+from decimal import Decimal, ROUND_HALF_EVEN, localcontext
 from enum import StrEnum
 import hashlib
 import json
@@ -62,6 +62,12 @@ def _round(value: Decimal) -> Decimal:
     return _decimal(value, "calculation", non_negative=False).quantize(
         QUANT, rounding=ROUND_HALF_EVEN
     )
+
+
+def _average_cost(total_cost: Decimal, quantity: Decimal) -> Decimal:
+    with localcontext() as context:
+        context.prec = MAX_DECIMAL_PLACES * 2
+        return total_cost / quantity
 
 
 def _decimal_text(value: Decimal | None) -> str | None:
@@ -566,6 +572,8 @@ def transition_paper_state(
     if outcome.status is FillOutcomeStatus.FAILED:
         return _result(TransitionStatus.NO_CHANGE, reference, prior_state, outcome, position, reason=outcome.reason_codes)
     if outcome.status is FillOutcomeStatus.REJECTED:
+        if "INSUFFICIENT_INVENTORY" in outcome.reason_codes:
+            return _result(TransitionStatus.REJECTED, reference, prior_state, outcome, position, reason=outcome.reason_codes)
         return _result(TransitionStatus.NO_CHANGE, reference, prior_state, outcome, position, reason=outcome.reason_codes)
     if outcome.status is FillOutcomeStatus.UNAVAILABLE:
         return _result(TransitionStatus.UNAVAILABLE, reference, prior_state, outcome, position, reason=outcome.reason_codes)
@@ -594,7 +602,7 @@ def transition_paper_state(
             Decimal(delta.days * 86400 + delta.seconds)
             + (Decimal(delta.microseconds) / Decimal("1000000"))
         )
-        if age_seconds > valuation.max_age_seconds:
+        if age_seconds >= valuation.max_age_seconds:
             return _result(TransitionStatus.UNAVAILABLE, reference, prior_state, outcome, position, reason=("STALE_VALUATION",))
     if valuation.valuation_status is not ValuationStatus.PASS:
         return _result(TransitionStatus.UNAVAILABLE, reference, prior_state, outcome, position, reason=("VALUATION_UNKNOWN",))
@@ -605,7 +613,7 @@ def transition_paper_state(
         next_quantity = _round(position.quantity + filled)
         acquisition = _round(trade_value + fees)
         next_cost = _round(position.total_cost_basis + acquisition)
-        average = _round(next_cost / next_quantity)
+        average = _average_cost(next_cost, next_quantity)
         accounting = AccountingEffect(accounting_context.fee_amount, accounting_context.priority_fee_amount,
                                       trade_value, acquisition, None, None, position.cost_basis_unit)
     else:
@@ -613,7 +621,7 @@ def transition_paper_state(
         removed = _round(filled * position.average_cost)  # type: ignore[operator]
         next_cost = Decimal("0") if next_quantity == 0 else _round(position.total_cost_basis - removed)
         proceeds = _round(trade_value - fees)
-        average = None if next_quantity == 0 else _round(next_cost / next_quantity)
+        average = None if next_quantity == 0 else _average_cost(next_cost, next_quantity)
         accounting = AccountingEffect(accounting_context.fee_amount, accounting_context.priority_fee_amount,
                                       trade_value, None, removed, proceeds, position.cost_basis_unit)
     next_position = PaperPositionState(target, position.quantity_unit, next_quantity, position.cost_basis_unit,
