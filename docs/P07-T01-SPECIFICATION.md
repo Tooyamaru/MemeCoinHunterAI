@@ -1,6 +1,6 @@
 # P07-T01 — Paper Simulation Input / Execution Context Contract
 
-**Status:** SPECIFICATION PREPARED — IMPLEMENTATION NOT AUTHORIZED PENDING
+**Status:** COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION AUTHORIZED
 AUDIT  
 **Phase:** P07 — Paper Trading Engine  
 **Contract:** `p07-t01-v1`  
@@ -448,6 +448,20 @@ proposed.
 ## Governance conclusion
 
 P07 architecture gate: **PASSED**.  
-P07-T01 specification: **PREPARED FOR AUDIT**.  
-P07-T01 implementation: **NOT AUTHORIZED** pending audit of this
-specification and explicit implementation approval.
+P07-T01 specification: **COMPLETE / CLOSED / AUDITED PASS**.  
+P07-T01 implementation: **AUTHORIZED**.
+
+Audit basis:
+- Audit A: governance, repository, dependency, and premature-implementation
+  boundary verification — PASS.
+- Audit B: contract identity, P06 linkage, authorization observation,
+  execution observation, replay, UNKNOWN, fail-closed, and authority-boundary
+  verification — PASS.
+- Audit C: cross-contract P06 consistency, configuration/state identity,
+  canonicalization, temporal leakage, and project-state consistency — PASS.
+
+Implementation authorization is limited strictly to the approved P07-T01
+implementation boundary and proposed files in this specification. No P07-T02,
+paper-fill engine, position mutation, ledger, reconciliation, provider,
+network, wallet, signing, broadcast, live execution, P08, or P09 behavior is
+authorized by this approval.

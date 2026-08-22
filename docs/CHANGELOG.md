@@ -1,3 +1,24 @@
+## 2026-08-21 — P07-T01 Specification Audit / Authorization
+
+- P07-T01 specification independently audited and **COMPLETE / CLOSED /
+  AUDITED PASS**.
+- Audit A passed governance, repository, dependency, and premature-runtime
+  implementation checks.
+- Audit B passed contract identity, P06 DecisionIntent linkage, independent
+  Risk / Capital Authorization observation, point-in-time execution
+  observation, replay, UNKNOWN, fail-closed, and authority-boundary checks.
+- Audit C passed cross-contract P06 consistency, simulation configuration and
+  initial paper-state identity, canonicalization, temporal future-data
+  leakage, and project-state consistency checks.
+- Explicit implementation authorization granted for P07-T01 only.
+- Authorized implementation boundary is limited to
+  `core/execution/paper_simulation_input.py`,
+  `core/execution/__init__.py`, and
+  `tests/test_paper_simulation_input.py`.
+- No P07-T02, paper-fill, position mutation, ledger, reconciliation,
+  provider, network, wallet, signing, broadcast, live execution, P08, or P09
+  behavior is authorized.
+
 ## 2026-08-21
 
 - P07 architecture gate recorded as PASSED and P07-T01 canonical specification
