@@ -1,6 +1,6 @@
 # P07-T03 — Paper Position / Exposure State Transition Contract
 
-**Status:** SPECIFICATION COMPLETE — AUDITED PASS — IMPLEMENTATION NOT
+**Status:** SPECIFICATION CORRECTED — AUDITED PASS — IMPLEMENTATION NOT
 AUTHORIZED  
 **Phase:** P07 — Paper Trading Engine  
 **Task:** P07-T03 — Paper Position / Exposure State Transition Contract  
@@ -74,7 +74,10 @@ The eventual implementation must consume:
 1. one accepted `PaperFillOutcome` from P07-T02;
 2. one immutable `PaperPositionExposureState` representing the state before
    the outcome; and
-3. one explicitly supplied transition reference time.
+3. one explicit target asset-identity linkage;
+4. one explicit point-in-time valuation context;
+5. one explicit accounting context for absolute fee amounts; and
+6. one explicitly supplied transition reference time.
 
 The T02 outcome is consumed by identity and verified by its canonical digest.
 T03 must not reconstruct an outcome from fields, replace it with a newer
@@ -86,6 +89,27 @@ missing position, refresh prices, or recover missing provenance.
 
 The transition reference time is input data. T03 must never read the system
 clock.
+
+### 4.1 Boundary-repair inputs
+
+The following are explicit T03 inputs. They are not reconstructed from T02
+fields and do not require changing the approved T02 contract:
+
+- `target_asset_identity`: the canonical asset identity of exactly one target
+  position. Matching by symbol, display name, provider label, or position
+  order is forbidden.
+- `valuation_context`: an immutable bounded tuple of valuation observations,
+  each containing the exact `asset_identity`, observation ID and digest,
+  observed and available timestamps, finite `price`, `price_unit`,
+  `valuation_status`, source contract version, and bounded provenance.
+- `accounting_context`: an immutable bounded value containing absolute
+  quote-denominated `fee_amount` and `priority_fee_amount`, their common
+  `fee_unit`, observation identity/digest, accounting contract version, and
+  bounded provenance. These are amounts, not rates.
+
+The caller supplies these values from an approved, point-in-time,
+provider-neutral context. T03 validates identity, digest, units, timestamps,
+freshness, and provenance; it does not fetch, infer, convert, or replace them.
 
 ## 5. Contract identity and top-level result
 
@@ -206,9 +230,14 @@ T03 must verify at minimum:
 - quantity conservation already required by T02; and
 - all timestamps against the transition reference time.
 
-The asset identity and quantity unit in the outcome must match the target
-position identity and unit. A missing or contradictory identity is invalid; it
-must not be matched by symbol, display name, or provider label alone.
+The explicit `target_asset_identity` input must match exactly one prior
+position. The T02 outcome has no asset-identity field, so T03 must not claim
+that identity was supplied by T02 or derive it from a symbol, display name,
+provider label, or position order. Missing, duplicate, or contradictory target
+linkage is `INVALID`.
+
+The outcome's `quantity_unit` must match the target position's
+`quantity_unit`. A mismatch is `INVALID`.
 
 Only `FILLED` and `PARTIALLY_FILLED` outcomes with positive filled quantity
 are eligible to apply a state change. `PARTIALLY_FILLED` applies only its
@@ -248,10 +277,13 @@ For a valid successful BUY:
   and
 - the position must remain non-negative and internally consistent.
 
-The T02 `effective_price` and fee representation are authoritative inputs for
-this accounting calculation. If an effective price or required fee unit is
-missing, UNKNOWN, incompatible, or contradictory, T03 returns `UNAVAILABLE`
-or `INVALID` as applicable; it does not assume zero cost.
+The T02 `effective_price` is authoritative for trade value. T02
+`FrictionComponents.fees` and `FrictionComponents.priority_fees` are not used
+as accounting amounts by T03: the approved T02 contract does not specify
+whether they are absolute amounts or rates. T03 instead requires the explicit
+`accounting_context` in Section 4.1. Missing, UNKNOWN, incompatible, or
+contradictory effective price, absolute fee amount, or unit produces
+`UNAVAILABLE` or `INVALID` as applicable; T03 does not assume zero cost.
 
 ### 8.2 SELL effect
 
@@ -263,8 +295,9 @@ For a valid successful SELL:
 - the cost removed from carrying basis is
   `filled_quantity * prior_average_cost`;
 - remaining total cost basis equals prior total cost basis minus removed cost;
-- proceeds equal `filled_quantity * effective_price` less applicable
-  quote-denominated fees and priority fees; and
+- proceeds equal `filled_quantity * effective_price` less the absolute
+  quote-denominated fees and priority fees supplied by `accounting_context`;
+  and
 - when quantity reaches zero, total cost basis is exactly zero and average cost
   is `null`.
 
@@ -334,7 +367,34 @@ T03 does not create quote-currency cash balances. Fees and proceeds are
 reported in their declared units and remain accounting observations until a
 future approved ledger/cash-state contract defines ownership.
 
-## 10. Cost-basis and rounding policy
+## 10. Fee and accounting semantics
+
+The approved T02 contract exposes `FrictionComponents.fees` and
+`FrictionComponents.priority_fees`, but does not define either field as an
+absolute monetary amount, percentage, basis-point rate, or other accounting
+representation. T03 MUST NOT reinterpret either field.
+
+T03 accounting uses only the explicit `accounting_context` input. Its
+`fee_amount` and `priority_fee_amount` are absolute amounts in the declared
+`fee_unit`, apply to the actual `filled_quantity` only, and must be
+independently identified, digestible, point-in-time, and provenance-preserving.
+The fee unit must equal the position's `cost_basis_unit` and the outcome's
+`fee_unit`; no currency conversion is performed.
+
+For BUY, the accounting cost is:
+
+`filled_quantity * effective_price + fee_amount + priority_fee_amount`
+
+For SELL, the accounting proceeds effect is:
+
+`filled_quantity * effective_price - fee_amount - priority_fee_amount`
+
+These are bounded paper accounting observations only. T03 does not create a
+cash balance or settle fees. Unknown, unavailable, stale, future, or
+contradictory accounting context produces `UNAVAILABLE` or `INVALID`, never a
+zero-fee substitute.
+
+## 11. Cost-basis and rounding policy
 
 All quantity, price, fee, proceeds, cost-basis, and exposure values use finite
 `Decimal` values. Binary floating-point values, NaN, infinity, implicit
@@ -365,19 +425,24 @@ The required order is:
 Changing units, formulas, cost-basis method, rounding, or calculation order
 requires a new contract version and explicit approval.
 
-## 11. Exposure derivation
+## 12. Valuation context and exposure derivation
 
-Exposure is derived from the resulting paper positions and explicitly supplied
-valuation context already present in the accepted P07 input/outcome boundary.
-T03 may not fetch or refresh prices.
+Exposure is derived from the resulting paper positions and the explicit
+`valuation_context` T03 input. The observations originate from an approved
+provider-neutral market/valuation boundary outside T03. They are supplied by
+identity and digest, not fetched or refreshed by T03.
 
 For a position with known quantity and known applicable valuation price:
 
 `notional = quantity * valuation_price`
 
-The result preserves the valuation price, price unit, timestamp, source
-identity, and digest. Valuation timestamps must be no later than the
-transition reference time and must satisfy the approved freshness policy.
+The applicable observation must match `target_asset_identity` exactly and
+preserve its valuation price, price unit, observation ID/digest, availability
+time, timestamp, source contract version, and provenance. Valuation timestamps
+must be no later than the transition reference time and must satisfy the
+versioned freshness requirement supplied by the approved valuation policy.
+T03 does not invent a freshness duration; an absent or unsupported freshness
+policy is `UNAVAILABLE`.
 
 If valuation is UNKNOWN or unavailable:
 
@@ -395,7 +460,21 @@ permissive exposure.
 Exposure does not evaluate limits, correlations, concentration, theme risk,
 capital permission, or risk approval. Those remain outside T03.
 
-## 12. Temporal and stale-data rules
+## 13. Paper position and exposure state quality
+
+The prior state, target position, valuation observations, and accounting
+context must each retain quality, identity, timestamp, and provenance. An
+applied transition may produce a known quantity with UNKNOWN notional when
+valuation alone is UNKNOWN. It may not produce an applied transition when the
+target identity, quantity, cost basis, or accounting amount needed for the
+transition is UNKNOWN.
+
+The next state's `as_of_time` is exactly `transition_reference_time`; it is
+never taken from the local clock or silently advanced beyond the supplied
+boundary. The next exposure is derived from the same state transition and
+valuation context, without hidden state.
+
+## 14. Temporal and stale-data rules
 
 `transition_reference_time` is the single as-of boundary for the transition.
 The following must hold:
@@ -407,6 +486,7 @@ The following must hold:
   must not be silently moved forward;
 - valuation observations used for exposure are available by the reference
   time;
+- accounting observations used for fees are available by the reference time;
 - no required value is future relative to the reference time;
 - no required value is outside the approved freshness window;
 - timestamp equality is permitted; and
@@ -416,7 +496,7 @@ Stale, future, unavailable, or contradictory state/outcome/valuation material
 produces an explicit non-success result. T03 does not backfill, truncate,
 refresh, or choose the newest conflicting value.
 
-## 13. Failure, contradiction, and UNKNOWN semantics
+## 15. Failure, contradiction, and UNKNOWN semantics
 
 Validation must reject or return a typed deterministic non-success result for:
 
@@ -431,6 +511,10 @@ Validation must reject or return a typed deterministic non-success result for:
 - SELL inventory insufficiency;
 - UNKNOWN required quantity, cost basis, or identity;
 - unavailable effective price or required fee information;
+- missing, unsupported, ambiguous, stale, future, or contradictory
+  asset-identity linkage;
+- missing, unsupported, stale, future, or contradictory valuation context;
+- missing, unsupported, stale, future, or contradictory accounting context;
 - unbounded or unsupported provenance; and
 - any arithmetic or conservation violation.
 
@@ -443,7 +527,7 @@ UNKNOWN remains a first-class state. T03 must preserve UNKNOWN reason codes,
 source identity, timestamp, and digest. It must never convert UNKNOWN to
 PASS, zero, a valid position, a known exposure, or an applied transition.
 
-## 14. Provenance and replay
+## 16. Provenance and replay
 
 Every result must preserve enough immutable provenance to reproduce the
 transition, including:
@@ -455,6 +539,8 @@ transition, including:
 - replay ID;
 - simulation and transition reference times;
 - valuation evidence identity and digest, where applicable;
+- target asset-identity linkage;
+- accounting context identity, fee amounts, units, and digest;
 - state and exposure derivation versions; and
 - canonical transition representation and digest.
 
@@ -466,7 +552,7 @@ No hidden mutable state, process order, local timezone, wall clock, random
 value, network retry, provider response, filesystem state, database state, or
 external service may affect the deterministic result.
 
-## 15. Canonical representation and digest
+## 17. Canonical representation and digest
 
 Canonicalization must follow the established P07 conventions:
 
@@ -491,7 +577,7 @@ digest. Equivalent canonical values must have equal digests. The supplied
 digest, if any, must be verified after canonicalization and cannot be treated
 as authoritative when it disagrees.
 
-## 16. Authority boundaries and forbidden ownership
+## 18. Authority boundaries and forbidden ownership
 
 P07-T03 MUST NOT:
 
@@ -510,14 +596,14 @@ P07-T03 MUST NOT:
 A successful transition is hypothetical state evidence only. It cannot bypass
 the Risk Governor, authorize a later transition, or establish live-readiness.
 
-## 17. Proposed implementation boundary
+## 19. Proposed implementation boundary
 
 The following files are proposed only and MUST NOT be created by this
 specification task:
 
 | File | Proposed responsibility |
 |---|---|
-| `core/execution/paper_position_exposure_state.py` | Immutable position, exposure, state, effect, and transition contracts |
+| `core/execution/paper_position_exposure_state.py` | Immutable position, exposure, explicit valuation/accounting context, effect, and transition contracts |
 | `core/execution/__init__.py` | Export only the explicitly approved T03 contract and version |
 | `tests/test_paper_position_exposure_state.py` | Focused transition, accounting, canonicalization, and fail-closed tests |
 
@@ -525,7 +611,7 @@ No ledger, reconciliation, persistence, database, migration, workflow,
 provider, network, RPC, DEX, wallet, signing, broadcast, P08, P09, or other
 implementation file is proposed.
 
-## 18. Focused verification requirements
+## 20. Focused verification requirements
 
 Tests may be created only after explicit implementation authorization. The
 focused suite must verify:
@@ -552,11 +638,15 @@ focused suite must verify:
 19. no wall-clock dependency or external I/O; and
 20. absence of ledger, reconciliation, authorization, wallet, provider, RPC,
     DEX, signing, broadcast, and live-execution behavior.
+21. explicit target asset identity rather than symbol/display-name matching;
+22. explicit valuation observations, freshness, and UNKNOWN notional;
+23. absolute fee accounting context without reinterpretation of T02 friction
+    fields.
 
 Verification must remain targeted to the explicitly approved T03
 implementation boundary.
 
-## 19. Entry criteria and authorization gate
+## 21. Entry criteria and authorization gate
 
 Implementation may begin only after all of the following are separately
 accepted:
@@ -573,9 +663,9 @@ accepted:
   implementation authorization.
 
 This specification does not authorize implementation. In particular, the
-proposed files in Section 17 MUST remain absent until that gate is satisfied.
+proposed files in Section 19 MUST remain absent until that gate is satisfied.
 
-## 20. Audit record
+## 22. Audit record
 
 The specification was internally audited against:
 
@@ -586,6 +676,9 @@ The specification was internally audited against:
 - P07-T02: only accepted immutable fill outcomes are consumed, T02 quantity
   conservation and friction/accounting inputs are preserved, and T02 remains
   free of position mutation;
+- boundary repair: T02 lacks asset identity, valuation context, and explicit
+  fee semantics, so T03 now requires each as an explicit input rather than
+  modifying or reinterpreting T02;
 - Risk / Capital Authorization: no authority is created, evaluated, renewed,
   or overridden;
 - P08/P09: no learning or live execution ownership is introduced;
@@ -594,12 +687,13 @@ The specification was internally audited against:
 - ledger/reconciliation boundaries: no persistence, append/journal semantics,
   external truth, or disagreement resolution is assigned to T03.
 
-Audit result: **PASS**. No unresolved scope, authority, quantity, accounting,
-exposure, provenance, or determinism ambiguity remains in this specification.
+Audit result: **PASS**. The three previously identified contract gaps are
+explicitly represented as T03 input dependencies. No T02 modification or
+implicit fee, asset, or valuation inference is required.
 
-## Governance conclusion
+## 23. Governance conclusion
 
-P07-T03 specification: **COMPLETE / AUDITED PASS**.  
+P07-T03 specification: **CORRECTED / COMPLETE / AUDITED PASS**.
 P07-T03 implementation: **NOT AUTHORIZED**.
 
 The next recommended step is an explicit human/architecture review of this
