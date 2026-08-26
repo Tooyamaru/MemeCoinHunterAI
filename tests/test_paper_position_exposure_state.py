@@ -1,6 +1,6 @@
 from dataclasses import FrozenInstanceError, replace
 from datetime import timedelta
-from decimal import Decimal
+from decimal import Decimal, ROUND_CEILING, ROUND_DOWN, localcontext
 
 import pytest
 
@@ -170,8 +170,58 @@ def test_insufficient_and_unknown_inventory_fail_closed():
 def test_unknown_valuation_is_preserved_without_zero_substitution():
     valuation = _valuation(ValuationStatus.UNKNOWN)
     result = _transition(_evaluate(), valuation=valuation)
-    assert result.transition_status is TransitionStatus.UNAVAILABLE
-    assert result.next_state is None
+    assert result.transition_status is TransitionStatus.APPLIED
+    assert result.next_state is not None
+    assert result.next_state.positions[0].quantity == Decimal("20")
+    affected = result.next_state.exposure.asset_exposures[0]
+    assert affected.valuation_status is ValuationStatus.UNKNOWN
+    assert affected.valuation_price is None
+    assert affected.notional is None
+    assert result.next_state.exposure.gross_notional_exposure is None
+    assert result.next_state.exposure.valuation_status is ValuationStatus.UNKNOWN
+
+
+def test_average_cost_is_explicitly_rounded_and_context_independent():
+    outcome = _evaluate(
+        requested_quantity=Decimal("2"),
+        executable_liquidity=Decimal("2"),
+        reference_quote_price=Decimal("99.66"),
+    )
+    with localcontext() as context:
+        context.rounding = ROUND_DOWN
+        down = _transition(outcome).next_state.positions[0].average_cost
+    with localcontext() as context:
+        context.rounding = ROUND_CEILING
+        ceiling = _transition(outcome).next_state.positions[0].average_cost
+    assert down == ceiling == Decimal("25.104166666666666667")
+    assert abs(down.as_tuple().exponent) <= 18
+
+
+def test_exposure_constructors_reject_contradictory_valuation_and_aggregates():
+    with pytest.raises(ValueError, match="non-PASS exposure"):
+        PaperExposureAsset(
+            ASSET, Decimal("10"), Decimal("10"), "QUOTE_PER_TOKEN",
+            None, REFERENCE, ValuationStatus.UNKNOWN,
+            "valuation-1", "a" * 64,
+        )
+
+    known = _exposure(_position(), _valuation()).asset_exposures[0]
+    with pytest.raises(ValueError, match="notional"):
+        PaperExposureAsset(
+            ASSET, Decimal("10"), Decimal("10"), "QUOTE_PER_TOKEN",
+            Decimal("101"), REFERENCE, ValuationStatus.PASS,
+            "valuation-1", "a" * 64,
+        )
+    with pytest.raises(ValueError, match="gross_quantity"):
+        PaperExposureState(
+            PORTFOLIO, (known,), Decimal("11"), Decimal("100"),
+            ValuationStatus.PASS, {"source": "fixture"},
+        )
+    with pytest.raises(ValueError, match="gross_notional"):
+        PaperExposureState(
+            PORTFOLIO, (known,), Decimal("10"), Decimal("101"),
+            ValuationStatus.PASS, {"source": "fixture"},
+        )
 
 
 def test_stale_valuation_and_asset_mismatch_are_rejected():
@@ -196,3 +246,12 @@ def test_state_and_result_are_immutable_and_replay_stable():
         first.transition_status = TransitionStatus.INVALID
     with pytest.raises(TypeError):
         first.next_state.positions[0].position_provenance["x"] = "y"
+
+
+def test_no_change_exposure_effect_uses_exposure_state_type():
+    result = _transition(_non_success(FillOutcomeStatus.FAILED))
+    assert result.transition_status is TransitionStatus.NO_CHANGE
+    assert isinstance(result.exposure_effect.prior_exposure, PaperExposureState)
+    assert isinstance(result.exposure_effect.next_exposure, PaperExposureState)
+    assert result.exposure_effect.next_exposure == result.prior_state.exposure
+    assert result.canonical_representation["exposure_effect"]

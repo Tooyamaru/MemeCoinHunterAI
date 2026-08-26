@@ -372,6 +372,32 @@ class PaperExposureState:
             object.__setattr__(self, "gross_notional_exposure", _decimal(self.gross_notional_exposure, "gross_notional_exposure"))
         object.__setattr__(self, "valuation_status", ValuationStatus(self.valuation_status))
         object.__setattr__(self, "exposure_provenance", _mapping(self.exposure_provenance, "exposure_provenance"))
+        quantity_total = _round(sum((item.quantity for item in self.asset_exposures), Decimal("0")))
+        if self.gross_quantity_exposure != quantity_total:
+            raise ValueError("gross_quantity_exposure does not match asset exposures")
+        statuses = {item.valuation_status for item in self.asset_exposures}
+        if ValuationStatus.INVALID in statuses:
+            expected_status = ValuationStatus.INVALID
+            expected_notional = None
+        elif ValuationStatus.UNKNOWN in statuses:
+            expected_status = ValuationStatus.UNKNOWN
+            expected_notional = None
+        else:
+            price_units = {item.price_unit for item in self.asset_exposures}
+            expected_status = (
+                ValuationStatus.PASS
+                if len(price_units) <= 1
+                else ValuationStatus.UNKNOWN
+            )
+            expected_notional = (
+                _round(sum((item.notional for item in self.asset_exposures), Decimal("0")))
+                if expected_status is ValuationStatus.PASS
+                else None
+            )
+        if self.valuation_status is not expected_status:
+            raise ValueError("valuation_status does not match asset exposures")
+        if self.gross_notional_exposure != expected_notional:
+            raise ValueError("gross_notional_exposure does not match asset exposures")
 
     @property
     def canonical_representation(self) -> Mapping[str, Any]:
@@ -487,6 +513,12 @@ class AccountingEffect:
 class ExposureEffect:
     prior_exposure: PaperExposureState
     next_exposure: PaperExposureState | None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.prior_exposure, PaperExposureState):
+            raise ValueError("prior_exposure must be PaperExposureState")
+        if self.next_exposure is not None and not isinstance(self.next_exposure, PaperExposureState):
+            raise ValueError("next_exposure must be PaperExposureState or None")
 
     @property
     def canonical_representation(self) -> Mapping[str, Any]:
@@ -625,8 +657,6 @@ def transition_paper_state(
         )
         if age_seconds >= valuation.max_age_seconds:
             return _result(TransitionStatus.UNAVAILABLE, reference, prior_state, outcome, position, reason=("STALE_VALUATION",))
-    if valuation.valuation_status is not ValuationStatus.PASS:
-        return _result(TransitionStatus.UNAVAILABLE, reference, prior_state, outcome, position, reason=("VALUATION_UNKNOWN",))
     filled = _round(outcome.filled_quantity)
     trade_value = _round(filled * outcome.effective_price)
     fees = _round(accounting_context.fee_amount + accounting_context.priority_fee_amount)
@@ -667,7 +697,11 @@ def _derive_exposure(prior: PaperPositionExposureState, position: PaperPositionS
     assets = []
     for item in prior.positions:
         if item.asset_identity == position.asset_identity:
-            notional = _round(position.quantity * valuation.price)  # type: ignore[operator]
+            notional = (
+                _round(position.quantity * valuation.price)
+                if valuation.valuation_status is ValuationStatus.PASS
+                else None
+            )
             assets.append(PaperExposureAsset(position.asset_identity, position.quantity, valuation.price,
                                              valuation.price_unit, notional, valuation.observed_at,
                                              valuation.valuation_status, valuation.observation_id,
@@ -689,7 +723,7 @@ def _result(status: TransitionStatus, reference: datetime, prior: PaperPositionE
                               position.quantity, None, position.quantity_unit)
     accounting = AccountingEffect(Decimal("0"), Decimal("0"), None, None, None, None, position.cost_basis_unit)
     return PaperStateTransitionResult(status, reference, prior, _outcome_identity(outcome), prior if status is TransitionStatus.NO_CHANGE else None,
-                                      quantity, accounting, ExposureEffect(prior.exposure, prior if status is TransitionStatus.NO_CHANGE else None),
+                                      quantity, accounting, ExposureEffect(prior.exposure, prior.exposure if status is TransitionStatus.NO_CHANGE else None),
                                       reason, {"prior_state_digest": prior.digest, "outcome_digest": outcome.outcome_digest})
 
 
