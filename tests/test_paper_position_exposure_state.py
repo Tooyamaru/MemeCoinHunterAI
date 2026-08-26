@@ -181,6 +181,36 @@ def test_unknown_valuation_is_preserved_without_zero_substitution():
     assert result.next_state.exposure.valuation_status is ValuationStatus.UNKNOWN
 
 
+def test_invalid_valuation_returns_typed_deterministic_non_success():
+    outcome = _evaluate()
+    valuation = _valuation(ValuationStatus.INVALID)
+
+    first = _transition(outcome, valuation=valuation)
+    second = _transition(outcome, valuation=valuation)
+
+    assert first.transition_status is TransitionStatus.INVALID
+    assert first.next_state is None
+    assert first.exposure_effect.next_exposure is None
+    assert first.reason_codes == ("INVALID_VALUATION",)
+    assert first.canonical_representation == second.canonical_representation
+    assert first.digest == second.digest
+
+
+def test_contradictory_non_pass_valuation_returns_invalid_without_exception():
+    valuation = ValuationObservation(
+        ASSET, "valuation-1", REFERENCE - timedelta(seconds=1),
+        REFERENCE - timedelta(milliseconds=500), Decimal("10"),
+        "QUOTE_PER_TOKEN", ValuationStatus.UNKNOWN, "valuation-v1",
+        {"source": "fixture"}, Decimal("300"),
+    )
+
+    result = _transition(_evaluate(), valuation=valuation)
+
+    assert result.transition_status is TransitionStatus.INVALID
+    assert result.next_state is None
+    assert result.reason_codes == ("CONTRADICTORY_VALUATION",)
+
+
 def test_average_cost_is_explicitly_rounded_and_context_independent():
     outcome = _evaluate(
         requested_quantity=Decimal("2"),

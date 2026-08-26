@@ -645,6 +645,12 @@ def transition_paper_state(
     valuation = next((item for item in valuation_context.observations if item.asset_identity == target), None)
     if valuation is None:
         return _result(TransitionStatus.UNAVAILABLE, reference, prior_state, outcome, position, reason=("VALUATION_UNKNOWN",))
+    if valuation.valuation_status is ValuationStatus.INVALID:
+        return _result(TransitionStatus.INVALID, reference, prior_state, outcome, position,
+                       reason=("INVALID_VALUATION",))
+    if valuation.valuation_status is not ValuationStatus.PASS and valuation.price is not None:
+        return _result(TransitionStatus.INVALID, reference, prior_state, outcome, position,
+                       reason=("CONTRADICTORY_VALUATION",))
     if valuation.availability_time > reference or valuation.observed_at > reference:
         return _result(TransitionStatus.REJECTED, reference, prior_state, outcome, position, reason=("FUTURE_VALUATION",))
     if valuation.max_age_seconds is None and valuation.valuation_status is ValuationStatus.PASS:
