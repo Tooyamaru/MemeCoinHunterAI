@@ -1,10 +1,10 @@
 # P07-T03 — Paper Position / Exposure State Transition Contract
 
-**Status:** SPECIFICATION CORRECTED — AUDITED PASS — IMPLEMENTATION NOT
-AUTHORIZED  
-**Phase:** P07 — Paper Trading Engine  
-**Task:** P07-T03 — Paper Position / Exposure State Transition Contract  
-**Contract:** `p07-t03-v1`  
+**Status:** SPECIFICATION COMPLETE / AUDITED PASS — IMPLEMENTATION COMPLETE /
+AUDITED PASS
+**Phase:** P07 — Paper Trading Engine
+**Task:** P07-T03 — Paper Position / Exposure State Transition Contract
+**Contract:** `p07-t03-v1`
 **Nature:** Immutable, provider-neutral, deterministic paper-state transition
 only
 
@@ -691,14 +691,28 @@ Audit result: **PASS**. The three previously identified contract gaps are
 explicitly represented as T03 input dependencies. No T02 modification or
 implicit fee, asset, or valuation inference is required.
 
+Final closure audit result: **PASS**. FIX #4 returns typed deterministic
+non-success results for INVALID or contradictory valuation observations.
+FIX #5 validates the supported T02 model versions and rejects inconsistent
+position/exposure identity sets. Focused T03 tests, T02 regression tests, the
+full suite, diff checks, T02 integrity, and forbidden-scope checks all passed.
+
 ## 23. Governance conclusion
 
-P07-T03 specification: **CORRECTED / COMPLETE / AUDITED PASS**.
-P07-T03 implementation: **NOT AUTHORIZED**.
+P07-T03 specification: **COMPLETE / AUDITED PASS**.
+P07-T03 implementation: **COMPLETE / AUDITED PASS**.
+P07-T03 focused tests: **PASS**.
+P07-T02 regression: **PASS**.
+Full suite: **PASS**.
+Diff check: **PASS**.
+Forbidden scope: **PASS**.
+P07-T02: **UNTOUCHED**.
+FIX #4: **RESOLVED**.
+FIX #5: **RESOLVED**.
+P07-T03: **CLOSED**.
 
-The next recommended step is an explicit human/architecture review of this
-document. Only after approval may a separate implementation task authorize the
-three proposed files and their focused tests. No implementation, test,
-dependency, persistence, ledger, reconciliation, provider, wallet, RPC, DEX,
-signing, broadcast, P08, P09, or live-execution work is authorized by this
-document.
+P07-T04 is the next separately governed task candidate. No P07-T04
+implementation is started or authorized by this closure. No implementation,
+test, dependency, persistence, ledger, reconciliation, provider, wallet, RPC,
+DEX, signing, broadcast, P08, P09, or live-execution work outside the
+completed T03 boundary is authorized by this document.

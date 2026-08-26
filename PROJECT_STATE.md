@@ -8,9 +8,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P07 — Paper Trading Engine
-- **Current task:** P07-T01 — Paper Simulation Input / Execution Context Contract
-- **Current task status:** SPECIFICATION PREPARED FOR AUDIT — IMPLEMENTATION NOT AUTHORIZED
-- **Last updated:** 2026-08-21
+- **Current task:** P07-T03 — Paper Position / Exposure State Transition Contract
+- **Current task status:** COMPLETE / CLOSED / AUDITED PASS
+- **Last updated:** 2026-08-26
 
 ## Master progress
 
@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION VERIFIED; P06 runtime and P07–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION VERIFIED; P07-T02 COMPLETE / CLOSED / AUDITED PASS; P07-T03 COMPLETE / CLOSED / AUDITED PASS; P06 runtime, P07-T04+, and P08–P12 not started
 
 ## Phase status
 
@@ -27,11 +27,12 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P06 runtime; P07 implementation; P08–P12
+- **Not started:** P06 runtime; P07-T04+; P08–P12
 
 ## Current objective
 
-P07 architecture review has passed. P07-T01 defines the immutable,
+P07 architecture review has passed. P07-T03 is COMPLETE / CLOSED / AUDITED
+PASS, including FIX #4 and FIX #5. P07-T01 defines the immutable,
 provider-neutral, reproducible paper-simulation input boundary after P06 and
 independent Risk / Capital Authorization. It grants no live execution, wallet,
 signing, broadcast, RPC, DEX, provider, persistence, or P08/P09 authority.
@@ -56,7 +57,7 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-P06-T02 final boundary verification completed on 2026-08-21.
+P07-T03 final boundary verification completed on 2026-08-26.
 P06-T01 and P06-T02 are COMPLETE / CLOSED / AUDITED PASS. P06-T03 is COMPLETE /
 CLOSED and does not alter T02 authority. P05-T06, P05-T07,
 and P05-T08 remain COMPLETE / CLOSED / AUDITED PASS after the evidence-first
@@ -166,10 +167,8 @@ functionality was introduced.
 ## Next action
 
 P07-T02 implementation and final audit are COMPLETE / CLOSED / AUDITED PASS.
-
-No P07-T03 implementation is authorized yet. Any P07-T03 work requires its own
-specification, audit, and explicit implementation authorization before code is
-created.
+P07-T03 implementation and final audit are COMPLETE / CLOSED / AUDITED PASS.
+FIX #4 and FIX #5 are resolved. P07-T04 has not been started.
 
 ## Next task
 
@@ -194,6 +193,13 @@ Focused P07-T02 tests: 19 passed.
 Full project test suite: 574 passed with 1 non-blocking dependency warning.
 Direct negative-latency contract probes: all passed.
 `git diff --check`: passed.
+
+P07-T03 specification, implementation, and final governance audit are
+COMPLETE / CLOSED / AUDITED PASS. P07-T03 focused tests: 18 passed; P07-T02
+regression: 19 passed; full project test suite: 592 passed with one
+non-blocking dependency warning; `git diff --check`: passed. FIX #4 and FIX #5
+are resolved. P07-T02 remains untouched, no forbidden scope was added, and
+P07-T04 has not started.
 
 No position, exposure, ledger, reconciliation, provider, network, wallet,
 signing, broadcast, live execution, P08, or P09 work is authorized.
