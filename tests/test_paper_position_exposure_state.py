@@ -148,6 +148,17 @@ def test_non_success_outcomes_do_not_mutate_state(status, expected):
         assert result.next_state is None
 
 
+@pytest.mark.parametrize("field", ["fill_model_version", "friction_model_version"])
+def test_unsupported_t02_model_version_returns_invalid_result(field):
+    outcome = replace(_evaluate(), **{field: "unsupported-v2", "outcome_digest": None})
+
+    result = _transition(outcome)
+
+    assert result.transition_status is TransitionStatus.INVALID
+    assert result.next_state is None
+    assert result.reason_codes == ("UNSUPPORTED_T02_VERSION",)
+
+
 def test_insufficient_and_unknown_inventory_fail_closed():
     insufficient = _transition(
         _evaluate(side=TradeSide.SELL, available_inventory=Decimal("10"),
@@ -251,6 +262,25 @@ def test_exposure_constructors_reject_contradictory_valuation_and_aggregates():
         PaperExposureState(
             PORTFOLIO, (known,), Decimal("10"), Decimal("101"),
             ValuationStatus.PASS, {"source": "fixture"},
+        )
+
+
+def test_state_constructor_rejects_positions_and_exposures_with_different_identities():
+    other_asset = {"chain": "solana", "mint": "mint-2"}
+    other_exposure_asset = PaperExposureAsset(
+        other_asset, Decimal("10"), Decimal("10"), "QUOTE_PER_TOKEN",
+        Decimal("100"), REFERENCE, ValuationStatus.PASS,
+        "valuation-2", "b" * 64,
+    )
+    other_exposure = PaperExposureState(
+        PORTFOLIO, (other_exposure_asset,), Decimal("10"), Decimal("100"),
+        ValuationStatus.PASS, {"source": "fixture"},
+    )
+
+    with pytest.raises(ValueError, match="positions and asset_exposures"):
+        PaperPositionExposureState(
+            "state-1", "state-v1", PORTFOLIO, (_position(),),
+            other_exposure, REFERENCE, StateQuality.PASS, {"source": "fixture"},
         )
 
 

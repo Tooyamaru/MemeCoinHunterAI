@@ -14,6 +14,8 @@ from typing import Any, Mapping, Sequence
 from core.execution.paper_fill_outcome import (
     FillOutcomeStatus,
     PaperFillOutcome,
+    P07_T02_FILL_MODEL_VERSION,
+    P07_T02_FRICTION_MODEL_VERSION,
     TradeSide,
 )
 
@@ -435,6 +437,10 @@ class PaperPositionExposureState:
             raise ValueError("exposure must be PaperExposureState")
         if self.exposure.portfolio_scope != self.portfolio_scope:
             raise ValueError("exposure portfolio scope mismatch")
+        position_identities = {_digest(item.asset_identity) for item in self.positions}
+        exposure_identities = {_digest(item.asset_identity) for item in self.exposure.asset_exposures}
+        if position_identities != exposure_identities:
+            raise ValueError("positions and asset_exposures must match")
         object.__setattr__(self, "as_of_time", _utc(self.as_of_time, "as_of_time"))
         object.__setattr__(self, "state_quality", StateQuality(self.state_quality))
         object.__setattr__(self, "state_provenance", _mapping(self.state_provenance, "state_provenance"))
@@ -612,6 +618,12 @@ def transition_paper_state(
         raise ValueError("target asset identity must match exactly one position")
     if not isinstance(valuation_context, ValuationContext) or not isinstance(accounting_context, AccountingContext):
         raise TypeError("valuation_context and accounting_context have invalid types")
+    if (
+        outcome.fill_model_version != P07_T02_FILL_MODEL_VERSION
+        or outcome.friction_model_version != P07_T02_FRICTION_MODEL_VERSION
+    ):
+        return _result(TransitionStatus.INVALID, reference, prior_state, outcome, position,
+                       reason=("UNSUPPORTED_T02_VERSION",))
     if prior_state.as_of_time > reference:
         raise ValueError("prior state is future relative to transition reference time")
     if outcome.quote_observation_time and _utc(outcome.quote_observation_time, "quote_observation_time") > reference:
