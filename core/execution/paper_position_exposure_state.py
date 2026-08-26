@@ -66,8 +66,18 @@ def _round(value: Decimal) -> Decimal:
 
 def _average_cost(total_cost: Decimal, quantity: Decimal) -> Decimal:
     with localcontext() as context:
-        context.prec = MAX_DECIMAL_PLACES * 2
-        return total_cost / quantity
+        context.prec = max(
+            MAX_DECIMAL_PLACES * 4,
+            len(total_cost.as_tuple().digits)
+            + len(quantity.as_tuple().digits)
+            + MAX_DECIMAL_PLACES
+            + 4,
+        )
+        context.rounding = ROUND_HALF_EVEN
+        return (total_cost / quantity).quantize(
+            QUANT,
+            rounding=ROUND_HALF_EVEN,
+        )
 
 
 def _decimal_text(value: Decimal | None) -> str | None:
@@ -275,7 +285,11 @@ class PaperPositionState:
         if self.quantity == 0:
             if self.total_cost_basis != 0 or self.average_cost is not None:
                 raise ValueError("zero position must have zero cost and null average_cost")
-        elif self.average_cost is None or _round(self.average_cost * self.quantity) != _round(self.total_cost_basis):
+        elif (
+            self.average_cost is None
+            or self.average_cost != _round(self.average_cost)
+            or self.average_cost != _average_cost(self.total_cost_basis, self.quantity)
+        ):
             raise ValueError("average_cost does not match total_cost_basis")
         try:
             object.__setattr__(self, "position_quality", StateQuality(self.position_quality))
@@ -314,6 +328,13 @@ class PaperExposureAsset:
         if self.valuation_timestamp is not None:
             object.__setattr__(self, "valuation_timestamp", _utc(self.valuation_timestamp, "valuation_timestamp"))
         object.__setattr__(self, "valuation_status", ValuationStatus(self.valuation_status))
+        if self.valuation_status is ValuationStatus.PASS:
+            if self.valuation_price is None or self.notional is None:
+                raise ValueError("PASS exposure requires price and notional")
+            if self.notional != _round(self.quantity * self.valuation_price):
+                raise ValueError("notional does not match quantity and valuation price")
+        elif self.valuation_price is not None or self.notional is not None:
+            raise ValueError("non-PASS exposure must not contain price or notional")
         if self.source_identity is not None:
             _text(self.source_identity, "source_identity")
         if self.source_digest is not None:
