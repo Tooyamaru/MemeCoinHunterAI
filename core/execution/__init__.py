@@ -69,3 +69,7 @@ __all__ = [
     "materialize_paper_state_transition",
     "transition_paper_state",
 ]
+from .paper_simulation_result import (
+    P07_T06_CONTRACT_VERSION,
+    PaperSimulationResult,
+)
