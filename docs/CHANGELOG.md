@@ -1,3 +1,17 @@
+## 2026-08-27 — P08-T02 Boundary Discovery
+
+- **PHASE:** P08 — Outcome Learning
+- **TASK:** P08-T02 — Outcome Learning Dataset Snapshot Boundary
+- **CHANGE:** Defined the evidence-first T02 specification candidate as an
+  immutable, deterministic, point-in-time snapshot of validated P08-T01
+  observations. The proposal includes duplicate rejection, future-data
+  protection, complete provenance, and fail-closed behavior while deferring
+  outcome interpretation, metrics, aggregation, model changes, and all
+  external or execution behavior.
+- **GOVERNANCE:** Specification only; P08-T02 runtime implementation remains
+  unauthorized pending explicit approval of the field-level contract and bias
+  controls.
+
 ## 2026-08-27
 
 - **PHASE:** P08 — Outcome Learning
