@@ -7,9 +7,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** P07 — Paper Trading Engine
-- **Current task:** P07-T07 — Paper Simulation Result History Boundary
-- **Current task status:** IN PROGRESS
+- **Current phase:** P08 — Outcome Learning
+- **Current task:** P08 Next-Boundary Governance Proposal
+- **Current task status:** PROPOSAL ONLY / NOT AUTHORIZED FOR IMPLEMENTATION
 - **Last updated:** 2026-08-27
 
 ## Master progress
@@ -19,20 +19,20 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION VERIFIED; P07-T02 COMPLETE / CLOSED / AUDITED PASS; P07-T03 COMPLETE / CLOSED / AUDITED PASS; P07-T04 COMPLETE / CLOSED / AUDITED PASS; P07-T05 COMPLETE / CLOSED / AUDITED PASS; P07-T06 COMPLETE / CLOSED / AUDITED PASS; P07-T07 IN PROGRESS; P06 runtime and P08–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P06 runtime and P08 implementation/P09–P12 not started
 
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** P07-T07 — Paper Simulation Result History Boundary
+- **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P06 runtime; P07-T07 implementation; P08–P12
+- **Not started:** P06 runtime; P08 implementation; P09–P12
 
 ## Current objective
 
-P07 architecture review has passed. P07-T01, P07-T02, P07-T03, P07-T04, and
-P07-T05 are COMPLETE / CLOSED / AUDITED PASS.
+P07 architecture review has passed, and P07-T01 through P07-T07 are COMPLETE /
+CLOSED / AUDITED PASS. P07 is now COMPLETE / CLOSED / AUDITED PASS.
 
 P07-T05 is the deterministic, immutable, provider-neutral paper reconciliation
 boundary. It compares only explicitly supplied immutable P07-T04 ledger
@@ -47,10 +47,10 @@ uses canonical deterministic representations and SHA-256 digests, and has no
 wall-clock, provider, network, persistence, wallet, signing, broadcast, or
 external-authority dependency.
 
-P07-T06 is COMPLETE / CLOSED / AUDITED PASS as the immutable paper-simulation
-result contract. P07-T07 is the current bounded implementation task for the
-deterministic local history of validated T06 results. No P08 or P09 work is
-authorized.
+P07-T06 is the immutable paper-simulation result contract and P07-T07 is the
+deterministic local history boundary for validated T06 results. No P07-T08
+exists or is required. P08 is the next governed phase and remains proposal-only
+until its own boundary is reviewed and explicitly authorized.
 
 P06-T02 is COMPLETE / CLOSED / AUDITED PASS as the deterministic evaluation
 boundary, and P06-T03 is COMPLETE / CLOSED as an optional non-authoritative
@@ -72,31 +72,31 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-P07-T05 verification completed on 2026-08-27 against the current repository
+P07-T07 verification completed on 2026-08-27 against the current repository
 state.
 
-P07-T05 focused tests: 15 passed.
-Full project test suite: 626 passed with one existing non-blocking
+P07-T07 focused tests: 13 passed.
+Full project test suite: 639 passed with one existing non-blocking
 Starlette/httpx deprecation warning.
 Python version: 3.13.11.
 `git diff --check`: PASS.
 
-P07-T05 implementation is present in:
-`core/execution/paper_reconciliation.py`
+P07-T07 implementation is present in:
+`core/execution/paper_simulation_result_history.py`
 and
-`tests/test_paper_reconciliation.py`.
+`tests/test_paper_simulation_result_history.py`.
 
-The recovered P07-T05 specification is:
-`docs/P07-T05-SPECIFICATION.md`.
+The P07-T07 specification is:
+`docs/P07-T07-SPECIFICATION.md`.
 
 The implementation remains deterministic, immutable, provider-neutral,
 simulation-only, provenance-preserving, and fail-closed. No live execution,
 wallet, signing, broadcast, RPC, DEX, provider, network, persistence,
 external-authority reconciliation, P08, or P09 functionality was introduced.
 
-P07-T01 through P07-T07 are now recorded as COMPLETE / CLOSED / AUDITED PASS.
-P07-T06 is COMPLETE / CLOSED / AUDITED PASS, and P07-T07 is COMPLETE / CLOSED
-/ AUDITED PASS.
+P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
+P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
+exists.
 P06-T01 and P06-T02 are COMPLETE / CLOSED / AUDITED PASS. P06-T03 is COMPLETE /
 CLOSED and does not alter T02 authority. P05-T06, P05-T07,
 and P05-T08 remain COMPLETE / CLOSED / AUDITED PASS after the evidence-first
@@ -206,29 +206,21 @@ functionality was introduced.
 
 ## Next action
 
-P07-T01 through P07-T07 implementation and final audits are COMPLETE / CLOSED /
-AUDITED PASS. P07 remains simulation-only and no P08 or P09 work is authorized.
+P07-T01 through P07-T07 implementation and verification are COMPLETE / CLOSED /
+AUDITED PASS. P07 remains simulation-only and has no live execution authority.
+No P07-T08 exists or is required.
+
+Prepare and review the P08 Outcome Learning boundary proposal. P08 runtime,
+learning workers, model training, model promotion, and strategy modification
+remain NOT AUTHORIZED.
 
 ## Next task
 
-P07-T07 specification and implementation are COMPLETE / CLOSED / AUDITED PASS.
-
-P07-T07 is limited to deterministic local history of explicitly supplied,
-immutable P07-T06 paper simulation results. It does not fetch or establish
-external truth and has no live execution, wallet, signing, broadcast, RPC, DEX,
-provider, network, persistence, authorization, capital, settlement, AI/LLM,
-ranking, optimization, P08, or P09 authority.
-
-P07-T07 verification:
-- focused tests: 13 passed;
-- full project suite: 639 passed;
-- `git diff --check`: PASS;
-- Python: 3.13.11;
-- one existing non-blocking Starlette/httpx deprecation warning.
-
-P07-T07 is COMPLETE / CLOSED / AUDITED PASS. The next P07 task requires a
-separate specification and explicit authorization. No P08 or P09 work is
-authorized yet.
+P08 is the next governed phase: read-only outcome and performance learning from
+immutable P06/P07 decision and paper-outcome records. Its boundary requires
+separate architecture review, field-level contract approval, bias/future-data
+controls, verification criteria, and explicit implementation authorization.
+Until then, the P08 proposal is documentation only.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

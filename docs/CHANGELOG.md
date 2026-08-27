@@ -1,3 +1,18 @@
+## 2026-08-27 — P07 Complete / Closed / Audited PASS
+
+- P07-T01 through P07-T07 are COMPLETE / CLOSED / AUDITED PASS.
+- P07 exit criteria are satisfied: the field-level contracts are versioned,
+  deterministic replay and friction/failure semantics are covered, paper state,
+  exposure, reconciliation, ledger provenance, and result history are complete,
+  fail-closed and authority-separation behavior is verified, and no forbidden
+  live capability or integration exists.
+- No P07-T08 task or specification exists or is required.
+- The next governed phase is P08 Outcome Learning. Added
+  `docs/P08-NEXT-BOUNDARY-PROPOSAL.md` as proposal-only governance
+  documentation; no P08 runtime or implementation authorization was added.
+- P07 remains simulation-only. No live execution, wallet, signing, broadcast,
+  RPC, DEX, Jupiter, Jito, provider, network, or real-money behavior was added.
+
 ## 2026-08-27 — P07-T04 Complete / Closed / Audited PASS
 
 - P07-T04 Paper Ledger / Append-Only Simulation Record Contract is COMPLETE /
