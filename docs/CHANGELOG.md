@@ -73,6 +73,16 @@
   provider, network, wallet, signing, broadcast, live execution, P08, or P09
   behavior is authorized.
 
+## 2026-08-27
+
+- P07-T07 COMPLETE / CLOSED / AUDITED PASS: deterministic in-memory history
+  boundary for validated P07-T06 paper simulation results.
+- Added duplicate handling, canonical ordering, SHA-256 history linkage, and
+  fail-closed validation for invalid, unsupported, non-canonical, and tampered
+  results. No P08/P09 or live execution behavior was added.
+- Verification: 13 focused tests and 639 full-suite tests passed; Python 3.13.11;
+  `git diff --check` passed.
+
 ## 2026-08-21
 
 - P07 architecture gate recorded as PASSED and P07-T01 canonical specification

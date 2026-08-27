@@ -73,3 +73,26 @@ from .paper_simulation_result import (
     P07_T06_CONTRACT_VERSION,
     PaperSimulationResult,
 )
+from .paper_simulation_result_history import (
+    P07_T07_CONTRACT_VERSION,
+    PaperResultHistory,
+    PaperSimulationHistory,
+    PaperSimulationResultHistory,
+    PaperSimulationResultHistoryOutcome,
+    PaperSimulationResultHistoryResult,
+    PaperSimulationResultHistoryResultAlias,
+    PaperSimulationResultHistoryStatus,
+)
+
+__all__ += [
+    "P07_T06_CONTRACT_VERSION",
+    "PaperSimulationResult",
+    "P07_T07_CONTRACT_VERSION",
+    "PaperResultHistory",
+    "PaperSimulationHistory",
+    "PaperSimulationResultHistory",
+    "PaperSimulationResultHistoryOutcome",
+    "PaperSimulationResultHistoryResult",
+    "PaperSimulationResultHistoryResultAlias",
+    "PaperSimulationResultHistoryStatus",
+]

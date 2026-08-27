@@ -1,6 +1,6 @@
 # P07-T06 — Paper Simulation Result / Performance Outcome Contract
 
-**Status:** IMPLEMENTATION AUTHORIZED
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Contract:** `p07-t06-v1`
 
 ## Purpose
@@ -35,4 +35,5 @@ A canonical `PaperSimulationResult` containing:
 - provenance;
 - deterministic digest.
 
-P07-T06 is the final paper-outcome contract before P08.
+P07-T06 is the completed paper-outcome contract consumed by the P07-T07 local
+history boundary before future P08 outcome learning.
