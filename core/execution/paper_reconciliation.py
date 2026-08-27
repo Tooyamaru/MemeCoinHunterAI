@@ -798,7 +798,7 @@ def _validate_future_data(
             if value is None:
                 continue
             try:
-                if _timestamp(value) > reference:
+                if _timestamp_as_datetime(value) > reference:
                     return (
                         ReconciliationStatus.TIMESTAMP_MISMATCH,
                         ("FUTURE_DATA_LEAKAGE",),
@@ -1103,6 +1103,13 @@ def _timestamp(value: Any) -> datetime | str:
             raise ValueError("timestamp must use canonical microseconds")
         return value
     raise ValueError("timestamp must be datetime or canonical UTC text")
+
+
+def _timestamp_as_datetime(value: Any) -> datetime:
+    canonical = _timestamp(value)
+    if isinstance(canonical, datetime):
+        return canonical
+    return datetime.fromisoformat(canonical[:-1] + "+00:00")
 
 
 __all__ = [
