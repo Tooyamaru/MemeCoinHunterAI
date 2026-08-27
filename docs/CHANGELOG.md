@@ -1,3 +1,17 @@
+## 2026-08-27 — P08-T03 Specification Draft
+
+- **PHASE:** P08 — Outcome Learning
+- **TASK:** P08-T03 — Outcome Interpretation Boundary
+- **CHANGE:** Added a reviewable T03 specification draft for the narrowest
+  defensible read-only, per-observation interpretation boundary after the
+  P08-T02 dataset snapshot.
+- **UNRESOLVED:** The outcome taxonomy, evaluation horizon and evidence source,
+  missing-data result behavior, exact output cardinality/fields, and placement
+  of metrics and aggregation still require explicit governance approval.
+- **GOVERNANCE:** P08-T03 runtime remains unauthorized. No runtime code, tests,
+  P07 changes, architecture changes, P08-T04 work, or external capability was
+  added.
+
 ## 2026-08-27 — P08-T03 Boundary Discovery
 
 - **PHASE:** P08 — Outcome Learning
