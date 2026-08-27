@@ -1,3 +1,17 @@
+## 2026-08-27 — P08-T03 Boundary Discovery
+
+- **PHASE:** P08 — Outcome Learning
+- **TASK:** P08-T03 — Outcome Interpretation Boundary Discovery
+- **DETERMINATION:** The repository documents are insufficient to authorize a
+  concrete T03 runtime boundary. The defensible future role is a separately
+  specified read-only interpretation/classification boundary after T02, but the
+  outcome taxonomy, evidence/time horizon, output contract, aggregation
+  placement, and missing-data semantics remain undefined.
+- **GOVERNANCE:** Added `docs/P08-T03-BOUNDARY-DISCOVERY.md` documenting the
+  exact approval gaps, dependencies, deterministic/provenance requirements,
+  entry/exit criteria, and explicit non-scope. No runtime code, tests, P07
+  changes, architecture changes, or later P08 work was added.
+
 ## 2026-08-27 — P08-T02 Complete / Closed / Audited PASS
 
 - **PHASE:** P08 — Outcome Learning
