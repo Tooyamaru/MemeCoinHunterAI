@@ -155,3 +155,27 @@ decision, execution, authorization, AI, or external I/O. P05-T05 is COMPLETE /
 CLOSED / AUDITED PASS as the deterministic, provider-neutral, pure per-candidate
 opportunity pre-score boundary. P05-T06 is COMPLETE / CLOSED / AUDITED PASS. P05 remains deterministic, provider-neutral,
 and fail-closed.
+
+## P06 Architecture Gate
+
+P05-T01 through P05-T08 are complete and closed. The P06 architecture gate is
+IN PROGRESS; no P06 runtime is authorized yet. The approved P06 boundary
+consumes one validated P05-T08 evidence-first opportunity context and produces
+one deterministic, versioned analytical decision intent.
+
+Optional bounded deep analysis, including statistical, classical, bounded ML,
+or narrative/LLM analysis, is non-authoritative and separately versioned. It
+must not invent evidence, overwrite risk state, independently trigger an
+action, or block the deterministic hot path. The deterministic Decision Engine
+remains the decision authority.
+
+P06 preserves all P05 provenance, risk and uncertainty/invalidation context,
+timestamps, contract/evaluator versions, and T05/T06/T07/T08 digests. It may
+emit only an analytical action from the approved vocabulary or `NO_TRADE`;
+confidence is not profit probability and action is not authorization.
+
+P06 does not rank candidates, compare candidate sets, authorize capital, own
+private keys or wallets, sign, broadcast, call RPC/DEX/provider execution
+infrastructure, construct transactions, or submit orders. The separate
+Risk/Capital Authorization, Execution Request, isolated Signing Boundary,
+Broadcast, Reconciliation, and Journal boundaries remain mandatory.
