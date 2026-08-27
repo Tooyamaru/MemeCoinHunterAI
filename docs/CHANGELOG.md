@@ -1,3 +1,17 @@
+## 2026-08-27
+
+- **PHASE:** P08 — Outcome Learning
+- **TASK:** P08-T01 — Immutable Outcome Learning Observation
+- **CHANGE:** Added the first bounded read-only learning contract. It links one
+  validated P06 DecisionIntent, one validated P07 PaperSimulationInput, and one
+  linked P07 PaperSimulationResult into an immutable, deterministic,
+  provider-neutral observation with complete provenance. It performs no outcome
+  interpretation, aggregation, ranking, decision, authorization, execution,
+  model update, or external I/O. P08-T02 was not started.
+- **VERIFICATION:** 6 focused P08-T01 tests, 645 full project tests, and
+  `git diff --check` passed. The full suite reported one existing
+  Starlette/httpx deprecation warning.
+
 ## 2026-08-27 — P07 Complete / Closed / Audited PASS
 
 - P07-T01 through P07-T07 are COMPLETE / CLOSED / AUDITED PASS.

@@ -1,6 +1,6 @@
 # P08 Next-Boundary Governance Proposal
 
-**Status:** PROPOSAL ONLY — NOT AUTHORIZED FOR IMPLEMENTATION
+**Status:** INITIAL BOUNDARY REFINED INTO P08-T01 SPECIFICATION
 **Date:** 2026-08-27
 
 ## Determination
@@ -9,8 +9,9 @@ P07 is COMPLETE / CLOSED / AUDITED PASS. Its implemented chain ends at
 P07-T07, the deterministic local history boundary for validated
 `PaperSimulationResult` values. No P07-T08 task or specification is required.
 
-The next governed phase is P08 — Outcome Learning. This proposal defines the
-candidate boundary only; it does not authorize P08 runtime implementation.
+The next governed phase is P08 — Outcome Learning. This proposal supplied the
+initial boundary; P08-T01 is now separately bounded by
+`docs/P08-T01-SPECIFICATION.md`.
 
 ```text
 P07-T07 PaperSimulationResultHistory
@@ -62,7 +63,8 @@ This proposal does not authorize:
   integrations; or
 - P09 execution or any later phase.
 
-P08 implementation requires a separately approved specification and explicit
-authorization. Until then, preserve the deterministic, immutable,
-provider-neutral P07 contracts and the read-only learning principles already
-documented in `docs/LEARNING_ENGINE.md`.
+P08-T01 implementation is limited to the separately bounded specification and
+does not authorize P08-T02, model training, model promotion, strategy
+modification, execution, or any external integration. Preserve the deterministic,
+immutable, provider-neutral P07 contracts and the read-only learning principles
+already documented in `docs/LEARNING_ENGINE.md`.

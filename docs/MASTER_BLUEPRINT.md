@@ -261,6 +261,11 @@ STOP, PAUSE, or change market.
 - **Exit criteria:** Learning is validated against bias and cannot self-modify production uncontrolled.
 - **Major risks:** Overfitting, look-ahead, regime/survivorship bias, feedback loops.
 - **Deliverables:** Outcome dataset, evaluation reports, controlled model versioning.
+- **Current boundary:** P08-T01 — Immutable Outcome Learning Observation —
+  IMPLEMENTED / PENDING AUDIT. It preserves one validated P06 decision, one
+  validated P07 simulation input, and one linked P07 paper result without
+  interpreting, aggregating, ranking, deciding, authorizing, executing, or
+  modifying any model or strategy. P08-T02 is not started.
 
 ### P09 — DEX / JUPITER EXECUTION
 - **Objective:** Add provider-agnostic controlled execution only after prior validation and explicit go-live approval.
