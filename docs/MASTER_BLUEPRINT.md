@@ -262,11 +262,10 @@ STOP, PAUSE, or change market.
 - **Major risks:** Overfitting, look-ahead, regime/survivorship bias, feedback loops.
 - **Deliverables:** Outcome dataset, evaluation reports, controlled model versioning.
 - **Current boundary:** P08-T02 — Outcome Learning Dataset Snapshot Boundary —
-  SPECIFICATION PROPOSED / IMPLEMENTATION NOT AUTHORIZED. P08-T01 is COMPLETE /
-  CLOSED / AUDITED PASS. The proposed T02 boundary snapshots validated P08-T01
-  observations with a point-in-time cutoff and provenance, without outcome
-  interpretation, aggregation, ranking, decision, authorization, execution, or
-  model/strategy modification.
+  COMPLETE / CLOSED / AUDITED PASS. P08-T01 is COMPLETE / CLOSED / AUDITED PASS.
+  The T02 boundary snapshots validated P08-T01 observations with a point-in-time
+  cutoff and provenance, without outcome interpretation, aggregation, ranking,
+  decision, authorization, execution, or model/strategy modification.
 
 ### P09 — DEX / JUPITER EXECUTION
 - **Objective:** Add provider-agnostic controlled execution only after prior validation and explicit go-live approval.

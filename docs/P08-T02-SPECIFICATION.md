@@ -1,9 +1,9 @@
 # P08-T02 — Outcome Learning Dataset Snapshot Boundary
 
-**Status:** SPECIFICATION PROPOSED / IMPLEMENTATION NOT AUTHORIZED
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P08 — Outcome Learning
 **Task:** P08-T02
-**Contract:** `p08-t02-v1` (proposed)
+**Contract:** `p08-t02-v1`
 **Nature:** Immutable, deterministic, provider-neutral, read-only
 
 ## 1. Purpose and bounded scope
@@ -86,18 +86,17 @@ P08-T02 does not:
 - access wallets, signing, broadcast, RPC, DEXs, Jupiter, Jito, providers,
   networks, databases, or external authorities.
 
-## 6. Required approval before implementation
+## 6. Implementation acceptance
 
-Before runtime implementation is authorized, governance must explicitly approve:
+The implementation is accepted only when verification demonstrates:
 
 1. the exact field-level input/output contract and version;
 2. the non-empty and duplicate semantics;
-3. the point-in-time cutoff and ordering rule;
-4. missing-data and invalid-record behavior;
+3. the point-in-time cutoff and canonical ordering rule;
+4. missing-data and invalid-record fail-closed behavior;
 5. look-ahead, survivorship, regime, and feedback-loop controls;
 6. focused tests for all fail-closed paths; and
-7. the boundary's separation from later outcome interpretation and analysis.
+7. separation from later outcome interpretation and analysis.
 
-Until those approvals exist, P08-T02 remains specification-only and no runtime,
-worker, persistence, aggregation, metric, model, or external integration may be
-added.
+The accepted implementation adds no worker, persistence, aggregation, metric,
+model, or external integration.
