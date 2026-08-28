@@ -45,3 +45,24 @@ from core.learning.outcome_interpretation import (
     interpret_outcome_learning_dataset,
     interpret_outcomes,
 )
+from core.learning.outcome_evidence import (
+    OutcomeEvidenceEvaluationResult,
+    OutcomeEvidenceReasonCode,
+    OutcomeEvidenceState,
+    P08_T04_CONTRACT_VERSION,
+    P08_T04_EVALUATOR_VERSION,
+    create_outcome_evidence_evaluation,
+    evaluate_outcome_evidence,
+    evaluate_outcome_interpretation_evidence,
+)
+
+__all__ += [
+    "OutcomeEvidenceEvaluationResult",
+    "OutcomeEvidenceReasonCode",
+    "OutcomeEvidenceState",
+    "P08_T04_CONTRACT_VERSION",
+    "P08_T04_EVALUATOR_VERSION",
+    "create_outcome_evidence_evaluation",
+    "evaluate_outcome_evidence",
+    "evaluate_outcome_interpretation_evidence",
+]
