@@ -12,7 +12,7 @@ read-only evidence-state interpretation boundary after the immutable P08-T02
 dataset snapshot. It interprets only the evidence already present in that
 snapshot and does not infer financial performance.
 
-P08-T03 is specification complete, but implementation remains unauthorized.
+P08-T03 implementation has been authorized, technically audited, and formally closed.
 No classifier beyond the approved evidence-state result, metric, aggregation,
 report, worker, model behavior, or external integration is authorized.
 
@@ -167,5 +167,7 @@ and execution authority.
 The current allowed state is:
 
 - P08-T03 specification complete;
-- P08-T03 implementation not authorized; and
+- P08-T03 implementation authorized and audited;
+- P08-T03 implementation verified with 18 focused tests and 669 full-regression tests;
+- P08-T03 formally closed; and
 - economic classification and P08-T04 or later work outside scope.

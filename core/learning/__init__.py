@@ -26,4 +26,22 @@ __all__ = [
     "build_outcome_learning_dataset_snapshot",
     "create_outcome_learning_dataset_snapshot",
     "snapshot_outcome_learning_dataset",
+    "OutcomeInterpretationResult",
+    "OutcomeInterpretationSnapshot",
+    "OutcomeInterpretationStatus",
+    "P08_T03_CONTRACT_VERSION",
+    "P08_T03_EVALUATOR_VERSION",
+    "create_outcome_interpretation_snapshot",
+    "interpret_outcome_learning_dataset",
+    "interpret_outcomes",
 ]
+from core.learning.outcome_interpretation import (
+    OutcomeInterpretationResult,
+    OutcomeInterpretationSnapshot,
+    OutcomeInterpretationStatus,
+    P08_T03_CONTRACT_VERSION,
+    P08_T03_EVALUATOR_VERSION,
+    create_outcome_interpretation_snapshot,
+    interpret_outcome_learning_dataset,
+    interpret_outcomes,
+)
