@@ -1,3 +1,19 @@
+## 2026-08-28 — P08-T03 Specification Complete
+
+- **PHASE:** P08 — Outcome Learning
+- **TASK:** P08-T03 — Outcome Interpretation Boundary
+- **GOVERNANCE:** Finalized the `p08-t03-v1` evidence-state-only specification
+  with the approved taxonomy and exact immutable per-observation output
+  contract.
+- **TAXONOMY:** `UNCLASSIFIED`, `UNKNOWN`, `UNAVAILABLE`, and `INCOMPLETE`
+  describe evidence interpretability only.
+- **EXCLUSIONS:** Economic WIN/LOSS classification, economic evaluation horizon,
+  future market evidence, metrics, aggregation, and external evidence remain
+  outside T03.
+- **STATUS:** P08-T03 specification complete; runtime implementation remains
+  unauthorized. No runtime code, tests, P07 changes, architecture changes,
+  P08-T04 work, or external capability was added.
+
 ## 2026-08-27 — P08-T03 Specification Draft
 
 - **PHASE:** P08 — Outcome Learning
