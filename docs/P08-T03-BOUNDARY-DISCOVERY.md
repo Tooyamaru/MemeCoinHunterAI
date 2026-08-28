@@ -2,7 +2,7 @@
 
 **Status:** DISCOVERY COMPLETE / RESOLVED INTO FINAL SPECIFICATION
 **Phase:** P08 — Outcome Learning
-**Implementation status:** NOT AUTHORIZED
+**Implementation status:** COMPLETE / CLOSED / AUDITED PASS
 **Dependencies:** P08-T01 and P08-T02
 
 ## 1. Determination
@@ -143,9 +143,9 @@ P08-T03 depends on:
 1. the complete, immutable P08-T01 observation contract; and
 2. the complete, immutable P08-T02 dataset snapshot contract.
 
-The specification is complete. Runtime implementation remains unauthorized.
-If a later governance action authorizes implementation, the implementation must
-at minimum satisfy:
+The specification is complete and the separately authorized runtime
+implementation is present, verified, and formally closed. The implementation
+satisfied at minimum:
 
 - P08-T01 and P08-T02 remaining complete, closed, and auditable;
 - the approved field-level T03 input/output contract and version;
@@ -157,12 +157,11 @@ at minimum satisfy:
 
 ## 9. Exit criteria and governance conclusion
 
-P08-T03 specification completion is recorded by the approved specification and
-this resolved discovery record. Runtime completion would require a separately
-authorized implementation, focused tests, full regression verification,
-provenance and deterministic-behavior audits, and confirmation that the
-implementation remains separate from metrics, model changes, strategy changes,
-and execution authority.
+P08-T03 specification completion and runtime closure are recorded by the
+approved specification, this resolved discovery record, the implementation,
+focused tests, full regression verification, provenance and deterministic-
+behavior audits, and confirmation that the implementation remains separate from
+metrics, model changes, strategy changes, and execution authority.
 
 The current allowed state is:
 

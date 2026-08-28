@@ -246,8 +246,9 @@ P08-T02 OutcomeLearningDatasetSnapshot
 P08-T03 approved interpretation boundary
 ```
 
-Runtime implementation is not authorized by this specification. If a later
-governance action separately authorizes implementation, it must require:
+This specification did not itself grant implementation authorization. A separate
+governance action authorized the current repository implementation, which is
+present and formally closed. That authorization required:
 
 1. P08-T01 and P08-T02 remain complete, immutable, and auditable;
 2. the supplied T02 snapshot contains the observations required for the
@@ -267,9 +268,10 @@ evidence-state interpretation;
 
 T03 is **specification complete** when the exact evidence-state-only contract defined in this document is recorded in governance.
 
-T03 is **implementation authorized** only by a separate explicit governance
-decision. This specification records the contract but does not authorize
-runtime code.
+T03 implementation authorization is a separate governance decision rather than
+an effect of this specification. That decision has occurred for the current
+repository implementation; this specification remains the contract it must
+follow.
 
 T03 is **complete** only after the implementation, focused tests, full
 regression suite, canonical/digest checks, provenance checks, immutability

@@ -37,9 +37,11 @@ CLOSED / AUDITED PASS. P07 is now COMPLETE / CLOSED / AUDITED PASS.
 P08-T01 is COMPLETE / CLOSED / AUDITED PASS as the immutable, read-only
 outcome observation boundary. P08-T02 is COMPLETE / CLOSED / AUDITED PASS as
 the immutable, deterministic, point-in-time dataset snapshot boundary.
-P08-T03 is COMPLETE / CLOSED / AUDITED PASS as an evidence-state-only interpretation boundary. The approved `p08-t03-v1` contract defines the exact taxonomy, output,
-provenance, deterministic behavior, and missing-data semantics. Runtime
-implementation remains unauthorized.
+P08-T03 is COMPLETE / CLOSED / AUDITED PASS as an evidence-state-only
+interpretation boundary. The approved `p08-t03-v1` contract defines the exact
+taxonomy, output, provenance, deterministic behavior, and missing-data
+semantics. Its runtime implementation is present, verified, and formally
+closed under separate implementation authorization.
 
 P07-T05 is the deterministic, immutable, provider-neutral paper reconciliation
 boundary. It compares only explicitly supplied immutable P07-T04 ledger
@@ -59,8 +61,8 @@ deterministic local history boundary for validated T06 results. No P07-T08
 exists or is required. P08-T01 consumes one validated P06 decision intent, one
 validated P07 simulation input, and one linked P07 paper result retained by a
 P07-T07 history snapshot. It does not interpret outcomes, aggregate, rank,
- decide, authorize, execute, or modify any model or strategy. P08-T03 is closed and no longer remains an open implementation gate.
-specification-only and its runtime is not authorized.
+decide, authorize, execute, or modify any model or strategy. P08-T03 is closed
+and no longer remains an open implementation gate.
 
 P06-T02 is COMPLETE / CLOSED / AUDITED PASS as the deterministic evaluation
 boundary, and P06-T03 is COMPLETE / CLOSED as an optional non-authoritative
@@ -116,8 +118,8 @@ The P08-T01 specification is:
 The implementation remains deterministic, immutable, provider-neutral,
 simulation-only, provenance-preserving, and fail-closed. No live execution,
 wallet, signing, broadcast, RPC, DEX, provider, network, persistence,
-external-authority reconciliation, outcome interpretation, metric, model,
-or P09 functionality was introduced.
+external-authority reconciliation, economic metric, model, or P09
+functionality was introduced. P08-T03 remains evidence-state-only.
 
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
@@ -235,17 +237,17 @@ P07-T01 through P07-T07 implementation and verification are COMPLETE / CLOSED /
 AUDITED PASS. P07 remains simulation-only and has no live execution authority.
 No P07-T08 exists or is required.
 
-Review and explicitly authorize or reject the P08-T02 dataset snapshot
-specification. No P08-T02 runtime, learning worker, metric, aggregation, model
-training, model promotion, strategy modification, or external integration is
-authorized.
+Review the corrected P08-T04 specification for implementation readiness. P08-T04
+runtime remains unauthorized until the output contract, reason codes, T03
+governance state, and provenance equality rules pass specification audit.
 
 ## Next task
 
-P08-T02 is the current separately governed specification candidate: an
-immutable, point-in-time dataset snapshot of validated P08-T01 observations.
-Its runtime implementation requires explicit approval of the field-level
-contract and bias controls. No P08-T02 behavior exists.
+P08-T04 is the current separately governed specification candidate: a
+single-observation evidence integrity/sufficiency evaluation over one validated
+P08-T03 result and its linked P08-T02 snapshot. Its runtime implementation
+requires explicit authorization after the corrected specification is audited.
+No P08-T04 behavior exists.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

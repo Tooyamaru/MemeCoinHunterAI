@@ -159,28 +159,56 @@ T04 must preserve the T03 interpretation state and source provenance.
 
 ## 9. Output Contract
 
-The conceptual output is:
+The exact public output type is:
 
 `OutcomeEvidenceEvaluationResult`
+
+It is an immutable record with exactly these public fields:
+
+| Field | Exact type | Meaning |
+|---|---|---|
+| `source_interpretation_digest` | `str` | SHA-256 digest of the validated source `OutcomeInterpretationResult`. |
+| `source_dataset_digest` | `str` | Exact P08-T02 dataset digest. |
+| `source_observation_digest` | `str` | Exact P08-T01 observation digest resolved from the dataset. |
+| `source_paper_outcome_status` | `str` | Exact source P07 paper outcome status copied from the resolved observation. |
+| `source_reconciliation_status` | `str` | Exact source P07 reconciliation status copied from the resolved observation. |
+| `evidence_state` | `OutcomeEvidenceState` | One value from the exact T03 evidence-state taxonomy. |
+| `reason_codes` | `tuple[OutcomeEvidenceReasonCode, ...]` | Fixed, deterministic explanation codes in the order defined in Section 24. |
+| `source_candidate_id` | `str` | Candidate identity copied from the resolved observation. |
+| `source_chain_id` | `str` | Chain identity copied from the resolved observation. |
+| `source_token_identity` | `str` | Token identity copied from the resolved observation. |
+| `source_reference_time` | `datetime` | Resolved observation simulation reference time in canonical UTC form. |
+| `source_interpretation_contract_version` | `Literal["p08-t03-v1"]` | Exact source T03 contract version. |
+| `source_interpretation_evaluator_version` | `str` | Exact source T03 evaluator version. |
+| `contract_version` | `Literal["p08-t04-v1"]` | Exact P08-T04 contract version. |
+| `evaluator_version` | `Literal["p08-t04-outcome-evidence-v1"]` | Exact P08-T04 evaluator version. |
+| `result_digest` | `str` | SHA-256 digest of the complete canonical semantic result representation. |
+
+`OutcomeEvidenceState` is exactly:
+
+```text
+UNCLASSIFIED
+UNKNOWN
+UNAVAILABLE
+INCOMPLETE
+```
+
+`OutcomeEvidenceReasonCode` is the fixed vocabulary defined in Section 24.
+No other public evidence state or reason code is permitted.
 
 The output cardinality is exactly one result for exactly one validated
 P08-T03 `OutcomeInterpretationResult`.
 
 The result must preserve, at minimum:
 
-- source P08-T03 interpretation digest;
-- source P08-T02 dataset digest;
-- source P08-T01 observation digest;
-- source paper outcome status;
-- source reconciliation status;
-- evidence-evaluation state;
-- deterministic reason information;
-- P08-T04 contract version;
-- P08-T04 evaluator version; and
-- canonical SHA-256 representation digest.
+- all fields in the exact output table above; and
+- the complete source provenance represented by those fields.
 
-The exact runtime field names and validation implementation must conform to
-this specification and may not introduce unapproved semantic ownership.
+`result_digest` is derived from the canonical representation of every field
+above except `result_digest` itself. The digest field is not hashed into itself.
+The canonical representation uses stable field names, enum values, canonical UTC
+timestamps, deterministic reason-code ordering, and SHA-256 coverage of all
+other semantic fields.
 
 ## 10. Evidence-Evaluation State
 
@@ -467,7 +495,22 @@ Resolution must verify that:
 - the observation belongs to the supplied dataset;
 - the dataset digest equals the T03 source dataset digest;
 - the observation's reference time is not after the dataset cutoff; and
-- the observation remains consistent with the provenance represented by T03.
+- the resolved observation and T03 result have exact equality for every
+  applicable provenance field:
+  - `T03.source_observation_digest == observation.digest`;
+  - `T03.source_dataset_digest == dataset.digest`;
+  - `T03.candidate_id == observation.candidate_id`;
+  - `T03.chain_id == observation.chain_id`;
+  - `T03.token_identity == observation.token_identity`;
+  - `T03.reference_time == observation.simulation_reference_time` after
+    canonical UTC normalization;
+  - `T03.source_outcome_status == observation.outcome_status`; and
+  - `T03.source_reconciliation_status == observation.reconciliation_status`.
+
+The T04 output copies these values into its corresponding
+`source_*` fields without reconstruction or substitution. Any mismatch,
+including a mismatch in the source observation identity itself, is a
+provenance contradiction and must fail closed.
 
 T04 must not search outside the supplied snapshot to resolve an observation.
 
@@ -499,34 +542,42 @@ This distinction is intentional:
 
 ## 24. Reason Information
 
-The T04 result must expose deterministic reason information sufficient to
-explain the evidence evaluation without introducing economic interpretation.
+The T04 result exposes `reason_codes` as a tuple of the following exact fixed
+enum values:
 
-Reason information may identify conditions such as:
+| Code | Meaning | Emitted when |
+|---|---|---|
+| `LINKAGE_VALID` | All declared T03→T02 dataset, observation, provenance, version, canonical, digest, and cutoff checks pass. | Always, before the state-preservation code, for a successful result. |
+| `STATE_UNCLASSIFIED_PRESERVED` | The valid T03 evidence state is preserved as unclassified. | `interpretation_status == UNCLASSIFIED`. |
+| `STATE_UNKNOWN_PRESERVED` | The valid T03 evidence state is preserved as unknown. | `interpretation_status == UNKNOWN`. |
+| `STATE_UNAVAILABLE_PRESERVED` | The valid T03 evidence state is preserved as unavailable. | `interpretation_status == UNAVAILABLE`. |
+| `STATE_INCOMPLETE_PRESERVED` | The valid T03 evidence state is preserved as incomplete. | `interpretation_status == INCOMPLETE`. |
 
-- valid predecessor linkage;
-- preserved unknown state;
-- preserved unavailable state;
-- preserved incomplete state;
-- preserved unclassified state;
-- missing required evidence;
-- invalid source identity;
-- digest mismatch;
-- cutoff violation;
-- provenance contradiction; or
-- canonicalization failure.
+The deterministic order is always:
 
-Reason values must be deterministic and must not contain:
+1. `LINKAGE_VALID`;
+2. exactly one state-preservation code matching `evidence_state`.
+
+No failure reason code is emitted because invalid, contradictory, tampered,
+non-canonical, or unsupported predecessor material produces no T04 result and
+fails closed. No code outside this five-value vocabulary is permitted.
+
+Reason codes are deterministic and must not depend on:
 
 - live market observations;
 - external provider responses;
 - wall-clock timestamps generated during evaluation;
+- wall-clock time;
+- random values;
+- process state;
+- filesystem state;
+- database state;
+- network state;
 - economic profit/loss claims; or
 - inferred outcomes.
 
-The exact reason-code vocabulary must be fixed by the implementation
-authorization and must not expand semantic ownership beyond this
-specification.
+`OutcomeEvidenceReasonCode` is the exact enum represented by the values in this
+section. Reason codes do not add economic interpretation or semantic ownership.
 
 ## 25. Cardinality
 
@@ -679,7 +730,10 @@ Implementation requires a separate explicit authorization after:
 6. confirmation that the T03 taxonomy is reused without semantic expansion;
 7. confirmation that economic evaluation remains outside T04; and
 8. confirmation that implementation remains limited to the approved T04
-   contract.
+   contract; and
+9. confirmation that the exact output fields, evidence-state values, reason
+   codes, ordering, and digest coverage in Sections 9 and 24 are implemented
+   without additions.
 
 Until that authorization is recorded, implementation is prohibited.
 
