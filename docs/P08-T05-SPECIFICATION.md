@@ -96,10 +96,20 @@ state-distribution metrics.
 The exact input boundary is:
 
 1. exactly one validated `OutcomeLearningDatasetSnapshot`; and
-2. one finite collection of `OutcomeEvidenceEvaluationResult` values.
+2. exactly one public input value of type
+   `tuple[OutcomeEvidenceEvaluationResult, ...]`.
 
-The collection must be non-empty and must contain exactly one T04 result for
-each observation in the supplied T02 dataset.
+The T04 evaluation tuple is the complete immutable, finite, replayable input
+collection. The public API MUST NOT accept a generic collection, `Iterable`,
+list, set, generator, arbitrary iterator, or any other unspecified collection
+type.
+
+The tuple must be non-empty and must contain exactly one T04 result for each
+observation in the supplied T02 dataset.
+
+An empty tuple, `tuple()`, is invalid and MUST fail closed. T05 requires a
+complete evidence set for the validated T02 dataset and therefore cannot
+produce a snapshot from an empty T04 evaluation tuple.
 
 Caller-provided collection order is not meaningful. Equivalent collections
 with different input order must produce equivalent snapshots and identical
@@ -157,7 +167,10 @@ For every supplied evaluation, T05 must validate:
 
 The following conditions are mandatory:
 
-- the evaluation collection is finite and non-empty;
+- the public evaluation input is exactly
+  `tuple[OutcomeEvidenceEvaluationResult, ...]`;
+- the evaluation tuple is finite by construction and is non-empty;
+- `tuple()` is rejected fail closed;
 - no T04 result digest is duplicated;
 - no source observation digest is duplicated;
 - every T04 `source_dataset_digest` equals the supplied T02 dataset digest;
@@ -215,9 +228,28 @@ The supplied T04 evaluations must cover exactly the observations represented by
 the supplied T02 dataset. Membership is compared by exact source observation
 digest.
 
-The canonical evaluation ordering is based on the complete canonical T04
-representation. Caller insertion order, process state, filesystem state,
-database state, and wall-clock time must not affect ordering.
+The canonical evaluation ordering key is exactly
+`source_observation_digest`.
+
+Ordering MUST be ascending lexicographical order over the canonical lowercase
+hexadecimal representation of `source_observation_digest`.
+
+Because T05 requires exactly one T04 evaluation for every T02 observation and
+every T02 observation digest is canonical and unique, `source_observation_digest`
+provides a total deterministic ordering.
+
+Caller-provided tuple order MUST NOT affect canonical ordering, canonical
+representation, or snapshot digest.
+
+The ordered T04 evaluations MUST be the direct basis for:
+
+- `evaluation_digests`;
+- canonical snapshot representation; and
+- `snapshot_digest`.
+
+T05 MUST NOT use evidence state, candidate score, economic outcome, timestamp,
+`result_digest`, or caller-provided order as the primary canonical ordering
+key.
 
 The `evaluation_digests` tuple must equal the ordered evaluations' T04 result
 digests. Any mismatch fails closed.
@@ -313,7 +345,8 @@ Canonicalization must provide:
 - stable enum and reason-code values;
 - canonical UTC timestamps;
 - deterministic mapping ordering;
-- deterministic evaluation ordering;
+- deterministic evaluation ordering by ascending lexicographical
+  `source_observation_digest` over canonical lowercase hexadecimal values;
 - immutable nested values; and
 - SHA-256 digest coverage of all semantic fields.
 
@@ -426,29 +459,31 @@ After separate implementation authorization, focused tests must demonstrate at
 minimum:
 
 1. valid complete T02/T04 membership;
-2. deterministic ordering independent of input order;
-3. deterministic snapshot digest;
-4. canonical representation stability;
-5. immutable snapshot and nested collections;
-6. preservation of all four T04 evidence states;
-7. T04 contract/evaluator version validation;
-8. T02 contract validation;
-9. dataset digest mismatch rejection;
-10. duplicate T04 result rejection;
-11. duplicate source observation rejection;
-12. missing observation coverage rejection;
-13. extra observation coverage rejection;
-14. ambiguous membership rejection;
-15. provenance mismatch rejection;
-16. cutoff violation rejection;
-17. tampered/non-canonical predecessor rejection;
-18. no wall-clock dependency;
-19. no randomness or external-state dependency;
-20. no filesystem/database/network/provider dependency;
-21. no economic classification or performance metrics;
-22. no ranking, comparison, or selection;
-23. no model/strategy/decision/risk mutation; and
-24. no P07 ownership replacement.
+2. empty T04 tuple `tuple()` rejection;
+3. deterministic ordering by ascending lexicographical
+   `source_observation_digest`, independent of caller tuple order;
+4. deterministic snapshot digest;
+5. canonical representation stability;
+6. immutable snapshot and nested collections;
+7. preservation of all four T04 evidence states;
+8. T04 contract/evaluator version validation;
+9. T02 contract validation;
+10. dataset digest mismatch rejection;
+11. duplicate T04 result rejection;
+12. duplicate source observation rejection;
+13. missing observation coverage rejection;
+14. extra observation coverage rejection;
+15. ambiguous membership rejection;
+16. provenance mismatch rejection;
+17. cutoff violation rejection;
+18. tampered/non-canonical predecessor rejection;
+19. no wall-clock dependency;
+20. no randomness or external-state dependency;
+21. no filesystem/database/network/provider dependency;
+22. no economic classification or performance metrics;
+23. no ranking, comparison, or selection;
+24. no model/strategy/decision/risk mutation; and
+25. no P07 ownership replacement.
 
 These expectations do not authorize implementation.
 
@@ -488,8 +523,9 @@ Implementation requires a separate explicit authorization after:
 8. confirmation that no economic or performance semantics are introduced;
 9. confirmation that no P07 facts are recalculated or replaced;
 10. confirmation that no external evidence or I/O is required;
-11. confirmation that exact output fields, versions, ordering, and digest
-    coverage are implemented without additions; and
+11. confirmation that exact output fields, versions, the
+    `source_observation_digest` canonical ordering rule, and digest coverage
+    are implemented without additions; and
 12. confirmation that focused tests cover every valid and fail-closed path.
 
 Until that authorization is recorded, P08-T05 implementation is prohibited.
