@@ -1,17 +1,18 @@
-# P07-T05 — Paper Reconciliation Contract
+# Ledger ↔ State Consistency Verification Contract
 
-**Status:** COMPLETE / CLOSED / AUDITED PASS  
+**Status:** EXISTING / SEPARATE VERIFICATION BOUNDARY
 **Phase:** P07 — Paper Trading Engine  
-**Task:** P07-T05 — Paper Reconciliation Contract  
-**Contract:** `p07-t05-v1`  
-**Reconciliation model:** `p07-t05-reconciliation-v1`  
+**Task:** Ledger ↔ State Consistency Verification
+**Contract:** `ledger-state-consistency-verification-v1`
+**Reconciliation model:** `ledger-state-consistency-verification-model-v1`
 **Source baseline:** `278437b` — `Implement paper reconciliation logic and add tests`
 
 ## 1. Purpose and boundary
 
-P07-T05 compares an explicitly supplied immutable paper-ledger sequence with
-one explicitly supplied expectation or replay observation. It produces one
-immutable, canonical, deterministic reconciliation result.
+The Ledger ↔ State Consistency Verification boundary compares an explicitly
+supplied immutable paper-ledger sequence with one explicitly supplied
+expectation or replay observation. It produces one immutable, canonical,
+deterministic reconciliation result.
 
 This is a paper-simulation audit boundary only. It does not fetch, infer, or
 establish external truth. A result is not an order, authorization, capital
@@ -31,11 +32,11 @@ values and does not modify P07-T01, P07-T02, or P07-T03 contracts.
 
 The implementation exposes explicit version identities for:
 
-- reconciliation contract: `p07-t05-v1`;
-- reconciliation model: `p07-t05-reconciliation-v1`;
-- discrepancy taxonomy: `p07-t05-taxonomy-v1`;
-- canonicalization: `p07-t05-canonical-v1`; and
-- comparison policy: `p07-t05-comparison-v1`.
+- reconciliation contract: `ledger-state-consistency-verification-v1`;
+- reconciliation model: `ledger-state-consistency-verification-model-v1`;
+- discrepancy taxonomy: `ledger-state-consistency-verification-taxonomy-v1`;
+- canonicalization: `ledger-state-consistency-verification-canonical-v1`; and
+- comparison policy: `ledger-state-consistency-verification-comparison-v1`.
 
 The public value objects are:
 
@@ -79,7 +80,7 @@ bounded provenance.
 
 ## 6. Forbidden ownership
 
-P07-T05 does not own or implement:
+This verification boundary does not own or implement:
 
 - live execution, transaction construction, submission, or broadcast;
 - wallets, keys, signing, RPC, DEX, venues, providers, or network access;
@@ -103,7 +104,7 @@ and forbidden external authority.
 
 Verification at the source baseline:
 
-- focused P07-T05 tests: **15 passed**;
+- focused ledger/state verification tests: **15 passed**;
 - full project test suite: **626 passed**;
 - `git diff --check`: **PASS**; and
 - working tree: **CLEAN**, with `main == origin/main`.
@@ -113,9 +114,8 @@ deprecation warning.
 
 ## Governance conclusion
 
-P07-T05 specification and implementation are **COMPLETE / CLOSED /
-AUDITED PASS**. The implementation is deterministic, immutable,
+The ledger/state verification implementation is deterministic, immutable,
 provider-neutral, simulation-only, provenance-preserving, and fail-closed.
 
-P07-T06 is the next separately governed task candidate. It is **not started
-and not authorized** by this document. No P08 or P09 work is authorized.
+P07-T05 remains reserved for its separately governed economic-outcome
+specification and is not implemented by this boundary.

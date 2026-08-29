@@ -43,18 +43,19 @@ taxonomy, output, provenance, deterministic behavior, and missing-data
 semantics. Its runtime implementation is present, verified, and formally
 closed under separate implementation authorization.
 
-P07-T05 is the deterministic, immutable, provider-neutral paper reconciliation
-boundary. It compares only explicitly supplied immutable P07-T04 ledger
-entries with one explicitly supplied expectation or replay observation.
-It produces an informational reconciliation result only and does not establish
-external truth, settlement, authorization, capital state, wallet state,
-transaction state, or live/on-chain state.
+The separate Ledger ↔ State Consistency Verification boundary is deterministic,
+immutable, provider-neutral, and compares only explicitly supplied immutable
+P07-T04 ledger entries with one explicitly supplied expectation or replay
+observation. It produces an informational reconciliation result only and does
+not establish external truth, settlement, authorization, capital state, wallet
+state, transaction state, or live/on-chain state.
 
-P07-T05 preserves explicit UNKNOWN / UNAVAILABLE observation states, fails
-closed on unresolved material, preserves provenance and predecessor identity,
-uses canonical deterministic representations and SHA-256 digests, and has no
-wall-clock, provider, network, persistence, wallet, signing, broadcast, or
-external-authority dependency.
+The verification boundary preserves explicit UNKNOWN / UNAVAILABLE observation
+states, fails closed on unresolved material, preserves provenance and
+predecessor identity, uses canonical deterministic representations and SHA-256
+digests, and has no wall-clock, provider, network, persistence, wallet,
+signing, broadcast, or external-authority dependency. P07-T05 remains reserved
+for its separately governed economic-outcome boundary.
 
 P07-T06 is the immutable paper-simulation result contract and P07-T07 is the
 deterministic local history boundary for validated T06 results. No P07-T08

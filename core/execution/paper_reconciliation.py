@@ -1,4 +1,4 @@
-"""Deterministic, immutable P07-T05 paper reconciliation."""
+"""Deterministic, immutable ledger/state consistency verification."""
 
 from __future__ import annotations
 
@@ -13,11 +13,21 @@ from typing import Any, Mapping
 from core.execution.paper_ledger import PaperLedgerEntry
 
 
-P07_T05_CONTRACT_VERSION = "p07-t05-v1"
-P07_T05_RECONCILIATION_MODEL_VERSION = "p07-t05-reconciliation-v1"
-P07_T05_DISCREPANCY_TAXONOMY_VERSION = "p07-t05-taxonomy-v1"
-P07_T05_CANONICALIZATION_VERSION = "p07-t05-canonical-v1"
-P07_T05_COMPARISON_POLICY_VERSION = "p07-t05-comparison-v1"
+LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION = (
+    "ledger-state-consistency-verification-v1"
+)
+LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION = (
+    "ledger-state-consistency-verification-model-v1"
+)
+LEDGER_STATE_CONSISTENCY_VERIFICATION_DISCREPANCY_TAXONOMY_VERSION = (
+    "ledger-state-consistency-verification-taxonomy-v1"
+)
+LEDGER_STATE_CONSISTENCY_VERIFICATION_CANONICALIZATION_VERSION = (
+    "ledger-state-consistency-verification-canonical-v1"
+)
+LEDGER_STATE_CONSISTENCY_VERIFICATION_COMPARISON_POLICY_VERSION = (
+    "ledger-state-consistency-verification-comparison-v1"
+)
 
 _DIGEST_LENGTH = 64
 _ALLOWED_EXPECTATION_KEYS = frozenset(
@@ -132,8 +142,10 @@ class PaperReconciliationExpectation:
     observed_at: datetime | None = None
     available_at: datetime | None = None
     reason_codes: tuple[str, ...] = ()
-    contract_version: str = P07_T05_CONTRACT_VERSION
-    reconciliation_model_version: str = P07_T05_RECONCILIATION_MODEL_VERSION
+    contract_version: str = LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION
+    reconciliation_model_version: str = (
+        LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION
+    )
     expectation_digest: str | None = None
 
     def __post_init__(self) -> None:
@@ -147,14 +159,14 @@ class PaperReconciliationExpectation:
             )
         except (TypeError, ValueError) as error:
             raise ValueError("unsupported observation_status") from error
-        if self.contract_version != P07_T05_CONTRACT_VERSION:
-            raise ValueError("unsupported P07-T05 contract_version")
+        if self.contract_version != LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION:
+            raise ValueError("unsupported ledger verification contract_version")
         if (
             self.reconciliation_model_version
-            != P07_T05_RECONCILIATION_MODEL_VERSION
+            != LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION
         ):
             raise ValueError(
-                "unsupported P07-T05 reconciliation_model_version"
+                "unsupported ledger verification reconciliation_model_version"
             )
         object.__setattr__(
             self,
@@ -290,13 +302,19 @@ class PaperReconciliationResult:
     resulting_state_identity: Mapping[str, Any] | None
     timestamps: Mapping[str, Any]
     provenance: Mapping[str, Any]
-    contract_version: str = P07_T05_CONTRACT_VERSION
-    reconciliation_model_version: str = P07_T05_RECONCILIATION_MODEL_VERSION
-    discrepancy_taxonomy_version: str = (
-        P07_T05_DISCREPANCY_TAXONOMY_VERSION
+    contract_version: str = LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION
+    reconciliation_model_version: str = (
+        LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION
     )
-    canonicalization_version: str = P07_T05_CANONICALIZATION_VERSION
-    comparison_policy_version: str = P07_T05_COMPARISON_POLICY_VERSION
+    discrepancy_taxonomy_version: str = (
+        LEDGER_STATE_CONSISTENCY_VERIFICATION_DISCREPANCY_TAXONOMY_VERSION
+    )
+    canonicalization_version: str = (
+        LEDGER_STATE_CONSISTENCY_VERIFICATION_CANONICALIZATION_VERSION
+    )
+    comparison_policy_version: str = (
+        LEDGER_STATE_CONSISTENCY_VERIFICATION_COMPARISON_POLICY_VERSION
+    )
     result_digest: str | None = None
 
     def __post_init__(self) -> None:
@@ -305,31 +323,35 @@ class PaperReconciliationResult:
         except (TypeError, ValueError) as error:
             raise ValueError("unsupported reconciliation status") from error
         versions = (
-            (self.contract_version, P07_T05_CONTRACT_VERSION, "contract_version"),
+            (
+                self.contract_version,
+                LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION,
+                "contract_version",
+            ),
             (
                 self.reconciliation_model_version,
-                P07_T05_RECONCILIATION_MODEL_VERSION,
+                LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION,
                 "reconciliation_model_version",
             ),
             (
                 self.discrepancy_taxonomy_version,
-                P07_T05_DISCREPANCY_TAXONOMY_VERSION,
+                LEDGER_STATE_CONSISTENCY_VERIFICATION_DISCREPANCY_TAXONOMY_VERSION,
                 "discrepancy_taxonomy_version",
             ),
             (
                 self.canonicalization_version,
-                P07_T05_CANONICALIZATION_VERSION,
+                LEDGER_STATE_CONSISTENCY_VERIFICATION_CANONICALIZATION_VERSION,
                 "canonicalization_version",
             ),
             (
                 self.comparison_policy_version,
-                P07_T05_COMPARISON_POLICY_VERSION,
+                LEDGER_STATE_CONSISTENCY_VERIFICATION_COMPARISON_POLICY_VERSION,
                 "comparison_policy_version",
             ),
         )
         for supplied, expected, name in versions:
             if supplied != expected:
-                raise ValueError(f"unsupported P07-T05 {name}")
+                raise ValueError(f"unsupported ledger verification {name}")
         for value, name in (
             (self.expectation_identity, "expectation_identity"),
             (self.ledger_stream_identity, "ledger_stream_identity"),
@@ -616,7 +638,7 @@ def _make_result(
         ),
     }
     provenance: Mapping[str, Any] = {
-        "source_contract": "P07-T05",
+        "source_contract": "LEDGER_STATE_CONSISTENCY_VERIFICATION",
         "comparison_input": "supplied-paper-ledger-and-expectation",
         "expectation_id": expectation.expectation_id if expectation else None,
         "expectation_digest": (
@@ -1115,11 +1137,11 @@ def _timestamp_as_datetime(value: Any) -> datetime:
 __all__ = [
     "DiscrepancyStatus",
     "ObservationAvailability",
-    "P07_T05_CANONICALIZATION_VERSION",
-    "P07_T05_COMPARISON_POLICY_VERSION",
-    "P07_T05_CONTRACT_VERSION",
-    "P07_T05_DISCREPANCY_TAXONOMY_VERSION",
-    "P07_T05_RECONCILIATION_MODEL_VERSION",
+    "LEDGER_STATE_CONSISTENCY_VERIFICATION_CANONICALIZATION_VERSION",
+    "LEDGER_STATE_CONSISTENCY_VERIFICATION_COMPARISON_POLICY_VERSION",
+    "LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION",
+    "LEDGER_STATE_CONSISTENCY_VERIFICATION_DISCREPANCY_TAXONOMY_VERSION",
+    "LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION",
     "PaperReconciliationExpectation",
     "PaperReconciliationResult",
     "ReconciliationObservationStatus",

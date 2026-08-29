@@ -142,8 +142,8 @@ In particular, P08-T04 must not:
 - replace P07 result status; or
 - establish external settlement truth.
 
-P07-T05 reconciliation remains the authoritative owner of its supplied
-paper-reconciliation comparison result.
+The Ledger ↔ State Consistency Verification boundary remains the authoritative
+owner of its supplied paper-reconciliation comparison result.
 
 T04 may consume its immutable status and reason codes as evidence.
 

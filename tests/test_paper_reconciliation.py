@@ -6,8 +6,9 @@ import pytest
 
 from core.execution.paper_fill_outcome import FillOutcomeStatus
 from core.execution.paper_reconciliation import (
+    LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION,
+    LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION,
     ObservationAvailability,
-    P07_T05_RECONCILIATION_MODEL_VERSION,
     PaperReconciliationExpectation,
     ReconciliationStatus,
     reconcile_paper_ledger,
@@ -48,8 +49,8 @@ def test_valid_reconciliation_preserves_identity_and_is_immutable():
     assert result.transition_identity == entry.transition_identity
     assert result.prior_state_identity == entry.prior_state_identity
     assert result.resulting_state_identity == entry.resulting_state_identity
-    assert result.contract_version == "p07-t05-v1"
-    assert result.reconciliation_model_version == P07_T05_RECONCILIATION_MODEL_VERSION
+    assert result.contract_version == LEDGER_STATE_CONSISTENCY_VERIFICATION_CONTRACT_VERSION
+    assert result.reconciliation_model_version == LEDGER_STATE_CONSISTENCY_VERIFICATION_MODEL_VERSION
 
     with pytest.raises(FrozenInstanceError):
         result.status = ReconciliationStatus.INVALID
@@ -299,7 +300,7 @@ def test_reconciliation_has_no_live_authority_or_execution_semantics():
         "network",
     ):
         assert forbidden not in serialized
-    assert result.provenance["source_contract"] == "P07-T05"
+    assert result.provenance["source_contract"] == "LEDGER_STATE_CONSISTENCY_VERIFICATION"
     assert "on-chain" not in str(result.provenance).lower()
 
 
@@ -311,4 +312,6 @@ def test_provider_neutral_and_no_random_or_clock_dependency():
         "2026-08-21T12:00:00.000000Z"
     )
     assert result.timestamps["observation_time"] is None
-    assert result.reconciliation_model_version == "p07-t05-reconciliation-v1"
+    assert result.reconciliation_model_version == (
+        "ledger-state-consistency-verification-model-v1"
+    )

@@ -12,7 +12,7 @@ boundary consumed by future P08 learning.
 - accepted P07-T02 fill outcome
 - accepted P07-T03 position/exposure transition
 - accepted P07-T04 ledger record
-- accepted P07-T05 reconciliation result
+- accepted ledger/state consistency verification result
 
 ## Rules
 - deterministic and provider-neutral;
