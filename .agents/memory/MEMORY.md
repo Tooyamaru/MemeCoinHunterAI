@@ -2,3 +2,4 @@
 - [Database URL normalization](database-url-normalization.md) — translate Replit PostgreSQL URL options before asyncpg connection attempts.
 - [Python 3.13 runtime](python-313-runtime.md) — this project requires Python 3.13; use the available base runtime when uv cannot download interpreters.
 - [P06 deterministic timestamps](p06-deterministic-timestamps.md) — DecisionIntent defaults decision time to the validated context reference time; never read the system clock.
+- [Validation wrapper assertions](validation-wrapper-assertions.md) — behavioral tests should assert fail-closed outcomes, not fragile internal wrapper error wording.

@@ -66,3 +66,21 @@ __all__ += [
     "evaluate_outcome_evidence",
     "evaluate_outcome_interpretation_evidence",
 ]
+
+from core.learning.outcome_evidence_snapshot import (
+    OutcomeEvidenceEvaluationSnapshot,
+    P08_T05_CONTRACT_VERSION,
+    P08_T05_EVALUATOR_VERSION,
+    build_outcome_evidence_evaluation_snapshot,
+    create_outcome_evidence_evaluation_snapshot,
+    snapshot_outcome_evidence_evaluations,
+)
+
+__all__ += [
+    "OutcomeEvidenceEvaluationSnapshot",
+    "P08_T05_CONTRACT_VERSION",
+    "P08_T05_EVALUATOR_VERSION",
+    "build_outcome_evidence_evaluation_snapshot",
+    "create_outcome_evidence_evaluation_snapshot",
+    "snapshot_outcome_evidence_evaluations",
+]
