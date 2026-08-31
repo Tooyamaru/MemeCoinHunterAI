@@ -261,11 +261,13 @@ STOP, PAUSE, or change market.
 - **Exit criteria:** Learning is validated against bias and cannot self-modify production uncontrolled.
 - **Major risks:** Overfitting, look-ahead, regime/survivorship bias, feedback loops.
 - **Deliverables:** Outcome dataset, evaluation reports, controlled model versioning.
-- **Current boundary:** P08-T02 — Outcome Learning Dataset Snapshot Boundary —
-  COMPLETE / CLOSED / AUDITED PASS. P08-T01 is COMPLETE / CLOSED / AUDITED PASS.
-  The T02 boundary snapshots validated P08-T01 observations with a point-in-time
-  cutoff and provenance, without outcome interpretation, aggregation, ranking,
-  decision, authorization, execution, or model/strategy modification.
+- **Current boundary:** P08-T06 — Outcome Evidence Analysis Readiness Boundary —
+  SPECIFICATION COMPLETE / AUDITED PASS; implementation not authorized. P08-T01
+  through P08-T05 are COMPLETE / CLOSED / AUDITED PASS. P08-T02 snapshots
+  validated P08-T01 observations with a point-in-time cutoff and provenance;
+  P08-T03 through P08-T05 preserve and evaluate that evidence without economic
+  outcome classification, uncontrolled aggregation, ranking, decision,
+  authorization, execution, or model/strategy modification.
 
 ### P09 — DEX / JUPITER EXECUTION
 - **Objective:** Add provider-agnostic controlled execution only after prior validation and explicit go-live approval.

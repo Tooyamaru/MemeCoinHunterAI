@@ -1,6 +1,6 @@
 # P08-T06 — Outcome Evidence Analysis Readiness Boundary
 
-**Status:** SPECIFICATION COMPLETE / AUDIT BLOCKED — GOVERNANCE CORRECTION REQUIRED  
+**Status:** SPECIFICATION COMPLETE / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning  
 **Task:** P08-T06 — Outcome Evidence Analysis Readiness  
 **Contract:** `p08-t06-v1`  
@@ -577,29 +577,17 @@ The substantive T06 boundary is internally complete: T05 is the direct
 predecessor, the readiness predicate is non-economic, provenance/cutoff and
 fail-closed rules are explicit, and no P07/P09 authority is introduced.
 
-The specification audit is nevertheless **BLOCKED / FAIL** until two existing
-governance inconsistencies are corrected:
+The independent audit is **PASS** after the governance reconciliation:
 
-1. `docs/MASTER_BLUEPRINT.md` still identifies P08-T02 as the current P08
-   boundary even though `PROJECT_STATE.md` records P08-T01 through P08-T05 as
-   complete and audited.
+1. `docs/MASTER_BLUEPRINT.md` now identifies the T06 specification candidate as
+   the current boundary and records T01–T05 as complete and audited.
 2. `docs/P08-T04-SPECIFICATION.md` and
-   `docs/P08-T05-SPECIFICATION.md` still state that implementation is
-   `NOT AUTHORIZED`, while `PROJECT_STATE.md` records both implementations as
-   complete, closed, and audited PASS.
+   `docs/P08-T05-SPECIFICATION.md` now distinguish their historical
+   specification-only gates from the separately authorized, complete, closed,
+   and audited current implementations.
 
-These are predecessor-governance and phase-map corrections, not T06 runtime
-work. T06 must not be implemented or authorized while the contradictions remain.
-
-Corrective proposal:
-
-1. Reconcile the P08 current-boundary/status entry in
-   `docs/MASTER_BLUEPRINT.md` with the authoritative closed T01–T05 state,
-   without redesigning the blueprint.
-2. Reconcile the historical authorization wording in the T04 and T05
-   specifications with their separately authorized COMPLETE / CLOSED /
-   AUDITED PASS implementation status, preserving their fixed contracts.
-3. Re-run the independent T06 specification audit after those corrections.
+These corrections changed only lifecycle/status and authorization-history
+wording. The fixed T04/T05 contracts and the T06 boundary remain unchanged.
 
 Implementation status remains:
 

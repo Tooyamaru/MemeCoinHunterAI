@@ -1,6 +1,6 @@
 # P08-T04 — Outcome Evidence Evaluation Boundary
 
-**Status:** SPECIFICATION COMPLETE / IMPLEMENTATION NOT AUTHORIZED  
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P08 — Learning Engine  
 **Task:** P08-T04 — Outcome Evidence Evaluation  
 **Contract:** `p08-t04-v1`  
@@ -29,12 +29,12 @@ P08-T04 consumes existing immutable P07/P08 evidence.
 
 A new external evidence packet is not required for this boundary.
 
-Implementation of P08-T04 is NOT AUTHORIZED by this specification alone.
+The current P08-T04 runtime implementation was separately authorized after
+specification audit and is COMPLETE / CLOSED / AUDITED PASS. This specification
+does not authorize changes outside the fixed T04 contract.
 
-Runtime implementation requires a separate explicit implementation
-authorization after specification audit.
-
-No P08-T05 or P09 behavior is authorized by this specification.
+No change to downstream P08-T05 or P09 behavior is authorized by this
+specification.
 
 ## 3. Dependency Chain
 

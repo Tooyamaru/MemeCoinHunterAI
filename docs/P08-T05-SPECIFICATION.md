@@ -1,6 +1,6 @@
 # P08-T05 — Outcome Evidence Evaluation Snapshot Boundary
 
-**Status:** SPECIFICATION COMPLETE / IMPLEMENTATION NOT AUTHORIZED
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P08 — Outcome Learning
 **Task:** P08-T05 — Outcome Evidence Evaluation Snapshot
 **Contract:** `p08-t05-v1`
@@ -27,12 +27,12 @@ P08-T05 is a structural snapshot boundary, not an economic analysis boundary.
 P08-T04 is the direct semantic and evidence-integrity predecessor. P08-T05
 does not replace or reinterpret P08-T04.
 
-Implementation of P08-T05 is not authorized by this specification alone.
-Runtime implementation requires a separate explicit implementation
-authorization after independent specification audit.
+The current P08-T05 runtime implementation was separately authorized after
+independent specification audit and is COMPLETE / CLOSED / AUDITED PASS. This
+specification does not authorize changes outside the fixed T05 contract.
 
-No P08-T06, P09, model update, strategy update, execution, or live-trading
-behavior is authorized by this specification.
+No P08-T06 runtime implementation, P09, model update, strategy update,
+execution, or live-trading behavior is authorized by this specification.
 
 ## 3. Dependency Chain
 
@@ -528,7 +528,8 @@ Implementation requires a separate explicit authorization after:
     are implemented without additions; and
 12. confirmation that focused tests cover every valid and fail-closed path.
 
-Until that authorization is recorded, P08-T05 implementation is prohibited.
+That authorization gate was satisfied for the current implementation. It remains
+required for any future T05 runtime or contract change.
 
 ## 22. Specification Acceptance Criteria
 
@@ -549,11 +550,11 @@ P08-T05 is specification-complete only when:
 
 ## 23. Final Specification Decision
 
-**P08-T05 SPECIFICATION: COMPLETE / READY FOR INDEPENDENT AUDIT**
+**P08-T05 SPECIFICATION: COMPLETE / CLOSED / AUDITED PASS**
 
 Implementation status remains:
 
-**NOT AUTHORIZED**
+**SEPARATELY AUTHORIZED / IMPLEMENTED / VERIFIED**
 
 The approved boundary is:
 
@@ -571,4 +572,5 @@ No performance metrics are produced.
 
 No P07 ownership is replaced.
 
-No P08-T06, P09, execution, model update, or strategy update is authorized.
+No P08-T06 runtime implementation, P09, execution, model update, or strategy
+update is authorized.
