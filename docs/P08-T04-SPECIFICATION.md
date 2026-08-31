@@ -735,7 +735,8 @@ Implementation requires a separate explicit authorization after:
    codes, ordering, and digest coverage in Sections 9 and 24 are implemented
    without additions.
 
-Until that authorization is recorded, implementation is prohibited.
+That authorization gate was satisfied for the current implementation. It remains
+required for any future T04 runtime or contract change.
 
 ## 33. Governance Acceptance Criteria
 
@@ -758,11 +759,11 @@ P08-T04 specification may be considered specification-complete only when:
 
 ## 34. Final Specification Decision
 
-**P08-T04 SPECIFICATION: COMPLETE / READY FOR AUDIT**
+**P08-T04 SPECIFICATION: COMPLETE / CLOSED / AUDITED PASS**
 
 Implementation status remains:
 
-**NOT AUTHORIZED**
+**SEPARATELY AUTHORIZED / IMPLEMENTED / VERIFIED**
 
 The approved boundary is:
 
@@ -780,5 +781,5 @@ No aggregate learning analysis is performed.
 
 No P07 ownership is replaced.
 
-No P09 behavior is authorized.
+No change to P09 behavior is authorized.
 
