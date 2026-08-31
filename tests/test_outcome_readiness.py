@@ -263,6 +263,27 @@ def test_rejects_invalid_snapshot_types_and_versions():
         evaluate_outcome_learning_readiness(object())
 
     snapshot = _snapshot()
+    class SnapshotSubclass(OutcomeEvidenceEvaluationSnapshot):
+        pass
+
+    subclass_snapshot = SnapshotSubclass(
+        source_dataset_digest=snapshot.source_dataset_digest,
+        source_dataset_as_of_time=snapshot.source_dataset_as_of_time,
+        evaluations=snapshot.evaluations,
+        evaluation_digests=snapshot.evaluation_digests,
+        source_evaluation_contract_version=(
+            snapshot.source_evaluation_contract_version
+        ),
+        source_evaluation_evaluator_version=(
+            snapshot.source_evaluation_evaluator_version
+        ),
+        contract_version=snapshot.contract_version,
+        evaluator_version=snapshot.evaluator_version,
+        snapshot_digest=snapshot.snapshot_digest,
+    )
+    with pytest.raises(ValueError, match="OutcomeEvidenceEvaluationSnapshot"):
+        evaluate_outcome_learning_readiness(subclass_snapshot)
+
     object.__setattr__(snapshot, "contract_version", "p08-t99-v1")
     with pytest.raises(ValueError, match="snapshot|contract|invalid"):
         evaluate_outcome_learning_readiness(snapshot)

@@ -262,7 +262,7 @@ def _reason_codes_for(
 
 
 def _validate_snapshot(value: Any) -> None:
-    if not isinstance(value, OutcomeEvidenceEvaluationSnapshot):
+    if type(value) is not OutcomeEvidenceEvaluationSnapshot:
         raise ValueError(
             "snapshot must be an OutcomeEvidenceEvaluationSnapshot"
         )
