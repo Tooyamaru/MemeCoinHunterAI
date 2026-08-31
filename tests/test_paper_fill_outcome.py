@@ -40,6 +40,7 @@ def _evaluate(**overrides):
         "quantity_unit": "TOKEN",
         "price_unit": "QUOTE_PER_TOKEN",
         "fee_unit": "QUOTE",
+        "quote_currency": "QUOTE",
         "executable_liquidity": Decimal("10"),
         "reference_quote_price": Decimal("100"),
         "quote_observation_time": REFERENCE - timedelta(seconds=2),
@@ -59,6 +60,10 @@ def test_valid_buy_full_fill_preserves_provenance_and_precedence():
     assert outcome.remaining_quantity == Decimal("0")
     assert outcome.effective_price == Decimal("100.34")
     assert outcome.latency_seconds == Decimal("1.0")
+    assert outcome.asset_identity == {"token_identity": "token-1"}
+    assert outcome.base_currency == outcome.asset_identity
+    assert outcome.quote_currency == "QUOTE"
+    assert len(outcome.fill_id) == 64
     assert outcome.p07_t01_input_digest == outcome.p07_t01_input_digest
     assert len(outcome.outcome_digest) == 64
 
@@ -153,6 +158,61 @@ def test_canonical_digest_and_replay_are_stable():
     assert first.outcome_digest == second.outcome_digest
 
 
+def test_fill_id_is_stable_and_changes_with_canonical_fill_identity():
+    first = _evaluate()
+    second = _evaluate()
+    changed = _evaluate(requested_quantity=Decimal("9"))
+
+    assert first.fill_id == second.fill_id
+    assert first.fill_id != changed.fill_id
+
+
+def test_fill_id_tampering_is_rejected_with_supplied_digest():
+    outcome = _evaluate()
+
+    with pytest.raises(ValueError, match="outcome_digest"):
+        PaperFillOutcome(
+            **{
+                **outcome.__dict__,
+                "fill_id": "0" * 64,
+            }
+        )
+
+
+def test_asset_identity_mismatch_is_rejected_against_t01_observation():
+    with pytest.raises(ValueError, match="asset_identity"):
+        _evaluate(asset_identity={"chain": "other", "mint": "other"})
+
+
+def test_currency_and_unit_relationships_are_explicit():
+    outcome = _evaluate()
+
+    assert outcome.canonical_representation["asset_identity"] == {
+        "token_identity": "token-1"
+    }
+    assert outcome.canonical_representation["base_currency"] == {
+        "token_identity": "token-1"
+    }
+    assert outcome.canonical_representation["quote_currency"] == "QUOTE"
+    assert outcome.canonical_representation["quantity_unit"] == "TOKEN"
+    assert outcome.canonical_representation["price_unit"] == "QUOTE_PER_TOKEN"
+    assert outcome.canonical_representation["fee_unit"] == "QUOTE"
+
+    with pytest.raises(ValueError, match="price_unit"):
+        _evaluate(price_unit="TOKEN_PER_QUOTE")
+    with pytest.raises(ValueError, match="fee_unit"):
+        _evaluate(fee_unit="OTHER_QUOTE")
+
+
+def test_new_identity_fields_affect_outcome_digest():
+    outcome = _evaluate()
+    changed = _evaluate(quote_currency="USDC", fee_unit="USDC",
+                        price_unit="USDC_PER_TOKEN")
+
+    assert outcome.canonical_representation["fill_id"] == outcome.fill_id
+    assert outcome.outcome_digest != changed.outcome_digest
+
+
 def test_unknown_fields_and_non_decimal_values_are_rejected():
     with pytest.raises(TypeError):
         FrictionComponents(unknown_field=Decimal("1"))
@@ -171,6 +231,9 @@ def test_outcome_constructor_rejects_non_success_positive_fill():
             quantity_unit="TOKEN",
             price_unit="QUOTE_PER_TOKEN",
             fee_unit="QUOTE",
+            asset_identity={"token_identity": "token-1"},
+            base_currency={"token_identity": "token-1"},
+            quote_currency="QUOTE",
             reference_quote_price=None,
             effective_price=None,
             executable_liquidity=None,
@@ -198,6 +261,9 @@ def test_constructor_rejects_filled_quantity_above_liquidity():
             quantity_unit="TOKEN",
             price_unit="QUOTE_PER_TOKEN",
             fee_unit="QUOTE",
+            asset_identity={"token_identity": "token-1"},
+            base_currency={"token_identity": "token-1"},
+            quote_currency="QUOTE",
             reference_quote_price=Decimal("100"),
             effective_price=Decimal("100"),
             executable_liquidity=Decimal("5"),
@@ -239,6 +305,9 @@ def test_constructor_derives_latency_from_timestamps():
         quantity_unit="TOKEN",
         price_unit="QUOTE_PER_TOKEN",
         fee_unit="QUOTE",
+        asset_identity={"token_identity": "token-1"},
+        base_currency={"token_identity": "token-1"},
+        quote_currency="QUOTE",
         reference_quote_price=Decimal("100"),
         effective_price=Decimal("100"),
         executable_liquidity=Decimal("1"),
@@ -256,6 +325,51 @@ def test_constructor_derives_latency_from_timestamps():
     )
 
     assert outcome.latency_seconds == Decimal("60.0")
+
+
+def test_successful_outcome_requires_timezone_aware_fill_time():
+    outcome = _evaluate(fill_time=None)
+
+    assert outcome.status is FillOutcomeStatus.INVALID
+    assert outcome.reason_codes == ("MISSING_FILL_TIME",)
+    assert outcome.filled_quantity == Decimal("0")
+
+    with pytest.raises(ValueError, match="fill_time"):
+        PaperFillOutcome(
+            status=FillOutcomeStatus.FILLED,
+            side=TradeSide.BUY,
+            requested_quantity=Decimal("1"),
+            filled_quantity=Decimal("1"),
+            remaining_quantity=Decimal("0"),
+            quantity_unit="TOKEN",
+            price_unit="QUOTE_PER_TOKEN",
+            fee_unit="QUOTE",
+            asset_identity={"token_identity": "token-1"},
+            base_currency={"token_identity": "token-1"},
+            quote_currency="QUOTE",
+            reference_quote_price=Decimal("100"),
+            effective_price=Decimal("100"),
+            executable_liquidity=Decimal("1"),
+            friction=_friction(),
+            quote_observation_time=REFERENCE,
+            fill_time=None,
+            latency_seconds=None,
+            reason_codes=(),
+            p07_t01_input_digest="a" * 64,
+            simulation_configuration_id="config",
+            simulation_configuration_digest="b" * 64,
+            replay_id="replay",
+            execution_observation_id="obs",
+            execution_observation_digest="c" * 64,
+        )
+
+
+def test_non_success_outcome_may_omit_fill_time():
+    outcome = _evaluate(fill_time=None, executable_liquidity=Decimal("0"))
+
+    assert outcome.status is FillOutcomeStatus.FAILED
+    assert outcome.fill_time is None
+    assert outcome.filled_quantity == Decimal("0")
 
 
 def test_rounding_policy_is_explicit_and_deterministic():

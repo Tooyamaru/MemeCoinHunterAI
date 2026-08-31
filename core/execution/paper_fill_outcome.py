@@ -14,9 +14,9 @@ from typing import Any, Mapping
 from core.execution.paper_simulation_input import PaperSimulationInput
 
 
-P07_T02_CONTRACT_VERSION = "p07-t02-v1"
-P07_T02_FILL_MODEL_VERSION = "p07-t02-fill-v1"
-P07_T02_FRICTION_MODEL_VERSION = "p07-t02-friction-v1"
+P07_T02_CONTRACT_VERSION = "p07-t02-v2"
+P07_T02_FILL_MODEL_VERSION = "p07-t02-fill-v2"
+P07_T02_FRICTION_MODEL_VERSION = "p07-t02-friction-v2"
 
 P07_T02_ROUNDING_MODE = "ROUND_HALF_EVEN"
 P07_T02_MAX_DECIMAL_PLACES = 18
@@ -93,6 +93,8 @@ class FrictionComponents:
                 "quote_drift": _decimal_text(self.quote_drift),
                 "priority_fees": _decimal_text(self.priority_fees),
                 "mev_adverse_ordering": _decimal_text(self.mev_adverse_ordering),
+                "fee_denomination": "quote_currency",
+                "price_adjustment_denomination": "quote_per_base",
                 "evidence": self.evidence,
             }
         )
@@ -114,6 +116,9 @@ class PaperFillOutcome:
     quantity_unit: str
     price_unit: str
     fee_unit: str
+    asset_identity: Mapping[str, Any]
+    base_currency: Mapping[str, Any]
+    quote_currency: str
     reference_quote_price: Decimal | None
     effective_price: Decimal | None
     executable_liquidity: Decimal | None
@@ -132,6 +137,7 @@ class PaperFillOutcome:
     execution_observation_digest: str = ""
     contract_version: str = P07_T02_CONTRACT_VERSION
     outcome_digest: str | None = None
+    fill_id: str = ""
 
     def __post_init__(self) -> None:
         _enum(self.status, FillOutcomeStatus, "status")
@@ -172,6 +178,20 @@ class PaperFillOutcome:
         _text(self.quantity_unit, "quantity_unit")
         _text(self.price_unit, "price_unit")
         _text(self.fee_unit, "fee_unit")
+        asset_identity = _identity_mapping(self.asset_identity, "asset_identity")
+        base_currency = _identity_mapping(self.base_currency, "base_currency")
+        if base_currency != asset_identity:
+            raise ValueError("base_currency must equal asset_identity")
+        object.__setattr__(self, "asset_identity", asset_identity)
+        object.__setattr__(self, "base_currency", base_currency)
+        _text(self.quote_currency, "quote_currency")
+        _validate_unit_relationships(
+            self.quantity_unit,
+            self.price_unit,
+            self.fee_unit,
+            self.quote_currency,
+            asset_identity,
+        )
 
         if self.reference_quote_price is not None:
             _decimal(
@@ -201,6 +221,18 @@ class PaperFillOutcome:
         ):
             if value is not None:
                 object.__setattr__(self, name, _utc(value, name))
+
+        if (
+            self.status
+            in {
+                FillOutcomeStatus.FILLED,
+                FillOutcomeStatus.PARTIALLY_FILLED,
+            }
+            and self.fill_time is None
+        ):
+            raise ValueError(
+                "successful outcomes require timezone-aware fill_time"
+            )
 
         if self.quote_observation_time and self.fill_time:
             derived = _decimal(
@@ -280,7 +312,53 @@ class PaperFillOutcome:
         if self.contract_version != P07_T02_CONTRACT_VERSION:
             raise ValueError("unsupported P07-T02 contract_version")
 
+        expected_fill_id = _digest(self._fill_identity_representation())
+        if self.fill_id:
+            _digest_text(self.fill_id, "fill_id")
+            if self.fill_id != expected_fill_id:
+                if self.outcome_digest is not None:
+                    raise ValueError(
+                        "outcome_digest does not match canonical fill identity"
+                    )
+                raise ValueError(
+                    "fill_id does not match canonical identity material"
+                )
+        else:
+            object.__setattr__(self, "fill_id", expected_fill_id)
+
         _set_or_verify_outcome_digest(self)
+
+    def _fill_identity_representation(self) -> Mapping[str, Any]:
+        return {
+            "p07_t01_input_digest": self.p07_t01_input_digest,
+            "simulation_configuration_id": self.simulation_configuration_id,
+            "simulation_configuration_digest": (
+                self.simulation_configuration_digest
+            ),
+            "replay_id": self.replay_id,
+            "execution_observation_id": self.execution_observation_id,
+            "execution_observation_digest": (
+                self.execution_observation_digest
+            ),
+            "asset_identity": self.asset_identity,
+            "base_currency": self.base_currency,
+            "quote_currency": self.quote_currency,
+            "side": self.side,
+            "requested_quantity": self.requested_quantity,
+            "quantity_unit": self.quantity_unit,
+            "price_unit": self.price_unit,
+            "fee_unit": self.fee_unit,
+            "reference_quote_price": self.reference_quote_price,
+            "executable_liquidity": self.executable_liquidity,
+            "friction": (
+                self.friction.canonical_representation
+                if self.friction
+                else None
+            ),
+            "quote_observation_time": self.quote_observation_time,
+            "fill_time": self.fill_time,
+            "contract_version": self.contract_version,
+        }
 
     @property
     def canonical_representation(self) -> Mapping[str, Any]:
@@ -294,6 +372,9 @@ class PaperFillOutcome:
                 "quantity_unit": self.quantity_unit,
                 "price_unit": self.price_unit,
                 "fee_unit": self.fee_unit,
+                "asset_identity": self.asset_identity,
+                "base_currency": self.base_currency,
+                "quote_currency": self.quote_currency,
                 "reference_quote_price": _decimal_text(
                     self.reference_quote_price
                 ),
@@ -325,6 +406,7 @@ class PaperFillOutcome:
                     self.execution_observation_digest
                 ),
                 "contract_version": self.contract_version,
+                "fill_id": self.fill_id,
                 "rounding_mode": P07_T02_ROUNDING_MODE,
                 "max_decimal_places": P07_T02_MAX_DECIMAL_PLACES,
             }
@@ -346,9 +428,12 @@ def evaluate_paper_fill(
     executable_liquidity: Decimal,
     reference_quote_price: Decimal,
     quote_observation_time: datetime,
-    fill_time: datetime,
+    fill_time: datetime | None,
     friction: FrictionComponents,
     available_inventory: Decimal | None = None,
+    asset_identity: Mapping[str, Any] | None = None,
+    base_currency: Mapping[str, Any] | None = None,
+    quote_currency: str | None = None,
 ) -> PaperFillOutcome:
     """Evaluate one bounded hypothetical fill from supplied evidence only."""
 
@@ -357,6 +442,27 @@ def evaluate_paper_fill(
 
     side_value = TradeSide(side)
     reference = simulation_input.simulation_reference_time
+    authoritative_asset_identity = _identity_mapping(
+        simulation_input.execution_observation.subject_identity,
+        "execution_observation.subject_identity",
+    )
+    if (
+        asset_identity is not None
+        and _identity_mapping(asset_identity, "asset_identity")
+        != authoritative_asset_identity
+    ):
+        raise ValueError(
+            "asset_identity does not match execution observation"
+        )
+    if (
+        base_currency is not None
+        and _identity_mapping(base_currency, "base_currency")
+        != authoritative_asset_identity
+    ):
+        raise ValueError(
+            "base_currency does not match execution observation asset"
+        )
+    resolved_quote_currency = fee_unit if quote_currency is None else quote_currency
 
     base = dict(
         status=FillOutcomeStatus.INVALID,
@@ -367,6 +473,9 @@ def evaluate_paper_fill(
         quantity_unit=quantity_unit,
         price_unit=price_unit,
         fee_unit=fee_unit,
+        asset_identity=authoritative_asset_identity,
+        base_currency=authoritative_asset_identity,
+        quote_currency=resolved_quote_currency,
         reference_quote_price=reference_quote_price,
         effective_price=None,
         executable_liquidity=executable_liquidity,
@@ -416,24 +525,36 @@ def evaluate_paper_fill(
         _text(fee_unit, "fee_unit")
 
         quote_time = _utc(quote_observation_time, "quote_observation_time")
-        simulated_time = _utc(fill_time, "fill_time")
+        simulated_time = (
+            _utc(fill_time, "fill_time")
+            if fill_time is not None
+            else None
+        )
 
-        if quote_time > reference or simulated_time > reference:
+        if (
+            quote_time > reference
+            or (
+                simulated_time is not None
+                and simulated_time > reference
+            )
+        ):
             return _outcome(
                 base,
                 FillOutcomeStatus.REJECTED,
                 ("FUTURE_TIMESTAMP",),
             )
 
-        latency = _decimal(
-            Decimal(
-                str((simulated_time - quote_time).total_seconds())
-            ),
-            "latency_seconds",
-            non_negative=False,
-        )
+        latency = None
+        if simulated_time is not None:
+            latency = _decimal(
+                Decimal(
+                    str((simulated_time - quote_time).total_seconds())
+                ),
+                "latency_seconds",
+                non_negative=False,
+            )
 
-        if latency < 0:
+        if latency is not None and latency < 0:
             invalid_base = dict(base)
             invalid_base["latency_seconds"] = None
             return _outcome(
@@ -538,6 +659,13 @@ def evaluate_paper_fill(
                 base,
                 FillOutcomeStatus.FAILED,
                 ("NO_EXECUTABLE_LIQUIDITY",),
+            )
+
+        if simulated_time is None:
+            return _outcome(
+                base,
+                FillOutcomeStatus.INVALID,
+                ("MISSING_FILL_TIME",),
             )
 
         filled = _round(
@@ -670,6 +798,40 @@ def _freeze_mapping(
         raise ValueError(f"{name} must be a mapping")
 
     return _freeze(_canonicalize(value))
+
+
+def _identity_mapping(
+    value: Any,
+    name: str,
+) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping) or not value:
+        raise ValueError(f"{name} must be a non-empty mapping")
+    return _freeze_mapping(value, name)
+
+
+def _validate_unit_relationships(
+    quantity_unit: str,
+    price_unit: str,
+    fee_unit: str,
+    quote_currency: str,
+    asset_identity: Mapping[str, Any],
+) -> None:
+    expected_price_unit = f"{quote_currency}_PER_{quantity_unit}"
+    if fee_unit != quote_currency:
+        raise ValueError("fee_unit must identify quote_currency")
+    if price_unit != expected_price_unit:
+        raise ValueError(
+            "price_unit must identify quote_currency per base unit"
+        )
+
+    declared_quantity_unit = asset_identity.get("quantity_unit")
+    if (
+        declared_quantity_unit is not None
+        and declared_quantity_unit != quantity_unit
+    ):
+        raise ValueError(
+            "quantity_unit does not identify asset_identity base currency"
+        )
 
 
 def _decimal(
