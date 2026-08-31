@@ -8,9 +8,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P08 — Outcome Learning
-- **Current task:** P08-T04 — Outcome Evidence Evaluation Boundary
-- **Current task status:** P08-T04 NEXT — P08-T03 COMPLETE / CLOSED / AUDITED PASS
-- **Last updated:** 2026-08-28
+- **Current task:** P08-T05 — Outcome Evidence Evaluation Snapshot Boundary
+- **Current task status:** P08-T05 COMPLETE / CLOSED / AUDITED PASS
+- **Last updated:** 2026-08-31
 
 ## Master progress
 
@@ -19,15 +19,15 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 next; later P08 tasks not started; P06 runtime and P09–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 COMPLETE / CLOSED / AUDITED PASS; P08-T05 COMPLETE / CLOSED / AUDITED PASS; P08-T06 and later P08 tasks not started; P06 runtime and P09–P12 not started
 
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** P08-T04 — Outcome Evidence Evaluation Boundary
+- **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P06 runtime; P08-T04 runtime and later P08 tasks; P09–P12
+- **Not started:** P06 runtime; P08-T06 and later P08 tasks; P09–P12
 
 ## Current objective
 
@@ -85,14 +85,18 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-P08-T02 verification completed on 2026-08-27 against the current repository
+P08-T05 verification completed on 2026-08-31 against the current repository
 state.
 
-P08-T02 focused tests: 6 passed.
-Full project test suite: 651 passed with one existing non-blocking
+P08-T04 focused tests: 24 passed.
+P08-T05 focused tests: 20 passed.
+Full project test suite: 720 passed with one existing non-blocking
 Starlette/httpx deprecation warning.
 Python version: 3.13.11.
 `git diff --check`: PASS.
+
+P08-T04 and P08-T05 are COMPLETE / CLOSED / AUDITED PASS. No P08-T06,
+P09, or later behavior was introduced.
 
 P08-T01 implementation is present in:
 `core/learning/outcome_observation.py`
@@ -238,17 +242,16 @@ P07-T01 through P07-T07 implementation and verification are COMPLETE / CLOSED /
 AUDITED PASS. P07 remains simulation-only and has no live execution authority.
 No P07-T08 exists or is required.
 
-Review the corrected P08-T04 specification for implementation readiness. P08-T04
-runtime remains unauthorized until the output contract, reason codes, T03
-governance state, and provenance equality rules pass specification audit.
+P08-T04 and P08-T05 implementation and verification are COMPLETE / CLOSED /
+AUDITED PASS. No later P08 task is authorized or started by this checkpoint.
 
 ## Next task
 
-P08-T04 is the current separately governed specification candidate: a
-single-observation evidence integrity/sufficiency evaluation over one validated
-P08-T03 result and its linked P08-T02 snapshot. Its runtime implementation
-requires explicit authorization after the corrected specification is audited.
-No P08-T04 behavior exists.
+P08-T04 is COMPLETE / CLOSED / AUDITED PASS as a single-observation
+evidence-integrity evaluation over one validated P08-T03 result and its linked
+P08-T02 snapshot. P08-T05 is COMPLETE / CLOSED / AUDITED PASS as the
+deterministic, immutable collection snapshot over the complete T04 result set.
+No P08-T06 or P09 behavior has been started or authorized.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:
