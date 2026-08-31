@@ -84,3 +84,21 @@ __all__ += [
     "create_outcome_evidence_evaluation_snapshot",
     "snapshot_outcome_evidence_evaluations",
 ]
+
+from core.learning.outcome_readiness import (
+    OutcomeLearningReadinessReasonCode,
+    OutcomeLearningReadinessResult,
+    OutcomeLearningReadinessState,
+    P08_T06_CONTRACT_VERSION,
+    P08_T06_EVALUATOR_VERSION,
+    evaluate_outcome_learning_readiness,
+)
+
+__all__ += [
+    "OutcomeLearningReadinessReasonCode",
+    "OutcomeLearningReadinessResult",
+    "OutcomeLearningReadinessState",
+    "P08_T06_CONTRACT_VERSION",
+    "P08_T06_EVALUATOR_VERSION",
+    "evaluate_outcome_learning_readiness",
+]
