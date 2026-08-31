@@ -1,6 +1,7 @@
 # P08-T06 — Outcome Evidence Analysis Readiness Boundary
 
-**Status:** SPECIFICATION COMPLETE / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED
+**Status:** SPECIFICATION COMPLETE / AUDITED PASS — IMPLEMENTED / AUDITED PASS /
+READY TO CLOSE
 **Phase:** P08 — Outcome Learning  
 **Task:** P08-T06 — Outcome Evidence Analysis Readiness  
 **Contract:** `p08-t06-v1`  
@@ -34,9 +35,10 @@ membership, T02 cutoff linkage, T04 state preservation, and snapshot identity.
 T06 consumes exactly one validated P08-T05 snapshot. It does not consume raw
 P07, P08-T01, P08-T02, P08-T03, or P08-T04 material as a substitute for T05.
 
-This specification does not authorize runtime implementation. Runtime
-implementation requires a separate explicit implementation authorization after
-this specification audit.
+The original implementation-authorization gate remains part of this
+specification's historical governance record. A separate implementation
+authorization has since occurred for the current workspace, and the T06
+implementation is present and audited against this contract.
 
 No P08-T07, P09, model training, strategy update, execution, or live-trading
 behavior is authorized by this specification.
@@ -577,21 +579,25 @@ The substantive T06 boundary is internally complete: T05 is the direct
 predecessor, the readiness predicate is non-economic, provenance/cutoff and
 fail-closed rules are explicit, and no P07/P09 authority is introduced.
 
-The independent audit is **PASS** after the governance reconciliation:
-
-1. `docs/MASTER_BLUEPRINT.md` now identifies the T06 specification candidate as
-   the current boundary and records T01–T05 as complete and audited.
-2. `docs/P08-T04-SPECIFICATION.md` and
-   `docs/P08-T05-SPECIFICATION.md` now distinguish their historical
-   specification-only gates from the separately authorized, complete, closed,
-   and audited current implementations.
+The independent specification audit is **PASS** after the governance
+reconciliation. The current implementation audit also passed the focused
+contract, provenance, determinism, authority-boundary, and scope checks.
+`docs/MASTER_BLUEPRINT.md` records T06 as the current implemented boundary, and
+the T04/T05 documents distinguish their historical specification-only gates
+from their separately authorized, complete, closed, and audited implementations.
 
 These corrections changed only lifecycle/status and authorization-history
 wording. The fixed T04/T05 contracts and the T06 boundary remain unchanged.
 
-Implementation status remains:
+Implementation status:
 
-**NOT AUTHORIZED**
+**SEPARATELY AUTHORIZED / IMPLEMENTED / AUDITED PASS / READY TO CLOSE**
+
+Current verification evidence is:
+
+- focused T06 tests: 14 passed;
+- P08 regression tests: 76 passed; and
+- Python version: 3.13.11.
 
 The approved proposed boundary is:
 

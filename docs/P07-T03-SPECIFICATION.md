@@ -711,8 +711,9 @@ FIX #4: **RESOLVED**.
 FIX #5: **RESOLVED**.
 P07-T03: **CLOSED**.
 
-P07-T04 is the next separately governed task candidate. No P07-T04
-implementation is started or authorized by this closure. No implementation,
-test, dependency, persistence, ledger, reconciliation, provider, wallet, RPC,
-DEX, signing, broadcast, P08, P09, or live-execution work outside the
-completed T03 boundary is authorized by this document.
+At the time of this T03 closure, P07-T04 was the next separately governed task
+candidate. P07-T04 was subsequently implemented and closed within the P07
+chain. No implementation, test, dependency, persistence, ledger,
+reconciliation, provider, wallet, RPC, DEX, signing, broadcast, P08, P09, or
+live-execution work outside the completed T03 boundary was authorized by this
+document.

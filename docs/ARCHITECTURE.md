@@ -156,7 +156,7 @@ CLOSED / AUDITED PASS as the deterministic, provider-neutral, pure per-candidate
 opportunity pre-score boundary. P05-T06 is COMPLETE / CLOSED / AUDITED PASS. P05 remains deterministic, provider-neutral,
 and fail-closed.
 
-## P06 Architecture Gate
+## P06 Architecture Gate — COMPLETE / CLOSED / APPROVED
 
 P05-T01 through P05-T08 are complete and closed. The P06 architecture gate is
 IN PROGRESS; no P06 runtime is authorized yet. The approved P06 boundary
@@ -179,3 +179,41 @@ private keys or wallets, sign, broadcast, call RPC/DEX/provider execution
 infrastructure, construct transactions, or submit orders. The separate
 Risk/Capital Authorization, Execution Request, isolated Signing Boundary,
 Broadcast, Reconciliation, and Journal boundaries remain mandatory.
+
+## P07 Paper Trading Current Boundary
+
+P07-T01 through P07-T07 are complete, closed, and audited PASS. P07 remains
+simulation-only and owns paper-simulation facts, simulated fills, paper state,
+ledger records, reconciliation records, simulation results, and local history.
+It has no live-trading, capital, wallet, signing, broadcast, or P09 authority.
+
+## P08 Outcome Learning Current Boundary
+
+P08-T01 through P08-T05 are complete, closed, and audited PASS. The current
+P08-T06 boundary is implemented, audited PASS, and ready to close.
+
+The governed provenance chain is:
+
+```text
+P06 DecisionIntent
+→ P07 simulation input/result/history
+→ P08-T01 observation
+→ P08-T02 dataset snapshot
+→ P08-T03 interpretation
+→ P08-T04 evidence evaluation
+→ P08-T05 validated outcome record
+→ P08-T06 readiness
+```
+
+P08-T06 consumes exactly one validated P08-T05 snapshot and produces only the
+structural readiness predicate
+`READY_FOR_NON_ECONOMIC_ANALYSIS` or
+`NOT_READY_FOR_NON_ECONOMIC_ANALYSIS`. It preserves the T05 snapshot identity,
+T02 dataset digest and cutoff, and T04/T05 contract identities.
+
+T06 is immutable, deterministic, provider-neutral, read-only, and non-economic.
+It does not classify WIN/LOSS, calculate profit or performance metrics, rank or
+compare candidates, modify models or strategies, authorize risk or capital,
+execute trades, replace P07/P08 ownership, or activate P08-T07/P09 behavior.
+Any later analysis or economic outcome boundary requires separate governance,
+specification, and authorization.

@@ -1,5 +1,10 @@
 # AI ENTRY POINT
 
+> **LEGACY MIRROR — NOT CANONICAL.** Use the repository-root
+> `PROJECT_STATE.md` for current project state. This nested copy is retained
+> for historical/import compatibility and must not be used to determine the
+> active phase, task, implementation status, or authorization.
+
 **DO NOT SCAN THE FULL REPOSITORY.**
 
 Read `REPLIT_RULES.md` first. Use this file as the authoritative current development state. Then read only the files listed under **Relevant files for current task**.

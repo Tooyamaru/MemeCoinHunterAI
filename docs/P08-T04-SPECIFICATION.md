@@ -706,7 +706,7 @@ approved contract.
 No downstream task may treat the existence of a T04 result as proof of
 profitability or economic edge.
 
-T04 completion therefore does not authorize:
+T04 completion, by itself, did not authorize:
 
 - P08-T05 implementation;
 - model promotion;
@@ -714,6 +714,10 @@ T04 completion therefore does not authorize:
 - production decision changes;
 - live execution; or
 - P09 work.
+
+P08-T05 was subsequently authorized and is COMPLETE / CLOSED / AUDITED PASS.
+The separate P08-T06 readiness boundary is also implemented and audited PASS;
+neither status changes the non-economic scope or authority exclusions above.
 
 ## 32. Implementation Authorization Gate
 

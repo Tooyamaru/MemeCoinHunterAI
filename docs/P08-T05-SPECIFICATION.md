@@ -31,8 +31,10 @@ The current P08-T05 runtime implementation was separately authorized after
 independent specification audit and is COMPLETE / CLOSED / AUDITED PASS. This
 specification does not authorize changes outside the fixed T05 contract.
 
-No P08-T06 runtime implementation, P09, model update, strategy update,
-execution, or live-trading behavior is authorized by this specification.
+P08-T06 is a separate downstream boundary. Its implementation was separately
+authorized and is IMPLEMENTED / AUDITED PASS / READY TO CLOSE. No P08-T07,
+P09, model update, strategy update, execution, or live-trading behavior is
+authorized by this specification.
 
 ## 3. Dependency Chain
 
@@ -572,5 +574,6 @@ No performance metrics are produced.
 
 No P07 ownership is replaced.
 
-No P08-T06 runtime implementation, P09, execution, model update, or strategy
-update is authorized.
+P08-T06 is IMPLEMENTED / AUDITED PASS / READY TO CLOSE under separate
+authorization. No P08-T07, P09, execution, model update, or strategy update is
+authorized.

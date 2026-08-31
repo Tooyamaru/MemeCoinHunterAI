@@ -1,7 +1,7 @@
 # P07-T04 — Paper Ledger / Append-Only Simulation Record Contract
 
-**Status:** SPECIFICATION PROPOSED — REVIEW REQUIRED — IMPLEMENTATION NOT
-AUTHORIZED  
+**Status:** COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION COMPLETE /
+AUDITED PASS
 **Phase:** P07 — Paper Trading Engine  
 **Task:** P07-T04 — Paper Ledger / Append-Only Simulation Record Contract  
 **Contract:** `p07-t04-v1`  
@@ -838,16 +838,15 @@ Specific accidental-authority checks:
 - The returned tuple is an in-memory value, not persistence.
 - A ledger record cannot authorize a state transition or claim external truth.
 
-Audit result: **PROPOSED / REVIEW REQUIRED**.
+Audit result: **COMPLETE / CLOSED / AUDITED PASS**.
 
 ## 23. Governance conclusion
 
-P07-T04 is the next separately governed paper-ledger boundary after P07-T03.
-This document defines the proposed logical contract only.
+P07-T04 is the completed paper-ledger boundary after P07-T03. The historical
+authorization gate below remains part of the governance record; the current
+repository records P07-T04 as implemented, complete, closed, and audited PASS.
 
-**This document does not authorize implementation.**
-
-Implementation requires a separate explicit authorization containing:
+Implementation originally required a separate explicit authorization containing:
 
 - the exact approved baseline commit;
 - the exact implementation files;
@@ -856,6 +855,7 @@ Implementation requires a separate explicit authorization containing:
 - the exact regression command(s); and
 - explicit permission to modify those files.
 
-No P07-T04 implementation, test, dependency, persistence, reconciliation,
-provider, wallet, RPC, DEX, signing, broadcast, P08, P09, or live-execution
+The restrictions above describe the T04 authorization scope. P07-T05 through
+P07-T07 were subsequently authorized and completed as separate boundaries.
+No P08, P09, provider, wallet, RPC, DEX, signing, broadcast, or live-execution
 work is authorized by this document.

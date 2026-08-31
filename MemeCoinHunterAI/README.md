@@ -1,5 +1,9 @@
 # AI AGENTS — IMPORTANT
 
+> **LEGACY MIRROR — NOT CANONICAL.** Use the repository-root `README.md` and
+> `PROJECT_STATE.md` for current project status. This nested copy is retained
+> for historical/import compatibility.
+
 **DO NOT SCAN THE FULL REPOSITORY.**
 
 **FIRST READ:**

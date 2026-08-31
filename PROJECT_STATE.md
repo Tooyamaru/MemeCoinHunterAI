@@ -9,7 +9,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P08 — Outcome Learning
 - **Current task:** P08-T06 — Outcome Evidence Analysis Readiness Boundary
-- **Current task status:** P08-T06 SPECIFICATION COMPLETE / AUDITED PASS; IMPLEMENTATION NOT AUTHORIZED
+- **Current task status:** P08-T06 IMPLEMENTED / AUDITED PASS / READY TO CLOSE
 - **Last updated:** 2026-08-31
 
 ## Master progress
@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 COMPLETE / CLOSED / AUDITED PASS; P08-T05 COMPLETE / CLOSED / AUDITED PASS; P08-T06 SPECIFICATION COMPLETE / AUDITED PASS, implementation not authorized; P08-T07 and later P08 tasks not started; P06 runtime and P09–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 COMPLETE / CLOSED / AUDITED PASS; P08-T05 COMPLETE / CLOSED / AUDITED PASS; P08-T06 IMPLEMENTED / AUDITED PASS / READY TO CLOSE; P08-T07 and later P08 tasks not started; P06 runtime and P09–P12 not started
 
 ## Phase status
 
@@ -27,7 +27,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **In progress:** None
 - **Blocked:** None
 - **On hold:** None
-- **Not started:** P06 runtime; P08-T06 runtime; P08-T07 and later P08 tasks; P09–P12
+- **Not started:** P06 runtime; P08-T07 and later P08 tasks; P09–P12
 
 ## Current objective
 
@@ -42,6 +42,13 @@ interpretation boundary. The approved `p08-t03-v1` contract defines the exact
 taxonomy, output, provenance, deterministic behavior, and missing-data
 semantics. Its runtime implementation is present, verified, and formally
 closed under separate implementation authorization.
+
+P08-T04 and P08-T05 are complete, closed, and audited PASS. P08-T06 is the
+implemented, immutable, deterministic, non-economic readiness boundary over one
+validated P08-T05 snapshot. It emits only
+`READY_FOR_NON_ECONOMIC_ANALYSIS` or
+`NOT_READY_FOR_NON_ECONOMIC_ANALYSIS`, preserves T05/T02/T04 provenance, and
+does not classify economic outcomes or provide authority.
 
 The separate Ledger ↔ State Consistency Verification boundary is deterministic,
 immutable, provider-neutral, and compares only explicitly supplied immutable
@@ -85,20 +92,17 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-P08-T05 verification completed on 2026-08-31 against the current repository
-state.
+P08-T06 implementation and documentation synchronization were verified on
+2026-08-31 against the current repository state.
 
-P08-T04 focused tests: 24 passed.
-P08-T05 focused tests: 20 passed.
-Full project test suite: 720 passed with one existing non-blocking
-Starlette/httpx deprecation warning.
+P08-T06 focused tests: 14 passed.
+P08 regression tests: 76 passed.
 Python version: 3.13.11.
 `git diff --check`: PASS.
 
-P08-T04 and P08-T05 are COMPLETE / CLOSED / AUDITED PASS. P08-T06 is
-SPECIFICATION COMPLETE / AUDITED PASS as a structural, non-economic readiness
-boundary; its implementation remains unauthorized. No P08-T06 runtime,
-P08-T07, P09, or later behavior was introduced.
+P08-T01 through P08-T05 are COMPLETE / CLOSED / AUDITED PASS. P08-T06 is
+IMPLEMENTED / AUDITED PASS / READY TO CLOSE. No P08-T07, P09, or later
+behavior was introduced.
 
 P08-T01 implementation is present in:
 `core/learning/outcome_observation.py`
@@ -245,7 +249,8 @@ AUDITED PASS. P07 remains simulation-only and has no live execution authority.
 No P07-T08 exists or is required.
 
 P08-T04 and P08-T05 implementation and verification are COMPLETE / CLOSED /
-AUDITED PASS. No later P08 task is authorized or started by this checkpoint.
+AUDITED PASS. P08-T06 implementation and audit are COMPLETE / AUDITED PASS /
+READY TO CLOSE. No later P08 task is authorized or started by this checkpoint.
 
 ## Next task
 
@@ -253,7 +258,9 @@ P08-T04 is COMPLETE / CLOSED / AUDITED PASS as a single-observation
 evidence-integrity evaluation over one validated P08-T03 result and its linked
 P08-T02 snapshot. P08-T05 is COMPLETE / CLOSED / AUDITED PASS as the
 deterministic, immutable collection snapshot over the complete T04 result set.
-No P08-T06 or P09 behavior has been started or authorized.
+P08-T06 is IMPLEMENTED / AUDITED PASS / READY TO CLOSE as the structural,
+non-economic readiness predicate over one validated T05 snapshot. No P08-T07 or
+P09 behavior has been started or authorized.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

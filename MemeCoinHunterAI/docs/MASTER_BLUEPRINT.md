@@ -1,5 +1,9 @@
 # Master Blueprint
 
+> **LEGACY MIRROR — NOT CANONICAL.** Use the repository-root
+> `docs/MASTER_BLUEPRINT.md` for the current architecture and phase status.
+> This nested copy is retained for historical/import compatibility.
+
 This document maps the system. It does not implement future phases.
 
 ## Current implementation status

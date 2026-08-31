@@ -15,12 +15,12 @@ Meme Coin Hunter AI is a future AI-driven crypto intelligence and trading system
 
 ## Current status
 
-The project is in P04 — Market & Signal Intelligence. P04-T01 through P04-T04
-are complete contract-layer signal processing boundaries covering signal
-evidence, normalization, quality, and evaluation. P04-T05 — Signal Evidence
-Aggregation is the current active development boundary, but implementation has
-not started. No later P04 task has started, and no provider connectivity,
-wallet, trading, AI/ML, paper-trading, or Railway functionality has been
+The project is currently at P08 — Outcome Learning. P07-T01 through P07-T07
+and P08-T01 through P08-T05 are complete, closed, and audited PASS. The current
+P08-T06 boundary is implemented and audited PASS as a structural,
+non-economic readiness predicate over validated outcome evidence, and is ready
+to close. P08-T07 and later tasks remain unstarted. No provider connectivity,
+wallet, live trading, AI/ML, or P09 execution functionality has been
 implemented.
 
 ## Architecture summary

@@ -392,6 +392,7 @@ transition, ledger, reconciliation, simulation result, and local result
 history. No P07-T08 exists or is required.
 
 P07 remains simulation-only. Completion does not authorize live execution,
-capital movement, wallets, signing, broadcast, providers, or P09 work. The next
-governed boundary is P08 read-only outcome learning, which requires its own
-specification, review, and explicit implementation authorization.
+capital movement, wallets, signing, broadcast, providers, or P09 work. P08
+read-only outcome learning was subsequently specified and separately
+authorized through P08-T06; P08-T01 through P08-T06 remain non-economic and
+do not grant P09 or live-trading authority.

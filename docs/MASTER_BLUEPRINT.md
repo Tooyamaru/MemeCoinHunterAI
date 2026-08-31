@@ -241,7 +241,7 @@ STOP, PAUSE, or change market.
   contract, and evaluation criteria. Runtime implementation requires a later
   explicit authorization.
 
-### P07 — PAPER TRADING ENGINE — SPECIFICATION PREPARED / ARCHITECTURE REVIEW PENDING
+### P07 — PAPER TRADING ENGINE — COMPLETE / CLOSED / AUDITED PASS
 - **Objective:** Test decisions with realistic simulated execution.
 - **Major components:** BUY and SELL simulation, fees, spread, slippage, price impact, latency, liquidity, quote drift, priority fees, MEV effects, failed execution, partial fills, positions, exposure, and reconciliation.
 - **Dependencies:** P05, P06.
@@ -249,8 +249,8 @@ STOP, PAUSE, or change market.
 - **Exit criteria:** Paper results include frictions and support reproducible simulation.
 - **Major risks:** Perfect-fill assumptions, simulation mismatch, misleading performance.
 - **Deliverables:** Paper ledger, simulator, reconciliation, performance reports.
-- **Governance status:** Specification prepared; architecture review pending;
-  implementation not authorized. P07 is simulation-only, has no authority to
+- **Governance status:** P07-T01 through P07-T07 are implemented, complete,
+  closed, and audited PASS. P07 remains simulation-only, has no authority to
   trade, and does not start P08 or P09 automatically.
 
 ### P08 — OUTCOME LEARNING
@@ -262,12 +262,28 @@ STOP, PAUSE, or change market.
 - **Major risks:** Overfitting, look-ahead, regime/survivorship bias, feedback loops.
 - **Deliverables:** Outcome dataset, evaluation reports, controlled model versioning.
 - **Current boundary:** P08-T06 — Outcome Evidence Analysis Readiness Boundary —
-  SPECIFICATION COMPLETE / AUDITED PASS; implementation not authorized. P08-T01
-  through P08-T05 are COMPLETE / CLOSED / AUDITED PASS. P08-T02 snapshots
-  validated P08-T01 observations with a point-in-time cutoff and provenance;
-  P08-T03 through P08-T05 preserve and evaluate that evidence without economic
-  outcome classification, uncontrolled aggregation, ranking, decision,
-  authorization, execution, or model/strategy modification.
+  IMPLEMENTED / AUDITED PASS / READY TO CLOSE. P08-T01 through P08-T05 are
+  COMPLETE / CLOSED / AUDITED PASS. T06 consumes one validated T05 snapshot,
+  preserves T04/T02 provenance and cutoff, and emits only a structural,
+  non-economic readiness predicate without economic outcome classification,
+  aggregation, ranking, decision, authorization, execution, or model/strategy
+  modification.
+
+#### P08 implementation sequence
+
+- **P08-T01:** Immutable Outcome Learning Observation — COMPLETE / CLOSED /
+  AUDITED PASS
+- **P08-T02:** Outcome Learning Dataset Snapshot — COMPLETE / CLOSED /
+  AUDITED PASS
+- **P08-T03:** Outcome Interpretation Boundary — COMPLETE / CLOSED /
+  AUDITED PASS
+- **P08-T04:** Outcome Evidence Evaluation — COMPLETE / CLOSED / AUDITED PASS
+- **P08-T05:** Outcome Evidence Evaluation Snapshot — COMPLETE / CLOSED /
+  AUDITED PASS
+- **P08-T06:** Outcome Evidence Analysis Readiness — IMPLEMENTED / AUDITED PASS /
+  READY TO CLOSE
+- **P08-T07 and later:** NOT STARTED; separate specification and authorization
+  required.
 
 ### P09 — DEX / JUPITER EXECUTION
 - **Objective:** Add provider-agnostic controlled execution only after prior validation and explicit go-live approval.

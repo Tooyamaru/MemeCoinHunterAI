@@ -18,8 +18,10 @@ win/loss classifications, or any other learning metric. It does not train,
 update, compare, promote, or modify a model, strategy, threshold, weight, or
 risk limit.
 
-This document is a specification proposal only. It does not authorize runtime
-implementation or any later P08 task.
+This document records the approved T02 contract. Its historical
+specification-only gate is retained in the contract requirements below; the
+runtime implementation was separately authorized and is COMPLETE / CLOSED /
+AUDITED PASS. No later P08 task is authorized by this document.
 
 ## 2. Evidence-derived input contract
 
@@ -100,3 +102,10 @@ The implementation is accepted only when verification demonstrates:
 
 The accepted implementation adds no worker, persistence, aggregation, metric,
 model, or external integration.
+
+## 7. Current implementation status
+
+The P08-T02 implementation is present, deterministic, immutable,
+provider-neutral, and fail-closed. Its implementation and verification remain
+separate from the later P08-T03 through P08-T06 boundaries. The T02 snapshot
+continues to own dataset membership and the inherited point-in-time cutoff.
