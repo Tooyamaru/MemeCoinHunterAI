@@ -46,13 +46,28 @@ independent Risk / Capital Authorization
         ↓
 P07 Paper Trading Engine
         ↓
-paper fills / paper positions / exposure / reconciliation / ledger
+P07-T01 Simulation Input
         ↓
-future P08 outcome learning
+P07-T02 Fill Outcome
+        ↓
+P07-T03 Position / Exposure State
+        ↓
+P07-T04 Paper Ledger
+        ↓
+P07-T05 Paper Reconciliation
+        ↓
+P07-T06 PaperSimulationResult
+        ↓
+P07-T07 Result History
+        ↓
+P08-T01 Observation
 ```
 
 P07 is in the execution layer but is simulation-only. A paper result is not an
 authorization, an order, a quote, a route, or an on-chain state transition.
+P07-T06 is the canonical finalized non-economic paper-simulation result for
+the validated lifecycle record. It does not provide economic interpretation or
+live authority.
 
 ## 4. Dependencies
 
@@ -388,8 +403,8 @@ promote a strategy, or establish live execution readiness by themselves.
 
 P07 is **COMPLETE / CLOSED / AUDITED PASS**. P07-T01 through P07-T07 are the
 complete implemented paper-trading chain: input, fill outcome, position/exposure
-transition, ledger, reconciliation, simulation result, and local result
-history. No P07-T08 exists or is required.
+transition, ledger, reconciliation, canonical non-economic simulation result,
+and local result history. No P07-T08 exists or is required.
 
 P07 remains simulation-only. Completion does not authorize live execution,
 capital movement, wallets, signing, broadcast, providers, or P09 work. P08

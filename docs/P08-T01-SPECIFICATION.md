@@ -19,6 +19,11 @@ analysis. It does not interpret the result as a win, loss, missed opportunity,
 avoided loss, profit, expectancy, drawdown, or edge. Those semantics and any
 aggregation are outside P08-T01.
 
+The observed `PaperSimulationResult` is the P07-T06 canonical finalized
+non-economic paper-simulation result. Its preserved reconciliation identity and
+status retain the P07-T05 paper-reconciliation provenance without causing
+P08-T01 to reinterpret or economically classify the result.
+
 P08-T01 does not implement P08-T02 or any later task.
 
 ## 2. Input contract

@@ -187,6 +187,25 @@ simulation-only and owns paper-simulation facts, simulated fills, paper state,
 ledger records, reconciliation records, simulation results, and local history.
 It has no live-trading, capital, wallet, signing, broadcast, or P09 authority.
 
+The canonical P07-to-P08 provenance chain is:
+
+```text
+P06 DecisionIntent
+→ P07-T01 Simulation Input
+→ P07-T02 Fill Outcome
+→ P07-T03 Position / Exposure State
+→ P07-T04 Paper Ledger
+→ P07-T05 Paper Reconciliation
+→ P07-T06 PaperSimulationResult
+→ P07-T07 Result History
+→ P08-T01 Observation
+```
+
+P07-T06 is the canonical finalized non-economic paper-simulation result for
+the validated lifecycle record. This terminology does not imply economic
+finalization, profit, ROI, WIN/LOSS classification, strategy performance, or
+live authority.
+
 ## P08 Outcome Learning Current Boundary
 
 P08-T01 through P08-T05 are complete, closed, and audited PASS. The current

@@ -1,18 +1,25 @@
-# P07-T06 — Paper Simulation Result / Performance Outcome Contract
+# P07-T06 — Paper Simulation Result / Canonical Non-Economic Outcome Contract
 
 **Status:** COMPLETE / CLOSED / AUDITED PASS
 **Contract:** `p07-t06-v1`
 
 ## Purpose
-P07-T06 defines the immutable, deterministic paper-simulation outcome
-boundary consumed by future P08 learning.
+P07-T06 defines the immutable, deterministic canonical finalized
+non-economic paper-simulation result boundary consumed by future P08 learning.
+It assembles the validated paper-simulation lifecycle record after
+P07-T05 reconciliation.
+
+"Finalized" means that the supplied simulation, fill, paper-state, ledger, and
+reconciliation records have been assembled into one canonical result. It does
+not mean economic finalization, settlement, profit, ROI, WIN/LOSS
+classification, or strategy performance.
 
 ## Inputs
 - accepted P07-T01 simulation input
 - accepted P07-T02 fill outcome
 - accepted P07-T03 position/exposure transition
 - accepted P07-T04 ledger record
-- accepted ledger/state consistency verification result
+- accepted P07-T05 ledger/state consistency verification result
 
 ## Rules
 - deterministic and provider-neutral;
@@ -35,5 +42,7 @@ A canonical `PaperSimulationResult` containing:
 - provenance;
 - deterministic digest.
 
-P07-T06 is the completed paper-outcome contract consumed by the P07-T07 local
-history boundary before future P08 outcome learning.
+P07-T06 is the completed canonical non-economic paper-simulation result
+contract consumed by the P07-T07 local history boundary before future P08
+outcome learning. Its reconciliation identity and status preserve the
+P07-T05 result without changing that result's meaning.

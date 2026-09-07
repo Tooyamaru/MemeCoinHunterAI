@@ -50,27 +50,32 @@ validated P08-T05 snapshot. It emits only
 `NOT_READY_FOR_NON_ECONOMIC_ANALYSIS`, preserves T05/T02/T04 provenance, and
 does not classify economic outcomes or provide authority.
 
-The separate Ledger ↔ State Consistency Verification boundary is deterministic,
-immutable, provider-neutral, and compares only explicitly supplied immutable
-P07-T04 ledger entries with one explicitly supplied expectation or replay
-observation. It produces an informational reconciliation result only and does
-not establish external truth, settlement, authorization, capital state, wallet
-state, transaction state, or live/on-chain state.
+P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
+reconciliation boundary. It is deterministic, immutable, provider-neutral, and
+compares only explicitly supplied immutable P07-T04 ledger entries with one
+explicitly supplied expectation or replay observation. It produces an
+informational reconciliation result only and does not establish external truth,
+settlement, authorization, capital state, wallet state, transaction state, or
+live/on-chain state.
 
 The verification boundary preserves explicit UNKNOWN / UNAVAILABLE observation
 states, fails closed on unresolved material, preserves provenance and
 predecessor identity, uses canonical deterministic representations and SHA-256
 digests, and has no wall-clock, provider, network, persistence, wallet,
-signing, broadcast, or external-authority dependency. P07-T05 remains reserved
-for its separately governed economic-outcome boundary.
+signing, broadcast, or external-authority dependency. P07-T05 does not
+calculate profit, classify WIN/LOSS, calculate ROI, evaluate strategy
+performance, authorize capital, execute trades, or perform learning.
 
-P07-T06 is the immutable paper-simulation result contract and P07-T07 is the
-deterministic local history boundary for validated T06 results. No P07-T08
-exists or is required. P08-T01 consumes one validated P06 decision intent, one
-validated P07 simulation input, and one linked P07 paper result retained by a
-P07-T07 history snapshot. It does not interpret outcomes, aggregate, rank,
-decide, authorize, execute, or modify any model or strategy. P08-T03 is closed
-and no longer remains an open implementation gate.
+P07-T05 reconciliation feeds P07-T06, the immutable canonical finalized
+non-economic `PaperSimulationResult`, and P07-T07, the deterministic local
+history boundary for validated T06 results. "Finalized" here means that the
+validated paper-simulation lifecycle record has been assembled; it does not
+mean economic finalization or outcome interpretation. No P07-T08 exists or is
+required. P08-T01 consumes one validated P06 decision intent, one validated P07
+simulation input, and one linked P07 paper result retained by a P07-T07 history
+snapshot. It does not interpret outcomes, aggregate, rank, decide, authorize,
+execute, or modify any model or strategy. P08-T03 is closed and no longer
+remains an open implementation gate.
 
 P06-T02 is COMPLETE / CLOSED / AUDITED PASS as the deterministic evaluation
 boundary, and P06-T03 is COMPLETE / CLOSED as an optional non-authoritative

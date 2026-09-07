@@ -96,9 +96,9 @@ Therefore T06 must not produce:
 - any performance metric.
 
 An economic outcome boundary, if later required, needs a separately approved
-evidence and ownership contract. Its placement must also resolve the existing
-P07-T05 reservation for a separately governed economic-outcome specification.
-That unresolved issue is not silently assigned to T06.
+evidence and ownership contract. P07-T05 is already resolved as the paper
+reconciliation boundary, and no economic outcome boundary is silently assigned
+to P07-T06 or created elsewhere in P07.
 
 ## 5. Input boundary
 

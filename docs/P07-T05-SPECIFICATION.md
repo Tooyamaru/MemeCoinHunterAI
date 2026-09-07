@@ -1,8 +1,8 @@
-# Ledger ↔ State Consistency Verification Contract
+# P07-T05 — Paper Reconciliation / Ledger ↔ State Consistency Verification
 
-**Status:** EXISTING / SEPARATE VERIFICATION BOUNDARY
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P07 — Paper Trading Engine  
-**Task:** Ledger ↔ State Consistency Verification
+**Task:** P07-T05 — Paper Reconciliation / Ledger ↔ State Consistency Verification
 **Contract:** `ledger-state-consistency-verification-v1`
 **Reconciliation model:** `ledger-state-consistency-verification-model-v1`
 **Source baseline:** `278437b` — `Implement paper reconciliation logic and add tests`
@@ -114,8 +114,14 @@ deprecation warning.
 
 ## Governance conclusion
 
-The ledger/state verification implementation is deterministic, immutable,
+P07-T05 is the canonical paper-reconciliation boundary in P07. The
+ledger/state verification implementation is deterministic, immutable,
 provider-neutral, simulation-only, provenance-preserving, and fail-closed.
+It feeds the P07-T06 `PaperSimulationResult` and does not calculate profit,
+classify WIN/LOSS, calculate ROI, evaluate strategy performance, authorize
+capital, execute trades, or perform learning.
 
-P07-T05 remains reserved for its separately governed economic-outcome
-specification and is not implemented by this boundary.
+P07-T06 is the canonical finalized non-economic paper-simulation result
+boundary for the validated lifecycle record. Economic finalization and
+economic interpretation remain outside P07-T05 and require separate governance
+and authorization. No P07-T08 is approved or created.

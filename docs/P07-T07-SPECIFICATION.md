@@ -8,8 +8,8 @@
 ## 1. Purpose and architectural position
 
 P07-T07 is the bounded history boundary after the completed P07-T06
-`PaperSimulationResult`. It retains already-validated paper outcomes for
-reproducible replay and future P08 consumption.
+`PaperSimulationResult`. It retains already-validated canonical non-economic
+paper-simulation results for reproducible replay and future P08 consumption.
 
 ```text
 P07-T06 PaperSimulationResult
@@ -19,10 +19,11 @@ P07-T07 PaperSimulationResultHistory
 future P08 read-only outcome learning
 ```
 
-T07 stores one result at a time, keyed by its deterministic T06 digest. It
-preserves each result by identity and does not reinterpret simulation status,
-reconciliation disagreement, UNKNOWN state, partial fill, failure, or
-unavailability.
+P07-T05 reconciliation is preserved inside the P07-T06 result provenance and
+therefore inside the T07 history record. T07 stores one result at a time,
+keyed by its deterministic T06 digest. It preserves each result by identity
+and does not reinterpret simulation status, reconciliation disagreement,
+UNKNOWN state, partial fill, failure, or unavailability.
 
 ## 2. Input and output contract
 
