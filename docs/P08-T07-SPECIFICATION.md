@@ -1,396 +1,57 @@
 # P08-T07 — Economic Outcome Interpretation Boundary
 
-**Status:** SPECIFICATION DRAFT / IMPLEMENTATION NOT AUTHORIZED
+**Status:** FINAL CANDIDATE SPECIFICATION / IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning
 **Task:** P08-T07 — Economic Outcome Interpretation
-**Contract:** UNRESOLVED / REQUIRES GOVERNANCE DECISION
-**Evaluator:** UNRESOLVED / REQUIRES GOVERNANCE DECISION
-**Nature:** Proposed immutable, deterministic, provider-neutral, read-only
-boundary; no runtime behavior is authorized by this document
+**Conceptual contract:** `EconomicOutcomeInterpretation`
+**Conceptual evaluator:** `EconomicOutcomeInterpretationEvaluator`
+**Contract version:** GOVERNANCE PARAMETER REQUIRED
+**Evaluator version:** GOVERNANCE PARAMETER REQUIRED
+**Nature:** Immutable, deterministic, provider-neutral, read-only economic
+interpretation boundary
 
-## 1. Purpose
+This document is an architecture/specification candidate. It defines the
+locked boundary and the remaining governance parameters required before
+implementation. It does not authorize runtime code, tests, economic evidence
+collection, external access, execution, model learning, or P09 behavior.
 
-P08-T07 is a proposed downstream boundary for the separately governed
-interpretation of economic outcomes associated with the already validated
-P06 → P07 → P08 evidence chain.
+## 1. Purpose and Scope
 
-This document exists to define the ownership boundary, admissibility
-requirements, and unresolved governance parameters that must be settled before
-P08-T07 can be implemented. T07 does not create economic truth itself:
-economic truth must come from explicitly governed and admissible economic
-evidence. This document does not authorize a runtime implementation.
+P08-T07 owns interpretation of the economic outcome for one validated decision
+or trade lifecycle, using:
 
-The current governance direction establishes the following boundary:
+1. the complete validated upstream P06 → P07 → P08-T06 chain; and
+2. a separately supplied `EconomicEvidencePacket` containing explicitly
+   governed and admissible economic evidence.
 
-> P08-T07 owns economic outcome interpretation, including realized P&L when
-> admissible, and may derive an approved target classification from economic
-> facts through deterministic calculation. It must consume validated upstream
-> records and explicitly governed economic evidence; it must not create
-> economic truth, and its exact implementation semantics still require
-> governance approval.
+T07 does not create economic truth. Economic truth must come from the
+explicitly governed economic evidence authority. T07 interprets that evidence
+through deterministic, versioned calculation and classification rules.
 
-No runtime economic conclusion is authorized by this draft.
+T07 owns:
 
-### 1.1 Non-overlap with existing P08 boundaries
+- economic outcome interpretation;
+- realized P&L interpretation when admissible; and
+- approved economic outcome classification.
 
-P08-T07 must not duplicate or absorb the responsibility of any predecessor:
+T07 is per decision/trade lifecycle. It is not a portfolio, strategy, model,
+or performance-learning boundary.
 
-| Boundary | Existing responsibility | P08-T07 must not replace |
-|---|---|---|
-| P08-T01 Observation | Preserves the point-in-time link between the decision and the canonical P07 paper result. | Observation identity, decision linkage, or P07 fact ownership. |
-| P08-T02 Dataset Snapshot | Owns dataset membership, ordering, duplicate rejection, and the `as_of_time` cutoff. | Dataset membership, cutoff authority, or snapshot construction. |
-| P08-T03 Interpretation | Assigns only evidence-state interpretation such as `UNCLASSIFIED`, `UNKNOWN`, `UNAVAILABLE`, and `INCOMPLETE`. | The evidence-state taxonomy or a financial meaning for those states. |
-| P08-T04 Evidence Evaluation | Validates linkage, completeness, admissibility, and internal consistency of an individual interpretation. | P07 recalculation, reconciliation, settlement truth, or economic performance. |
-| P08-T05 Evaluation Snapshot | Assembles the complete one-to-one T04 evaluation set into an immutable snapshot. | Collection membership, T04 state replacement, or snapshot identity. |
-| P08-T06 Readiness | Emits only `READY_FOR_NON_ECONOMIC_ANALYSIS` or `NOT_READY_FOR_NON_ECONOMIC_ANALYSIS`. | Economic readiness, profitability, sample sufficiency, or authorization. |
+This specification does not authorize implementation. The exact public field
+names, contract versions, evaluator versions, numeric parameters, and failure
+codes remain subject to the governance parameters in Section 18.
 
-P08-T07 is therefore not an alternative observation, dataset, evidence-state,
-evaluation, snapshot, or readiness boundary. Any future T07 contract must
-consume and preserve the validated predecessor chain rather than bypassing,
-reconstructing, or weakening it.
+## 2. Locked Ownership and Non-Overlap
 
-### 1.2 Current governance position
+### 2.1 Locked T07 ownership
 
-The current state is:
+P08-T07 owns the interpretation of economic facts for one decision/trade
+lifecycle. Its core economic result is realized P&L when all admissibility,
+settlement, horizon, accounting, quantity, unit, and calculation requirements
+are satisfied.
 
-- P07-T01 through P07-T07 are complete, closed, and audited PASS.
-- P08-T01 through P08-T05 are complete, closed, and audited PASS.
-- P08-T06 is implemented, audited PASS, and remains a non-economic readiness
-  boundary.
-- P08-T07 has no approved implementation contract.
-- P09 remains separately governed and unauthorized.
-
-The P08 next-boundary proposal is candidate scope, not authorization. Its
-references to wins, losses, expectancy, drawdown, slippage, latency, cost,
-attribution, drift, or validation do not define their semantics.
-
-## 2. Economic Outcome Boundary
-
-### 2.1 What the existing chain establishes
-
-The existing chain establishes immutable paper-simulation facts, evidence
-linkage, evidence-state interpretation, evidence evaluation, collection
-integrity, and non-economic readiness. It does not establish:
-
-- market settlement truth;
-- a future-price or target/stop event window;
-- an economic valuation source;
-- an authoritative accounting numeraire;
-- a fee, spread, slippage, latency, price-impact, MEV, or infrastructure-cost
-  source for economic analysis;
-- a benchmark or counterfactual;
-  - a strategy-performance definition; or
-  - an approved economic outcome classification rule.
-
-P07-T06's word **finalized** means that the validated paper simulation,
-paper-state, ledger, and reconciliation records were assembled into one
-canonical non-economic result. It does not mean economically finalized,
-settled, profitable, loss-making, or classified as `WIN` or `LOSS`.
-
-P08-T06's `READY_FOR_NON_ECONOMIC_ANALYSIS` means only that the validated T05
-evidence set contains no explicit T04 `UNKNOWN`, `UNAVAILABLE`, or `INCOMPLETE`
-state under the T06 predicate. It does not mean economically evaluable,
-sufficiently sampled, profitable, or ready for promotion or execution.
-
-### 2.2 Economic concept decision matrix
-
-The ownership decisions below are now settled. Exact evidence, formulas,
-parameters, and field-level semantics remain subject to governance review.
-
-| Concept | Ownership / boundary | Authoritative source | Required input evidence | Unit / precision | Temporal meaning | Current status |
-|---|---|---|---|---|---|---|
-| `WIN` | T07 target classification derived from economic facts, never a primitive fact. | Governed economic evidence plus the approved calculation/classification contract. | Admissible realized or other explicitly approved economic facts. | **GOVERNANCE PARAMETER REQUIRED** | Must use the approved horizon and endpoint. | Numeric threshold and exact rule remain open. |
-| `LOSS` | T07 target classification derived from economic facts, never a primitive fact. | Governed economic evidence plus the approved calculation/classification contract. | Admissible realized or other explicitly approved economic facts. | **GOVERNANCE PARAMETER REQUIRED** | Must use the approved horizon and endpoint. | Numeric threshold and exact rule remain open. |
-| Realized P&L | Core T07 economic output when based on admissible settled/realized evidence. | Explicitly governed settlement/realization authority. | Authoritative quantities, prices, costs, fees, and settlement evidence. | Accounting basis, numeraire, precision, and rounding are **GOVERNANCE PARAMETER REQUIRED**. | Only after the required endpoint/horizon is satisfied. | Ownership settled to T07; exact semantics remain open. |
-| Valuation / mark-to-market | Distinct interpretation type; must not be mixed with realized P&L. | Explicitly governed valuation evidence and authority. | Approved valuation observations with timestamp and provenance. | **GOVERNANCE PARAMETER REQUIRED** | Must be labeled as valuation and use its own approved endpoint semantics. | T07 may support it only if separately authorized; not realized P&L. |
-| Return | Broader derived metric, not mandatory core T07 responsibility. | **UNRESOLVED / REQUIRES GOVERNANCE DECISION** | **UNRESOLVED / REQUIRES GOVERNANCE DECISION** | **GOVERNANCE PARAMETER REQUIRED** | **GOVERNANCE PARAMETER REQUIRED** | Outside core T07 unless separately approved. |
-| ROI | Broader performance metric, not mandatory core T07 responsibility. | **UNRESOLVED / REQUIRES GOVERNANCE DECISION** | **UNRESOLVED / REQUIRES GOVERNANCE DECISION** | **GOVERNANCE PARAMETER REQUIRED** | **GOVERNANCE PARAMETER REQUIRED** | Outside core T07. |
-| Outcome horizon | Required T07 temporal boundary, not an economic result itself. | Timestamp authority and endpoint authority must be governed. | Upstream reference time plus approved economic event/settlement evidence. | Exact duration or event rule is **GOVERNANCE PARAMETER REQUIRED**; no default is allowed. | Reference, start, endpoint, inclusion, and replay semantics are required. | T07 owns the requirement; exact parameters remain open. |
-| Trade result | T07 may own the economic result interpretation unit when explicitly defined. | **GOVERNANCE PARAMETER REQUIRED** | Validated upstream chain plus admissible economic evidence. | **GOVERNANCE PARAMETER REQUIRED** | Must be bound to an approved horizon. | Cardinality and exact semantics remain open. |
-| Economic performance | Broader portfolio/strategy performance analysis. | **UNRESOLVED / REQUIRES GOVERNANCE DECISION** | **UNRESOLVED / REQUIRES GOVERNANCE DECISION** | **GOVERNANCE PARAMETER REQUIRED** | **GOVERNANCE PARAMETER REQUIRED** | Outside core T07. |
-| Strategy attribution | Not a T07 responsibility; strategy/model/regime identity may be preserved as provenance only. | N/A for T07 attribution. | Decision and strategy/model version identities may be preserved. | N/A for T07 attribution. | N/A for T07 attribution. | Explicitly outside T07. |
-
-The same non-core status applies to `BREAKEVEN`, expectancy, drawdown,
-profitability, economic edge, missed opportunity, avoided loss, benchmark
-performance, counterfactual performance, regime attribution, model
-attribution, and challenger/production comparison. Their ownership and
-semantics require separate governance; they are not implied by T07 ownership
-of economic interpretation or realized P&L.
-
-### 2.3 Boundary conclusion
-
-The ownership decisions are settled as follows:
-
-1. T07 is the economic outcome interpretation boundary.
-2. Realized P&L is a core T07 output when admissible settled/realized evidence
-   and the approved accounting basis are present.
-3. `WIN` and `LOSS` are approved target classification concepts, derived from
-   economic facts through deterministic calculation; they are not primitive
-   economic truth.
-4. Mark-to-market/valuation is distinct from realized P&L and must not be
-   mixed with it.
-5. Return, ROI, and broader performance aggregation are not mandatory core T07
-   responsibilities.
-6. Strategy, model, and regime attribution are outside T07; relevant version
-   identities may be preserved as provenance only.
-
-The remaining open decisions concern the evidence source, settlement authority,
-horizon parameters, accounting and calculation semantics, classification
-thresholds, output schema, and failure taxonomy.
-
-## 3. Provenance and ownership
-
-### 3.1 Required provenance chain
-
-Any future T07 contract must preserve the complete chain without shortcuts:
-
-```text
-P06 DecisionIntent
-→ P07-T01 SimulationInput
-→ P07-T02 FillOutcome
-→ P07-T03 Position / Exposure State
-→ P07-T04 Paper Ledger
-→ P07-T05 Paper Reconciliation
-→ P07-T06 canonical finalized NON-ECONOMIC PaperSimulationResult
-→ P07-T07 PaperSimulationResultHistory
-→ P08-T01 Observation
-→ P08-T02 DatasetSnapshot
-→ P08-T03 Interpretation
-→ P08-T04 EvidenceEvaluation
-→ P08-T05 EvaluationSnapshot
-→ P08-T06 Readiness
-→ P08-T07
-```
-
-The P07-T06 and P07-T07 records remain paper-simulation records. They must not
-be relabeled as settlement or economic records merely because they are
-upstream of T07.
-
-### 3.2 Ownership preservation
-
-Ownership remains:
-
-- P06 owns the decision intent and its decision identity.
-- P07 owns paper simulation, fills, paper positions, exposure, ledger,
-  reconciliation, canonical paper results, and local result history.
-- P08-T01 owns the decision-to-paper-result observation link.
-- P08-T02 owns dataset membership and the dataset cutoff.
-- P08-T03 owns evidence-state interpretation.
-- P08-T04 owns individual evidence evaluation.
-- P08-T05 owns complete evaluation collection assembly and snapshot identity.
-- P08-T06 owns only the structural non-economic readiness predicate.
-- P08-T07 owns the economic outcome interpretation boundary, including
-  realized P&L when admissible and approved target classification derived from
-  economic facts. It does not own economic truth, which remains with the
-  explicitly governed evidence authority.
-- P09 owns a separately governed live execution chain and is not a T07
-  downstream implementation detail.
-
-T07 must not recalculate or replace any upstream fact. In particular, it must
-not re-simulate fills, rebuild paper positions, rebuild the ledger, redo
-reconciliation, or reinterpret paper statuses as economic success or failure.
-
-### 3.3 No provenance shortcut
-
-A future T07 operation must not accept raw P07 or raw P08 material as a
-substitute for validated predecessor contracts. It must not reconstruct
-missing predecessor values from identifiers, fetch missing artifacts, repair
-invalid digests, or silently replace an upstream object with a caller-created
-approximation.
-
-## 4. Candidate immutable inputs
-
-There is no approved T07 input schema. The following distinction is mandatory
-for the next architecture review, but is not an authorized runtime field list.
-
-### 4.1 Predecessor inputs
-
-T07 input design must distinguish two separate input classes:
-
-**A. Validated upstream P08 chain**
-
-- exactly one validated P08-T06 readiness result;
-- the exact P08-T05 snapshot referenced by that result;
-- the validated P08-T02 dataset and its T02 cutoff;
-- the P08-T01 observations; and
-- preserved P06/P07 provenance.
-
-**B. Separately governed economic evidence**
-
-- an explicitly identified economic-evidence artifact or immutable collection;
-- its authority, provenance, timestamp, version, and integrity/digest; and
-- its approved admissibility and replay semantics.
-
-T07 must not treat the T06 readiness state as economic evidence. T07 must not
-reconstruct missing upstream data or fetch or collect economic evidence itself.
-The exact input shape, cardinality, and artifact-resolution rule are
-**GOVERNANCE PARAMETER REQUIRED**.
-
-### 4.2 Identity and integrity requirements
-
-Before implementation authorization, governance must define which of the
-following are authoritative inputs and how each is represented:
-
-| Identity or value | Current status |
-|---|---|
-| Decision identity and digest | Preserved upstream; exact T07 input requirement is to be approved. |
-| Simulation identity and digest | Preserved upstream; exact T07 input requirement is to be approved. |
-| Paper result and history identities | Preserved upstream; not economic settlement authority. |
-| Observation identity and digest | Preserved upstream; exact T07 linkage requirement is to be approved. |
-| Dataset identity and digest | T02-owned; T02 remains cutoff and membership authority. |
-| T06 readiness identity and digest | T06-owned; readiness has no economic meaning. |
-| Economic evidence artifact identity | **GOVERNANCE PARAMETER REQUIRED** |
-| Contract and evaluator versions | T07 values are not assigned. |
-| Evidence-source versions | **GOVERNANCE PARAMETER REQUIRED** |
-| Observation and event timestamps | Upstream timestamps are preserved; economic event semantics are unresolved. |
-| Dataset `as_of_time` / cutoff | T02-owned and must not be silently replaced. |
-| Economic evaluation cutoff | **GOVERNANCE PARAMETER REQUIRED** |
-| Evidence/admissibility state | **GOVERNANCE PARAMETER REQUIRED** |
-
-No additional field is approved merely because it might be useful.
-
-### 4.3 Economic evidence admission
-
-The current contracts do not identify an authoritative source for:
-
-- settlement events;
-- future prices;
-- target or stop events;
-- fees or priority fees;
-- spread or slippage;
-- price impact or liquidity;
-- latency or infrastructure cost;
-- venue or chain truth;
-- benchmark values; or
-- counterfactual opportunity values.
-
-Any economic evidence admitted by T07 must have:
-
-- explicit authority and an identified owner;
-- a stable identity;
-- complete provenance;
-- an authoritative timestamp;
-- a source and contract version;
-- an integrity or digest value;
-- explicit admissibility rules; and
-- deterministic replay semantics.
-
-The exact evidence type, source, settlement authority, and admissibility rules
-are **GOVERNANCE PARAMETER REQUIRED**. No provider, network, RPC, DEX, wallet,
-database, or external authority may be used by a future implementation unless
-a separate approved contract explicitly changes this boundary.
-
-## 5. Temporal and outcome-horizon semantics
-
-### 5.1 Distinct time concepts
-
-The following time concepts must not be conflated:
-
-- P06 decision time;
-- P07 simulation reference time;
-- P08-T01 observation time;
-- P08-T02 dataset `as_of_time`;
-- any economic evidence observation time;
-- any economic event or settlement time;
-- any evaluation cutoff; and
-- any outcome endpoint or horizon.
-
-P08-T02 owns the current dataset cutoff. That cutoff is not, by itself, an
-economic outcome horizon.
-
-### 5.2 Horizon is required; exact parameters are not defined
-
-T07 requires an explicit outcome horizon before an economic result can be
-final. The current architecture does not define its exact immutable
-future-price window, target/stop event stream, settlement endpoint, benchmark
-period, or other economic horizon. T07 must not invent a duration, default
-endpoint, timezone, or wall-clock rule.
-
-The following are required horizon components and remain
-**GOVERNANCE PARAMETER REQUIRED**:
-
-- the reference time for an economic interpretation;
-- the start time;
-- the observation-time source and precedence;
-- the relationship to the dataset cutoff;
-- the endpoint and endpoint semantics;
-- fixed-duration versus event-terminated horizons;
-- endpoint inclusion and exclusion;
-- settlement versus mark-to-market endpoint rules;
-- timezone and UTC normalization rules;
-- handling of late, revised, or corrected evidence;
-- the timestamp authority;
-- whether incomplete horizons produce a non-final state or no result; and
-- whether multiple horizons are allowed.
-
-P08-T02 `as_of_time` remains the upstream dataset cutoff and is not
-automatically the T07 economic outcome horizon.
-
-### 5.3 Temporal safety requirements
-
-If a future T07 contract is authorized, it must:
-
-- reject future leakage rather than silently excluding future evidence;
-- define allowed timestamp ordering explicitly;
-- reject or explicitly classify events outside the approved horizon;
-- prevent post-outcome labels from entering pre-outcome evidence;
-- prevent local timezone, process time, insertion time, or wall-clock time from
-  changing a result;
-- preserve all source timestamps and their authority; and
-- make replay independent of when or where it is executed.
-
-These are design constraints; the exact horizon parameters remain
-**GOVERNANCE PARAMETER REQUIRED**.
-
-## 6. Economic calculation semantics
-
-Realized P&L is a core T07 economic output when all required settled/realized
-evidence is admissible. T07 must not treat paper simulation as economic truth,
-and must not treat an open or incomplete position as realized P&L or `WIN` /
-`LOSS`.
-
-The following exact calculation dimensions are
-**GOVERNANCE PARAMETER REQUIRED** before implementation:
-
-| Calculation dimension | Required decision |
-|---|---|
-| Accounting basis | Which settled economic events establish realized accounting facts. |
-| Quantity basis | How filled, partially filled, unfilled, open, closed, and residual quantities are treated. |
-| Price basis | Which observed, settled, quoted, marked, or benchmark price is authoritative. |
-| Cost basis | How acquisition cost, notional, capital, collateral, and denomination are defined. |
-| Fees and friction | Whether fees, spread, slippage, price impact, priority fees, MEV, latency, and infrastructure cost are included and where their evidence comes from. |
-| Currency / numeraire | The accounting unit, conversion source, conversion time, and treatment of unavailable conversion. |
-| Formula | The exact formula for each metric, including sign convention. |
-| Precision | Exact numeric representation, scale, permitted range, and overflow behavior. |
-| Rounding | The rounding mode, point at which rounding occurs, and replay behavior. |
-| Partial fills | Whether and how partial fills can receive an economic interpretation. |
-| Incomplete positions | Whether open or incomplete positions are admissible and what endpoint closes them. |
-| Zero denominator | Whether the result is rejected or receives an explicitly approved undefined state. |
-| Missing evidence | Whether no result, an unavailable state, or another approved state is emitted. |
-| Contradictory evidence | Which source wins, or whether contradiction always fails closed. |
-| Settlement | Whether economic truth requires actual settlement and who attests to it. |
-| Counterfactual | Whether counterfactual performance is permitted and how it is observed. |
-
-T07 may emit realized P&L only when:
-
-- economic evidence is explicitly governed and admissible;
-- quantities, prices, costs, and settlement facts are authoritative;
-- the accounting basis and numeraire are defined;
-- precision and rounding are defined;
-- the required endpoint/horizon is satisfied; and
-- the position is not open or incomplete under the approved semantics.
-
-Where an exact numeric rule is not authoritative, the specification must use
-the marker `GOVERNANCE PARAMETER REQUIRED`; implementation must not supply a
-default.
-
-## 7. Outcome classification
-
-### 7.1 Approved target-classification concept; exact rule remains open
-
-`WIN` and `LOSS` are approved target classification concepts for T07. They are
-not primitive economic truth and must never be derived directly from a paper
-result:
+`WIN` and `LOSS` are approved target classification concepts owned by T07.
+They are not primitive economic truth. The required flow is:
 
 ```text
 economic facts
@@ -398,174 +59,828 @@ economic facts
 → approved classification
 ```
 
-The exact numeric threshold, tie/breakeven semantics, and classification
-parameters are `GOVERNANCE PARAMETER REQUIRED`. Other possible states remain
-subject to the output and failure taxonomy decision:
+T07 must not reduce this flow to an implicit `P&L > 0` rule unless the
+classification contract explicitly defines that rule.
+
+### 2.2 Explicit non-ownership
+
+T07 does not own:
+
+- economic truth itself;
+- economic evidence collection;
+- provider, network, RPC, DEX, exchange, wallet, or API access;
+- strategy performance;
+- ROI or portfolio/performance aggregation;
+- strategy, model, or regime attribution;
+- model training or learning;
+- parameter optimization;
+- capital authorization;
+- execution;
+- P09; or
+- changes to any upstream P06, P07, or P08 artifact.
+
+T07 may preserve decision, strategy, model, and regime version identities as
+provenance. It must not conclude strategy performance or attribution from
+those identities.
+
+### 2.3 Non-overlap with existing boundaries
+
+| Boundary | Owns | T07 must not replace |
+|---|---|---|
+| P06 DecisionIntent | Decision identity, decision context, and decision provenance. | Decision creation or modification. |
+| P07-T01 through T07 | Paper simulation input, fills, paper state, ledger, reconciliation, canonical paper result, and local history. | Paper facts, paper accounting, reconciliation, or settlement truth. |
+| P08-T01 Observation | Decision-to-paper-result observation linkage. | Observation identity or upstream linkage. |
+| P08-T02 Dataset Snapshot | Dataset membership, duplicate handling, ordering, and `as_of_time`. | Dataset membership or cutoff authority. |
+| P08-T03 Interpretation | Non-economic evidence-state interpretation. | `UNCLASSIFIED`, `UNKNOWN`, `UNAVAILABLE`, or `INCOMPLETE` semantics. |
+| P08-T04 Evidence Evaluation | Individual evidence linkage, completeness, admissibility, and consistency. | Evidence evaluation or predecessor repair. |
+| P08-T05 Evaluation Snapshot | Complete T04 collection assembly and snapshot identity. | Collection membership or snapshot identity. |
+| P08-T06 Readiness | Structural non-economic readiness only. | Economic readiness, economic evidence, or outcome classification. |
+| P08-T07 | Economic interpretation for one decision/trade lifecycle. | Portfolio performance, strategy learning, model updates, or execution. |
+| P09 | Separately governed live execution chain. | Any authorization or execution step. |
+
+### 2.4 Paper simulation is not economic truth
+
+P07 paper simulation is **not economic truth**.
+
+P07-T06 `finalized` remains:
+
+```text
+canonical finalized NON-ECONOMIC PaperSimulationResult
+```
+
+It must never be interpreted by itself as settlement, profit, loss, `WIN`, or
+`LOSS`. A paper fill, paper ledger, paper reconciliation, or P07-T06
+finalization may be preserved as upstream context, but it does not satisfy the
+economic evidence requirement.
+
+## 3. Economic Evidence Boundary
+
+### 3.1 Conceptual input
+
+The conceptual economic input is:
+
+```text
+EconomicEvidencePacket
+```
+
+The packet is supplied to T07. T07 does not collect, fetch, reconstruct,
+repair, enrich, or substitute it.
+
+The packet must conceptually preserve, as applicable to its event types:
+
+- evidence identity;
+- outcome or trade-subject identity;
+- authority and authority identity;
+- source identity;
+- source version;
+- event or observation timestamp;
+- economic event type;
+- quantity or value;
+- price where applicable;
+- currency or numeraire where applicable;
+- cost or fee information where applicable;
+- settlement state where applicable;
+- complete provenance;
+- integrity or digest; and
+- canonical representation.
+
+Not every field is mandatory for every economic event type. The event-type
+contract determines which fields are required, prohibited, or optional.
+
+### 3.2 Evidence authority
+
+Every evidence item admitted into T07 must have:
+
+- an explicitly governed authority;
+- a stable identity;
+- a source identity and source version;
+- a timestamp with an identified timestamp authority;
+- provenance linking it to the lifecycle or event subject;
+- an integrity value or deterministic digest;
+- canonical representation;
+- explicit admissibility rules; and
+- deterministic replay semantics.
+
+The exact economic evidence source, settlement authority, authority identity,
+source version, and admissibility rules are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+No specific provider is selected by this specification.
+
+### 3.3 No evidence collection
+
+T07 must not:
+
+- query a provider;
+- call an RPC, DEX, exchange, or external API;
+- access a wallet or network;
+- read a database or persistence layer;
+- reconstruct a missing event;
+- repair a bad packet;
+- infer a value from paper simulation; or
+- silently substitute caller-created evidence.
+
+The complete evaluation must be possible from the explicit immutable inputs
+supplied to the evaluator.
+
+## 4. Economic Event Model
+
+T07 must use a provider-neutral conceptual event model. Economic event types
+must remain distinguishable and must not be collapsed into one
+`price/quantity/P&L` record.
+
+### 4.1 Observation event
+
+An **observation** records an economic value or state observed at an
+authoritative timestamp. An observation does not by itself establish
+execution, settlement, realized cost, or realized P&L.
+
+Required semantics:
+
+- subject identity;
+- observed value or state;
+- observation timestamp;
+- timestamp authority;
+- source identity and version;
+- provenance; and
+- integrity/digest.
+
+### 4.2 Execution/fill event
+
+An **execution/fill** records an economic execution event or an externally
+authoritative fill fact. It is distinct from the P07 paper fill.
+
+Required semantics:
+
+- lifecycle and subject identity;
+- executed quantity;
+- execution price where applicable;
+- execution timestamp;
+- source and authority;
+- provenance;
+- integrity/digest; and
+- any applicable fee or cost reference.
+
+An execution/fill event does not alone establish settlement or realized P&L.
+
+### 4.3 Economic cost event
+
+An **economic cost** records an admissible cost that belongs to the lifecycle,
+such as an explicitly governed fee, spread, slippage, price-impact, priority
+fee, MEV, latency, or infrastructure cost.
+
+The admissibility and ownership of each cost type, and whether it is included
+in realized P&L, are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+A paper-simulation cost is not automatically an economic cost.
+
+### 4.4 Settlement event
+
+A **settlement** records the authoritative event that makes an economic result
+realized. Settlement evidence is required for realized P&L.
+
+Required semantics:
+
+- lifecycle and subject identity;
+- settled quantity or value;
+- settlement timestamp;
+- settlement authority;
+- settlement state;
+- source identity and version;
+- provenance; and
+- integrity/digest.
+
+The exact settlement authority and settlement-state vocabulary are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+### 4.5 Valuation event
+
+A **valuation** records an authoritative value at a specified timestamp or
+horizon. Valuation is distinct from settlement and must not silently become
+realized P&L.
+
+Valuation is optional/separately authorized. Its authority, timestamp,
+horizon, price basis, and admissibility are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+### 4.6 Event separation
+
+At minimum, T07 must preserve the distinction between:
+
+```text
+observation
+execution/fill
+economic cost
+settlement
+valuation
+```
+
+One event may reference another by identity, but the evaluator must not infer
+settlement, realized cost, or valuation semantics merely because a price or
+quantity is present.
+
+## 5. Outcome Unit
+
+The primary economic interpretation unit is:
+
+```text
+one decision/trade lifecycle
+```
+
+It is not one fill.
+
+Individual fills remain economic evidence. Multiple partial fills that belong
+to the same lifecycle must not automatically create multiple independent
+`WIN` / `LOSS` classifications.
+
+### 5.1 Lifecycle identity
+
+The lifecycle identity must link, without ambiguity:
+
+- the P06 decision identity;
+- the P07 simulation identity and result identity;
+- the P08 observation and dataset identities;
+- the P08-T06 readiness identity; and
+- the economic evidence subject and event identities.
+
+The exact lifecycle key and linkage fields are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+### 5.2 Cardinality
+
+One valid lifecycle input produces at most one primary T07 economic
+interpretation. The result may preserve multiple economic evidence events and
+multiple partial fills inside that lifecycle.
+
+T07 does not produce:
+
+- one independent classification per partial fill;
+- a portfolio-level aggregate;
+- a strategy-level aggregate; or
+- a ranked collection.
+
+## 6. Temporal/Horizon Contract
+
+T07 requires an explicit outcome horizon. No default fixed duration may be
+invented.
+
+### 6.1 Realized outcome horizon
+
+For a `REALIZED` outcome, the authoritative endpoint is the governed
+settlement/realization event. A realized outcome is economically final only
+when the required settlement endpoint has been satisfied.
+
+An open or incomplete position cannot produce realized P&L or `WIN` / `LOSS`.
+
+### 6.2 Valuation outcome horizon
+
+For a `VALUATION` outcome, if valuation is separately authorized, the outcome
+requires an explicit valuation timestamp and/or governed valuation horizon.
+Valuation must remain labeled as valuation and must not be treated as
+settlement.
+
+### 6.3 Required time components
+
+The contract must explicitly define:
+
+- reference time;
+- start time;
+- endpoint;
+- endpoint semantics;
+- timestamp authority;
+- UTC normalization;
+- event inclusion/exclusion;
+- ordering for equal timestamps;
+- late evidence;
+- corrected evidence;
+- superseded evidence;
+- replay behavior; and
+- future-leakage prevention.
+
+The exact values and rules are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+P08-T02 `as_of_time` remains only the upstream dataset cutoff. It is not
+automatically the T07 economic endpoint or outcome horizon.
+
+### 6.4 Temporal safety
+
+T07 must reject future leakage rather than silently excluding it. It must not
+use local timezone, insertion time, process time, wall-clock time, or a
+post-outcome label to change a result.
+
+Late, corrected, and superseded evidence must be governed explicitly. A replay
+must use the same approved evidence identities, versions, timestamps, and
+canonical representations to reproduce the same result.
+
+## 7. Realized Economic Calculation
+
+### 7.1 Ownership
+
+T07 owns realized P&L interpretation when the evidence and calculation
+parameters are admissible. Realized P&L is not derived from paper simulation
+alone.
+
+The conceptual accounting relationship is:
+
+```text
+realized proceeds
+− realized acquisition/cost basis
+− approved economic costs
+```
+
+This is a conceptual relationship, not an implementation formula. The exact
+accounting basis and calculation parameters must be versioned.
+
+### 7.2 Required admissibility
+
+Realized P&L requires all of the following:
+
+- admissible economic evidence;
+- authoritative settlement/realization;
+- satisfied outcome endpoint;
+- complete required quantities;
+- valid accounting basis;
+- valid currency/numeraire;
+- valid price and cost basis;
+- valid calculation parameters;
+- valid lifecycle linkage; and
+- no unresolved contradiction.
+
+Open, incomplete, unavailable, or non-final positions cannot produce realized
+P&L.
+
+### 7.3 Calculation parameters
+
+The following are required versioned contract parameters:
+
+| Dimension | Required semantic decision |
+|---|---|
+| Accounting basis | Which settled economic events establish realized facts. |
+| Quantity basis | Treatment of filled, partially filled, unfilled, residual, and settled quantities. |
+| Price basis | Which settled or otherwise authorized price is authoritative. |
+| Cost basis | Treatment of acquisition cost, proceeds, notional, capital, and collateral. |
+| Fees/friction | Inclusion and evidence for fees, spread, slippage, price impact, priority fees, MEV, latency, and infrastructure cost. |
+| Currency/numeraire | Accounting unit and normalization basis. |
+| Conversion | Conversion source, conversion timestamp, and unavailable-conversion behavior. |
+| Precision | Exact numeric representation, scale, range, and overflow behavior. |
+| Rounding | Rounding mode and point at which rounding occurs. |
+| Sign convention | Meaning of positive, negative, and zero realized P&L. |
+| Partial fills | Lifecycle aggregation and admissibility treatment. |
+| Open positions | Prohibition on realized P&L until the required endpoint is satisfied. |
+| Zero denominator | Explicit undefined/rejection semantics where applicable. |
+| Contradictory evidence | Fail-closed rule; no silent source preference. |
+| Missing evidence | Explicit non-final/failure behavior. |
+| Settlement semantics | Authority and state required to call an outcome realized. |
+
+Every row remains:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+No implicit implementation default is permitted.
+
+## 8. Valuation Boundary (Optional / Separately Authorized)
+
+Valuation/mark-to-market is a distinct outcome type. It is not realized P&L.
+
+If separately authorized, valuation requires:
+
+- explicit valuation authority;
+- valuation evidence identity and provenance;
+- valuation timestamp;
+- explicit valuation horizon;
+- price/quantity basis;
+- currency/numeraire;
+- precision and rounding;
+- stale-data rules;
+- replay semantics; and
+- a distinct output type or outcome marker.
+
+Valuation must never be silently converted into realized P&L, `WIN`, or
+`LOSS`.
+
+Valuation is not mandatory for core T07. Whether T07 may output valuation at
+all is:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+## 9. Economic Classification
+
+### 9.1 Classification flow
+
+Classification is applied only after admissible economic facts and
+deterministic calculation:
+
+```text
+economic facts
+→ deterministic calculation
+→ approved classification
+```
+
+Paper result status, paper reconciliation status, P07-T06 finalization, and
+P08-T06 readiness must not directly produce `WIN` or `LOSS`.
+
+### 9.2 Conceptual taxonomy
+
+The conceptual T07 outcome/classification taxonomy is:
 
 ```text
 WIN
 LOSS
 BREAKEVEN
-UNKNOWN
-UNAVAILABLE
-INCOMPLETE
+NON_FINAL
 INVALID
 ```
 
-Existing P07 and P08 statuses must not be reused as economic labels without an
-explicit governance decision. In particular:
+`UNKNOWN`, `UNAVAILABLE`, `INCOMPLETE`, and `CONTRADICTORY` are evidence or
+failure states unless a later approved contract explicitly assigns another
+meaning. They must not be silently converted into `WIN` or `LOSS`.
 
-- `FILLED` does not mean `WIN`;
-- `FAILED` or `REJECTED` does not mean `LOSS`;
-- `PARTIAL` does not define a financial result;
-- `UNAVAILABLE` does not define a market loss;
-- `RECONCILED` does not define settlement or profit; and
-- `READY_FOR_NON_ECONOMIC_ANALYSIS` does not define economic admissibility.
+### 9.3 Classification requirements
 
-### 7.2 Required classification decisions
+The classification contract must define:
 
-For the approved target classification, governance must define:
+- exact vocabulary;
+- deterministic rule;
+- economic input facts;
+- calculation dependency;
+- threshold;
+- tie/breakeven rule;
+- classification version;
+- classification digest;
+- admissibility prerequisites;
+- lifecycle cardinality; and
+- behavior for non-final and invalid inputs.
 
-- the exact value vocabulary;
-- deterministic admissibility requirements;
-- the evidence needed for each value;
-- precedence when multiple evidence states coexist;
-- treatment of partial, failed, rejected, open, unavailable, unknown, and
-  contradictory cases;
-- whether a classification is descriptive only; it must not have execution,
-  capital, model, or strategy authority;
-- whether a classification is per decision, fill, position, trade, horizon,
-  dataset, strategy, or another unit; and
-- the version and digest semantics of the classification rule.
+`WIN` / `LOSS` ownership is locked to T07. Any exact numeric threshold, tie
+rule, or breakeven parameter that is not authoritative must be marked:
 
-T07 owns classification application after these parameters are approved. This
-draft does not authorize its runtime implementation.
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
 
-## 8. Determinism and canonicalization
+T07 must not assume that positive realized P&L means `WIN` or negative
+realized P&L means `LOSS` unless the approved classification contract
+explicitly states that rule.
 
-Any future T07 implementation must be pure, immutable, provider-neutral,
-read-only, and deterministic over explicitly supplied validated inputs.
+## 10. Input Contract
 
-Equivalent validated inputs must produce equivalent semantic output, canonical
-representation, and digest. The operation must not depend on:
+### 10.1 Conceptual public inputs
+
+The conceptual evaluator input is:
+
+```text
+EconomicOutcomeInterpretationEvaluator(
+    validated_upstream_chain,
+    economic_evidence_packet,
+)
+```
+
+The input model has two distinct parts:
+
+**A. Validated upstream P08 chain**
+
+- one validated P08-T06 readiness result;
+- its exact P08-T05 snapshot identity;
+- the validated P08-T02 dataset identity and cutoff;
+- the P08-T01 observation identity; and
+- preserved P06/P07 provenance.
+
+**B. Separately governed economic evidence**
+
+- one `EconomicEvidencePacket` for the decision/trade lifecycle;
+- packet identity and canonical representation;
+- packet source and authority;
+- packet event identities and timestamps;
+- packet versions and digests; and
+- packet admissibility state.
+
+T07 must not treat the T06 readiness state as economic evidence.
+
+### 10.2 Input validation
+
+Before producing a normal interpretation, the evaluator must validate:
+
+- exact input types;
+- supported contract and evaluator versions;
+- upstream P06/P07/P08 linkage;
+- P08-T06 source identity and digest;
+- lifecycle identity;
+- economic packet identity and digest;
+- event-type semantics;
+- event ordering;
+- timestamp authority and UTC normalization;
+- quantity and value validity;
+- currency/numeraire validity;
+- settlement or valuation authority;
+- calculation parameters;
+- classification parameters; and
+- canonical representation.
+
+No missing upstream value may be reconstructed from an identifier. No
+economic packet may be fetched, repaired, or substituted.
+
+## 11. Output Contract
+
+### 11.1 Conceptual output
+
+The conceptual public output is:
+
+```text
+EconomicOutcomeInterpretation
+```
+
+It must conceptually contain:
+
+- output identity;
+- outcome unit identity;
+- complete provenance;
+- source and evidence identities;
+- contract version;
+- evaluator version;
+- relevant timestamps;
+- evidence/admissibility state;
+- outcome type;
+- economic result when admissible;
+- realized P&L when applicable;
+- classification when applicable;
+- non-final/failure state when applicable;
+- canonical digest;
+- recursive immutability semantics; and
+- explicit authority effect: `NONE`.
+
+### 11.2 Outcome types
+
+The output must distinguish, at minimum, the following conceptual cases:
+
+- `REALIZED` — settled/realized outcome with admissible realized P&L where
+  required;
+- `VALUATION` — valuation outcome only if separately authorized;
+- `NON_FINAL` — required endpoint/horizon or required evidence is not
+  satisfied;
+- `INVALID` — input or evidence violates the contract.
+
+The exact public enum and additional evidence/failure states are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+### 11.3 Excluded output
+
+T07 output must not include:
+
+- strategy ranking;
+- ROI aggregation;
+- portfolio performance;
+- strategy performance;
+- expectancy;
+- drawdown;
+- walk-forward analysis;
+- confidence intervals;
+- drift analysis;
+- model update;
+- strategy update; or
+- execution authority.
+
+Return and ROI are not mandatory core T07 outputs. A later performance
+boundary may consume an authoritative T07 result under its own governance.
+
+## 12. Provenance and Identity
+
+### 12.1 Complete provenance chain
+
+T07 must preserve this complete chain:
+
+```text
+P06 DecisionIntent
+→ P07-T01 SimulationInput
+→ P07-T02 FillOutcome
+→ P07-T03 Position / Exposure
+→ P07-T04 Paper Ledger
+→ P07-T05 Reconciliation
+→ P07-T06 canonical finalized NON-ECONOMIC result
+→ P07-T07 History
+→ P08-T01 Observation
+→ P08-T02 Dataset Snapshot
+→ P08-T03 Interpretation
+→ P08-T04 Evidence Evaluation
+→ P08-T05 Evaluation Snapshot
+→ P08-T06 Readiness
+→ P08-T07
+```
+
+No shortcut, reconstruction, or caller-created substitute is permitted.
+
+### 12.2 Required identities
+
+The output must preserve, as applicable:
+
+- decision identity and digest;
+- simulation input and result identities;
+- fill, position, exposure, ledger, and reconciliation identities;
+- P07-T06 result and P07-T07 history identities;
+- P08-T01 observation identity;
+- P08-T02 dataset identity and `as_of_time`;
+- P08-T03 interpretation identity;
+- P08-T04 evaluation identity;
+- P08-T05 snapshot identity;
+- P08-T06 readiness identity;
+- lifecycle identity;
+- economic evidence packet identity;
+- event identities;
+- source and authority identities;
+- contract and evaluator versions; and
+- source and output digests.
+
+The exact field names and identity derivation are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+## 13. Determinism and Canonicalization
+
+The future T07 evaluator must be deterministic over explicit immutable
+inputs. Equivalent inputs must produce equivalent semantic output, canonical
+representation, and digest.
+
+The evaluator must not depend on:
 
 - wall-clock time;
 - randomness;
-- process identity or memory address;
-- filesystem state;
-- database state;
-- network or provider state;
-- insertion order;
 - local timezone;
-- hidden configuration; or
-- external assertions not present in the approved input contract.
+- insertion order;
+- database state;
+- network state;
+- provider state;
+- filesystem state;
+- hidden configuration;
+- process identity; or
+- memory address.
 
-### 8.1 Canonicalization decisions still open
+### 13.1 Canonicalization requirements
 
-The following exact details remain **UNRESOLVED / REQUIRES GOVERNANCE
-DECISION**:
+The contract must specify canonicalization for:
 
-- the public output field set;
-- field names and field ordering;
-- canonical enum and classification serialization;
-- decimal representation and scale;
-- treatment of negative zero, NaN, infinity, and overflow;
-- timestamp serialization and timezone normalization;
-- event ordering when timestamps tie;
-- collection ordering and duplicate identity;
-- canonical representation of external evidence;
-- digest algorithm and digest coverage;
-- version inclusion in the digest;
-- whether source artifacts are embedded or referenced by digest; and
-- replay equivalence rules for corrected or superseded evidence.
+- decimal numbers;
+- timestamps;
+- enums;
+- collection ordering;
+- duplicate identity;
+- negative zero;
+- NaN and infinity;
+- overflow;
+- digest coverage; and
+- version inclusion.
 
-The future contract must not rely on language-specific object ordering or
-implementation-specific numeric serialization.
+The exact representation, digest algorithm, field ordering, and numeric
+parameters are:
 
-## 9. Failure and fail-closed behavior
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
 
-The draft requires that no economic conclusion be produced unless all required
-predecessor and economic evidence is admissible, linked, canonical, and
-temporally valid.
+No language-specific object ordering or implementation-specific numeric
+serialization may determine the result.
 
-### 9.1 Conditions that must not produce an economic conclusion
+## 14. Admissibility and Fail-Closed Semantics
 
-The future contract must fail closed for at least:
+### 14.1 Failure/non-final distinction
 
-- missing predecessor evidence;
-- incomplete predecessor evidence;
-- unavailable required economic evidence;
-- contradictory source values;
-- invalid artifact or observation linkage;
+Economic classification must remain separate from failure and non-final states.
+At minimum, the conceptual failure/non-final set distinguishes:
+
+```text
+INVALID
+INCOMPLETE
+UNAVAILABLE
+CONTRADICTORY
+NOT_FINAL
+```
+
+No failure or non-final state may be converted into `WIN` or `LOSS`.
+
+`UNKNOWN`, `UNAVAILABLE`, and `INCOMPLETE` from upstream P08 evidence remain
+evidence states unless the T07 contract explicitly defines their relationship
+to a non-final output. They are not economic classifications by default.
+
+### 14.2 Fail-closed conditions
+
+T07 must fail closed for:
+
+- missing economic evidence;
+- incomplete economic evidence;
+- missing upstream provenance;
+- invalid linkage;
 - invalid or mismatched digest;
 - unsupported contract or evaluator version;
-- non-canonical source representation;
-- stale reference data;
-- unsatisfied outcome horizon;
-- temporal ordering violation;
+- non-canonical representation;
+- contradictory evidence;
+- invalid temporal ordering;
 - future leakage;
-- missing settlement or valuation authority;
-- undefined calculation or zero denominator;
-- unsupported unit or currency conversion;
-- invalid quantity or position state;
-- ambiguous partial-fill treatment;
-- invalid classification input; and
-- any unapproved external authority assertion.
+- unsatisfied outcome horizon;
+- missing settlement evidence;
+- missing valuation authority for an authorized valuation outcome;
+- undefined calculation;
+- unsupported currency conversion;
+- invalid quantities;
+- ambiguous partial fills;
+- open or incomplete positions presented as realized;
+- invalid classification parameters; and
+- unapproved external authority assertions.
 
-### 9.2 Failure taxonomy is not approved
+### 14.3 Prohibited recovery
 
-The exact public failure taxonomy, reason-code vocabulary, and distinction
-between rejected input, unavailable evidence, incomplete horizon, invalid
-calculation, and valid non-conclusion remain **UNRESOLVED / REQUIRES GOVERNANCE
-DECISION**.
+T07 must not:
 
-Until that taxonomy is approved, the only permitted draft-level behavior is:
+- infer missing economic facts;
+- impute a price, quantity, cost, fee, or settlement;
+- silently repair a packet;
+- filter contradictory evidence;
+- silently prefer one conflicting authority;
+- downgrade an invalid input to `NON_FINAL`;
+- upgrade a non-final input to `WIN` or `LOSS`; or
+- substitute paper simulation for economic evidence.
 
-> reject or withhold the economic conclusion; do not infer, impute, coerce,
-> filter, repair, downgrade, upgrade, or silently substitute evidence.
+The exact failure code vocabulary, whether invalid input produces no object or
+an explicit rejection record, and reason-code ordering are:
 
-An implementation must not turn an unresolved failure into `WIN`, `LOSS`,
-profit, return, ROI, or any other economic metric.
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
 
-## 10. Authority boundary
+## 15. Authority/Security Boundary
 
-P08-T07 must remain strictly read-only and must not:
+T07 is read-only and provider-neutral. It must not:
 
 - execute paper or live trades;
-- access wallets;
-- sign transactions;
-- broadcast transactions;
-- call RPCs, DEXs, exchanges, or providers;
 - authorize capital;
 - override Risk/Capital Authorization;
-- modify or reinterpret `DecisionIntent`;
-- modify P07 fills, positions, exposure, ledger, reconciliation, results, or
+- create an execution request;
+- access a wallet;
+- sign or broadcast;
+- call RPC, DEX, exchange, or external API;
+- access a network or provider SDK;
+- access a database, queue, worker, cache, or persistence layer;
+- collect economic evidence;
+- modify P06 DecisionIntent;
+- modify P07 fills, positions, exposure, ledger, reconciliation, result, or
   history;
-- modify P08-T01 through P08-T06 artifacts;
-- recalculate paper fills, fees, slippage, latency, or reconciliation;
-- retrain, fit, evaluate for promotion, or update a model;
+- modify P08-T01 through T06 artifacts;
+- retrain or update a model;
 - update a strategy, threshold, weight, parameter, or risk limit;
 - optimize parameters;
-- perform strategy or model learning;
-- rank, select, prioritize, or promote decisions;
-- become a P09 execution boundary;
-- create production authority;
-- create external side effects; or
-- treat an economic interpretation as authorization to act.
+- rank strategies or decisions;
+- calculate strategy performance;
+- perform portfolio aggregation; or
+- create an external side effect.
 
-Any future model, strategy, parameter, risk, capital, or execution effect
-requires its own separately reviewed and authorized boundary.
+The explicit authority effect of every T07 result is:
 
-## 11. P08-T07 versus P09
+```text
+NONE
+```
 
-P08-T07, if authorized, would be a read-only interpretation boundary over
-validated evidence. Its potential output would describe or classify an
-economic interpretation according to an explicitly approved contract. It would
-not submit an order, reserve capital, sign, broadcast, reconcile live
-execution, or write a journal entry.
+## 16. P09/Learning Boundary
 
-P09 remains a separately governed execution phase. The architecture preserves
-the mandatory chain:
+T07 does not:
+
+- train models;
+- update strategies;
+- optimize parameters;
+- rank strategies;
+- calculate strategy performance;
+- calculate ROI or portfolio performance aggregation;
+- authorize capital;
+- authorize execution;
+- execute anything; or
+- become P09.
+
+P09 remains a separate chain:
 
 ```text
 Decision Intent
@@ -577,168 +892,155 @@ Decision Intent
 → Journal
 ```
 
-T07 must not create a shortcut into any P09 step. A T07 result must not
-authorize P09, imply model promotion, or change strategy behavior. Any
-controlled promotion path remains subject to separate review and explicit
-authorization.
+An authoritative T07 result must not activate any P09 step, change a model,
+change a strategy, change a risk limit, or promote a parameter. Any later
+performance, learning, attribution, or promotion boundary requires separate
+architecture, specification, and authorization.
 
-## 12. Candidate output contract
+T07 has no portfolio-level aggregation, strategy-level performance, ranking,
+expectancy, drawdown, walk-forward analysis, confidence interval, or drift
+analysis. Those belong to a later separately governed performance/learning
+boundary.
 
-No public T07 output type, contract version, evaluator version, or exact field
-list is approved. The semantic ownership of the output is nevertheless
-settled. The following completeness checklist is for the next architecture
-review, not an implementation contract.
+## 17. Contract and Evaluator Versioning
 
-| Output category | Required governance decision |
-|---|---|
-| Output identity | Define the identity unit and deterministic identity derivation. |
-| Provenance identity | Preserve the complete P06 → P07 → P08-T06 chain and every required digest. |
-| Source artifact identities | Define which upstream and economic-evidence artifact identities are mandatory. |
-| Contract and evaluator versions | Assign supported versions and version-compatibility rules. |
-| Timestamps | Define source, reference, event, cutoff, horizon, and output timestamp semantics. |
-| Digest | Define canonical representation, algorithm, coverage, and replay rules. |
-| Evidence/admissibility state | Define the exact taxonomy and whether it is separate from economic classification. |
-| Economic outcome facts/results | T07-owned interpretation of explicitly governed economic evidence; exact fields and cardinality are **GOVERNANCE PARAMETER REQUIRED**. |
-| Realized P&L | Core T07 output when admissible; exact accounting and numeric semantics are **GOVERNANCE PARAMETER REQUIRED**. |
-| Valuation / mark-to-market | Distinct interpretation type if authorized; must not be mixed with realized P&L. |
-| Classification | T07-owned application of approved `WIN` / `LOSS` target semantics; exact threshold and tie rules are **GOVERNANCE PARAMETER REQUIRED**. |
-| Non-final / incomplete states | Must prevent realized P&L or `WIN` / `LOSS` for open, incomplete, unavailable, or unsatisfied-horizon cases; exact taxonomy is **GOVERNANCE PARAMETER REQUIRED**. |
-| Return / ROI / performance metrics | Outside mandatory core T07; any later use requires a separately governed performance boundary. |
-| Strategy/model/regime attribution | Outside T07; version identities may be preserved as provenance only. |
-| Immutability | Define recursive immutability and source-alias behavior. |
-| Cardinality | Define per-observation, per-decision, per-position, per-trade, or collection output. |
-| Aggregation | Define whether any aggregation is allowed and its ordering and missing-data rules. |
-| Authority effect | State explicitly that the output cannot authorize execution or model/strategy changes. |
+### 17.1 Conceptual names
 
-The semantic ownership rows are settled; exact implementation details remain
-open governance parameters.
+The conceptual public contract is:
 
-## 13. Security and provider neutrality
+```text
+EconomicOutcomeInterpretation
+```
 
-T07 must be provider-neutral. A future implementation must operate only on
-explicitly supplied, validated, immutable evidence and must not depend on
-live-provider authority.
+The conceptual evaluator is:
 
-This draft does not authorize:
+```text
+EconomicOutcomeInterpretationEvaluator
+```
 
-- network access;
-- provider SDKs;
-- RPC or DEX calls;
-- exchange or venue queries;
-- wallet access;
-- signing or broadcast;
-- database or persistence access;
-- workers, queues, or caches; or
-- external evidence collection.
+The contract owns the semantic output identity, provenance, outcome types,
+realized P&L applicability, classification applicability, non-final/failure
+states, immutability, and digest requirements.
 
-If governance later determines that an external source is required, its
-identity, authority, authentication boundary, timestamp semantics, versioning,
-replay behavior, and failure rules require a separate approved contract.
+The evaluator owns deterministic validation and interpretation of the explicit
+validated inputs. It must not collect evidence or create authority.
 
-## 14. Open governance decisions
+### 17.2 Version requirements
 
-The following decisions must be resolved before implementation authorization:
+The contract version and evaluator version must be explicit, supported, and
+included in the canonical identity/digest coverage according to the approved
+versioning rule.
 
-1. The authoritative economic evidence type/source and its owner.
-2. The settlement authority and the evidence that establishes realized status.
-3. Whether paper simulation can ever be economic evidence; the current
-   boundary says paper simulation is not economic truth.
-4. Whether valuation/mark-to-market evidence is admissible as a distinct
-   interpretation type and under what
-   restrictions.
-5. The exact horizon parameters: reference time, start time, endpoint,
-   endpoint semantics, timestamp authority, inclusion/exclusion, and replay.
-6. The accounting basis, quantity basis, price basis, and cost basis.
-7. The treatment of fees, spread, slippage, latency, price impact, MEV,
-   priority fees, and infrastructure cost.
-8. The currency/numeraire, conversion source, conversion semantics, precision,
-   scale, sign convention, and rounding.
-9. The realized P&L formulas and undefined/zero-denominator behavior.
-10. The exact definition of trade result and the unit of outcome.
-11. The exact `WIN` / `LOSS` classification threshold, tie/breakeven semantics,
-    and classification rule version.
-12. The definitions and formulas for return, ROI, expectancy, drawdown,
-   profitability, and economic edge.
-13. The definition and admissibility of missed opportunity and avoided loss;
-    these remain outside core T07 unless separately governed.
-14. The handling of partial fills, open positions, failed attempts, rejected
-    decisions, unavailable evidence, and reconciliation disagreement.
-15. The exact evidence/admissibility state taxonomy and failure taxonomy.
-16. The input cardinality and whether T07 consumes a T06 result, T05 snapshot,
-    governed evidence packet, or fully explicit immutable bundle.
-17. The exact output identity, fields, versions, digest, canonicalization, and
+The version contract must define:
+
+- supported predecessor versions;
+- supported economic packet versions;
+- calculation parameter versions;
+- classification rule versions;
+- compatibility and rejection rules;
+- digest inclusion;
+- replay behavior across versions; and
+- supersession behavior.
+
+Exact version strings and compatibility rules are:
+
+```text
+GOVERNANCE PARAMETER REQUIRED
+```
+
+No implementation may invent a version or silently accept an unsupported
+version.
+
+## 18. Remaining Governance Parameters
+
+The following are the remaining blocking parameters. They must be resolved
+before implementation authorization:
+
+1. Economic evidence packet authority, source type, source identity, and
+   settlement authority.
+2. `EconomicEvidencePacket` field-level schema, event-specific required fields,
+   and admissibility rules.
+3. Outcome/trade lifecycle identity and exact provenance linkage.
+4. Reference time, start time, endpoint, endpoint semantics, timestamp
+   authority, UTC normalization, inclusion/exclusion, and replay rules.
+5. Late, corrected, superseded, stale, and conflicting evidence behavior.
+6. Accounting basis, quantity basis, price basis, and cost basis.
+7. Fee/friction inclusion and evidence for spread, slippage, price impact,
+   priority fees, MEV, latency, and infrastructure cost.
+8. Currency/numeraire, conversion source, conversion semantics, precision,
+   scale, overflow, sign convention, and rounding.
+9. Realized P&L formula and zero/undefined denominator behavior.
+10. Valuation authorization, valuation source, valuation timestamp/horizon, and
+    distinct valuation output semantics.
+11. `WIN`, `LOSS`, and `BREAKEVEN` threshold, tie rule, classification formula,
+    classification version, and digest.
+12. Exact `NON_FINAL`, `INVALID`, `INCOMPLETE`, `UNAVAILABLE`, and
+    `CONTRADICTORY` output/failure vocabulary.
+13. Partial-fill aggregation and open/incomplete-position behavior.
+14. Exact public field names, output cardinality, identity derivation, and
     immutable representation.
-18. The relationship between T02 `as_of_time` and the T07 economic horizon.
-19. The allowed ordering of observations and events, including tied timestamps.
-20. Future-leakage, look-ahead, survivorship, selection, regime, and
-    feedback-loop controls.
-21. Missing, stale, unavailable, incomplete, contradictory, and superseded
-    evidence semantics.
-22. The exact digest coverage and replay equivalence rules.
-23. The exact fail-closed taxonomy and whether an invalid input produces no
-    result or an explicit non-economic rejection record.
-24. Whether any aggregation, comparison, ranking, confidence interval,
-    walk-forward analysis, drift analysis, or sample sufficiency measure is
-    within T07; broader performance remains outside core T07.
-25. The separate review required before any model, strategy, parameter, risk,
-    capital, or execution effect.
-26. The independent architecture and implementation authorization gates.
+15. Canonical decimal, timestamp, enum, collection, duplicate, negative-zero,
+    NaN/infinity, overflow, digest, and version serialization.
+16. Digest algorithm and complete digest coverage.
+17. Whether any additional economic result type is authorized beyond realized
+    outcome and the separately authorized valuation type.
+18. Explicit exclusion of ROI, strategy attribution, portfolio performance,
+    ranking, expectancy, drawdown, walk-forward analysis, confidence
+    intervals, and drift analysis from core T07.
+19. Exact implementation authorization and independent architecture-gate
+    decision.
 
-Each remaining parameter is a blocking decision. It must not be resolved by
-implementation convention, a default value, a provider response, or an
-assumption inherited from paper simulation.
+Each item is a governance parameter, not an implementation default.
 
-## 15. Future implementation authorization gate
+## 19. Implementation Authorization Gate
 
-Implementation remains prohibited until all of the following are complete:
+Runtime implementation remains prohibited until all of the following are
+complete:
 
-1. The economic purpose and non-overlap boundary are approved.
-2. Every authoritative input and output field is specified.
-3. Economic evidence ownership and admissibility are approved.
-4. Horizon, cutoff, endpoint, replay, and future-leakage semantics are
+1. The architecture gate approves this ownership and non-overlap boundary.
+2. The economic evidence authority and `EconomicEvidencePacket` semantics are
    approved.
-5. Units, formulas, precision, rounding, sign conventions, and undefined
-   cases are approved.
-6. Realized P&L semantics and `WIN` / `LOSS` classification parameters are
-   approved; return, ROI, and broader performance metrics are explicitly
-   excluded or separately governed.
-7. Provenance, versions, canonicalization, ordering, and digest coverage are
+3. The event model and lifecycle identity/linkage are approved.
+4. The realized outcome horizon and settlement endpoint are approved.
+5. Any valuation output is separately approved or explicitly excluded.
+6. Accounting, quantity, price, cost, fee/friction, numeraire, conversion,
+   precision, rounding, and sign semantics are approved.
+7. Classification vocabulary, thresholds, tie rules, versions, and digests are
    approved.
-8. Fail-closed and missing-data behavior is approved.
-9. P07 and P08-T01 through T06 ownership is explicitly preserved.
-10. P09, model, strategy, risk, capital, and execution exclusions are
-    explicitly preserved.
-11. A separate implementation authorization is recorded.
-12. Focused validation and regression requirements are specified after, not
-    before, the contract is approved.
+8. Non-final/failure vocabulary and fail-closed behavior are approved.
+9. Input and output contracts, cardinality, provenance, and identities are
+   approved.
+10. Canonicalization and digest coverage are approved.
+11. Provider neutrality and no-evidence-collection boundaries are preserved.
+12. P07, P08-T01 through T06, model/strategy, and P09 ownership boundaries are
+    preserved.
+13. A separate implementation authorization is recorded.
+14. Runtime tests and regression requirements are specified only after the
+    contract is approved.
 
-This draft itself satisfies none of those implementation-authorization
-conditions.
+This document does not grant implementation authorization.
 
-## 16. Specification draft conclusion
+## 20. Architecture Candidate Conclusion
 
-P08-T07 is not yet a complete executable contract. Governance now establishes
-T07 as the read-only economic outcome interpretation boundary, with realized
-P&L as a core output when admissible and `WIN` / `LOSS` as target
-classifications derived from economic facts. The current repository still does
-not define the economic evidence authority, settlement authority, exact
-horizon parameters, formulas, numeric rules, output shape, or failure taxonomy
-required to implement it safely.
+P08-T07 is now specified as the **Economic Outcome Interpretation Boundary**
+with locked ownership for:
 
-The correct current behavior is therefore:
+- economic outcome interpretation;
+- realized P&L when admissible; and
+- approved economic outcome classification.
 
-- preserve all upstream non-economic semantics;
-- keep all unresolved calculation and admissibility parameters explicit;
-- distinguish settled/realized P&L from valuation/mark-to-market;
-- prevent open or incomplete positions from producing realized P&L or `WIN` /
-  `LOSS`;
-- derive `WIN` / `LOSS` only from economic facts through deterministic
-  calculation;
-- keep return, ROI, strategy attribution, and broader performance analysis
-  outside core T07;
-- fail closed for any attempted unsupported economic conclusion;
-- do not implement runtime behavior;
-- do not change P07, P08-T01 through T06, or P09; and
-- require a new governance decision before implementation authorization.
+The candidate contract consumes a validated upstream P08 chain plus a supplied
+provider-neutral `EconomicEvidencePacket`. It uses a distinct event model for
+observation, execution/fill, economic cost, settlement, and valuation. Its
+primary unit is one decision/trade lifecycle. Realized outcomes require
+settlement/realization and a satisfied endpoint; valuation remains distinct
+and optional. `WIN` / `LOSS` are derived classifications, never primitive
+truth. T07 produces no strategy, portfolio, model, capital, or execution
+authority.
 
-**FINAL STATUS: P08-T07 SPECIFICATION DRAFT — READY FOR SECOND ARCHITECTURE REVIEW**
+The remaining accounting, horizon, evidence, classification, failure,
+canonicalization, versioning, and output parameters remain explicitly marked
+as `GOVERNANCE PARAMETER REQUIRED`. No runtime behavior, test behavior,
+provider access, or P09 capability is authorized.
+
+**FINAL STATUS: P08-T07 FINAL CANDIDATE SPECIFICATION — READY FOR ARCHITECTURE GATE**
