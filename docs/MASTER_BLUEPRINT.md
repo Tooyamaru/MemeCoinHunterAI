@@ -137,15 +137,17 @@ Long-term retention prioritizes decision/audit data, associated snapshots,
 executed trades, outcomes, and provenance over raw high-frequency data unless
 raw data is needed for audit or research.
 
-Learning is read-only in early versions: it may analyze outcomes, expectancy,
-drift, and parameters, but may not autonomously change live thresholds or
-risk limits. Changes require controlled review and approval. Readiness is
-multi-dimensional—expectancy, drawdown, slippage, execution failures,
-latency, infrastructure cost, stale data, duplicate orders, kill-switch
-behavior, market-regime performance, and confidence intervals—and is never
-based on win rate or a fixed trade count alone. If controlled testing fails to
-demonstrate durable risk-adjusted edge, governance must allow the project to
-STOP, PAUSE, or change market.
+Future learning is read-only and separately governed: a later authorized
+boundary may analyze outcomes, expectancy, drift, and parameters, but may not
+autonomously change live thresholds or risk limits. Changes require controlled
+review and approval. Readiness is multi-dimensional—expectancy, drawdown,
+slippage, execution failures, latency, infrastructure cost, stale data,
+duplicate orders, kill-switch behavior, market-regime performance, and
+confidence intervals—and is never based on win rate or a fixed trade count
+alone. The current P08-T01 through P08-T06 contracts remain non-economic
+observation, evidence, snapshot, and readiness boundaries. If a separately
+authorized future economic analysis fails to demonstrate durable risk-adjusted
+edge, governance must allow the project to STOP, PAUSE, or change market.
 
 ## Phase map
 
@@ -248,19 +250,30 @@ STOP, PAUSE, or change market.
 - **Entry criteria:** Decisions are auditable and execution assumptions are explicit.
 - **Exit criteria:** Paper results include frictions and support reproducible simulation.
 - **Major risks:** Perfect-fill assumptions, simulation mismatch, misleading performance.
-- **Deliverables:** Paper ledger, simulator, reconciliation, performance reports.
+- **Deliverables:** Paper ledger, simulator, reconciliation, reproducible
+  simulation results, and reconciliation evidence.
 - **Governance status:** P07-T01 through P07-T07 are implemented, complete,
   closed, and audited PASS. P07 remains simulation-only, has no authority to
   trade, and does not start P08 or P09 automatically.
 
 ### P08 — OUTCOME LEARNING
-- **Objective:** Learn from decisions and outcomes without uncontrolled strategy changes.
-- **Major components:** Read-only analysis of wins/losses, missed opportunities, avoided losses, expectancy, drift, regime/strategy/feature/decision/entry/exit performance, immutable point-in-time snapshots, production/challenger models, walk-forward validation, and controlled promotion.
+- **Objective:** Preserve and evaluate decision/outcome evidence without
+  uncontrolled strategy changes; any economic interpretation is a separately
+  governed future boundary.
+- **Major components:** Current P08-T01 through P08-T06 provide
+  non-economic observation, dataset, interpretation, evidence evaluation,
+  immutable snapshots, and readiness. A later separately authorized boundary
+  may analyze wins/losses, missed opportunities, avoided losses, expectancy,
+  drift, regime/strategy/feature/decision/entry/exit performance,
+  production/challenger models, walk-forward validation, and controlled
+  promotion.
 - **Dependencies:** P06, P07.
 - **Entry criteria:** Sufficient historical decision and outcome records exist.
 - **Exit criteria:** Learning is validated against bias and cannot self-modify production uncontrolled.
 - **Major risks:** Overfitting, look-ahead, regime/survivorship bias, feedback loops.
-- **Deliverables:** Outcome dataset, evaluation reports, controlled model versioning.
+- **Deliverables:** Non-economic outcome dataset and evidence reports;
+  economic reports and controlled model versioning require separate
+  specification and authorization.
 - **Current boundary:** P08-T06 — Outcome Evidence Analysis Readiness Boundary —
   IMPLEMENTED / AUDITED PASS / READY TO CLOSE. P08-T01 through P08-T05 are
   COMPLETE / CLOSED / AUDITED PASS. T06 consumes one validated T05 snapshot,

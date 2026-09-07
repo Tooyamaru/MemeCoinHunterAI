@@ -158,10 +158,11 @@ and fail-closed.
 
 ## P06 Architecture Gate — COMPLETE / CLOSED / APPROVED
 
-P05-T01 through P05-T08 are complete and closed. The P06 architecture gate is
-IN PROGRESS; no P06 runtime is authorized yet. The approved P06 boundary
-consumes one validated P05-T08 evidence-first opportunity context and produces
-one deterministic, versioned analytical decision intent.
+P05-T01 through P05-T08 are complete and closed. The P06 architecture/
+specification gate is COMPLETE / CLOSED / APPROVED; no P06 runtime is
+authorized yet. The approved P06 boundary consumes one validated P05-T08
+evidence-first opportunity context and produces one deterministic, versioned
+analytical decision intent.
 
 Optional bounded deep analysis, including statistical, classical, bounded ML,
 or narrative/LLM analysis, is non-authoritative and separately versioned. It

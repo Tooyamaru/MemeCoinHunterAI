@@ -391,13 +391,23 @@ P07 does not implement or authorize:
 
 P07 outputs may later become inputs to:
 
-- **P08:** read-only outcome and performance learning after sufficient
-  immutable paper outcomes exist; or
+- **P08:** read-only, non-economic outcome/evidence analysis after sufficient
+  immutable paper outcomes exist. Any economic outcome or performance
+  interpretation requires a separately governed specification and is not
+  authorized by P07; or
 - **P09:** separately authorized provider-agnostic execution after paper
   evidence, risk controls, pre-flight, signing, and go-live gates pass.
 
-Neither transition is automatic. Paper outcomes do not authorize capital,
-promote a strategy, or establish live execution readiness by themselves.
+Neither transition is automatic. P07-T05 remains Paper Reconciliation and
+P07-T06 remains the canonical finalized NON-ECONOMIC paper-simulation result.
+Here, “finalized” means finalized within the paper-simulation lifecycle, not
+real-world settlement. P07 does not establish profit, ROI, WIN/LOSS,
+expectancy, economic performance, or real-world settlement. Paper outcomes do
+not authorize capital, promote a strategy, or establish live execution
+readiness by themselves. P08-T01 remains observation/preservation only,
+P08-T06 remains evidence-readiness only, P08-T07 remains NOT AUTHORIZED until
+its own specification/architecture gate is passed, and P09 remains separately
+gated and unauthorized.
 
 ## Governance conclusion
 
