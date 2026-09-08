@@ -451,30 +451,18 @@ remain `UNRESOLVED` and block implementation readiness.
 
 ### 10A.1 Authority A status reconciliation
 
-The repository evidence supports determination **(a)** from the work order:
-the Authority A document is not formally closed in the repository.
+The repository now records Authority A as:
 
-The document explicitly says:
+`SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED`
 
-- `SPECIFICATION DRAFT — IMPLEMENTATION NOT AUTHORIZED`;
-- `FORMAL AUDIT REQUIRED`; and
-- `P08 ... SPECIFICATION DRAFT COMPLETE — FORMAL AUDIT REQUIRED`.
+This status is present in the Authority A specification, its standalone audit
+record at `docs/P08-AUTHORITY-A-SPECIFICATION-AUDIT.md`, and
+`PROJECT_STATE.md`. Authority A's semantic boundary is therefore resolved for
+this bounded Authority B audit, while its implementation remains unauthorized.
 
-`PROJECT_STATE.md` records P08-T07 as closed, but it does not contain a
-committed Authority A PASS or handover record. The work-order checkpoint says
-Authority A PASS, but that checkpoint is not itself a repository document or
-commit proving that the Authority A document was formally reconciled.
-
-Therefore:
-
-- Authority A semantic boundary: `RESOLVED` for purposes of this bounded B
-  audit;
-- Authority A formal closure: `UNRESOLVED / NOT PROVEN BY REPOSITORY EVIDENCE`;
-- Authority A document status: unchanged; and
-- no assumption is made that the checkpoint silently supersedes the document.
-
-This status is an implementation-readiness blocker and requires an explicit
-governance reconciliation. It is not corrected by this audit.
+No Authority A compatibility blocker remains. Authority B must still consume
+Authority A's established lifecycle identity and must not redefine, split,
+merge, or replace it.
 
 ### 10A.2 Authority B object classification
 
@@ -791,45 +779,109 @@ those supplied semantics; B only supplies lineage facts.
 
 ## 15. Authority A Baseline Reconciliation
 
-The supplied checkpoint identifies Authority A as closed and PASS. The current
-Authority A document also contains an internal status of
-`SPECIFICATION DRAFT — IMPLEMENTATION NOT AUTHORIZED` and says formal audit is
-required.
+Authority A is formally reconciled and closed at specification level:
 
-This is a governance-document status inconsistency. It does not change the
-Authority A semantic boundary used by this audit, and it does not authorize B
-implementation. Before any implementation-readiness decision, the project
-governance record should reconcile the checkpoint status and the Authority A
-document status through an explicit governance update. No such update is made
-by this work order.
+`SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED`
+
+The standalone Authority A audit records the semantic PASS, the bounded
+identity authority, the deterministic/replay requirements, the deferred
+representation-level items, and the explicit implementation prohibition.
+Authority B remains downstream of that closed specification and cannot use this
+audit to extend Authority A's authority.
 
 ## 16. Audit Conclusion and Next Governance Gate
 
 Authority B is **SEMANTICALLY BOUNDED / SPECIFICATION-LEVEL BLOCKED**.
 
-The repository establishes a precise non-economic boundary: B owns immutable
-correction/supersession lineage facts and their provenance, while T07 validates
-them and selects a canonical head. The semantic graph is closed enough to
-distinguish direct branching from valid multi-hop correction chains, but
-direct predecessor convergence, identity seeds, field-level representation,
-timestamp semantics, duplicate policy, failure precedence, and Authority A
-formal closure remain unresolved.
+The audit confirms that B owns only immutable correction/supersession lineage
+facts and their provenance, while T07 validates them and selects the canonical
+head. The directed, lifecycle-scoped graph invariants are explicit for
+single-predecessor/single-successor edges, linear multi-hop chains, branching,
+self-reference, cycles, cross-lifecycle references, missing endpoints, and
+contradictory relationships.
 
-The next governance gate is a dedicated Authority B implementation-readiness
-decision that must, at minimum, lock:
+The following blockers remain:
 
-1. the semantic identity seed;
-2. exact serialized fields and types;
-3. canonical field ordering and nullable policy;
-4. timestamp and effective-time semantics;
-5. duplicate and conflict behavior;
-6. public failure vocabulary and precedence;
-7. adapter mapping into the closed T07 contract; and
-8. reconciliation of the Authority A formal-closure status.
+1. The deterministic semantic identity seed for `LineageFact` and
+   `LineageEdge`, including the semantic role of predecessor and successor
+   references, is not locked.
+2. The exact field/type contract is not locked: required and optional fields,
+   nullability, cardinality, endpoint references, lifecycle references, fact
+   identity, and edge identity remain unresolved.
+3. Canonical serialization is constrained semantically but its exact field
+   ordering, normalization, nullable-field policy, canonical format, and
+   identity-to-representation adapter remain unresolved.
+4. Timestamp and effective-time semantics are not locked. Supplied timestamps
+   may remain provenance data and no wall-clock dependency is permitted, but
+   event, correction, supersession, and effective-time treatment is not yet
+   authoritative.
+5. Exact duplicate behavior is unresolved: idempotent acceptance versus
+   duplicate reporting is not selected. Conflicting duplicates must fail
+   closed, but their deterministic public handling is not fully specified.
+6. Failure taxonomy and precedence are not fully locked: public enum
+   spellings, multi-failure precedence, error payload shape, and mapping into
+   the closed T07 contract remain unresolved.
+7. The exact Authority B adapter mapping into the T07 input/output contract is
+   not locked, even though no semantic change to T07 is required.
 
-That gate must remain separate from G1–G5 economic authority decisions.
+Predecessor convergence/merge remains intentionally deferred and unsupported
+for the current scope. It must fail closed and must not be inferred as valid,
+invalid, or preferentially resolved. This preserves deterministic behavior but
+does not authorize implementation of merge semantics.
 
-## 17. Implementation Status
+Authority A compatibility is now resolved. The semantic T07 compatibility is
+also resolved: B supplies the fact, T07 validates the fact and graph, and T07
+selects the canonical head. The unresolved adapter and representation decisions
+above still prevent Authority B specification closure for this governance gate.
+
+That gate remains separate from G1–G5 economic authority decisions.
+
+## 17. Formal Audit Record — 2026-09-08
+
+### 17.1 Scope and documents reviewed
+
+This formal audit reviewed:
+
+- `REPLIT_RULES.md`;
+- `PROJECT_STATE.md`;
+- `docs/P08-AUTHORITY-B-SPECIFICATION-AUDIT.md`;
+- `docs/P08-CANONICAL-ECONOMIC-SUBJECT-LIFECYCLE-IDENTITY-AUTHORITY-SPECIFICATION.md`;
+- `docs/P08-AUTHORITY-A-SPECIFICATION-AUDIT.md`;
+- `docs/P08-T07-CANONICAL-RESULT-AUTHORITY-EXTENSION-SPECIFICATION.md`; and
+- `docs/P08-T07-SPECIFICATION.md`.
+
+### 17.2 Findings matrix
+
+| Audit area | Result | Determination |
+|---|---|---|
+| Authority A verification | PASS | Authority A is formally closed; implementation remains unauthorized. |
+| Semantic identity seed | BLOCKED | `LineageFact` and `LineageEdge` seeds and endpoint participation are unresolved. |
+| Field/type contract | BLOCKED | Exact fields, types, optionality, nullability, cardinality, and identity fields are unresolved. |
+| Canonical serialization | BLOCKED | Semantic requirements exist, but exact ordering, normalization, nullable policy, and adapter are unresolved. |
+| Timestamp/effective-time semantics | BLOCKED | No wall-clock dependency is allowed, but authoritative temporal concepts are not locked. |
+| Duplicate semantics | BLOCKED | Exact duplicate acceptance/reporting and conflicting duplicate treatment are unresolved. |
+| Conflict semantics | PASS with deferred mapping | Branching and contradictory relationships fail closed; public category/precedence mapping remains unresolved. |
+| Merge/convergence | DEFERRED / FAIL CLOSED | Convergence is intentionally unsupported for this scope; no nondeterministic merge behavior is permitted. |
+| Graph invariants | PASS | Directed, lifecycle-scoped, single-edge endpoints, linear multi-hop, branch, cycle, self-reference, cross-lifecycle, missing endpoint, and orphan rules are bounded. |
+| Failure taxonomy/precedence | BLOCKED | Semantic categories exist, but public vocabulary, precedence, payload, and T07 mapping are unresolved. |
+| Provenance | PASS | The P06 → P07 → P08 → Authority A → Authority B → T07 chain is preserved and B cannot bypass A. |
+| Authority A compatibility | PASS | B consumes an established lifecycle and cannot redefine Authority A identity. |
+| T07 compatibility | PASS semantically / BLOCKED at adapter level | T07 retains graph validation and canonical-head selection; exact adapter mapping remains unresolved. |
+| Determinism/replay | PASS conditionally | Prohibited time/order/provider/random dependencies are excluded; unresolved identity/serialization decisions still block closure. |
+| Economic/custody boundary | PASS | B has no realization, accounting, classification, custody, signing, execution, or Risk/Capital authority. |
+
+### 17.3 Formal verdict
+
+The audit does not establish specification closure. The required governance
+status remains:
+
+**AUTHORITY B SPECIFICATION-LEVEL BLOCKED**
+
+The blockers are semantic and contract-level, not permission to invent fields,
+enum values, merge behavior, or implementation workarounds. They must be
+resolved by explicit specification decisions before another closure audit.
+
+## 18. Implementation Status
 
 **AUTHORITY B IMPLEMENTATION = NOT AUTHORIZED**
 
