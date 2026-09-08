@@ -1,6 +1,6 @@
 # P08 — Authority B Specification and Audit
 
-**Status:** BOUNDED SPECIFICATION / AUDIT COMPLETE — IMPLEMENTATION NOT AUTHORIZED
+**Status:** SEMANTIC CLOSURE AUDIT COMPLETE — SPECIFICATION-LEVEL BLOCKED — IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning
 **Authority:** Authority B — Correction / Supersession Lineage Facts
 **Scope:** Immutable lineage-fact authority for canonical T07 result lineage
@@ -56,6 +56,12 @@ Authority B owns:
 Authority B supplies those facts to P08-T07. P08-T07 validates the supplied
 lineage and selects the current canonical result per lifecycle. Authority B
 does not select that canonical head.
+
+The `LineageFact` is an authoritative Authority B domain fact, not merely an
+evidence or input object invented by T07. T07 remains the independent validator
+of whether the supplied fact is structurally valid, linked to existing result
+identities, and usable for canonical-head selection. Validation by T07 does
+not transfer ownership of the fact to T07.
 
 ### 2.2 Exact boundary
 
@@ -209,12 +215,33 @@ predecessor or successor result, its identity, or its digest.
 The fact is read-only after creation. A later correction or supersession is a
 new fact and a new successor relationship; it is not an in-place edit.
 
-The repository evidence supports the following structural constraint:
+The repository evidence supports the following direct structural constraint:
 
-> At most one authoritative successor edge may exist for a result.
+> At most one direct authoritative successor edge may leave one result.
 
-Multiple authoritative successors from one predecessor create a branching
-conflict. T07 must fail closed and must not select a branch.
+Multiple direct authoritative successors from one predecessor create a
+branching conflict. T07 must fail closed and must not select a branch.
+
+This is an out-degree rule, not a blanket limit on the length of a lineage.
+The following is structurally compatible with the repository's correction
+model:
+
+```text
+R1 ── correction ──> R2 ── correction ──> R3
+```
+
+R2 may be the successor of R1 and the predecessor of R3. Multiple successors
+along a chain are therefore allowed when they are separate direct edges at
+successive nodes. The following cases remain distinct:
+
+- **Multiple direct successors:** prohibited; this is a branching conflict.
+- **Multiple transitive successors:** permitted as a linear multi-hop chain,
+  subject to every edge being independently valid.
+- **Multiple direct predecessors converging on one successor:** not specified
+  by the current governance material and therefore `UNRESOLVED`; no merge may
+  be accepted for implementation until its semantics are explicitly locked.
+- **A cycle or self-reference:** prohibited and must fail closed.
+- **Cross-lifecycle edge:** prohibited and must fail closed.
 
 ### 5.3 Canonical representation and digest
 
@@ -420,6 +447,232 @@ The canonicalization and digest rules are sufficiently established
 semantically. The exact field-level serialization and semantic identity seed
 remain `UNRESOLVED` and block implementation readiness.
 
+## 10A. Semantic Closure Findings
+
+### 10A.1 Authority A status reconciliation
+
+The repository evidence supports determination **(a)** from the work order:
+the Authority A document is not formally closed in the repository.
+
+The document explicitly says:
+
+- `SPECIFICATION DRAFT — IMPLEMENTATION NOT AUTHORIZED`;
+- `FORMAL AUDIT REQUIRED`; and
+- `P08 ... SPECIFICATION DRAFT COMPLETE — FORMAL AUDIT REQUIRED`.
+
+`PROJECT_STATE.md` records P08-T07 as closed, but it does not contain a
+committed Authority A PASS or handover record. The work-order checkpoint says
+Authority A PASS, but that checkpoint is not itself a repository document or
+commit proving that the Authority A document was formally reconciled.
+
+Therefore:
+
+- Authority A semantic boundary: `RESOLVED` for purposes of this bounded B
+  audit;
+- Authority A formal closure: `UNRESOLVED / NOT PROVEN BY REPOSITORY EVIDENCE`;
+- Authority A document status: unchanged; and
+- no assumption is made that the checkpoint silently supersedes the document.
+
+This status is an implementation-readiness blocker and requires an explicit
+governance reconciliation. It is not corrected by this audit.
+
+### 10A.2 Authority B object classification
+
+`LineageFact` is an authoritative object owned by Authority B because the
+governance extension explicitly assigns B ownership of correction facts,
+supersession facts, predecessor/successor relationships, lineage identity,
+lineage provenance, and lineage policy/version.
+
+It is also an input to T07. Those statements are not contradictory:
+
+```text
+Authority B owns and asserts the fact
+        ↓
+T07 validates the fact and its graph placement
+        ↓
+T07 selects the canonical head
+```
+
+T07 is not the origin of the lineage assertion, and B does not inherit T07's
+canonical-head authority.
+
+### 10A.3 Correction/supersession graph invariant
+
+The governed graph is a directed, lifecycle-scoped graph whose nodes are
+independently immutable result identities and whose edges are independently
+provenanced correction or supersession facts.
+
+The currently supported invariant is:
+
+1. each direct edge has exactly one predecessor result and one successor
+   result;
+2. one result has at most one direct authoritative successor edge;
+3. a successor may become the predecessor of a later edge;
+4. a linear multi-hop chain is valid when every edge is independently valid;
+5. multiple direct successors from one predecessor are a branching conflict;
+6. direct predecessor convergence/merging is `UNRESOLVED`;
+7. self-reference is invalid;
+8. cycles are invalid;
+9. predecessor and successor must belong to the same lifecycle; and
+10. missing, orphaned, contradictory, or non-resolvable endpoints fail closed.
+
+T07 may select one terminal representative only after this graph has been
+validated. Neither B nor T07 may choose a branch using timestamps, result
+magnitude, insertion order, or caller preference.
+
+### 10A.4 Identity closure
+
+The repository provides the Authority A lifecycle seed:
+
+```text
+Canonical Economic Subject Identity
++ P06 DecisionIntent Identity
+```
+
+The repository does **not** provide an approved semantic identity seed for:
+
+- `LineageFact`;
+- `LineageEdge`;
+- the predecessor reference; or
+- the successor reference.
+
+Predecessor and successor references are required relationship endpoints, but
+their presence does not define the semantic identity seed of the fact or edge.
+The result identity seed referenced by those endpoints is itself a separate
+specification dependency. No seed is created by this audit.
+
+### 10A.5 Canonical representation closure
+
+The repository establishes the following semantic requirements:
+
+- the fact and edge are immutable;
+- the edge has deterministic canonical representation;
+- canonical UTF-8 and deterministic serialization are required;
+- object keys and governed collections are deterministically ordered;
+- canonical enum and authorized UTC timestamp representations are required;
+- the digest covers the complete canonical edge representation;
+- the digest is SHA-256; and
+- the digest is excluded from its own input and cannot define semantic
+  identity circularly.
+
+The following remain unresolved:
+
+- exact field set;
+- exact field types;
+- required versus optional fields;
+- nullability;
+- exact field ordering;
+- normalization rules for every field;
+- exact canonical serialization format; and
+- exact identity-to-representation adapter.
+
+### 10A.6 Timestamp closure
+
+The repository does not define Authority B's fact-creation time, correction
+time, supersession time, or effective time as semantic inputs.
+
+Predecessor/successor result timestamps belong to the referenced result
+contracts. They must not be used by B or T07 to choose a canonical result.
+
+The current safe rule is:
+
+- explicitly supplied timestamps may be preserved as governed provenance;
+- no B timestamp is an Authority B clock;
+- no wall-clock/current-time dependency is allowed;
+- timestamps cannot resolve a conflict or choose a branch; and
+- effective-time semantics remain `UNRESOLVED`.
+
+### 10A.7 Duplicate and conflict closure
+
+The current governance supports deterministic failure categories for missing
+references, invalid lineage, branching, cycles, digest failures, provenance
+failures, and conflicting input. It does not fully define duplicate policy.
+
+| Case | Current determination |
+|---|---|
+| Exact replay of the same fact | Same canonical inputs must replay identically; idempotent acceptance versus duplicate reporting is `UNRESOLVED`. |
+| Same identity with different payload | Must fail closed; exact public failure mapping is `UNRESOLVED`. |
+| Conflicting correction facts | Must not be resolved by preference; exact failure precedence is `UNRESOLVED`. |
+| Conflicting supersession facts | Must not be resolved by preference; exact failure precedence is `UNRESOLVED`. |
+| Multiple direct successors | `LINEAGE_BRANCH_CONFLICT` is the governed semantic category. |
+| Multiple transitive successors in a linear chain | Valid when each direct edge is valid. |
+| Direct predecessor convergence/merge | `UNRESOLVED`; no implementation acceptance rule exists. |
+| Contradictory graph edges | Must fail closed; exact category precedence is `UNRESOLVED`. |
+| Cycle or self-reference | `LINEAGE_CYCLE` / invalid lineage behavior is established semantically; exact public mapping remains subject to the existing contract. |
+
+No new enum or silent conflict-resolution rule is introduced.
+
+### 10A.8 Failure taxonomy and precedence
+
+The existing governance material names these relevant categories:
+
+- `MISSING_LIFECYCLE_SPLIT_FACT`;
+- `INVALID_LIFECYCLE_MAPPING`;
+- `MISSING_SUCCESSOR`;
+- `MISSING_PREDECESSOR`;
+- `INVALID_LINEAGE`;
+- `LINEAGE_BRANCH_CONFLICT`;
+- `LINEAGE_CYCLE`;
+- `UNRESOLVED_CANONICAL_STATE`;
+- `DIGEST_FAILURE`;
+- `PROVENANCE_LINKAGE_FAILURE`;
+- `CONFLICTING_INPUT`; and
+- `INVALID_INPUT`.
+
+The semantic meanings are sufficiently established for audit purposes.
+However, the public enum spelling, multi-failure precedence, error payload
+shape, and mapping into the already-closed T07 contract are not fully locked.
+Those details remain `UNRESOLVED`; this audit does not create replacement
+failure codes.
+
+### 10A.9 T07 integration closure
+
+The conceptual mapping is:
+
+```text
+Authority B LineageFact
+        ↓
+T07 validates fact identity, endpoints, lifecycle, provenance, digest,
+and graph invariants
+        ↓
+T07 determines canonical-head outcome per lifecycle
+```
+
+Authority B must not select the canonical head. T07 must not invent, repair,
+or silently substitute a missing lineage fact. A valid correction chain can
+contain multiple successive result nodes, but a branch, cycle, missing
+endpoint, invalid lifecycle, or unresolved merge cannot be selected.
+
+### 10A.10 Economic and custody closure
+
+The following remain explicitly outside Authority B:
+
+- realization;
+- settled account;
+- custody;
+- signer;
+- provider selection;
+- settlement;
+- accounting;
+- P&L;
+- ROI;
+- `WIN`;
+- `LOSS`;
+- `BREAKEVEN`;
+- trading authority;
+- execution authority; and
+- Risk/Capital Authorization.
+
+The supplied gate status remains unchanged:
+
+```text
+G1 = BLOCKED / UNRESOLVED
+G2 concrete endpoint = BLOCKED_BY_G1
+G3 = BLOCKED_BY_G1_G2
+G4 = BLOCKED_BY_G3
+G5 = BLOCKED
+```
+
 ## 11. G1 / G2 / G3 / G4 / G5 Impact Matrix
 
 The following statuses are the supplied governance baseline and are not
@@ -492,7 +745,8 @@ those supplied semantics; B only supplies lineage facts.
 - Correction and supersession are distinct relationship types.
 - Results and facts are immutable; later lineage does not mutate historical
   records.
-- At most one authoritative successor edge may exist for a result.
+- At most one direct authoritative successor edge may leave a result; a
+  multi-hop correction/supersession chain is not itself a branch.
 - Branches, cycles, missing references, contradictory facts, and invalid
   provenance fail closed.
 - SHA-256 protects a deterministic canonical edge representation and is not
@@ -555,8 +809,11 @@ Authority B is **SEMANTICALLY BOUNDED / SPECIFICATION-LEVEL BLOCKED**.
 
 The repository establishes a precise non-economic boundary: B owns immutable
 correction/supersession lineage facts and their provenance, while T07 validates
-them and selects a canonical head. The repository does not establish the
-field-level contract required for implementation readiness.
+them and selects a canonical head. The semantic graph is closed enough to
+distinguish direct branching from valid multi-hop correction chains, but
+direct predecessor convergence, identity seeds, field-level representation,
+timestamp semantics, duplicate policy, failure precedence, and Authority A
+formal closure remain unresolved.
 
 The next governance gate is a dedicated Authority B implementation-readiness
 decision that must, at minimum, lock:
@@ -568,7 +825,7 @@ decision that must, at minimum, lock:
 5. duplicate and conflict behavior;
 6. public failure vocabulary and precedence;
 7. adapter mapping into the closed T07 contract; and
-8. reconciliation of the Authority A status inconsistency.
+8. reconciliation of the Authority A formal-closure status.
 
 That gate must remain separate from G1–G5 economic authority decisions.
 
