@@ -3,3 +3,4 @@
 - [Python 3.13 runtime](python-313-runtime.md) — this project requires Python 3.13; use the available base runtime when uv cannot download interpreters.
 - [P06 deterministic timestamps](p06-deterministic-timestamps.md) — DecisionIntent defaults decision time to the validated context reference time; never read the system clock.
 - [Validation wrapper assertions](validation-wrapper-assertions.md) — behavioral tests should assert fail-closed outcomes, not fragile internal wrapper error wording.
+- [Replit Python 3.13 module](replit-python-313-module.md) — this environment exposes Python 3.13 through the supported base module, with uv-managed project dependencies.
