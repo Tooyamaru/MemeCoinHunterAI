@@ -7,7 +7,7 @@ external operation.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from enum import Enum
@@ -380,6 +380,12 @@ def evaluate_economic_outcome_interpretation(
     issue = _validate_input(value)
     if issue is not None:
         return _invalid_result(value, issue.reason)
+    value = replace(
+        value,
+        canonical_timestamps=_canonical_timestamp_mapping(
+            value.canonical_timestamps
+        ),
+    )
 
     g2_state = _coerce_enum(value.g2_state, G2RealizationState, "g2_state")
     g3_validity = _coerce_enum(value.g3_validity, G3Validity, "g3_validity")
@@ -404,6 +410,13 @@ def evaluate_economic_outcome_interpretation(
 
     if g2_state is not G2RealizationState.REALIZED_ELIGIBLE:
         return _invalid_result(value, EconomicOutcomeFailureReason.INVALID_G2)
+    if value.canonical_numeraire is None:
+        return _invalid_result(
+            value,
+            EconomicOutcomeFailureReason.MISSING_REQUIRED_INPUT,
+        )
+    if not _is_text(value.canonical_numeraire):
+        return _invalid_result(value, EconomicOutcomeFailureReason.NUMERIC_INVALID)
     if g3_validity not in _VALID_G3_STATES:
         return _invalid_result(value, EconomicOutcomeFailureReason.INVALID_G3)
     if g4_validity not in _VALID_G4_STATES:
@@ -525,7 +538,9 @@ def _validate_input(
     if not isinstance(timestamps, Mapping) or not timestamps:
         return _InputIssue(EconomicOutcomeFailureReason.MISSING_REQUIRED_INPUT)
     for timestamp in timestamps.values():
-        if not _valid_timestamp(timestamp):
+        try:
+            _canonical_timestamp(timestamp)
+        except ValueError:
             return _InputIssue(EconomicOutcomeFailureReason.PROVENANCE_LINKAGE_FAILURE)
 
     for name, lineage in (
@@ -819,6 +834,8 @@ def _validate_result_semantics(
             raise ValueError("VALID result must be realization eligible")
         if result.realized_economic_result is None:
             raise ValueError("VALID result requires an economic result")
+        if not _is_text(result.canonical_numeraire):
+            raise ValueError("VALID result requires a canonical numeraire")
         if result.performance_classification is None:
             raise ValueError("VALID result requires a classification")
         if result.classification_digest is None:
@@ -937,10 +954,37 @@ def _valid_reference_tuple(value: Any) -> bool:
     )
 
 
-def _valid_timestamp(value: Any) -> bool:
+def _canonical_timestamp(value: Any) -> str:
     if isinstance(value, datetime):
-        return value.tzinfo is not None and value.utcoffset() is not None
-    return isinstance(value, str) and bool(value.strip())
+        parsed = value
+    elif isinstance(value, str) and value.strip() == value:
+        try:
+            parsed = datetime.fromisoformat(value)
+        except ValueError as error:
+            raise ValueError("timestamp is not valid ISO-8601") from error
+    else:
+        raise ValueError("timestamp must be a datetime or ISO-8601 string")
+
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("timestamp must be timezone-aware")
+    return parsed.astimezone(timezone.utc).isoformat()
+
+
+def _valid_timestamp(value: Any) -> bool:
+    try:
+        _canonical_timestamp(value)
+    except ValueError:
+        return False
+    return True
+
+
+def _canonical_timestamp_mapping(value: Any) -> Mapping[str, str]:
+    if not isinstance(value, Mapping) or not value:
+        raise ValueError("canonical timestamps are required")
+    return {
+        str(key): _canonical_timestamp(timestamp)
+        for key, timestamp in value.items()
+    }
 
 
 def _safe_provenance(value: Any) -> Mapping[str, Any] | tuple[Any, ...] | None:

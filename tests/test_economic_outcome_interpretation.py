@@ -1,5 +1,5 @@
 from dataclasses import FrozenInstanceError, fields, replace
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import inspect
@@ -297,6 +297,97 @@ def test_negative_zero_normalizes_without_reclassification():
     assert result.status is EconomicOutcomeInterpretationStatus.VALID
     assert result.realized_economic_result == "0"
     assert result.performance_classification is PerformanceClassification.BREAKEVEN
+
+
+def test_timezone_aware_timestamp_normalizes_to_utc():
+    result = _valid_result(
+        canonical_timestamps={
+            "lifecycle": datetime(
+                2026,
+                1,
+                1,
+                1,
+                tzinfo=timezone(timedelta(hours=1)),
+            )
+        }
+    )
+
+    assert result.status is EconomicOutcomeInterpretationStatus.VALID
+    assert result.provenance["canonical_timestamps"] == {
+        "lifecycle": "2026-01-01T00:00:00+00:00"
+    }
+
+
+def test_utc_timestamp_string_is_valid():
+    result = _valid_result(
+        canonical_timestamps={"lifecycle": "2026-01-01T00:00:00Z"}
+    )
+
+    assert result.status is EconomicOutcomeInterpretationStatus.VALID
+    assert result.provenance["canonical_timestamps"] == {
+        "lifecycle": "2026-01-01T00:00:00+00:00"
+    }
+
+
+@pytest.mark.parametrize(
+    "timestamp",
+    [
+        "2026-01-01T00:00:00",
+        "not-a-timestamp",
+    ],
+)
+def test_naive_or_malformed_timestamp_is_invalid(timestamp):
+    result = _valid_result(canonical_timestamps={"lifecycle": timestamp})
+
+    assert result.status is EconomicOutcomeInterpretationStatus.INVALID_INPUT
+    assert result.failure_reason is (
+        EconomicOutcomeFailureReason.PROVENANCE_LINKAGE_FAILURE
+    )
+
+
+def test_equivalent_timestamps_have_deterministic_utc_representation():
+    offset_result = _valid_result(
+        canonical_timestamps={"lifecycle": "2026-01-01T01:00:00+01:00"}
+    )
+    utc_result = _valid_result(
+        canonical_timestamps={"lifecycle": "2026-01-01T00:00:00Z"}
+    )
+
+    assert (
+        offset_result.canonical_representation
+        == utc_result.canonical_representation
+    )
+    assert offset_result.result_digest == utc_result.result_digest
+
+
+def test_valid_realized_result_requires_canonical_numeraire():
+    result = _valid_result(canonical_numeraire=None)
+
+    assert result.status is EconomicOutcomeInterpretationStatus.INVALID_INPUT
+    assert result.failure_reason is (
+        EconomicOutcomeFailureReason.MISSING_REQUIRED_INPUT
+    )
+    assert result.realized_economic_result is None
+    assert result.canonical_numeraire is None
+
+
+@pytest.mark.parametrize("numeraire", ["", "   ", 42])
+def test_invalid_realized_numeraire_is_fail_closed(numeraire):
+    result = _valid_result(canonical_numeraire=numeraire)
+
+    assert result.status is EconomicOutcomeInterpretationStatus.INVALID_INPUT
+    assert result.failure_reason is EconomicOutcomeFailureReason.NUMERIC_INVALID
+
+
+def test_realized_numeraire_is_assembled_without_conversion():
+    result = _valid_result(
+        canonical_numeraire="EUR",
+        realized_economic_result=Decimal("12.3400"),
+    )
+
+    assert result.status is EconomicOutcomeInterpretationStatus.VALID
+    assert result.canonical_numeraire == "EUR"
+    assert result.realized_economic_result == "12.3400"
 
 
 def test_result_and_nested_canonical_values_are_immutable():
