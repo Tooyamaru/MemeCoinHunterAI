@@ -1,6 +1,6 @@
 # P08 — Authority B Specification and Audit
 
-**Status:** SEMANTIC CLOSURE AUDIT COMPLETE — SPECIFICATION-LEVEL BLOCKED — IMPLEMENTATION NOT AUTHORIZED
+**Status:** BLOCKER RESOLUTION PASS COMPLETE — PENDING FORMAL CLOSURE AUDIT — IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning
 **Authority:** Authority B — Correction / Supersession Lineage Facts
 **Scope:** Immutable lineage-fact authority for canonical T07 result lineage
@@ -41,8 +41,9 @@ The terms below are used normatively:
 
 ### 2.1 Determination
 
-Authority B is sufficiently established as a **bounded semantic authority**,
-but it is not implementation-ready.
+Authority B is a bounded semantic authority. The blocker-resolution pass is
+complete and pending a separate formal closure audit. No implementation
+authorization is implied.
 
 Authority B owns:
 
@@ -151,11 +152,11 @@ authority over the referenced economic result.
 | Predecessor result identity | `authoritative` reference | Required relationship endpoint. B asserts the relationship; T07 validates that the referenced result exists and belongs to the lifecycle. |
 | Successor result identity | `authoritative` reference | Required relationship endpoint. B asserts the relationship; T07 validates that the referenced result exists and belongs to the lifecycle. |
 | Lineage type (`correction` or `supersession`) | `authoritative` fact content | Must be explicit. No precedence between the two types may be inferred. |
-| Lineage fact identity | `derived` from the locked semantic fact identity | Must be stable and distinct from result identity and result digest. Exact seed fields remain unresolved. |
-| Lineage policy/version | `authoritative` governance input | Must be preserved in the fact and edge representation. Exact version vocabulary is unresolved. |
-| Fact/evidence identity and provenance | `authoritative` support | Must be preserved and independently verifiable. Missing or contradictory provenance fails closed. |
-| Explicit fact/evidence timestamps | `contextual` provenance | May be carried only under an approved timestamp contract. They must not select a successor or resolve a conflict by age. |
-| Canonical lineage-edge representation | `derived` representation | Construct only from the locked semantic fact and authorized references. Exact fields, ordering, and null policy remain unresolved. |
+| Lineage fact identity | `derived` from the locked semantic fact identity | SHA-256 domain-separated digest over the fixed six-field identity projection in Section 5.5. |
+| Lineage policy/version | `authoritative` governance input | Required `VersionId`; current contract fixes `p08-authority-b-policy-v1`. |
+| Fact/evidence identity and provenance | `authoritative` support | Provenance link identities must be preserved and independently verifiable. Missing or contradictory provenance fails closed. |
+| Explicit fact/evidence timestamps | `contextual` provenance | No Authority B timestamp field exists; upstream timestamps may be preserved only inside provenance and cannot affect identity or graph decisions. |
+| Canonical lineage-edge representation | `derived` representation | Construct using the exact fields and canonicalization rules in Sections 5.3–5.7. |
 | Lineage-edge digest | `derived` integrity value | SHA-256 of the complete canonical edge representation, excluding the digest itself. |
 | P06 → P07 → P08 provenance chain | `contextual` required linkage | Preserve for downstream verification; it does not become a new lineage authority. |
 | G2/G3/G4 economic results | `prohibited` as B semantics | B does not calculate, validate, replace, or interpret realization, accounting, or classification. T07 consumes separately governed G2/G3/G4 outputs. |
@@ -166,12 +167,12 @@ authority over the referenced economic result.
 
 Authority B must not reconstruct missing inputs from identifiers, timestamps,
 database order, result magnitude, or caller preference. A missing endpoint,
-ambiguous lifecycle, invalid authority, contradictory fact, or unresolved
-provenance chain remains unresolved and fails closed for downstream use.
+ambiguous lifecycle, invalid authority, contradictory fact, or invalid
+provenance chain fails closed using the first applicable category in Section 5.6.
 
-The repository has not locked the exact public failure enum spelling or
-precedence among failure-reporting fields. Those details are
-`UNRESOLVED`, not permission to collapse distinct failures.
+The normative failure categories and precedence are defined in Section 5.6.
+They map deterministically into T07's existing `INVALID_INPUT` boundary as
+defined in Section 5.7.
 
 ## 5. Canonical Output
 
@@ -203,9 +204,9 @@ The fact and edge must preserve:
 - canonical representation; and
 - integrity digest.
 
-The exact serialized field names and types for `LineageFact`,
-`LineageEdgeIdentity`, and the canonical edge representation are
-`UNRESOLVED`. They must be separately locked before implementation readiness.
+The normative field names, semantic types, identity participation, and
+canonical representation are defined in Sections 5.4–5.7 below. They are
+specification-level rules only and do not authorize implementation.
 
 ### 5.2 Immutability and correction semantics
 
@@ -237,30 +238,208 @@ successive nodes. The following cases remain distinct:
 - **Multiple direct successors:** prohibited; this is a branching conflict.
 - **Multiple transitive successors:** permitted as a linear multi-hop chain,
   subject to every edge being independently valid.
-- **Multiple direct predecessors converging on one successor:** not specified
-  by the current governance material and therefore `UNRESOLVED`; no merge may
-  be accepted for implementation until its semantics are explicitly locked.
+- **Multiple direct predecessors converging on one successor:** unsupported;
+  `MERGE / CONVERGENCE UNSUPPORTED — FAIL CLOSED`.
 - **A cycle or self-reference:** prohibited and must fail closed.
 - **Cross-lifecycle edge:** prohibited and must fail closed.
 
 ### 5.3 Canonical representation and digest
 
-The representation must use the repository’s deterministic governance
-requirements:
+The canonical representation is UTF-8 JSON with no byte-order mark, no
+whitespace outside JSON string contents, and object keys sorted by their
+Unicode code points. All strings must be Unicode NFC and must not contain
+unpaired surrogate code points; a non-NFC value is invalid rather than silently
+rewritten. Identity references, versions, and enum values are non-empty strings
+and are validated before canonicalization.
 
-- canonical UTF-8;
-- deterministic JSON or the approved existing canonical format;
-- sorted object keys;
-- canonical enum strings;
-- canonical UTC timestamps where timestamps are authorized;
-- deterministic collection ordering by canonical identity or digest;
-- no language-specific object ordering; and
-- SHA-256 over the complete canonical representation, excluding the digest
-  field itself.
+The representation has:
 
-The exact field ordering, nullable-field policy, and semantic identity seed are
-`UNRESOLVED`. A digest is an integrity value; it is not automatically semantic
-identity and must not participate in a circular identity/digest dependency.
+- no nullable fields;
+- no optional semantic fields;
+- fixed object keys defined in Section 5.4;
+- a provenance sequence in the fixed stage order defined in Section 5.4;
+- lowercase ASCII hexadecimal SHA-256 digests;
+- canonical enum strings; and
+- no language-specific object or collection ordering.
+
+The identity projection is a JSON array whose values appear in the exact order
+defined in Section 5.5. Its canonical bytes are hashed with SHA-256. The edge
+integrity digest is SHA-256 over the complete canonical `LineageEdge`
+representation with only the `edge_digest` field omitted. A digest never
+participates in the identity projection that it protects.
+
+### 5.4 Normative field and type contract
+
+The semantic contract uses the following categories; these are not
+programming-language class requirements:
+
+- `IdentityRef`: an upstream-established, non-empty canonical UTF-8 identity
+  string in Unicode NFC form. Authority B must not generate or reinterpret it.
+- `VersionId`: a non-empty ASCII token matching
+  `[A-Za-z0-9][A-Za-z0-9._-]*`.
+- `Digest256`: exactly 64 lowercase ASCII hexadecimal characters.
+- `LineageType`: exactly `correction` or `supersession`.
+- `ProvenanceLink`: one upstream chain link containing exactly
+  `stage`, `record_identity`, `record_digest`, and `authority_identity`, all
+  required; `record_identity` and `authority_identity` are `IdentityRef` and
+  `record_digest` is `Digest256`.
+
+The allowed `stage` values are exactly `p06_decision_intent`,
+`p07_simulation_input`, `p07_simulation_result`, `p07_history`,
+`p08_t01_observation`, `p08_t02_dataset`, `p08_t03_interpretation`,
+`p08_t04_evaluation`, `p08_t05_snapshot`, `p08_t06_readiness`, and
+`authority_a_identity`. Each value occurs exactly once in the required
+sequence below.
+
+`LineageFact` has exactly these required, non-null fields:
+
+| Field | Semantic meaning | Type/category | Identity | Serialized | Provenance-only |
+|---|---|---|---|---|---|
+| `contract_version` | Authority B fact contract | `VersionId`; fixed to `p08-authority-b-lineage-v1` | yes | yes | no |
+| `lineage_policy_version` | Policy governing the relationship | `VersionId`; fixed to `p08-authority-b-policy-v1` for this contract | yes | yes | no |
+| `lifecycle_identity` | Established Authority A lifecycle | `IdentityRef` | yes | yes | no |
+| `predecessor_result_identity` | Exactly one predecessor result | `IdentityRef` | yes | yes | no |
+| `successor_result_identity` | Exactly one successor result | `IdentityRef` | yes | yes | no |
+| `lineage_type` | Correction or supersession assertion | `LineageType` | yes | yes | no |
+| `authority_identity` | Authority asserting the fact | `IdentityRef` | no | yes | yes |
+| `provenance` | Complete upstream provenance chain | non-empty ordered `ProvenanceLink` sequence | no | yes | yes |
+| `lineage_fact_identity` | Derived identity of the semantic fact | `Digest256` | derived | yes | no |
+
+The `provenance` sequence must contain exactly one link for each stage, in this
+order: `p06_decision_intent`, `p07_simulation_input`,
+`p07_simulation_result`, `p07_history`, `p08_t01_observation`,
+`p08_t02_dataset`, `p08_t03_interpretation`, `p08_t04_evaluation`,
+`p08_t05_snapshot`, `p08_t06_readiness`, and `authority_a_identity`.
+
+`LineageEdge` has exactly these required, non-null fields:
+
+| Field | Semantic meaning | Type/category | Identity | Serialized | Provenance-only |
+|---|---|---|---|---|---|
+| `contract_version` | Authority B edge contract | `VersionId`; fixed to `p08-authority-b-lineage-v1` | yes | yes | no |
+| `lineage_policy_version` | Policy governing the relationship | `VersionId`; fixed to `p08-authority-b-policy-v1` for this contract | yes | yes | no |
+| `lifecycle_identity` | Established Authority A lifecycle | `IdentityRef` | yes | yes | no |
+| `predecessor_result_identity` | Exactly one predecessor result | `IdentityRef` | yes | yes | no |
+| `successor_result_identity` | Exactly one successor result | `IdentityRef` | yes | yes | no |
+| `lineage_type` | Correction or supersession assertion | `LineageType` | yes | yes | no |
+| `lineage_fact_identity` | Identity of the asserted fact | `Digest256` | derived | yes | no |
+| `authority_identity` | Authority asserting the fact | `IdentityRef` | no | yes | yes |
+| `provenance` | Complete upstream provenance chain | ordered `ProvenanceLink` sequence | no | yes | yes |
+| `lineage_edge_identity` | Derived identity of the edge | `Digest256` | derived | yes | no |
+| `edge_digest` | Integrity digest of the canonical edge representation | `Digest256` | no | yes | no |
+
+The edge contains exactly one predecessor and one successor; there are no
+collections of endpoints and no nullable or optional semantic fields.
+
+Administrative metadata, generated IDs, random UUIDs, free-form reasons,
+amounts, timestamps, effective times, provider state, and network state are not
+Authority B fields. They cannot be smuggled into identity or canonical
+serialization.
+
+### 5.5 Normative identity seeds
+
+The identity projection for both objects is the following fixed six-element
+tuple, represented as a canonical JSON array:
+
+```text
+[
+  contract_version,
+  lineage_policy_version,
+  lifecycle_identity,
+  predecessor_result_identity,
+  successor_result_identity,
+  lineage_type
+]
+```
+
+`LineageFactIdentity` is:
+
+```text
+SHA-256(UTF-8("p08-authority-b:fact:v1\0" + canonical_identity_projection))
+```
+
+`LineageEdgeIdentity` is:
+
+```text
+SHA-256(UTF-8("p08-authority-b:edge:v1\0" + canonical_identity_projection))
+```
+
+The domain prefixes are fixed ASCII bytes and are not JSON fields. Provenance,
+authority identity, timestamps, effective time, administrative metadata,
+database order, insertion order, generated IDs, and runtime state do not
+participate in either identity. Lifecycle identity, predecessor identity,
+successor identity, lineage type, contract version, and policy version do
+participate.
+
+Two semantically identical lineage facts therefore receive the same fact and
+edge identities on every replay. Two facts with different identity-bearing
+values cannot receive the same identity except through a SHA-256 collision;
+collision handling is a digest/integrity failure, not an identity-resolution
+fallback.
+
+### 5.6 Duplicate, conflict, and failure semantics
+
+An exact duplicate is a second input whose identity matches an existing fact
+and whose complete canonical `LineageFact` representation is byte-identical.
+It is idempotently accepted as the already-established fact and creates no
+new edge.
+
+A conflicting duplicate is any second input with the same
+`lineage_fact_identity` but a different canonical representation, including a
+difference in provenance-only or authority metadata. It produces
+`CONFLICTING_DUPLICATE`, fails closed, and never uses last-write-wins.
+
+The normative failure categories are:
+
+1. `MALFORMED_FACT`
+2. `INVALID_IDENTITY`
+3. `INVALID_LIFECYCLE`
+4. `MISSING_ENDPOINT`
+5. `CROSS_LIFECYCLE_REFERENCE`
+6. `CONFLICTING_DUPLICATE`
+7. `LINEAGE_SELF_REFERENCE`
+8. `LINEAGE_CYCLE`
+9. `MERGE_UNSUPPORTED`
+10. `LINEAGE_BRANCH_CONFLICT`
+11. `CONTRADICTORY_LINEAGE`
+12. `PROVENANCE_FAILURE`
+13. `DETERMINISM_FAILURE`
+14. `DIGEST_FAILURE`
+
+`EXACT_DUPLICATE` is an idempotent success outcome, not a failure. When more
+than one failure applies, the first applicable category in the numbered list
+above is the sole reported category. The implementation must not select a
+different category from input order, timestamps, provider state, or caller
+preference.
+
+### 5.7 Exact T07 adapter mapping
+
+For one valid Authority B fact, B supplies exactly one edge projection to T07
+containing the fact identity, edge identity, contract version, policy version,
+lifecycle identity, predecessor identity, successor identity, lineage type,
+authority identity, provenance, canonical edge representation, and edge
+digest. `EXACT_DUPLICATE` reuses the already-established same projection and
+does not create another edge.
+
+The mapping is one-to-one and representational only: no semantic field is
+renamed into a different meaning, and no economic value is created. T07
+consumes the projection and independently validates identity, lifecycle
+membership, endpoint existence, provenance, digest, graph invariants, and
+failure state. T07 retains sole authority to select the canonical head.
+
+Any Authority B failure maps to T07's existing primary `INVALID_INPUT` result.
+The secondary failure reason is deterministic:
+
+- `MALFORMED_FACT`, `INVALID_IDENTITY`, `INVALID_LIFECYCLE`,
+  `MISSING_ENDPOINT`, `CROSS_LIFECYCLE_REFERENCE` →
+  `MISSING_REQUIRED_INPUT`;
+- `CONFLICTING_DUPLICATE`, `LINEAGE_SELF_REFERENCE`, `LINEAGE_CYCLE`,
+  `MERGE_UNSUPPORTED`, `LINEAGE_BRANCH_CONFLICT`, and
+  `CONTRADICTORY_LINEAGE` → `CONFLICTING_INPUT`;
+- `PROVENANCE_FAILURE` → `PROVENANCE_LINKAGE_FAILURE`; and
+- `DETERMINISM_FAILURE` or `DIGEST_FAILURE` → `UNRESOLVED_RESIDUAL`.
+
+T07 does not infer a missing fact, repair an endpoint, or select a branch from
+any failure mapping.
 
 ## 6. Authority B Boundary
 
@@ -273,8 +452,8 @@ Authority B may:
 3. bind the relationship to one established lifecycle;
 4. preserve predecessor and successor identities without mutation;
 5. preserve the fact’s authority, evidence, provenance, and policy/version;
-6. produce deterministic lineage-fact and lineage-edge identities once their
-   semantic and serialized contracts are locked;
+6. produce deterministic lineage-fact and lineage-edge identities under the
+   normative semantic and serialized contract;
 7. produce an integrity digest for the canonical edge representation; and
 8. fail closed when the relationship is missing, ambiguous, contradictory,
    branching, cyclic, orphaned, or non-canonical.
@@ -341,9 +520,9 @@ The following must fail closed:
 - an edge with an invalid authority or provenance chain; or
 - a digest that does not match the canonical representation.
 
-The exact policy for accepting an exact duplicate representation versus
-reporting it as a duplicate is `UNRESOLVED`. Until that policy is locked, no
-ambiguous duplicate may be treated as a new authoritative fact.
+An exact duplicate is byte-identical and idempotently accepted. Any
+same-identity representation difference is `CONFLICTING_DUPLICATE` and fails
+closed. No duplicate may be treated as a new authoritative fact.
 
 No timestamp, database insertion order, retrieval order, result magnitude, or
 caller preference may resolve an identity collision.
@@ -379,24 +558,17 @@ substitute, or silently discard missing or contradictory provenance.
 
 ### 9.1 Allowed timestamps
 
-Authority B may consume an explicitly supplied timestamp only when it is part
-of an approved fact/evidence provenance contract. The timestamp is data
-belonging to that fact or evidence; it is not an Authority B clock.
+Authority B has no event time, reference time, correction time, supersession
+time, effective time, settlement time, or as-of/cutoff field. An upstream
+timestamp may be preserved only as provenance data under its existing contract.
+It is not an Authority B clock, does not participate in identity, and does not
+affect graph ordering or canonical-head selection.
 
-The following semantics are not currently locked for Authority B and therefore
-remain `UNRESOLVED`:
-
-- event time;
-- observation time;
-- reference time;
-- effective time of a correction;
-- effective time of a supersession;
-- correction time;
-- settlement time; and
-- any as-of/cutoff representation for lineage facts.
-
-Settlement time is not an Authority B authority. A settlement timestamp cannot
-make a result realized.
+Absence of an Authority B timestamp is therefore normative. A future timestamp
+may appear in preserved upstream provenance only if that upstream contract
+accepts it; B must not interpret, compare, or use it for any semantic decision.
+Settlement time is not an Authority B authority and cannot make a result
+realized.
 
 ### 9.2 Prohibited temporal behavior
 
@@ -443,11 +615,17 @@ The result must not depend on:
 - process identity; or
 - memory address.
 
-The canonicalization and digest rules are sufficiently established
-semantically. The exact field-level serialization and semantic identity seed
-remain `UNRESOLVED` and block implementation readiness.
+The field-level serialization, identity projection, digest construction,
+duplicate policy, failure precedence, and T07 mapping are normatively defined
+in Sections 5.3–5.7. This resolves the previous specification blockers for the
+separate closure audit; it does not authorize implementation.
 
-## 10A. Semantic Closure Findings
+## 10A. Prior Formal Audit Findings — Historical
+
+The findings in this section are retained as the record of the previous
+formal audit. The blocker-resolution rules in Sections 5.3–5.7 and Section 19
+supersede the prior unresolved determinations. They do not authorize
+implementation.
 
 ### 10A.1 Authority A status reconciliation
 
@@ -742,21 +920,23 @@ those supplied semantics; B only supplies lineage facts.
 - T07, not B, selects the canonical head per lifecycle.
 - B does not own G2, G3, G4, G5, custody, signing, settlement, or execution.
 
-### 14.2 Unresolved
+### 14.2 Resolved by blocker-resolution pass
 
-- Exact serialized fields and types for `LineageFact`.
-- Exact serialized fields and types for `LineageEdgeIdentity`.
-- Exact semantic identity seed for lineage facts and edges.
-- Exact field ordering and nullable-field policy.
-- Exact policy/version vocabulary.
-- Exact public failure enum spellings and precedence.
+- Exact serialized fields and semantic types for `LineageFact` and
+  `LineageEdge`.
+- Exact semantic identity seeds for lineage facts and edges.
+- Exact field ordering, normalization, nullable-field policy, and digest input.
+- Exact current contract and policy version values.
+- Exact failure categories and first-applicable precedence.
 - Exact mapping into the closed T07 input/output contract.
 - Exact duplicate handling policy.
-- Exact timestamp fields and effective-time semantics.
+- Exact timestamp and effective-time semantics.
 
 ### 14.3 Blocked
 
-- Implementation-ready Authority B contract.
+- Formal Authority B closure audit.
+- Implementation-ready Authority B runtime contract and implementation
+  authorization.
 - Any runtime or persistence implementation of B.
 - Any G1 concrete economic authority endpoint.
 - G2 concrete realization endpoint.
@@ -791,7 +971,8 @@ audit to extend Authority A's authority.
 
 ## 16. Audit Conclusion and Next Governance Gate
 
-Authority B is **SEMANTICALLY BOUNDED / SPECIFICATION-LEVEL BLOCKED**.
+The Authority B blocker-resolution pass is complete and reconciled. Authority B
+is **PENDING FORMAL CLOSURE AUDIT** and remains implementation-unauthorized.
 
 The audit confirms that B owns only immutable correction/supersession lineage
 facts and their provenance, while T07 validates them and selects the canonical
@@ -800,41 +981,21 @@ single-predecessor/single-successor edges, linear multi-hop chains, branching,
 self-reference, cycles, cross-lifecycle references, missing endpoints, and
 contradictory relationships.
 
-The following blockers remain:
+No genuine semantic blocker remains within this documented scope. Predecessor
+convergence/merge is intentionally deferred by design:
 
-1. The deterministic semantic identity seed for `LineageFact` and
-   `LineageEdge`, including the semantic role of predecessor and successor
-   references, is not locked.
-2. The exact field/type contract is not locked: required and optional fields,
-   nullability, cardinality, endpoint references, lifecycle references, fact
-   identity, and edge identity remain unresolved.
-3. Canonical serialization is constrained semantically but its exact field
-   ordering, normalization, nullable-field policy, canonical format, and
-   identity-to-representation adapter remain unresolved.
-4. Timestamp and effective-time semantics are not locked. Supplied timestamps
-   may remain provenance data and no wall-clock dependency is permitted, but
-   event, correction, supersession, and effective-time treatment is not yet
-   authoritative.
-5. Exact duplicate behavior is unresolved: idempotent acceptance versus
-   duplicate reporting is not selected. Conflicting duplicates must fail
-   closed, but their deterministic public handling is not fully specified.
-6. Failure taxonomy and precedence are not fully locked: public enum
-   spellings, multi-failure precedence, error payload shape, and mapping into
-   the closed T07 contract remain unresolved.
-7. The exact Authority B adapter mapping into the T07 input/output contract is
-   not locked, even though no semantic change to T07 is required.
+`MERGE / CONVERGENCE UNSUPPORTED — FAIL CLOSED`
 
-Predecessor convergence/merge remains intentionally deferred and unsupported
-for the current scope. It must fail closed and must not be inferred as valid,
-invalid, or preferentially resolved. This preserves deterministic behavior but
-does not authorize implementation of merge semantics.
+It must not be inferred as valid, invalid, or preferentially resolved, and no
+merge implementation is authorized.
 
-Authority A compatibility is now resolved. The semantic T07 compatibility is
-also resolved: B supplies the fact, T07 validates the fact and graph, and T07
-selects the canonical head. The unresolved adapter and representation decisions
-above still prevent Authority B specification closure for this governance gate.
+Authority A compatibility is resolved. T07 compatibility is resolved:
+Authority B supplies one authoritative fact/edge projection, T07 validates the
+fact and graph, and T07 selects the canonical head. The mapping is
+representational and does not redesign T07.
 
-That gate remains separate from G1–G5 economic authority decisions.
+The formal closure gate remains separate from G1–G5 economic authority
+decisions.
 
 ## 17. Formal Audit Record — 2026-09-08
 
@@ -850,7 +1011,7 @@ This formal audit reviewed:
 - `docs/P08-T07-CANONICAL-RESULT-AUTHORITY-EXTENSION-SPECIFICATION.md`; and
 - `docs/P08-T07-SPECIFICATION.md`.
 
-### 17.2 Findings matrix
+### 17.2 Findings matrix — Historical
 
 | Audit area | Result | Determination |
 |---|---|---|
@@ -870,16 +1031,16 @@ This formal audit reviewed:
 | Determinism/replay | PASS conditionally | Prohibited time/order/provider/random dependencies are excluded; unresolved identity/serialization decisions still block closure. |
 | Economic/custody boundary | PASS | B has no realization, accounting, classification, custody, signing, execution, or Risk/Capital authority. |
 
-### 17.3 Formal verdict
+### 17.3 Historical formal verdict
 
-The audit does not establish specification closure. The required governance
-status remains:
+The previous audit did not establish specification closure and correctly
+recorded:
 
 **AUTHORITY B SPECIFICATION-LEVEL BLOCKED**
 
-The blockers are semantic and contract-level, not permission to invent fields,
-enum values, merge behavior, or implementation workarounds. They must be
-resolved by explicit specification decisions before another closure audit.
+The blocker-resolution pass below supersedes that previous unresolved finding
+for the current governance state. A separate formal closure audit is still
+required and implementation remains unauthorized.
 
 ## 18. Implementation Status
 
@@ -888,3 +1049,29 @@ resolved by explicit specification decisions before another closure audit.
 This document does not authorize source changes, tests, persistence, runtime
 behavior, wallet access, provider selection, economic calculation, P08-T08,
 P09, or any later phase.
+
+## 19. Blocker Resolution Pass — 2026-09-08
+
+This section records the resolution of the eight blockers identified by the
+previous formal audit. The normative rules are defined in the Authority B
+specification and are summarized here for audit traceability. This is not the
+formal closure audit.
+
+| Original blocker | Result | Resolution |
+|---|---|---|
+| Semantic identity seed | RESOLVED | `LineageFactIdentity` and `LineageEdgeIdentity` use domain-separated SHA-256 digests over the fixed identity projection: contract version, policy version, lifecycle identity, predecessor result identity, successor result identity, and lineage type. |
+| Exact field/type contract | RESOLVED | The specification now defines the required semantic fields, types/categories, cardinality, nullability, identity participation, serialization participation, and provenance-only fields for the fact and edge. |
+| Canonical serialization | RESOLVED | Canonical UTF-8 JSON, NFC string validation, sorted keys, fixed provenance order, no nulls, no optional semantic fields, fixed identity projection order, and SHA-256 edge digest input are normative. |
+| Timestamp/effective-time semantics | RESOLVED | Authority B has no event, reference, correction, supersession, or effective-time field. Any upstream timestamp is provenance-only and cannot affect identity, graph order, conflict resolution, or canonical-head selection. |
+| Duplicate handling | RESOLVED | Byte-identical canonical facts with the same identity are idempotently accepted. Any same-identity representation difference is `CONFLICTING_DUPLICATE`, fails closed, and never uses last-write-wins. |
+| Conflict/failure vocabulary and precedence | RESOLVED | A closed failure taxonomy and first-applicable precedence order are defined, including deterministic mapping to T07's existing `INVALID_INPUT` failure boundary. |
+| Exact adapter mapping into T07 | RESOLVED | One valid Authority B fact produces one edge projection supplied to T07; B supplies identity, endpoints, type, versions, provenance, representation, digest, and validation state, while T07 revalidates graph placement and selects the canonical head. |
+| Merge/convergence treatment | DEFERRED BY DESIGN | `MERGE / CONVERGENCE UNSUPPORTED — FAIL CLOSED` is normative. No merge semantics or graph redesign is introduced. |
+
+### 19.1 Resolution boundary
+
+The blocker-resolution pass establishes a deterministic specification contract,
+but it does not declare Authority B closed or implementation-ready. The next
+gate is:
+
+**NEXT GATE: FORMAL AUTHORITY B SPECIFICATION CLOSURE AUDIT**
