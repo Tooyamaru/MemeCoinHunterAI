@@ -90,8 +90,14 @@ Authority A owns:
 - authoritative Lifecycle Split Facts; and
 - lifecycle mapping conflict resolution.
 
-Authority A supplies the lifecycle identity and any authoritative split fact
-consumed by T07.
+Authority A authoritatively asserts and supplies the distinct resulting
+Canonical Economic Subject Identities and the mapping from the originating
+P06 DecisionIntent to those resulting subjects and lifecycles. Authority A
+also supplies any authoritative Lifecycle Split Fact consumed by T07.
+
+The Lifecycle Split Fact does not create or generate canonical economic
+subjects. It records and provides provenance for Authority A's authoritative
+assertion of the resulting distinct subjects and their lifecycle mapping.
 
 Authority A does not own:
 
@@ -191,14 +197,19 @@ The fact must:
 
 - be authoritative under Authority A;
 - identify the originating P06 DecisionIntent;
-- identify each resulting lifecycle identity;
+- authoritatively assert and provide each distinct resulting Canonical
+  Economic Subject Identity;
+- provide the mapping from the originating P06 DecisionIntent to those
+  resulting subjects and lifecycles;
 - state the authoritative reason or basis for the split;
 - preserve its own fact identity and provenance; and
 - be independently validated before T07 uses the resulting mapping.
 
 The exact field names and serialized field types for the Lifecycle Split Fact
 are a **specification-level governance dependency** until separately locked.
-No field may be added merely to encode implementation convenience.
+No field may be added merely to encode implementation convenience. In
+particular, the split fact is not an arbitrary lifecycle identity
+discriminator.
 
 ### 4.4 Event association
 
@@ -234,6 +245,11 @@ P06 DecisionIntent Identity
 P08-T01, T02, and T06 identities are linkage or provenance only. They are not
 part of the lifecycle identity seed.
 
+For a valid split, each distinct resulting Canonical Economic Subject Identity
+together with the same P06 DecisionIntent Identity produces a distinct
+lifecycle identity. The Lifecycle Split Fact itself is mapping/provenance
+authority and is not part of the lifecycle identity seed.
+
 Lifecycle identity remains stable across:
 
 - T02 dataset snapshots;
@@ -254,16 +270,20 @@ Before canonical-result selection, T07 must validate that:
 3. the P06 DecisionIntent identity is present;
 4. the lifecycle-to-P06 relationship satisfies the V1 cardinality rule;
 5. any multiple-lifecycle mapping has an authoritative Lifecycle Split Fact;
-6. the split fact identifies the resulting lifecycle identities;
-7. lifecycle equivalence and conflict information is authoritative;
-8. T01/T02/T06 records are used only for their declared linkage/provenance
+6. the split fact authoritatively asserts distinct resulting Canonical
+   Economic Subject Identities;
+7. the split fact provides the mapping from the originating P06 to those
+   resulting subjects and lifecycles;
+8. lifecycle equivalence and conflict information is authoritative;
+9. T01/T02/T06 records are used only for their declared linkage/provenance
    purposes; and
-9. the supplied lifecycle identity is consistent with the candidate result.
+10. the supplied lifecycle identity is consistent with the candidate result.
 
-T07 validates the supplied mapping. It does not create, split, merge, or
-redefine the lifecycle.
+T07 validates the supplied subject identities and mapping. It does not create,
+split, merge, generate, or redefine canonical economic subjects or lifecycles.
 
-An ambiguous, conflicting, missing, or unmappable relationship fails closed.
+An ambiguous, conflicting, missing, unmappable, or non-distinct relationship
+fails closed with `INVALID_LIFECYCLE_MAPPING`.
 
 ## 6. Result Identity Model
 
@@ -668,6 +688,8 @@ proven to be identity-defining.
 For equivalent validated authoritative inputs, T07 must produce equivalent:
 
 - lifecycle validation outcomes;
+- distinct resulting Canonical Economic Subject Identities for an authorized
+  split;
 - candidate result identities;
 - canonical result representations;
 - result digests;
@@ -692,6 +714,11 @@ T07 must not depend on:
 - process identity; or
 - memory address.
 
+Replay of a split must use the same authoritative resulting subject
+identities and the same P06 DecisionIntent Identity. A T02 snapshot, retrieval
+order, or implementation-generated discriminator cannot change the resulting
+lifecycle identities.
+
 ## 18. Failure Taxonomy
 
 The extension recognizes the following semantic failure categories:
@@ -715,7 +742,10 @@ The exact public enum spelling, precedence among failure reporting fields, and
 mapping to the existing T07 failure vocabulary are
 **specification-level governance dependencies** where the existing contract
 has not already locked them. No implementation may silently collapse distinct
-failure categories.
+failure categories. A split that cannot establish distinct resulting
+Canonical Economic Subject Identities must fail closed with
+`INVALID_LIFECYCLE_MAPPING`; it must not be repaired with an artificial
+discriminator.
 
 ## 19. Formal Invariants
 
@@ -729,16 +759,22 @@ economic subject.
 ### I-02 — Lifecycle cardinality
 
 Every lifecycle maps to exactly one P06 DecisionIntent. A P06 maps to exactly
-one lifecycle unless Authority A supplies a valid Lifecycle Split Fact.
+one lifecycle by default and may map to multiple lifecycles only when Authority
+A supplies a valid Lifecycle Split Fact that authoritatively asserts distinct
+resulting Canonical Economic Subject Identities.
 
 ### I-03 — Event association
 
-Event grouping cannot create, split, or redefine lifecycle identity.
+Event grouping or association cannot create, split, merge, or redefine
+canonical economic subject or lifecycle identity.
 
 ### I-04 — Lifecycle identity stability
 
-T02, T06, observation identity, replay order, retrieval order, and dataset
-snapshot identity cannot alter lifecycle identity.
+T02, T06, observation identity, replay order, retrieval order, dataset
+snapshot identity, and the Lifecycle Split Fact as mapping/provenance
+authority cannot alter lifecycle identity. Only the authoritative resulting
+Canonical Economic Subject Identity and P06 DecisionIntent Identity define the
+seed.
 
 ### I-05 — Result/lineage non-circularity
 
@@ -799,7 +835,8 @@ Current canonical T07 selection cannot depend on future AEA analytical cutoff.
 ### I-16 — Ownership preservation
 
 T07 validates and assembles supplied semantics but does not invent upstream
-lifecycle, lineage, realization, accounting, or classification facts.
+Canonical Economic Subject Identities, lifecycle mappings, Lifecycle Split
+Facts, lineage, realization, accounting, or classification facts.
 
 ### I-17 — Deterministic replay
 
@@ -817,6 +854,10 @@ implementation convenience.
 
 ```text
 Authority A
+        ↓
+Authoritative Lifecycle Split Fact (when applicable)
+        ↓
+Distinct Canonical Economic Subject Identities
         ↓
 Lifecycle Identity
         ↓
@@ -857,6 +898,8 @@ The dependency constraints are:
 
 ```text
 CPA MUST NOT create or split lifecycles.
+CPA MUST consume the authoritative distinct lifecycle projection and MUST NOT
+derive lifecycle identity from P06 identity alone.
 CPA MUST NOT select the canonical T07 result.
 AEA MUST NOT feed lineage selection.
 AEA MUST NOT redefine T07 economic meaning.
@@ -900,24 +943,27 @@ specification or contract amendment without inventing semantics:
 
 1. exact serialized fields and types for `LifecycleIdentity`;
 2. exact serialized fields and types for `LifecycleSplitFact`;
-3. exact semantic definition of the result identity seed, including the
+3. exact semantic contract requiring Authority A to assert distinct resulting
+   Canonical Economic Subject Identities for every valid split;
+4. exact semantic definition of the result identity seed, including the
    semantic facts that make two results the same or different;
-4. exact serialized fields and types for the result identity and canonical
+5. exact serialized fields and types for the result identity and canonical
    result representation, separately from semantic identity authority;
-5. exact serialized fields and types for `LineageFact`;
-6. exact serialized fields and types for `LineageEdgeIdentity` and its
+6. exact serialized fields and types for `LineageFact`;
+7. exact serialized fields and types for `LineageEdgeIdentity` and its
    canonical edge representation;
-7. exact canonical field ordering and nullable-field policy for new records;
-8. exact public enum spellings and failure-reporting structure for new failure
+8. exact canonical field ordering and nullable-field policy for new records;
+9. exact public enum spellings and failure-reporting structure for new failure
    categories; and
-9. exact adapter mapping between the extension and the existing closed T07
+10. exact adapter mapping between the extension and the existing closed T07
    input/output contracts.
 
 The semantic result identity definition is a semantic specification dependency
-and must be explicitly locked before implementation readiness. The remaining
-field, serialization, and adapter items are separate representation or
-integration dependencies. None permits inference from implementation
-convenience.
+and must be explicitly locked before implementation readiness. The distinct-
+subject requirement for valid lifecycle splits is also semantic and is now
+approved as part of Authority A's clarification. The remaining field,
+serialization, and adapter items are separate representation or integration
+dependencies. None permits inference from implementation convenience.
 
 ## 23. Status and Next Audit
 
