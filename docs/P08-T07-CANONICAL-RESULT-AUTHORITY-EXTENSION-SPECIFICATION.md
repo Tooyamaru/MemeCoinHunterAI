@@ -294,9 +294,23 @@ The identity seed must not include:
 - mutable status caused only by later lineage; or
 - vague or mutable provenance that has not been proven identity-defining.
 
-The exact field set for the semantic result identity seed is a
-**specification-level governance dependency** where the existing T07 contract
-does not already define it. T07 must not invent fields to close that gap.
+The exact semantic definition of the result identity seed is a
+**semantic specification dependency**. It determines result identity and must
+be explicitly locked before implementation readiness.
+
+The governance model is approved and the T07 extension structure is approved
+for drafting. Semantic identity authority is not interchangeable with
+serialization or field-naming authority:
+
+- semantic result identity defines what makes two results the same or
+  different domain result;
+- canonical representation defines how an already-defined result is
+  represented; and
+- serialization and field naming define the encoding contract.
+
+The exact semantic result identity definition must be locked separately from
+the exact serialized fields and field names. T07 must not invent identity
+fields or infer identity semantics from implementation convenience.
 
 ### 6.2 Canonical representation
 
@@ -308,11 +322,49 @@ representation of the validated T07 result. It may contain:
 - validated upstream G2/G3/G4 references;
 - required provenance;
 - contract and evaluator versions;
-- correction or supersession references as immutable supplied facts; and
+- explicitly authorized immutable result references; and
 - other fields explicitly authorized by the T07 contract.
 
-An outgoing successor edge is not part of a predecessor’s representation merely
-because the successor exists.
+The following distinctions are normative:
+
+- A **result reference** is a reference to an independently defined immutable
+  result identity or result digest.
+- A **lineage fact** is an authoritative assertion supplied by Authority B
+  stating that a lineage relationship exists.
+- A **lineage edge** is the separate canonical representation of that
+  relationship.
+- A **lineage edge digest** is the SHA-256 integrity digest of that lineage
+  edge representation.
+
+The canonical result representation must not contain:
+
+- outgoing successor edges;
+- successor result digests as identity inputs;
+- lineage-edge digests that transitively depend on the result digest being
+  computed; or
+- any self-referential lineage representation.
+
+A direct immutable predecessor result reference may be represented inside a
+successor result only when that reference is separately authorized and remains
+non-circular. It must not introduce a dependency through a lineage edge or
+lineage-edge digest that depends on the successor identity or digest.
+
+More generally, a result identity or `result_digest` must not depend on a
+lineage edge whose representation transitively depends on that same result
+identity or digest. The prohibited cycle is:
+
+```text
+Result Representation
+        ↓
+Lineage Edge
+        ↓
+Successor Result Identity
+        ↓
+Result Representation
+```
+
+An outgoing successor edge is never added to a predecessor’s representation
+merely because the successor exists.
 
 ### 6.3 Integrity digest
 
@@ -322,7 +374,9 @@ The digest provides integrity and content identification for the representation
 being hashed. It does not define the semantic identity seed that produced that
 representation.
 
-The digest must not be self-referential.
+The digest must not be self-referential, and result identity/digest construction
+must not depend on a lineage edge that depends transitively on that same
+identity/digest.
 
 ## 7. Canonicalization and SHA-256 Requirements
 
@@ -356,13 +410,15 @@ For lineage:
 ```text
 Lineage Fact
         ↓
-Lineage Edge Identity
+Lineage Edge Representation
         ↓
 Lineage Edge Digest
 ```
 
 The lineage edge digest covers the canonical lineage-edge representation and
-does not include itself.
+does not include itself. A lineage edge may reference immutable result
+identities or digests, but the result cannot depend backward on a lineage edge
+that depends on the result.
 
 ## 8. Correction Lineage
 
@@ -454,13 +510,24 @@ edge type preference, result magnitude, or caller preference.
 
 ## 12. Canonical-Head Selection
 
-T07 selects the current canonical representative from the validated lineage
-graph after lifecycle and lineage validation.
+T07 selects the current canonical representative independently for each
+lifecycle from that lifecycle's validated lineage graph after lifecycle and
+lineage validation.
 
 The normative rule is:
 
-> Exactly one structurally valid terminal representative is the current
-> canonical T07 representative.
+> For each lifecycle, exactly one structurally valid terminal representative
+> is the current canonical T07 representative for that lifecycle.
+
+The lifecycle-level cardinality is:
+
+```text
+one lifecycle
+        ↓
+zero or one canonical representative
+```
+
+There is no single global canonical head for the entire T07 population.
 
 A result is terminal when it has no declared successor edge.
 
@@ -471,11 +538,11 @@ The selection rules are:
 | No successor declared | Terminal candidate |
 | Declared successor is missing | `MISSING_SUCCESSOR` |
 | Declared lineage is invalid | `INVALID_LINEAGE` |
-| More than one valid terminal head exists | Canonical selection ambiguity; fail closed |
+| More than one valid terminal head exists for a lifecycle | Canonical selection ambiguity; fail closed |
 | More than one authoritative successor edge exists | Branching conflict; fail closed |
 | A cycle exists | Cycle failure; fail closed |
-| Lineage cannot be resolved | No canonical result |
-| Exactly one structurally valid terminal exists | Current canonical representative |
+| Lineage cannot be resolved for a lifecycle | No canonical representative for that lifecycle |
+| Exactly one structurally valid terminal exists for a lifecycle | Current canonical representative for that lifecycle |
 
 Selection must not depend on:
 
@@ -500,14 +567,15 @@ does not count toward any coverage category.
 ### 13.2 Canonical `INVALID_INPUT` representative
 
 A structurally valid T07 record may be the current canonical terminal
-representative while carrying `INVALID_INPUT`.
+representative for one lifecycle while carrying `INVALID_INPUT`.
 
 It:
 
 - may count toward structural lifecycle coverage;
 - may count toward canonical representative coverage;
 - is not a valid economic result; and
-- must not count toward economic-outcome coverage.
+- must not count toward economic-outcome coverage; and
+- must not be treated as G2/G3/G4-valid economic semantics.
 
 ### 13.3 Unresolved canonical state
 
@@ -672,20 +740,24 @@ Event grouping cannot create, split, or redefine lifecycle identity.
 T02, T06, observation identity, replay order, retrieval order, and dataset
 snapshot identity cannot alter lifecycle identity.
 
-### I-05 — Result identity acyclicity
+### I-05 — Result/lineage non-circularity
 
+Neither a result identity nor its digest may depend on a lineage edge whose
+representation transitively depends on that same result identity or digest.
 The result digest is not an input to the identity seed that produces the
 canonical result representation.
 
-### I-06 — Lineage separation
+### I-06 — Directional lineage references
 
-A lineage edge is not part of either result’s canonical representation merely
-because the edge exists.
+Lineage may reference independently immutable result identities or digests,
+but result identity and result digest construction must not depend backward on
+a lineage edge that depends on the result. A successor edge cannot be embedded
+in the predecessor representation.
 
-### I-07 — Historical immutability
+### I-07 — Immutable historical result identity
 
-Creating a successor cannot mutate the predecessor result or predecessor
-digest.
+Creating a correction or supersession edge, or creating a successor, cannot
+mutate or retroactively alter either result, its identity, or its digest.
 
 ### I-08 — Successor cardinality
 
@@ -703,10 +775,13 @@ A cyclic lineage graph must fail closed.
 
 Missing declared predecessor or successor references must fail closed.
 
-### I-12 — Canonical-head uniqueness
+### I-12 — Per-lifecycle canonicality
 
-Exactly one structurally valid terminal representative is required for a
-current canonical T07 result.
+For each lifecycle, zero or one canonical representative may exist. If that
+lifecycle's validated lineage graph contains exactly one structurally valid
+terminal representative, that representative is the current canonical T07
+representative for that lifecycle. Multiple terminal representatives or
+unresolved lineage fail closed.
 
 ### I-13 — Invalid-result separation
 
@@ -731,30 +806,33 @@ lifecycle, lineage, realization, accounting, or classification facts.
 Equivalent authoritative inputs produce equivalent validation, representation,
 digest, lineage, and canonical-head outcomes.
 
+### I-18 — Semantic identity dependency
+
+The semantic result identity definition is a separate specification dependency
+from serialization and field naming. It must be explicitly locked before
+implementation readiness, and no identity semantics may be inferred from
+implementation convenience.
+
 ## 20. Dependency Graph
 
 ```text
-Canonical Economic Subject / Lifecycle Identity Authority
+Authority A
         ↓
-Canonical Economic Subject Identity
-        ↓
-Lifecycle Identity / Equivalence / Split Validation
+Lifecycle Identity
         ↓
 T07 Candidate Results
 ```
 
-Parallel lineage path:
-
 ```text
-Correction / Supersession Lineage Fact Authority
+Authority B
         ↓
-Correction / Supersession Facts
-        ↓
-T07 Lineage Validation
+Validated Lineage
         ↓
 T07 Canonical Selection
-        ↓
-Current Canonical T07 Representative
+```
+
+```text
+T07 Canonical Result
         ↓
 AEA
         ↓
@@ -763,12 +841,10 @@ Future Analytical Snapshot
 Future Performance / Economic Analysis
 ```
 
-Parallel population path:
-
 ```text
 T02 Observation Population
         +
-Lifecycle Identity / Equivalence
+Lifecycle Identity
         ↓
 CPA
         ↓
@@ -785,6 +861,7 @@ CPA MUST NOT select the canonical T07 result.
 AEA MUST NOT feed lineage selection.
 AEA MUST NOT redefine T07 economic meaning.
 Snapshot MUST NOT create economic semantics.
+No dependency may return backward into T07 identity or lineage authority.
 ```
 
 ## 21. Explicit Non-Responsibilities
@@ -823,26 +900,35 @@ specification or contract amendment without inventing semantics:
 
 1. exact serialized fields and types for `LifecycleIdentity`;
 2. exact serialized fields and types for `LifecycleSplitFact`;
-3. exact semantic field set for the result identity seed;
-4. exact serialized fields and types for `LineageFact`;
-5. exact serialized fields and types for `LineageEdgeIdentity`;
-6. exact canonical field ordering and nullable-field policy for new records;
-7. exact public enum spellings and failure-reporting structure for new failure
+3. exact semantic definition of the result identity seed, including the
+   semantic facts that make two results the same or different;
+4. exact serialized fields and types for the result identity and canonical
+   result representation, separately from semantic identity authority;
+5. exact serialized fields and types for `LineageFact`;
+6. exact serialized fields and types for `LineageEdgeIdentity` and its
+   canonical edge representation;
+7. exact canonical field ordering and nullable-field policy for new records;
+8. exact public enum spellings and failure-reporting structure for new failure
    categories; and
-8. exact adapter mapping between the extension and the existing closed T07
+9. exact adapter mapping between the extension and the existing closed T07
    input/output contracts.
 
-These are specification dependencies, not permission to infer fields from
-implementation convenience.
+The semantic result identity definition is a semantic specification dependency
+and must be explicitly locked before implementation readiness. The remaining
+field, serialization, and adapter items are separate representation or
+integration dependencies. None permits inference from implementation
+convenience.
 
 ## 23. Status and Next Audit
 
 ### Specification status
 
-**P08-T07 Canonical Result Authority Extension specification draft complete.**
+**P08-T07 Canonical Result Authority Extension specification draft complete —
+targeted corrections applied; formal audit required.**
 
-The draft reflects the explicitly approved governance baseline and preserves
-the existing closed P08-T07 implementation boundary.
+The draft reflects the explicitly approved governance baseline, incorporates
+the targeted post-audit corrections, and preserves the existing closed
+P08-T07 implementation boundary. This status is not a specification PASS.
 
 ### Implementation status
 
@@ -851,11 +937,13 @@ the existing closed P08-T07 implementation boundary.
 No source code, tests, runtime behavior, Authority A, Authority B, CPA, AEA,
 Snapshot, or P08-T08 was created or modified by this specification.
 
-### Unresolved specification dependencies
+### Remaining semantic and specification dependencies
 
-The field-level, serialization-level, and exact public failure-vocabulary
-items listed in Section 22 remain specification dependencies. They are not
-unresolved semantic governance decisions and must not be filled by inference.
+The exact semantic result identity definition listed in Section 22 remains a
+semantic specification dependency and must be explicitly locked before
+implementation readiness. The field-level, serialization-level, failure-
+vocabulary, and adapter items are separate specification dependencies and must
+not be filled by inference.
 
 ### Exact next audit required
 
