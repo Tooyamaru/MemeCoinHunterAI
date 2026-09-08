@@ -181,6 +181,42 @@ A Canonical Economic Subject is not inherently:
 Those artifacts may provide evidence, linkage, or provenance. They do not
 define Lifecycle Identity by themselves.
 
+### 3.1.1 Semantic governance boundary
+
+Authority A governs the semantic question of which economic unit is being
+represented. It does not govern the final serialization merely because a
+serialization is used to carry the result.
+
+For V1, the semantic boundary is:
+
+1. **Subject-defining facts** are authoritative facts that establish the
+   economic unit represented by the Canonical Economic Subject and establish
+   whether two such units are the same or distinct.
+2. **Lifecycle-anchor facts** establish the relationship between the subject
+   and the P06 DecisionIntent Identity. The approved Lifecycle Identity seed
+   remains exactly the Canonical Economic Subject Identity plus the P06
+   DecisionIntent Identity.
+3. **Mapping and correction facts** may establish, split, correct, or leave
+   unresolved the relationship between supplied subject claims and lifecycle
+   identities, but they do not permit an arbitrary discriminator to become
+   subject identity.
+4. **Evidence and provenance facts** support the authority, traceability, and
+   replay of a semantic claim without defining the subject by themselves.
+
+The first two categories determine semantic identity under the approved
+governance baseline. The third category governs how that identity is mapped or
+corrected. The fourth category documents the claim. The exact field names,
+types, envelopes, and wire encoding for these categories are serialization
+governance and remain specification dependencies.
+
+Two representations are semantically the same subject when their validated
+authoritative subject-defining facts resolve to the same Canonical Economic
+Subject Identity. They are semantically distinct only when Authority A
+authoritatively establishes distinct economic units and assigns distinct
+subject identities. A representation that differs only in provenance,
+observation, event, retrieval, storage, or administrative information is not
+thereby a different subject.
+
 ### 3.2 Associated events
 
 An event is an occurrence associated with an already-established subject or
@@ -215,7 +251,12 @@ Similarity is not identity. Subject equality must not be inferred from:
 - database ordering;
 - caller preference;
 - event count; or
-- retrieval order.
+- retrieval order;
+- event identity;
+- observation identity;
+- T02 identity;
+- T06 identity; or
+- administrative identifiers.
 
 ## 4. Canonical Economic Subject Identity
 
@@ -511,10 +552,19 @@ Authority A must not introduce an unrestricted merge operation.
 ### 8.1 Same-subject resolution
 
 When authoritative facts establish that two mappings represent the same
-subject, they resolve to one Canonical Economic Subject Identity and, when the
-P06 identity is also the same, one Lifecycle Identity.
+subject, **unestablished candidate mappings** resolve to one Canonical Economic
+Subject Identity and, when the P06 identity is also the same, one Lifecycle
+Identity.
 
 Event grouping does not perform this semantic merge.
+
+An equivalence assertion must not automatically perform a retroactive merge of
+already-established Lifecycle Identities. If two established lifecycle
+identities later appear equivalent, the assertion is an identity-correction or
+identity-change case governed by Section 10. Authority A must preserve the
+historical identities and topology while the authorized correction outcome is
+determined. There is no unrestricted merge operation and no silent historical
+rewrite.
 
 ### 8.2 Distinct-subject resolution
 
@@ -574,26 +624,60 @@ supersession lineage for T07 results.
 
 ### 10.1 Correction of identity representation
 
-A correction to the representation of an identity may preserve the same
-Canonical Economic Subject Identity when the authoritative semantic identity
-is unchanged.
+A representation correction is a correction to how an already-established
+semantic identity is encoded or transported, with no change to the
+authoritative subject-defining facts.
+
+For this case:
+
+- the existing Canonical Economic Subject Identity and Lifecycle Identity
+  remain valid;
+- no new Lifecycle Identity is required;
+- the historical identity and its prior representations are preserved; and
+- the corrected representation may replace or supersede the representation
+  only under the applicable canonicalization rule.
 
 The corrected representation must not silently rewrite historical identity
 facts or make a different subject appear equivalent.
 
 ### 10.2 Correction of an authoritative identity fact
 
-A correction to an authoritative identity fact must be represented as a new
-authoritative Authority A fact with explicit provenance and a reference to
-the fact being corrected.
+A correction of an authoritative identity fact is a claim that the prior fact
+was wrong, incomplete, or misapplied. It must be represented as a new
+authoritative Authority A fact with explicit provenance and a reference to the
+fact being corrected.
 
 It must not mutate the historical fact in place.
+
+For this case:
+
+- the historical Canonical Economic Subject Identity and Lifecycle Identity
+  remain valid for the historical fact set and historical representations;
+- a new Lifecycle Identity is required only if the authorized correction
+  establishes a distinct semantic subject or otherwise establishes a distinct
+  lifecycle mapping;
+- the historical identity and topology are preserved; and
+- until an explicit authorized correction outcome determines the result, the
+  affected mapping is unresolved and fails closed.
 
 ### 10.3 Correction of lifecycle mapping
 
 If the underlying lifecycle mapping is later proven wrong, Authority A must
 not silently change the historical Lifecycle Identity. The corrected mapping
 must be evaluated under an explicitly authorized identity-correction rule.
+
+For this case:
+
+- the historical Lifecycle Identity remains valid for the historical mapping
+  and is never silently mutated;
+- a new Lifecycle Identity is required when the corrected authoritative
+  mapping establishes a distinct subject/P06 combination;
+- the historical identity, historical mapping, and historical topology are
+  preserved;
+- the corrected mapping is unresolved and fails closed until an authorized
+  outcome is selected; and
+- a vague future or later mapping is not an implicit identity mutation
+  mechanism.
 
 Until that rule establishes a deterministic outcome, the mapping is unresolved
 and fails closed.
@@ -602,6 +686,11 @@ and fails closed.
 
 Authority A may require a new identity fact to replace a prior fact only under
 an explicitly authorized identity-fact change rule.
+
+The replacement or supersession of a fact does not by itself merge or mutate
+established lifecycle identities. The rule must explicitly state whether the
+replacement preserves the existing semantic identity, establishes a distinct
+identity, or leaves the mapping unresolved.
 
 This is not T07 result correction or supersession lineage. Authority B owns
 correction and supersession facts for T07 result lineage and remains separate.
@@ -612,14 +701,27 @@ An actual semantic change in the economic subject is not an identity mutation.
 It establishes a distinct subject identity and, when paired with a P06
 DecisionIntent Identity, a distinct Lifecycle Identity.
 
-No historical result, identity, or lineage representation is retroactively
-mutated.
+For this case:
+
+- the existing Lifecycle Identity remains valid for the historical subject
+  and historical fact set;
+- a new Lifecycle Identity is required for the changed semantic subject when
+  it is paired with a P06 DecisionIntent Identity;
+- the historical identity, results, and lineage representations are preserved;
+  and
+- no historical result, identity, or lineage representation is retroactively
+  mutated.
 
 ### 10.6 Identity change boundary
 
 An established historical Lifecycle Identity is immutable. A later
 authoritative fact may establish a corrected or distinct future mapping only
 through an explicitly authorized Authority A identity-change outcome.
+
+No future-mapping label, pending mapping, equivalence assertion, or
+administrative replacement may silently mutate an established identity. If the
+authorized outcome cannot be determined, Authority A must preserve the
+historical identity and fail the affected current mapping closed.
 
 This specification does not become Authority B's result-lineage authority.
 
@@ -713,16 +815,40 @@ The representation must preserve the established canonicalization principles:
 - negative-zero normalization; and
 - deterministic collection ordering.
 
-### 13.1 Semantic identity
+### 13.1 Normative semantic dependency sequence
+
+The dependency sequence is:
+
+```text
+Semantic Identity Definition
+          ↓
+Semantic Identity Value
+          ↓
+Canonical Representation
+          ↓
+Integrity Digest
+```
+
+The Semantic Identity Definition establishes which authoritative semantic facts
+define the subject or lifecycle. The Semantic Identity Value is the resulting
+identity claim before serialization. The Canonical Representation is the
+deterministic encoding of that already-defined value. The Integrity Digest
+protects that representation.
+
+The digest is not semantic identity. Semantic identity must not be defined by
+hashing a representation that itself depends on that digest. No identity or
+digest circular dependency is permitted.
+
+### 13.2 Semantic identity
 
 Semantic identity is the stable meaning of the subject or lifecycle.
 
-### 13.2 Canonical representation
+### 13.3 Canonical representation
 
 Canonical representation is the deterministic encoding of an already-defined
 semantic identity fact.
 
-### 13.3 Integrity digest
+### 13.4 Integrity digest
 
 An integrity digest protects the canonical representation. It does not become
 semantic identity merely because it is convenient.
@@ -886,6 +1012,42 @@ Authority A owns subject and lifecycle identity. Authority B owns T07 result
 correction and supersession lineage. Neither may silently assume the other's
 authority.
 
+### A-17 — Semantic boundary
+
+Only authoritative subject-defining and lifecycle-anchor facts may determine
+semantic identity. Provenance, evidence, observations, events, T02, T06,
+timestamps, retrieval order, provider identifiers, and administrative
+identifiers cannot independently define it.
+
+### A-18 — No silent identity mutation
+
+An established historical Lifecycle Identity must not be silently mutated.
+Every correction, replacement, or semantic change requires an explicit
+authorized Authority A outcome; otherwise the affected state fails closed.
+
+### A-19 — No retroactive equivalence merge
+
+An equivalence assertion must not retroactively merge established Lifecycle
+Identities or silently rewrite historical lifecycle topology.
+
+### A-20 — Explicit correction outcome
+
+An identity correction must deterministically preserve the historical identity,
+establish a new identity, or fail closed as unresolved. A vague future mapping
+cannot select implicitly among those outcomes.
+
+### A-21 — Digest is not identity
+
+The integrity digest protects the canonical representation after semantic
+identity has been defined. It cannot define semantic identity or participate in
+a circular identity/digest dependency.
+
+### A-22 — Semantic replay chain
+
+Equivalent authoritative inputs must produce equivalent semantic identity
+values before canonical representation and digest construction. Serialization
+or digest differences must not create semantic identity differences.
+
 ## 16. Dependency Graph
 
 Base identity path:
@@ -937,6 +1099,21 @@ CPA MUST NOT create, split, merge, or redefine lifecycle identity.
 AEA MUST NOT redefine lifecycle identity or lineage.
 No downstream component may feed identity authority backward.
 ```
+
+Semantic identity and integrity dependency:
+
+```text
+Semantic Identity Definition
+        ↓
+Semantic Identity Value
+        ↓
+Canonical Representation
+        ↓
+Integrity Digest
+```
+
+The digest protects the canonical representation and cannot define the
+semantic identity or feed back into its definition.
 
 Authority B remains a parallel downstream authority for T07 result lineage:
 
@@ -1007,7 +1184,11 @@ This specification must allow a later architect to independently determine:
 - whether conflicts fail closed;
 - whether CPA and T07 remain consumers rather than authorities;
 - whether replay produces identical identities; and
-- whether provenance can be independently verified.
+- whether provenance can be independently verified;
+- whether semantic identity is separated from serialization governance;
+- whether identity corrections have deterministic outcomes;
+- whether equivalence avoids retroactive lifecycle merges; and
+- whether the identity-to-representation-to-digest chain is non-circular.
 
 The formal audit must verify the requirements of this document against the
 approved P08-T07 Canonical Result Authority Extension specification.
