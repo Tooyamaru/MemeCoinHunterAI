@@ -57,6 +57,17 @@ digests, returns explicit `VALID`, `NOT_REALIZED`, or `INVALID_INPUT` results,
 and does not recompute accounting or classification. No provider, external I/O,
 persistence, wallet, signing, execution, or P09 behavior was introduced.
 
+Authority A is recorded as **SPECIFICATION COMPLETE / CLOSED / AUDITED PASS;
+IMPLEMENTATION NOT AUTHORIZED**. Its standalone specification audit is recorded
+in `docs/P08-AUTHORITY-A-SPECIFICATION-AUDIT.md`. Authority A remains
+specification-level only and owns canonical economic subject identity, lifecycle
+identity, lifecycle mapping, equivalence, split, and related identity facts
+within its documented boundary.
+
+Authority B remains **SPECIFICATION-LEVEL BLOCKED**. This governance closure
+does not authorize Authority A or Authority B implementation, does not change
+the closed P08-T07 status, and does not start P09.
+
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and
 compares only explicitly supplied immutable P07-T04 ledger entries with one

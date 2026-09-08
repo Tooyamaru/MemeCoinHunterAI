@@ -1,6 +1,6 @@
 # P08 — Canonical Economic Subject / Lifecycle Identity Authority
 
-**Status:** SPECIFICATION DRAFT — IMPLEMENTATION NOT AUTHORIZED  
+**Status:** SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED
 **Authority:** Authority A — Canonical Economic Subject / Lifecycle Identity Authority  
 **Phase:** P08 — Outcome Learning  
 **Scope:** Upstream semantic subject and lifecycle identity governance
@@ -1197,10 +1197,11 @@ approved P08-T07 Canonical Result Authority Extension specification.
 
 ### Specification status
 
-**SPECIFICATION DRAFT — IMPLEMENTATION NOT AUTHORIZED**
+**SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED**
 
-This document defines the proposed Authority A semantic governance contract.
-It does not claim PASS or implementation readiness.
+This document defines the closed Authority A semantic governance contract at
+specification level. It does not authorize implementation readiness or runtime
+behavior.
 
 ### Implementation status
 
@@ -1211,6 +1212,11 @@ Authority B, CPA, AEA, Snapshot, and P08-T08 are not started.
 
 ### Exact next action
 
-**FORMAL AUDIT REQUIRED**
+**GOVERNANCE CLOSED — NO IMPLEMENTATION AUTHORIZED**
 
-P08 CANONICAL ECONOMIC SUBJECT / LIFECYCLE IDENTITY AUTHORITY SPECIFICATION DRAFT COMPLETE — FORMAL AUDIT REQUIRED — IMPLEMENTATION NOT AUTHORIZED
+Authority A governance is closed at specification level. Any future
+representation-level work requires a separate specification and explicit
+implementation authorization.
+
+P08 CANONICAL ECONOMIC SUBJECT / LIFECYCLE IDENTITY AUTHORITY
+SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED
