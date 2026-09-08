@@ -1,66 +1,64 @@
 # P08-T07 — Economic Outcome Interpretation Boundary
 
-**Status:** FINAL CANDIDATE SPECIFICATION / IMPLEMENTATION NOT AUTHORIZED
+**Status:** IMPLEMENTED / VALIDATED
 **Phase:** P08 — Outcome Learning
 **Task:** P08-T07 — Economic Outcome Interpretation
-**Conceptual contract:** `EconomicOutcomeInterpretation`
-**Conceptual evaluator:** `EconomicOutcomeInterpretationEvaluator`
-**Contract version:** GOVERNANCE PARAMETER REQUIRED
-**Evaluator version:** GOVERNANCE PARAMETER REQUIRED
+**Input contract:** `EconomicOutcomeInterpretationInput`
+**Output contract:** `EconomicOutcomeInterpretationResult`
+**Evaluator:** `EconomicOutcomeInterpretationEvaluator`
+**Contract version:** `p08-t07-v1`
+**Evaluator version:** `p08-t07-evaluator-v1`
 **Nature:** Immutable, deterministic, provider-neutral, read-only economic
 interpretation boundary
 
-This document is an architecture/specification candidate. It defines the
-locked boundary and the remaining governance parameters required before
-implementation. It does not authorize runtime code, tests, economic evidence
-collection, external access, execution, model learning, or P09 behavior.
+This document records the approved G1–G6 boundary and its validated runtime
+implementation. It does not authorize economic evidence collection, external
+access, execution, model learning, or P09 behavior.
 
 ## 1. Purpose and Scope
 
-P08-T07 owns interpretation of the economic outcome for one validated decision
-or trade lifecycle, using:
+P08-T07 assembles the economic outcome interpretation for one validated
+decision or trade lifecycle, using:
 
 1. the complete validated upstream P06 → P07 → P08-T06 chain; and
-2. a separately supplied `EconomicEvidencePacket` containing explicitly
-   governed and admissible economic evidence.
+2. validated/materialized G2, G3, and G4 results with their required
+   provenance and digest references.
 
-T07 does not create economic truth. Economic truth must come from the
-explicitly governed economic evidence authority. T07 interprets that evidence
-through deterministic, versioned calculation and classification rules.
+T07 does not create economic truth and does not independently interpret raw
+economic evidence. G2, G3, and G4 remain the authoritative upstream boundaries.
 
 T07 owns:
 
-- economic outcome interpretation;
-- realized P&L interpretation when admissible; and
-- approved economic outcome classification.
+- deterministic economic outcome interpretation; and
+- deterministic assembly of the authoritative G2, G3, and G4 results.
 
 T07 is per decision/trade lifecycle. It is not a portfolio, strategy, model,
 or performance-learning boundary.
 
-This specification does not authorize implementation. The exact public field
-names, contract versions, evaluator versions, numeric parameters, and failure
-codes remain subject to the governance parameters in Section 18.
+The exact public field names, versions, status vocabulary, canonicalization,
+digest coverage, and failure semantics are locked by the G1–G6 governance
+contract and implemented in the dedicated P08-T07 module.
 
 ## 2. Locked Ownership and Non-Overlap
 
 ### 2.1 Locked T07 ownership
 
-P08-T07 owns the interpretation of economic facts for one decision/trade
-lifecycle. Its core economic result is realized P&L when all admissibility,
-settlement, horizon, accounting, quantity, unit, and calculation requirements
-are satisfied.
+P08-T07 owns the interpretation and assembly boundary for one decision/trade
+lifecycle. Its economic result and classification are supplied by authoritative
+G3 and G4 results after G2 establishes realization eligibility.
 
-`WIN` and `LOSS` are approved target classification concepts owned by T07.
-They are not primitive economic truth. The required flow is:
+`WIN`, `LOSS`, and `BREAKEVEN` are supplied by authoritative G4. The required
+flow is:
 
 ```text
-economic facts
-→ deterministic calculation
-→ approved classification
+validated G2 result
+→ validated G3 result
+→ validated G4 result
+→ T07 interpretation / assembly
 ```
 
-T07 must not reduce this flow to an implicit `P&L > 0` rule unless the
-classification contract explicitly defines that rule.
+T07 must not recompute accounting or classification, apply thresholds, round
+economic values, or create an alternative classification path.
 
 ### 2.2 Explicit non-ownership
 
@@ -113,62 +111,51 @@ It must never be interpreted by itself as settlement, profit, loss, `WIN`, or
 finalization may be preserved as upstream context, but it does not satisfy the
 economic evidence requirement.
 
-## 3. Economic Evidence Boundary
+## 3. Materialized Economic Result Boundary
 
 ### 3.1 Conceptual input
 
-The conceptual economic input is:
+The exact public input is:
 
 ```text
-EconomicEvidencePacket
+EconomicOutcomeInterpretationInput
 ```
 
-The packet is supplied to T07. T07 does not collect, fetch, reconstruct,
-repair, enrich, or substitute it.
+The input contains the validated upstream identity chain, materialized G2/G3/G4
+references and results, evidence/provenance references, canonical timestamps,
+and immutable correction/supersession lineage.
 
-The packet must conceptually preserve, as applicable to its event types:
+An `EconomicEvidencePacket`, if introduced by an upstream authority, is not a
+raw evaluator input for T07. T07 may preserve only its governed references,
+identities, digests, authorities, sources, and lineage through the input.
 
-- evidence identity;
-- outcome or trade-subject identity;
-- authority and authority identity;
-- source identity;
-- source version;
-- event or observation timestamp;
-- economic event type;
-- quantity or value;
-- price where applicable;
-- currency or numeraire where applicable;
-- cost or fee information where applicable;
-- settlement state where applicable;
-- complete provenance;
-- integrity or digest; and
-- canonical representation.
+T07 does not collect, fetch, reconstruct, repair, enrich, or substitute raw
+economic evidence.
 
-Not every field is mandatory for every economic event type. The event-type
-contract determines which fields are required, prohibited, or optional.
+The required input groups are:
 
-### 3.2 Evidence authority
+- P06 DecisionIntent and P08-T01 through P08-T06 identity references;
+- G2 result identity, state, policy version, digest, and provenance;
+- G3 result identity, validity, canonical economic result, numeraire, policy
+  version, digest, and provenance;
+- G4 result identity, validity, classification, policy version, digest, and
+  provenance; and
+- evidence, authority, source, timestamp, correction, and supersession
+  references.
 
-Every evidence item admitted into T07 must have:
+### 3.2 Upstream evidence authority
 
-- an explicitly governed authority;
-- a stable identity;
-- a source identity and source version;
-- a timestamp with an identified timestamp authority;
-- provenance linking it to the lifecycle or event subject;
-- an integrity value or deterministic digest;
-- canonical representation;
-- explicit admissibility rules; and
-- deterministic replay semantics.
+Evidence admissibility and economic authority remain upstream governance
+responsibilities. T07 consumes only the resulting validated G2/G3/G4 outputs
+and their references.
 
-The exact economic evidence source, settlement authority, authority identity,
-source version, and admissibility rules are:
+The provider and economic evidence source are:
 
 ```text
-GOVERNANCE PARAMETER REQUIRED
+NONE
 ```
 
-No specific provider is selected by this specification.
+No provider, wallet, RPC, network, or external authority is accessed by T07.
 
 ### 3.3 No evidence collection
 
@@ -429,9 +416,10 @@ Realized P&L requires all of the following:
 Open, incomplete, unavailable, or non-final positions cannot produce realized
 P&L.
 
-### 7.3 Calculation parameters
+### 7.3 Upstream accounting parameters
 
-The following are required versioned contract parameters:
+The following parameters belong to the authoritative G3 accounting boundary
+and are supplied to T07 through the materialized G3 result:
 
 | Dimension | Required semantic decision |
 |---|---|
@@ -452,13 +440,9 @@ The following are required versioned contract parameters:
 | Missing evidence | Explicit non-final/failure behavior. |
 | Settlement semantics | Authority and state required to call an outcome realized. |
 
-Every row remains:
-
-```text
-GOVERNANCE PARAMETER REQUIRED
-```
-
-No implicit implementation default is permitted.
+T07 preserves the supplied G3 policy version and result digest. It does not
+select accounting bases, calculate fees, normalize quantities, apply
+conversions, round values, or resolve contradictory economic evidence.
 
 ## 8. Valuation Boundary (Optional / Separately Authorized)
 
@@ -489,39 +473,45 @@ GOVERNANCE PARAMETER REQUIRED
 
 ## 9. Economic Classification
 
-### 9.1 Classification flow
+### 9.1 Classification ownership
 
-Classification is applied only after admissible economic facts and
-deterministic calculation:
+Classification is authoritative in G4 and is consumed by T07 after G2/G3
+validation:
 
 ```text
-economic facts
-→ deterministic calculation
-→ approved classification
+G2 realization eligibility
+→ G3 economic accounting
+→ G4 performance classification
+→ T07 interpretation / assembly
 ```
 
 Paper result status, paper reconciliation status, P07-T06 finalization, and
 P08-T06 readiness must not directly produce `WIN` or `LOSS`.
 
-### 9.2 Conceptual taxonomy
+### 9.2 Canonical taxonomy
 
-The conceptual T07 outcome/classification taxonomy is:
+The canonical T07 status and classification vocabularies are:
 
 ```text
+VALID
+NOT_REALIZED
+INVALID_INPUT
 WIN
 LOSS
 BREAKEVEN
-NON_FINAL
-INVALID
 ```
 
-`UNKNOWN`, `UNAVAILABLE`, `INCOMPLETE`, and `CONTRADICTORY` are evidence or
-failure states unless a later approved contract explicitly assigns another
-meaning. They must not be silently converted into `WIN` or `LOSS`.
+`NON_FINAL`, `SETTLEMENT_PENDING`, and
+`SETTLED_BUT_NOT_REALIZED_ELIGIBLE` are non-realized G2 states. They result in
+`NOT_REALIZED`, never in an economic classification.
+
+`UNKNOWN`, `UNAVAILABLE`, `INCOMPLETE`, and `CONTRADICTORY` remain upstream
+evidence or failure conditions. They must not be converted into `WIN`, `LOSS`,
+or `BREAKEVEN`.
 
 ### 9.3 Classification requirements
 
-The classification contract must define:
+The authoritative G4 contract defines:
 
 - exact vocabulary;
 - deterministic rule;
@@ -535,31 +525,21 @@ The classification contract must define:
 - lifecycle cardinality; and
 - behavior for non-final and invalid inputs.
 
-`WIN` / `LOSS` ownership is locked to T07. Any exact numeric threshold, tie
-rule, or breakeven parameter that is not authoritative must be marked:
-
-```text
-GOVERNANCE PARAMETER REQUIRED
-```
-
-T07 must not assume that positive realized P&L means `WIN` or negative
-realized P&L means `LOSS` unless the approved classification contract
-explicitly states that rule.
+`WIN`, `LOSS`, and `BREAKEVEN` are preserved exactly from G4. T07 does not
+assume a positive or negative economic result implies any classification and
+does not apply a threshold or tie rule.
 
 ## 10. Input Contract
 
-### 10.1 Conceptual public inputs
+### 10.1 Exact public input
 
-The conceptual evaluator input is:
+The evaluator input is:
 
 ```text
-EconomicOutcomeInterpretationEvaluator(
-    validated_upstream_chain,
-    economic_evidence_packet,
-)
+EconomicOutcomeInterpretationInput
 ```
 
-The input model has two distinct parts:
+The input model contains:
 
 **A. Validated upstream P08 chain**
 
@@ -569,14 +549,15 @@ The input model has two distinct parts:
 - the P08-T01 observation identity; and
 - preserved P06/P07 provenance.
 
-**B. Separately governed economic evidence**
+**B. Materialized G2/G3/G4 results and references**
 
-- one `EconomicEvidencePacket` for the decision/trade lifecycle;
-- packet identity and canonical representation;
-- packet source and authority;
-- packet event identities and timestamps;
-- packet versions and digests; and
-- packet admissibility state.
+- G2 realization state, policy version, result digest, and provenance;
+- G3 validity, canonical economic result, numeraire, policy version, result
+  digest, and provenance;
+- G4 validity, canonical classification, policy version, result digest, and
+  provenance; and
+- evidence, authority, source, timestamp, correction, and supersession
+  references.
 
 T07 must not treat the T06 readiness state as economic evidence.
 
@@ -589,65 +570,61 @@ Before producing a normal interpretation, the evaluator must validate:
 - upstream P06/P07/P08 linkage;
 - P08-T06 source identity and digest;
 - lifecycle identity;
-- economic packet identity and digest;
-- event-type semantics;
-- event ordering;
+- materialized G2/G3/G4 identity and digest;
 - timestamp authority and UTC normalization;
-- quantity and value validity;
-- currency/numeraire validity;
-- settlement or valuation authority;
-- calculation parameters;
-- classification parameters; and
+- canonical decimal representation inherited from G3;
+- classification validity supplied by G4; and
 - canonical representation.
 
-No missing upstream value may be reconstructed from an identifier. No
-economic packet may be fetched, repaired, or substituted.
+No missing upstream value may be reconstructed from an identifier. No raw
+economic evidence may be fetched, repaired, or substituted.
 
 ## 11. Output Contract
 
-### 11.1 Conceptual output
+### 11.1 Exact public output
 
-The conceptual public output is:
-
-```text
-EconomicOutcomeInterpretation
-```
-
-It must conceptually contain:
-
-- output identity;
-- outcome unit identity;
-- complete provenance;
-- source and evidence identities;
-- contract version;
-- evaluator version;
-- relevant timestamps;
-- evidence/admissibility state;
-- outcome type;
-- economic result when admissible;
-- realized P&L when applicable;
-- classification when applicable;
-- non-final/failure state when applicable;
-- canonical digest;
-- recursive immutability semantics; and
-- explicit authority effect: `NONE`.
-
-### 11.2 Outcome types
-
-The output must distinguish, at minimum, the following conceptual cases:
-
-- `REALIZED` — settled/realized outcome with admissible realized P&L where
-  required;
-- `VALUATION` — valuation outcome only if separately authorized;
-- `NON_FINAL` — required endpoint/horizon or required evidence is not
-  satisfied;
-- `INVALID` — input or evidence violates the contract.
-
-The exact public enum and additional evidence/failure states are:
+The public output is:
 
 ```text
-GOVERNANCE PARAMETER REQUIRED
+EconomicOutcomeInterpretationResult
 ```
+
+The result contains the exact canonical fields:
+
+- `contract_version`;
+- `evaluator_version`;
+- `decision_intent_id`;
+- `lifecycle_id`;
+- `status`;
+- `failure_reason`;
+- `realization_eligibility`;
+- `realized_economic_result`;
+- `canonical_numeraire`;
+- `performance_classification`;
+- G2/G3/G4 result identities, policy versions, and result digests;
+- `evidence_digest`;
+- `provenance`;
+- `correction_lineage`;
+- `supersession_lineage`;
+- `result_digest`; and
+- `classification_digest`.
+
+All fields remain present in canonical representation. Semantic absence is
+represented by `null`.
+
+### 11.2 Result states
+
+The exact primary status vocabulary is:
+
+```text
+VALID
+NOT_REALIZED
+INVALID_INPUT
+```
+
+`VALID` contains the canonical G3 economic result and canonical G4
+classification. `NOT_REALIZED` contains neither. `INVALID_INPUT` contains
+neither and preserves one bounded machine-readable failure reason.
 
 ### 11.3 Excluded output
 
@@ -757,12 +734,11 @@ The contract must specify canonicalization for:
 - digest coverage; and
 - version inclusion.
 
-The exact representation, digest algorithm, field ordering, and numeric
-parameters are:
-
-```text
-GOVERNANCE PARAMETER REQUIRED
-```
+The implementation uses deterministic JSON with sorted keys, explicit nulls,
+enum string values, UTC timestamps, UTF-8 encoding, and SHA-256. Economic
+values use the deterministic decimal/scaled-decimal representation inherited
+from G3. Negative zero canonicalizes to zero; binary floating point, NaN,
+infinity, overflow, underflow, and precision loss are invalid.
 
 No language-specific object ordering or implementation-specific numeric
 serialization may determine the result.
@@ -772,21 +748,18 @@ serialization may determine the result.
 ### 14.1 Failure/non-final distinction
 
 Economic classification must remain separate from failure and non-final states.
-At minimum, the conceptual failure/non-final set distinguishes:
+The exact primary status and failure distinction is:
 
 ```text
-INVALID
-INCOMPLETE
-UNAVAILABLE
-CONTRADICTORY
-NOT_FINAL
+VALID
+NOT_REALIZED
+INVALID_INPUT
 ```
 
 No failure or non-final state may be converted into `WIN` or `LOSS`.
 
 `UNKNOWN`, `UNAVAILABLE`, and `INCOMPLETE` from upstream P08 evidence remain
-evidence states unless the T07 contract explicitly defines their relationship
-to a non-final output. They are not economic classifications by default.
+evidence states. They are not economic classifications.
 
 ### 14.2 Fail-closed conditions
 
@@ -826,12 +799,11 @@ T07 must not:
 - upgrade a non-final input to `WIN` or `LOSS`; or
 - substitute paper simulation for economic evidence.
 
-The exact failure code vocabulary, whether invalid input produces no object or
-an explicit rejection record, and reason-code ordering are:
-
-```text
-GOVERNANCE PARAMETER REQUIRED
-```
+Invalid input produces an explicit result object. The bounded failure reasons
+are `MISSING_REQUIRED_INPUT`, `INVALID_G2`, `INVALID_G3`, `INVALID_G4`,
+`PROVENANCE_LINKAGE_FAILURE`, `DIGEST_FAILURE`, `CONFLICTING_INPUT`,
+`UNSUPPORTED_VERSION`, `UNRESOLVED_CORRECTION`, `UNRESOLVED_SUPERSESSION`,
+`UNRESOLVED_RESIDUAL`, and `NUMERIC_INVALID`.
 
 ## 15. Authority/Security Boundary
 
@@ -906,141 +878,74 @@ boundary.
 
 ### 17.1 Conceptual names
 
-The conceptual public contract is:
+The public input contract is:
 
 ```text
-EconomicOutcomeInterpretation
+EconomicOutcomeInterpretationInput
 ```
 
-The conceptual evaluator is:
+The public output contract is:
+
+```text
+EconomicOutcomeInterpretationResult
+```
+
+The evaluator is:
 
 ```text
 EconomicOutcomeInterpretationEvaluator
 ```
 
-The contract owns the semantic output identity, provenance, outcome types,
-realized P&L applicability, classification applicability, non-final/failure
-states, immutability, and digest requirements.
-
-The evaluator owns deterministic validation and interpretation of the explicit
-validated inputs. It must not collect evidence or create authority.
+The contract owns the semantic output identity, provenance, status, immutable
+representation, and digest requirements. The evaluator assembles only explicit
+validated inputs and does not collect evidence or create authority.
 
 ### 17.2 Version requirements
 
-The contract version and evaluator version must be explicit, supported, and
-included in the canonical identity/digest coverage according to the approved
-versioning rule.
-
-The version contract must define:
-
-- supported predecessor versions;
-- supported economic packet versions;
-- calculation parameter versions;
-- classification rule versions;
-- compatibility and rejection rules;
-- digest inclusion;
-- replay behavior across versions; and
-- supersession behavior.
-
-Exact version strings and compatibility rules are:
+The exact supported versions are:
 
 ```text
-GOVERNANCE PARAMETER REQUIRED
+contract_version = "p08-t07-v1"
+evaluator_version = "p08-t07-evaluator-v1"
 ```
 
-No implementation may invent a version or silently accept an unsupported
-version.
+Unsupported versions fail closed with `INVALID_INPUT` and
+`UNSUPPORTED_VERSION`. G2/G3/G4 policy versions remain supplied by their
+respective authoritative results.
 
-## 18. Remaining Governance Parameters
+## 18. Approved Runtime Contract
 
-The following are the remaining blocking parameters. They must be resolved
-before implementation authorization:
+The approved runtime contract is immutable, deterministic, provider-neutral,
+read-only, and has no external I/O or persistence.
 
-1. Economic evidence packet authority, source type, source identity, and
-   settlement authority.
-2. `EconomicEvidencePacket` field-level schema, event-specific required fields,
-   and admissibility rules.
-3. Outcome/trade lifecycle identity and exact provenance linkage.
-4. Reference time, start time, endpoint, endpoint semantics, timestamp
-   authority, UTC normalization, inclusion/exclusion, and replay rules.
-5. Late, corrected, superseded, stale, and conflicting evidence behavior.
-6. Accounting basis, quantity basis, price basis, and cost basis.
-7. Fee/friction inclusion and evidence for spread, slippage, price impact,
-   priority fees, MEV, latency, and infrastructure cost.
-8. Currency/numeraire, conversion source, conversion semantics, precision,
-   scale, overflow, sign convention, and rounding.
-9. Realized P&L formula and zero/undefined denominator behavior.
-10. Valuation authorization, valuation source, valuation timestamp/horizon, and
-    distinct valuation output semantics.
-11. `WIN`, `LOSS`, and `BREAKEVEN` threshold, tie rule, classification formula,
-    classification version, and digest.
-12. Exact `NON_FINAL`, `INVALID`, `INCOMPLETE`, `UNAVAILABLE`, and
-    `CONTRADICTORY` output/failure vocabulary.
-13. Partial-fill aggregation and open/incomplete-position behavior.
-14. Exact public field names, output cardinality, identity derivation, and
-    immutable representation.
-15. Canonical decimal, timestamp, enum, collection, duplicate, negative-zero,
-    NaN/infinity, overflow, digest, and version serialization.
-16. Digest algorithm and complete digest coverage.
-17. Whether any additional economic result type is authorized beyond realized
-    outcome and the separately authorized valuation type.
-18. Explicit exclusion of ROI, strategy attribution, portfolio performance,
-    ranking, expectancy, drawdown, walk-forward analysis, confidence
-    intervals, and drift analysis from core T07.
-19. Exact implementation authorization and independent architecture-gate
-    decision.
+P08-T07 consumes validated/materialized G2, G3, and G4 results. It does not
+recompute realization eligibility, economic accounting, or classification.
 
-Each item is a governance parameter, not an implementation default.
+One lifecycle produces at most one primary T07 result. Corrections and
+supersessions create new results with preserved predecessor lineage; historical
+results are never mutated.
 
-## 19. Implementation Authorization Gate
+## 19. Implementation Authorization and Validation
 
-Runtime implementation remains prohibited until all of the following are
-complete:
+The G1–G6 governance chain and final implementation authorization approve the
+runtime boundary. The implementation is limited to:
 
-1. The architecture gate approves this ownership and non-overlap boundary.
-2. The economic evidence authority and `EconomicEvidencePacket` semantics are
-   approved.
-3. The event model and lifecycle identity/linkage are approved.
-4. The realized outcome horizon and settlement endpoint are approved.
-5. Any valuation output is separately approved or explicitly excluded.
-6. Accounting, quantity, price, cost, fee/friction, numeraire, conversion,
-   precision, rounding, and sign semantics are approved.
-7. Classification vocabulary, thresholds, tie rules, versions, and digests are
-   approved.
-8. Non-final/failure vocabulary and fail-closed behavior are approved.
-9. Input and output contracts, cardinality, provenance, and identities are
-   approved.
-10. Canonicalization and digest coverage are approved.
-11. Provider neutrality and no-evidence-collection boundaries are preserved.
-12. P07, P08-T01 through T06, model/strategy, and P09 ownership boundaries are
-    preserved.
-13. A separate implementation authorization is recorded.
-14. Runtime tests and regression requirements are specified only after the
-    contract is approved.
+```text
+core/learning/economic_outcome_interpretation.py
+tests/test_economic_outcome_interpretation.py
+```
 
-This document does not grant implementation authorization.
+The implementation is validated by focused T07 tests and the full project
+test suite. P07 and P08-T01 through P08-T06 remain unchanged.
 
-## 20. Architecture Candidate Conclusion
+## 20. Implemented Boundary Conclusion
 
-P08-T07 is now specified as the **Economic Outcome Interpretation Boundary**
-with locked ownership for:
+P08-T07 is implemented as the **Economic Outcome Interpretation Boundary**.
+It consumes a validated upstream chain and materialized G2/G3/G4 results,
+preserves authoritative provenance and digests, and produces one deterministic
+`EconomicOutcomeInterpretationResult` per lifecycle at most.
 
-- economic outcome interpretation;
-- realized P&L when admissible; and
-- approved economic outcome classification.
+It provides no strategy, portfolio, model, capital, custody, provider,
+execution, persistence, or P09 authority.
 
-The candidate contract consumes a validated upstream P08 chain plus a supplied
-provider-neutral `EconomicEvidencePacket`. It uses a distinct event model for
-observation, execution/fill, economic cost, settlement, and valuation. Its
-primary unit is one decision/trade lifecycle. Realized outcomes require
-settlement/realization and a satisfied endpoint; valuation remains distinct
-and optional. `WIN` / `LOSS` are derived classifications, never primitive
-truth. T07 produces no strategy, portfolio, model, capital, or execution
-authority.
-
-The remaining accounting, horizon, evidence, classification, failure,
-canonicalization, versioning, and output parameters remain explicitly marked
-as `GOVERNANCE PARAMETER REQUIRED`. No runtime behavior, test behavior,
-provider access, or P09 capability is authorized.
-
-**FINAL STATUS: P08-T07 FINAL CANDIDATE SPECIFICATION — READY FOR ARCHITECTURE GATE**
+**FINAL STATUS: P08-T07 IMPLEMENTED / VALIDATED**
