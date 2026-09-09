@@ -1,6 +1,6 @@
 # P08 — Authority B Specification and Audit
 
-**Status:** FINAL FORMAL CLOSURE AUDIT COMPLETE — SPECIFICATION-LEVEL BLOCKED — IMPLEMENTATION NOT AUTHORIZED
+**Status:** BLOCKER RESOLUTION PASS COMPLETE — PENDING FORMAL CLOSURE AUDIT — IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning
 **Authority:** Authority B — Correction / Supersession Lineage Facts
 **Scope:** Immutable lineage-fact authority for canonical T07 result lineage
@@ -41,9 +41,9 @@ The terms below are used normatively:
 
 ### 2.1 Determination
 
-Authority B is a bounded semantic authority. The final formal closure audit
-identified remaining specification blockers. No implementation authorization is
-implied.
+Authority B is a bounded semantic authority. The final three-blocker
+resolution pass is complete, but the separate formal closure audit has not
+been performed. No implementation authorization is implied.
 
 Authority B owns:
 
@@ -247,10 +247,47 @@ successive nodes. The following cases remain distinct:
 
 The canonical representation is UTF-8 JSON with no byte-order mark, no
 whitespace outside JSON string contents, and object keys sorted by their
-Unicode code points. All strings must be Unicode NFC and must not contain
-unpaired surrogate code points; a non-NFC value is invalid rather than silently
-rewritten. Identity references, versions, and enum values are non-empty strings
-and are validated before canonicalization.
+Unicode code points. The following serialization profile is normative for every
+`LineageFact`, `LineageEdge`, identity projection, and lineage-fact-set
+snapshot:
+
+1. Every textual semantic value is normalized to Unicode NFC **before** JSON
+   escaping. No NFKC, NFD, case folding, trimming, locale transformation, or
+   other normalization is permitted. Unpaired surrogate code points are
+   invalid. A conforming implementation must therefore serialize the same NFC
+   scalar sequence for the same semantic string.
+2. A quotation mark (`U+0022`) is serialized only as `\"`, and a reverse
+   solidus (`U+005C`) is serialized only as `\\`. The solidus (`U+002F`) is
+   never escaped.
+3. Control characters `U+0000` through `U+001F` use the only permitted
+   short escapes: `\b`, `\t`, `\n`, `\f`, and `\r` for their five named
+   characters. Every other control character uses `\u00xx` with lowercase
+   hexadecimal digits. No other `\u` escape is permitted.
+4. Non-ASCII Unicode scalar values, including `U+2028` and `U+2029`, are
+   emitted directly as UTF-8 and are not converted to `\u` escapes.
+5. Object keys are compared and emitted in ascending lexicographic order of
+   Unicode code-point sequences, with no locale or implementation-defined
+   collation. Arrays are never sorted; their order is semantic and is fixed by
+   the applicable contract.
+6. The only permitted separators are `,` between array/object members and `:`
+   between an object key and value. No spaces, tabs, line breaks, or other
+   insignificant bytes are emitted.
+7. Boolean values are exactly lowercase `true` and `false`; null is exactly
+   lowercase `null`. Authority B objects have no nullable or optional semantic
+   fields, so an absent key and an explicit `null` are both invalid rather than
+   equivalent. The downstream T07 output contract may use its separately
+   specified semantic `null` values.
+8. Authority B defines no numeric semantic fields. Any numeric JSON token,
+   including integer, decimal, exponent, negative zero, NaN, or infinity, is
+   invalid in a fact, edge, identity projection, or snapshot.
+9. The resulting JSON text is encoded as UTF-8 without a byte-order mark. The
+   exact UTF-8 bytes, not a language-native object or string representation,
+   are the digest input.
+
+Identity references, versions, and enum values are non-empty strings and are
+validated before normalization and canonical serialization. Implementations
+must not preserve alternate escaped/unescaped forms for the same semantic
+string.
 
 The representation has:
 
@@ -378,15 +415,66 @@ fallback.
 
 ### 5.6 Duplicate, conflict, and failure semantics
 
-An exact duplicate is a second input whose identity matches an existing fact
-and whose complete canonical `LineageFact` representation is byte-identical.
-It is idempotently accepted as the already-established fact and creates no
-new edge.
+Duplicate classification requires an explicit immutable
+**Authoritative Lineage Fact Set Snapshot** supplied as an input to the
+validation decision. It is a value snapshot, not a mutable registry and not an
+ambient database authority.
 
-A conflicting duplicate is any second input with the same
-`lineage_fact_identity` but a different canonical representation, including a
-difference in provenance-only or authority metadata. It produces
-`CONFLICTING_DUPLICATE`, fails closed, and never uses last-write-wins.
+The snapshot has exactly these semantic components:
+
+- `snapshot_contract_version`, fixed to
+  `p08-authority-b-lineage-snapshot-v1`;
+- one `lifecycle_identity`, establishing the snapshot's lifecycle scope;
+- `members`, the complete set of already-established immutable
+  `LineageFact` canonical representations for that lifecycle, with each
+  member's `lineage_fact_identity` and complete canonical bytes; and
+- `snapshot_identity` and `snapshot_digest`, derived as specified below and
+  excluded from every member fact's identity.
+
+The snapshot is authoritative only because it is explicitly supplied by the
+Authority B validation boundary as an already-established set of immutable
+facts. Authority B does not discover it from a database, filesystem, provider,
+network, process memory, or insertion order. A snapshot with a missing member,
+duplicate member identity, invalid member digest, mixed lifecycle scope,
+non-canonical member, or non-canonical ordering fails closed.
+
+Snapshot members are serialized as an array sorted lexicographically by the
+ASCII `lineage_fact_identity` value. The snapshot identity projection contains
+only `snapshot_contract_version`, `lifecycle_identity`, and the canonically
+ordered `members`; it excludes both `snapshot_identity` and `snapshot_digest`.
+The snapshot identity is:
+
+```text
+SHA-256(UTF-8("p08-authority-b:snapshot:v1\0" + canonical_snapshot_identity_projection))
+```
+
+The snapshot digest is the SHA-256 digest of the complete canonical snapshot
+representation with only `snapshot_digest` omitted; this representation
+includes the already-derived `snapshot_identity` and therefore is not
+self-referential. Snapshot identity and snapshot digest are validation-context
+values only; neither participates in `LineageFactIdentity`,
+`LineageEdgeIdentity`, or any fact/edge semantic field.
+
+For a candidate fact, Authority B first computes its identity from Section 5.5,
+without reading the snapshot. It then searches the explicit snapshot for that
+identity:
+
+- no matching member means the candidate is not a duplicate;
+- one matching member with byte-identical complete canonical `LineageFact`
+  representation is `EXACT_DUPLICATE`, idempotently accepted, and reuses the
+  already-established edge projection without creating a new edge; and
+- one matching member with any byte difference, including provenance-only or
+  authority metadata, is `CONFLICTING_DUPLICATE`, fails closed, and never uses
+  last-write-wins.
+
+More than one matching member or any disagreement between a member identity,
+canonical bytes, and digest is a snapshot determinism or digest failure. It
+must not be resolved by selecting one member.
+
+The existence of a duplicate is contextual validation. It never changes the
+candidate's semantic identity, and the snapshot is never an identity input.
+The same valid `LineageFact` therefore has the same identity against every
+valid snapshot; only duplicate/conflict status may differ.
 
 The normative failure categories are:
 
@@ -413,33 +501,106 @@ preference.
 
 ### 5.7 Exact T07 adapter mapping
 
-For one valid Authority B fact, B supplies exactly one edge projection to T07
-containing the fact identity, edge identity, contract version, policy version,
-lifecycle identity, predecessor identity, successor identity, lineage type,
-authority identity, provenance, canonical edge representation, and edge
-digest. `EXACT_DUPLICATE` reuses the already-established same projection and
-does not create another edge.
+For one valid Authority B fact, B supplies exactly one canonical `LineageEdge`
+member to the T07 lineage destination field selected by `lineage_type`:
 
-The mapping is one-to-one and representational only: no semantic field is
-renamed into a different meaning, and no economic value is created. T07
-consumes the projection and independently validates identity, lifecycle
-membership, endpoint existence, provenance, digest, graph invariants, and
-failure state. T07 retains sole authority to select the canonical head.
+| Authority B relation | Exact T07 destination field | Cardinality and representation |
+|---|---|---|
+| `correction` | `EconomicOutcomeInterpretationInput.correction_lineage` and the corresponding `EconomicOutcomeInterpretationResult.correction_lineage` | One canonical `LineageEdge` member per valid correction fact, retained in the existing T07 lineage collection representation. |
+| `supersession` | `EconomicOutcomeInterpretationInput.supersession_lineage` and the corresponding `EconomicOutcomeInterpretationResult.supersession_lineage` | One canonical `LineageEdge` member per valid supersession fact, retained in the existing T07 lineage collection representation. |
 
-Any Authority B failure maps to T07's existing primary `INVALID_INPUT` result.
-The secondary failure reason is deterministic:
+The adapter field mapping is:
 
-- `MALFORMED_FACT`, `INVALID_IDENTITY`, `INVALID_LIFECYCLE`,
-  `MISSING_ENDPOINT`, `CROSS_LIFECYCLE_REFERENCE` →
-  `MISSING_REQUIRED_INPUT`;
-- `CONFLICTING_DUPLICATE`, `LINEAGE_SELF_REFERENCE`, `LINEAGE_CYCLE`,
-  `MERGE_UNSUPPORTED`, `LINEAGE_BRANCH_CONFLICT`, and
-  `CONTRADICTORY_LINEAGE` → `CONFLICTING_INPUT`;
-- `PROVENANCE_FAILURE` → `PROVENANCE_LINKAGE_FAILURE`; and
-- `DETERMINISM_FAILURE` or `DIGEST_FAILURE` → `UNRESOLVED_RESIDUAL`.
+| Authority B field | T07 destination | Transformation | Propagation rule |
+|---|---|---|---|
+| `contract_version` | Lineage member `contract_version` inside the selected lineage field | None; representational copy | Preserve exactly; it is not replaced by T07's `p08-t07-v1`. |
+| `lineage_policy_version` | Lineage member `lineage_policy_version` | None; representational copy | Preserve exactly. |
+| `lifecycle_identity` | T07 input/output `lifecycle_id` and the lineage member `lifecycle_identity` | Identity reference is carried without reinterpretation | Must equal the T07 lifecycle; mismatch fails closed. |
+| `predecessor_result_identity` | Lineage member `predecessor_result_identity` | None | T07 validates existence and lifecycle membership. |
+| `successor_result_identity` | Lineage member `successor_result_identity` | None | T07 validates existence and lifecycle membership. |
+| `lineage_type` | Selected `correction_lineage` or `supersession_lineage` field | Relation type selects the destination; no value conversion | `correction` can only populate `correction_lineage`; `supersession` can only populate `supersession_lineage`. |
+| `lineage_fact_identity` | Lineage member `lineage_fact_identity` | None | Preserve and independently verify; no top-level T07 identity is substituted. |
+| `lineage_edge_identity` | Lineage member `lineage_edge_identity` | None | Preserve and independently verify; no canonical-head authority is transferred. |
+| `authority_identity` | Lineage member `authority_identity` and T07 `provenance` | None | Preserve the asserting authority; T07 validates linkage. |
+| `provenance` | Lineage member `provenance` and T07 output `provenance` | None; fixed stage order remains intact | Missing, contradictory, or altered provenance fails closed. |
+| `edge_digest` | Lineage member `edge_digest` | None | T07 recomputes/verifies the digest over the canonical edge representation. |
+| Complete canonical `LineageEdge` representation | The selected lineage field's member representation | No semantic transformation; only transport into the existing T07 field | The canonical bytes are not replaced by a T07 result digest. |
 
-T07 does not infer a missing fact, repair an endpoint, or select a branch from
-any failure mapping.
+T07's own `contract_version`, `evaluator_version`, `status`,
+`failure_reason`, G2/G3/G4 fields, `result_digest`, and
+`classification_digest` retain their existing meanings. Authority B does not
+populate or redefine them except that an Authority B validation failure is
+represented by T07's existing `status = INVALID_INPUT` and the mapped
+`failure_reason` below. For an invalid Authority B projection, the
+corresponding T07 lineage field is semantically absent (`null` under the
+existing T07 output contract); an invalid edge is never treated as a valid
+lineage member.
+
+`EXACT_DUPLICATE` reuses the already-established same projection and does not
+create another edge or another T07 lineage member. T07 independently validates
+identity, lifecycle membership, endpoint existence, provenance, digest, graph
+invariants, and failure state. T07 retains sole authority to select the
+canonical head.
+
+Every Authority B failure maps to T07's existing primary `INVALID_INPUT`
+result. The following table is exhaustive and deterministic; entries that
+intentionally collapse several B categories are an explicit many-to-one
+mapping:
+
+| Authority B category | Existing T07 `failure_reason` | T07 treatment |
+|---|---|---|
+| `MALFORMED` / `MALFORMED_FACT` | `MISSING_REQUIRED_INPUT` | No lineage field is accepted. |
+| `INVALID_IDENTITY` | `MISSING_REQUIRED_INPUT` | No lineage field is accepted. |
+| `INVALID_LIFECYCLE` | `CONFLICTING_INPUT` | The supplied lifecycle claim conflicts with the established lifecycle. |
+| `MISSING_ENDPOINT` | `MISSING_REQUIRED_INPUT` | No incomplete edge is accepted. |
+| `CROSS_LIFECYCLE` / `CROSS_LIFECYCLE_REFERENCE` | `CONFLICTING_INPUT` | The edge is rejected; T07 does not repair lifecycle membership. |
+| `DUPLICATE` / `EXACT_DUPLICATE` | No failure; idempotent success | The existing projection is reused exactly once. |
+| `CONFLICTING_DUPLICATE` | `CONFLICTING_INPUT` | Same identity with different bytes fails closed. |
+| `BRANCHING` / `LINEAGE_BRANCH_CONFLICT` | `CONFLICTING_INPUT` | T07 rejects the graph and selects no branch. |
+| `CYCLE` / `LINEAGE_CYCLE` | `CONFLICTING_INPUT` | T07 rejects the graph. |
+| `SELF_REFERENCE` / `LINEAGE_SELF_REFERENCE` | `CONFLICTING_INPUT` | T07 rejects the edge. |
+| `MERGE/CONVERGENCE` / `MERGE_UNSUPPORTED` | `UNRESOLVED_RESIDUAL` | Unsupported convergence remains fail closed; no merge authority is created. |
+| `PROVENANCE_FAILURE` | `PROVENANCE_LINKAGE_FAILURE` | T07 rejects missing or contradictory provenance. |
+| `DETERMINISM_FAILURE` | `UNRESOLVED_RESIDUAL` | T07 rejects non-replayable input. |
+| `DIGEST_FAILURE` | `DIGEST_FAILURE` | T07 rejects the mismatched or non-canonical digest. |
+
+The many-to-one mappings above preserve T07's closed vocabulary without
+redesigning it. T07 does not infer a missing fact, repair an endpoint, select a
+branch, or reinterpret a failure from any mapping.
+
+### 5.8 Snapshot-independent identity and replay
+
+The following consistency rule is normative:
+
+```text
+Fact F submitted against valid snapshot S1
+Fact F submitted against valid snapshot S2
+        ↓
+Identity(F,S1) == Identity(F,S2) == Identity(F)
+```
+
+`S1` and `S2` may produce different contextual statuses, such as new fact,
+exact duplicate, or conflicting duplicate, but the fact identity, edge
+identity, and canonical fact bytes cannot change. A fact cannot become valid
+against another snapshot when its lifecycle or endpoint semantics are invalid.
+
+The required conceptual replay checks are:
+
+| Replay | Required result |
+|---|---|
+| A — same fact and same snapshot | Same identities, canonical bytes, digest, and validation outcome. |
+| B — same fact and same snapshot in a different processing order | Same result; snapshot member ordering is canonical and processing order is irrelevant. |
+| C — same fact and equivalent snapshot in a different member ordering | Same snapshot identity/digest after canonical sorting and the same fact result. |
+| D — same fact submitted twice | First submission establishes one projection; second is `EXACT_DUPLICATE` and reuses it idempotently. |
+| E — conflicting fact with the same claimed identity | `CONFLICTING_DUPLICATE` and T07 `CONFLICTING_INPUT`; no last-write-wins. |
+| F — same fact against a different valid snapshot | Same semantic identities; only contextual duplicate/conflict status may differ. |
+
+Cross-lifecycle behavior is also normative: a candidate whose
+`lifecycle_identity` differs from the snapshot scope or from either endpoint's
+authoritative lifecycle fails closed as `CROSS_LIFECYCLE_REFERENCE` and maps to
+T07 `CONFLICTING_INPUT`. Moving the same bytes to another snapshot cannot make
+the fact valid, and the snapshot never overrides Authority A lifecycle
+identity.
 
 ## 6. Authority B Boundary
 
@@ -925,19 +1086,20 @@ those supplied semantics; B only supplies lineage facts.
 - Exact serialized fields and semantic types for `LineageFact` and
   `LineageEdge`.
 - Exact semantic identity seeds for lineage facts and edges.
-- Exact field ordering, normalization, nullable-field policy, and digest input.
+- Exact JSON escaping, field ordering, normalization, nullable-field policy,
+  and digest input.
 - Exact current contract and policy version values.
 - Exact failure categories and first-applicable precedence.
-- Exact mapping into the closed T07 input/output contract.
-- Exact duplicate handling policy.
+- Exact mapping of every Authority B field into the closed T07 input/output
+  contract, including correction/supersession destinations and failure
+  mapping.
+- Exact duplicate handling policy and explicit fact-set snapshot context.
 - Exact timestamp and effective-time semantics.
+- Snapshot-independent identity and replay behavior.
 
 ### 14.3 Blocked
 
 - Formal Authority B closure audit findings recorded in Section 20.
-- Cross-implementation canonical JSON escaping rules.
-- Deterministic duplicate-comparison context.
-- Exact field-level adapter mapping into the existing T07 contract.
 - Implementation-ready Authority B runtime contract and implementation
   authorization.
 - Any runtime or persistence implementation of B.
@@ -974,8 +1136,9 @@ audit to extend Authority A's authority.
 
 ## 16. Audit Conclusion and Next Governance Gate
 
-The final formal Authority B closure audit is complete. Authority B remains
-**SPECIFICATION-LEVEL BLOCKED** and implementation-unauthorized.
+The three-blocker resolution pass is complete. Authority B is
+**RESOLVED / RECONCILED — PENDING FORMAL CLOSURE AUDIT** and remains
+implementation-unauthorized.
 
 The audit confirms that B owns only immutable correction/supersession lineage
 facts and their provenance, while T07 validates them and selects the canonical
@@ -991,10 +1154,11 @@ Predecessor convergence/merge remains intentionally deferred by design:
 It must not be inferred as valid, invalid, or preferentially resolved, and no
 merge implementation is authorized.
 
-Authority A compatibility, graph semantics, provenance, and the economic
-authority boundary pass. Canonical serialization, duplicate context, and the
-exact field-level T07 adapter remain blocking specification gaps as recorded in
-Section 20. No T07 redesign is authorized.
+Authority A compatibility, graph semantics, provenance, canonical serialization,
+explicit duplicate context, and the exact field-level T07 adapter are resolved
+at specification level. No T07 redesign is authorized. The separate formal
+closure audit is the next gate and may still fail closed if it identifies a
+semantic contradiction.
 
 The Authority B closure result remains separate from G1–G5 economic authority
 decisions.
@@ -1078,7 +1242,12 @@ gate is:
 
 **NEXT GATE: FORMAL AUTHORITY B SPECIFICATION CLOSURE AUDIT**
 
-## 20. Final Formal Specification Closure Audit — 2026-09-08
+## 20. Final Formal Specification Closure Audit — 2026-09-08 — Historical
+
+This section records the prior formal closure audit. It is retained for
+historical traceability and is superseded for current governance status by
+Section 21. The formal closure audit is not repeated by the current
+blocker-resolution pass.
 
 ### 20.1 Scope and documents reviewed
 
@@ -1117,7 +1286,7 @@ was made by this audit.
 | Determinism/replay | BLOCKED | Identity and graph outcomes are deterministic, but serialization escaping and duplicate comparison context prevent a complete replay guarantee. |
 | Economic authority boundary | PASS | Authority B establishes lineage only and does not establish realization, accounting, P&L, ROI, classification, custody, signing, settlement, execution, risk, or capital authorization. |
 
-### 20.3 Exact remaining blockers
+### 20.3 Exact remaining blockers — Historical finding superseded by Section 21
 
 1. **Canonical JSON escaping is not locked.** The document fixes UTF-8,
    normalization, sorted keys, and whitespace, but does not specify the exact
@@ -1159,3 +1328,55 @@ The previous blocker-resolution pass was substantively useful but did not
 resolve the three remaining semantic/contract-level gaps above. Authority B
 implementation remains unauthorized, P09 must not start, and no workaround or
 implementation placeholder is permitted.
+
+## 21. Final Three-Blocker Resolution Pass — 2026-09-09
+
+This is a specification/governance resolution record only. It does not perform
+the formal Authority B closure audit, authorize implementation, modify T07, or
+open P09. The historical findings in Section 20 remain unchanged as history;
+the normative resolutions below supersede their unresolved status for the next
+closure gate.
+
+### 21.1 Blocker resolution matrix
+
+| Blocker | Previous problem | Normative resolution | Compatibility result | Determinism result |
+|---|---|---|---|---|
+| Canonical JSON escaping | UTF-8, NFC, sorted keys, and whitespace were stated, but quote, backslash, control-character, Unicode, and alternate escape behavior were not fixed. | Section 5.3 fixes NFC-before-escaping, exact quote/backslash/control escapes, direct non-ASCII UTF-8, code-point key ordering, fixed separators, lowercase booleans/null, no numeric values, absent-vs-null rejection, and exact digest bytes. | Identity projection, fact, edge, and snapshot representations now use one shared serialization profile. | Two independent conforming implementations given the same semantic fact must produce byte-identical canonical bytes. |
+| Duplicate-comparison context | “Existing fact” was ambient and did not define an authoritative deterministic comparison set. | Section 5.6 requires an explicit immutable Authoritative Lineage Fact Set Snapshot with lifecycle scope, complete canonical members, snapshot identity/digest, canonical member ordering, and no database/registry discovery. | Exact duplicates are idempotently reused; same-identity payload differences fail closed as `CONFLICTING_DUPLICATE`; snapshot context is not identity. | Replays with equivalent snapshots and different order produce the same identities, bytes, digest, and contextual classification. |
+| Authority B → T07 field-level mapping | The projection was conceptual and did not lock correction versus supersession destinations, identity/digest/provenance propagation, or every failure mapping. | Section 5.7 maps every B field to the existing T07 lifecycle, lineage, provenance, status, and failure fields; relation type selects `correction_lineage` versus `supersession_lineage`; existing T07 many-to-one failures are explicit. | T07 remains the validator, graph-conflict detector, and canonical-head selector. No T07 field is redefined and no new failure taxonomy is introduced. | Every valid projection and every B failure has one deterministic T07 treatment; invalid edges cannot be accepted as valid lineage. |
+
+### 21.2 Required consistency checks
+
+The blocker-resolution pass records the following results without treating them
+as a closure-audit verdict:
+
+1. **Byte identity:** YES. The exact serialization profile in Section 5.3
+   removes alternate JSON byte representations.
+2. **Duplicate reproducibility:** YES. Duplicate/conflict classification uses
+   only the explicit snapshot and candidate fact, never ambient state.
+3. **T07 mapping completeness:** YES. Every Authority B output field and listed
+   failure category has an existing T07 destination or an explicit
+   many-to-one failure mapping.
+
+The mandatory identity-independence rule is:
+
+```text
+Identity(F,S1) == Identity(F,S2) == Identity(F)
+```
+
+for every valid fact `F` and valid snapshots `S1` and `S2`. Only contextual
+validation status may differ.
+
+### 21.3 Current governance result
+
+```text
+ALL THREE FINAL BLOCKERS RESOLVED — PENDING FORMAL CLOSURE AUDIT
+```
+
+Authority B remains specification-only. Implementation remains unauthorized,
+P09 remains unopened, merge/convergence remains unsupported and fail closed,
+and no runtime, persistence, API, T07 implementation, Authority A
+implementation, P06 runtime, P07, test, dependency, or source change was
+introduced.
+
+**NEXT GATE: FORMAL AUTHORITY B SPECIFICATION CLOSURE AUDIT**

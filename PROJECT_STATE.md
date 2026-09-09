@@ -10,7 +10,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current task:** P08-T07 — Economic Outcome Interpretation Boundary
 - **Current task status:** P08-T07 COMPLETE / CLOSED / AUDITED PASS
-- **Last updated:** 2026-09-08
+- **Last updated:** 2026-09-09
 
 ## Master progress
 
@@ -64,11 +64,12 @@ specification-level only and owns canonical economic subject identity, lifecycle
 identity, lifecycle mapping, equivalence, split, and related identity facts
 within its documented boundary.
 
-Authority B remains **SPECIFICATION-LEVEL BLOCKED** after the final formal
-closure audit. Remaining blockers are canonical JSON escaping, deterministic
-duplicate-comparison context, and exact field-level mapping into the existing
-T07 contract. Authority B implementation remains unauthorized. This governance
-state does not change the closed P08-T07 status and does not start P09.
+Authority B's three final specification blockers are now
+**RESOLVED / RECONCILED — PENDING FORMAL CLOSURE AUDIT**: canonical JSON
+escaping, deterministic duplicate-comparison context, and exact field-level
+mapping into the existing T07 contract. Authority B implementation remains
+unauthorized. This governance state does not change the closed P08-T07 status
+and does not start P09.
 
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and

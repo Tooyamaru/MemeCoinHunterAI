@@ -417,9 +417,12 @@ The canonicalization requirements are:
 - no dependency on language-specific object ordering.
 
 The exact field ordering, nullable-field policy, and canonical serialization
-schema for newly introduced lifecycle and lineage records are
+schema for newly introduced lifecycle records and extension-owned records are
 **specification-level governance dependencies** and must be locked before
-implementation.
+implementation. The Authority B `LineageFact`, `LineageEdge`, snapshot, and
+T07 adapter sub-contract are now locked by
+`docs/P08-AUTHORITY-B-SPECIFICATION-AUDIT.md`, Sections 5.3–5.8; this does not
+close the remaining lifecycle/result extension dependencies.
 
 SHA-256 is applied to the complete canonical representation after
 canonicalization. The digest field itself is excluded from the representation
@@ -498,7 +501,10 @@ semantic components:
 
 The exact serialized field names and types are a
 **specification-level governance dependency** unless already supplied by the
-existing upstream contract.
+existing upstream contract. For the Authority B correction/supersession
+lineage object, the field/type contract is locked by the Authority B
+specification; lifecycle and other extension-owned objects remain governed by
+this draft's dependencies.
 
 The edge identity is derived from the stable semantic identity of the edge.
 The edge digest is the SHA-256 digest of its canonical representation.
@@ -741,8 +747,11 @@ The extension recognizes the following semantic failure categories:
 The exact public enum spelling, precedence among failure reporting fields, and
 mapping to the existing T07 failure vocabulary are
 **specification-level governance dependencies** where the existing contract
-has not already locked them. No implementation may silently collapse distinct
-failure categories. A split that cannot establish distinct resulting
+has not already locked them. The Authority B categories and their mapping to
+the existing T07 failure reasons are locked by the Authority B specification,
+Section 5.7. Other extension-owned failure categories remain subject to this
+draft. No implementation may silently collapse distinct failure categories. A
+split that cannot establish distinct resulting
 Canonical Economic Subject Identities must fail closed with
 `INVALID_LIFECYCLE_MAPPING`; it must not be repaired with an artificial
 discriminator.
@@ -949,14 +958,20 @@ specification or contract amendment without inventing semantics:
    semantic facts that make two results the same or different;
 5. exact serialized fields and types for the result identity and canonical
    result representation, separately from semantic identity authority;
-6. exact serialized fields and types for `LineageFact`;
+6. exact serialized fields and types for `LineageFact` — **RESOLVED for
+   Authority B** by its governing specification;
 7. exact serialized fields and types for `LineageEdgeIdentity` and its
-   canonical edge representation;
-8. exact canonical field ordering and nullable-field policy for new records;
+   canonical edge representation — **RESOLVED for Authority B** by its
+   governing specification;
+8. exact canonical field ordering and nullable-field policy for new records —
+   **RESOLVED for Authority B lineage records**; lifecycle and other
+   extension-owned records remain open;
 9. exact public enum spellings and failure-reporting structure for new failure
-   categories; and
+   categories — **RESOLVED for Authority B → T07 mapping** in the governing
+   specification, with other extension-owned categories still open; and
 10. exact adapter mapping between the extension and the existing closed T07
-   input/output contracts.
+   input/output contracts — **RESOLVED for the Authority B lineage projection**
+   in its governing specification; broader extension integration remains open.
 
 The semantic result identity definition is a semantic specification dependency
 and must be explicitly locked before implementation readiness. The distinct-
@@ -987,9 +1002,11 @@ Snapshot, or P08-T08 was created or modified by this specification.
 
 The exact semantic result identity definition listed in Section 22 remains a
 semantic specification dependency and must be explicitly locked before
-implementation readiness. The field-level, serialization-level, failure-
-vocabulary, and adapter items are separate specification dependencies and must
-not be filled by inference.
+implementation readiness. Field-level, serialization-level, failure-vocabulary,
+and adapter dependencies that belong to lifecycle, result, or other
+extension-owned records remain open and must not be filled by inference.
+Authority B's correction/supersession lineage sub-contract is resolved
+separately, without authorizing implementation or closing this draft.
 
 ### Exact next audit required
 
