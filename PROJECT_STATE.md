@@ -64,10 +64,11 @@ specification-level only and owns canonical economic subject identity, lifecycle
 identity, lifecycle mapping, equivalence, split, and related identity facts
 within its documented boundary.
 
-Authority B specification blockers are **RESOLVED / RECONCILED — PENDING FORMAL
-CLOSURE AUDIT**. Authority B implementation remains unauthorized. This
-governance state does not change the closed P08-T07 status and does not start
-P09.
+Authority B remains **SPECIFICATION-LEVEL BLOCKED** after the final formal
+closure audit. Remaining blockers are canonical JSON escaping, deterministic
+duplicate-comparison context, and exact field-level mapping into the existing
+T07 contract. Authority B implementation remains unauthorized. This governance
+state does not change the closed P08-T07 status and does not start P09.
 
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and

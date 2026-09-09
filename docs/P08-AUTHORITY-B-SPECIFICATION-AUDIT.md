@@ -1,6 +1,6 @@
 # P08 — Authority B Specification and Audit
 
-**Status:** BLOCKER RESOLUTION PASS COMPLETE — PENDING FORMAL CLOSURE AUDIT — IMPLEMENTATION NOT AUTHORIZED
+**Status:** FINAL FORMAL CLOSURE AUDIT COMPLETE — SPECIFICATION-LEVEL BLOCKED — IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning
 **Authority:** Authority B — Correction / Supersession Lineage Facts
 **Scope:** Immutable lineage-fact authority for canonical T07 result lineage
@@ -41,9 +41,9 @@ The terms below are used normatively:
 
 ### 2.1 Determination
 
-Authority B is a bounded semantic authority. The blocker-resolution pass is
-complete and pending a separate formal closure audit. No implementation
-authorization is implied.
+Authority B is a bounded semantic authority. The final formal closure audit
+identified remaining specification blockers. No implementation authorization is
+implied.
 
 Authority B owns:
 
@@ -934,7 +934,10 @@ those supplied semantics; B only supplies lineage facts.
 
 ### 14.3 Blocked
 
-- Formal Authority B closure audit.
+- Formal Authority B closure audit findings recorded in Section 20.
+- Cross-implementation canonical JSON escaping rules.
+- Deterministic duplicate-comparison context.
+- Exact field-level adapter mapping into the existing T07 contract.
 - Implementation-ready Authority B runtime contract and implementation
   authorization.
 - Any runtime or persistence implementation of B.
@@ -971,8 +974,8 @@ audit to extend Authority A's authority.
 
 ## 16. Audit Conclusion and Next Governance Gate
 
-The Authority B blocker-resolution pass is complete and reconciled. Authority B
-is **PENDING FORMAL CLOSURE AUDIT** and remains implementation-unauthorized.
+The final formal Authority B closure audit is complete. Authority B remains
+**SPECIFICATION-LEVEL BLOCKED** and implementation-unauthorized.
 
 The audit confirms that B owns only immutable correction/supersession lineage
 facts and their provenance, while T07 validates them and selects the canonical
@@ -981,20 +984,19 @@ single-predecessor/single-successor edges, linear multi-hop chains, branching,
 self-reference, cycles, cross-lifecycle references, missing endpoints, and
 contradictory relationships.
 
-No genuine semantic blocker remains within this documented scope. Predecessor
-convergence/merge is intentionally deferred by design:
+Predecessor convergence/merge remains intentionally deferred by design:
 
 `MERGE / CONVERGENCE UNSUPPORTED — FAIL CLOSED`
 
 It must not be inferred as valid, invalid, or preferentially resolved, and no
 merge implementation is authorized.
 
-Authority A compatibility is resolved. T07 compatibility is resolved:
-Authority B supplies one authoritative fact/edge projection, T07 validates the
-fact and graph, and T07 selects the canonical head. The mapping is
-representational and does not redesign T07.
+Authority A compatibility, graph semantics, provenance, and the economic
+authority boundary pass. Canonical serialization, duplicate context, and the
+exact field-level T07 adapter remain blocking specification gaps as recorded in
+Section 20. No T07 redesign is authorized.
 
-The formal closure gate remains separate from G1–G5 economic authority
+The Authority B closure result remains separate from G1–G5 economic authority
 decisions.
 
 ## 17. Formal Audit Record — 2026-09-08
@@ -1050,7 +1052,7 @@ This document does not authorize source changes, tests, persistence, runtime
 behavior, wallet access, provider selection, economic calculation, P08-T08,
 P09, or any later phase.
 
-## 19. Blocker Resolution Pass — 2026-09-08
+## 19. Blocker Resolution Pass — 2026-09-08 — Historical
 
 This section records the resolution of the eight blockers identified by the
 previous formal audit. The normative rules are defined in the Authority B
@@ -1075,3 +1077,85 @@ but it does not declare Authority B closed or implementation-ready. The next
 gate is:
 
 **NEXT GATE: FORMAL AUTHORITY B SPECIFICATION CLOSURE AUDIT**
+
+## 20. Final Formal Specification Closure Audit — 2026-09-08
+
+### 20.1 Scope and documents reviewed
+
+This final closure audit reviewed:
+
+- `REPLIT_RULES.md`;
+- `PROJECT_STATE.md`;
+- this Authority B specification/audit record;
+- `docs/P08-CANONICAL-ECONOMIC-SUBJECT-LIFECYCLE-IDENTITY-AUTHORITY-SPECIFICATION.md`;
+- `docs/P08-T07-CANONICAL-RESULT-AUTHORITY-EXTENSION-SPECIFICATION.md`; and
+- `docs/P08-T07-SPECIFICATION.md`.
+
+Authority A was verified as:
+
+`SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED`
+
+No source code, runtime, database, migration, test, dependency, T07
+implementation, Authority A implementation, P07, P06 runtime, or P09 change
+was made by this audit.
+
+### 20.2 Resolution verification
+
+| Audit area | Result | Determination |
+|---|---|---|
+| Identity seed | PASS | Fact and edge identities use the fixed lifecycle/endpoint/type/version projection with domain-separated SHA-256 prefixes and no runtime, timestamp, provenance, or provider inputs. |
+| Field/type contract | PASS | Fact and edge fields, categories, requiredness, nullability, cardinality, identity participation, serialization participation, and provenance-only status are explicit. |
+| Canonical serialization | BLOCKED | UTF-8, NFC, sorted keys, no nulls, and digest coverage are defined, but JSON string escaping is not fixed. Independent implementations can produce different bytes for the same semantic string. |
+| Timestamp/effective-time | PASS | Authority B has no temporal semantic field; upstream timestamps are provenance-only and do not affect identity, ordering, conflict resolution, or canonical-head selection. |
+| Duplicate semantics | BLOCKED | Exact and conflicting duplicates are distinguished, but the authoritative existing-fact comparison set is not defined as an explicit deterministic input. Ambient database or registry state is prohibited by the replay contract. |
+| Conflict/failure precedence | PASS within B / BLOCKED at adapter detail | B defines a first-applicable precedence, but exact field-level preservation into the current T07 contract is not locked. |
+| Graph invariants | PASS | Directed lifecycle-scoped edges, linear multi-hop chains, branching failure, self-reference, cycles, cross-lifecycle references, missing endpoints, and contradictory relationships are bounded deterministically. |
+| Merge/convergence | DEFERRED BY DESIGN | `MERGE / CONVERGENCE UNSUPPORTED — FAIL CLOSED` is explicit and introduces no merge authority. |
+| Authority A compatibility | PASS | B consumes the established Authority A lifecycle and does not create, split, merge, substitute, or redefine economic subject identity. |
+| T07 compatibility | BLOCKED | The conceptual one-to-one projection is clear, but the specification does not identify the exact existing T07 input/output fields and behavior for correction versus supersession, fact/edge identities, provenance, digest, and mapped failure reasons. |
+| Provenance | PASS | The complete P06 → P07 → P08 → Authority A → Authority B → T07 chain is preserved without shortcut or inferred repair. |
+| Determinism/replay | BLOCKED | Identity and graph outcomes are deterministic, but serialization escaping and duplicate comparison context prevent a complete replay guarantee. |
+| Economic authority boundary | PASS | Authority B establishes lineage only and does not establish realization, accounting, P&L, ROI, classification, custody, signing, settlement, execution, risk, or capital authorization. |
+
+### 20.3 Exact remaining blockers
+
+1. **Canonical JSON escaping is not locked.** The document fixes UTF-8,
+   normalization, sorted keys, and whitespace, but does not specify the exact
+   escaping profile for quotes, reverse solidus, control characters, Unicode
+   characters, and equivalent escaped/unescaped forms. Two independent
+   implementations can therefore produce different canonical bytes and
+   different identities or digests.
+
+   **Decision required:** select and normatively specify one exact JSON escaping
+   and byte-serialization profile for both the identity projection and full
+   fact/edge representations.
+
+2. **Duplicate comparison context is not locked.** The duplicate rule compares
+   a new fact with an “existing fact,” while the replay contract prohibits
+   dependence on ambient database/filesystem state. The specification does not
+   define the authoritative established-fact set, its input boundary, or its
+   order-independent replay representation.
+
+   **Decision required:** define the deterministic authoritative fact set or
+   registry snapshot supplied to duplicate validation, including its identity
+   and canonical ordering, without introducing last-write-wins behavior.
+
+3. **The T07 adapter is not field-level exact.** The B document describes a
+   generic edge projection, but the existing T07 contract names concrete
+   `correction_lineage` and `supersession_lineage` inputs and bounded failure
+   reasons. It does not specify exactly how one B fact maps to those fields,
+   how fact/edge identity and digest are carried, or how every B failure maps
+   without semantic loss.
+
+   **Decision required:** lock the exact one-to-one adapter field mapping and
+   deterministic failure mapping against the existing T07 input/output
+   contract, without changing T07 ownership or redesigning its semantics.
+
+### 20.4 Final verdict
+
+**AUTHORITY B SPECIFICATION-LEVEL BLOCKED**
+
+The previous blocker-resolution pass was substantively useful but did not
+resolve the three remaining semantic/contract-level gaps above. Authority B
+implementation remains unauthorized, P09 must not start, and no workaround or
+implementation placeholder is permitted.
