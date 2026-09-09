@@ -64,23 +64,7 @@ specification-level only and owns canonical economic subject identity, lifecycle
 identity, lifecycle mapping, equivalence, split, and related identity facts
 within its documented boundary.
 
-Authority B is now recorded as
-**SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT
-AUTHORIZED**. Its three former specification blockers—canonical JSON escaping,
-deterministic duplicate-comparison context, and exact field-level mapping into
-the existing T07 contract—were formally verified as resolved in
-`docs/P08-AUTHORITY-B-FORMAL-CLOSURE-AUDIT.md`. This governance state does not
-change the closed P08-T07 status and does not start P09.
-
-Authority B implementation-readiness specification is COMPLETE / CLOSED / AUDITED PASS; a separate limited implementation authorization is required before code may be created. Authority B implementation remains NOT AUTHORIZED. It is recorded in
-`docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md`, with the
-formal readiness audit recorded in
-`docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-AUDIT.md`. These documents do
-not authorize implementation or alter P09 status. The nine readiness criteria
-pass, the three expected documentation files are the complete authorized diff
-relative to `origin/main`, and the current branch has no trailing whitespace.
-A separate limited Authority B implementation authorization is ready to be
-requested, but has not been granted.
+Authority B implementation is COMPLETE / CLOSED / AUDITED PASS as a lineage-only deterministic boundary. P09 remains NOT AUTHORIZED.
 
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and
