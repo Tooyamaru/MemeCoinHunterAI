@@ -72,6 +72,10 @@ the existing T07 contract—were formally verified as resolved in
 `docs/P08-AUTHORITY-B-FORMAL-CLOSURE-AUDIT.md`. This governance state does not
 change the closed P08-T07 status and does not start P09.
 
+Authority B implementation-readiness specification is COMPLETE / READY FOR REVIEW; implementation remains NOT AUTHORIZED. It is recorded in
+`docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md`. This
+readiness document does not authorize implementation or alter P09 status.
+
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and
 compares only explicitly supplied immutable P07-T04 ledger entries with one
