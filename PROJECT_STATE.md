@@ -76,7 +76,10 @@ Authority B implementation-readiness specification is COMPLETE / CLOSED / AUDITE
 `docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md`, with the
 formal readiness audit recorded in
 `docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-AUDIT.md`. These documents do
-not authorize implementation or alter P09 status.
+not authorize implementation or alter P09 status. The nine readiness criteria
+pass, but the current branch retains an extra readiness-specification diff and
+the committed audit snapshot has trailing whitespace; a separate limited
+implementation authorization request is not ready from this branch state.
 
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and

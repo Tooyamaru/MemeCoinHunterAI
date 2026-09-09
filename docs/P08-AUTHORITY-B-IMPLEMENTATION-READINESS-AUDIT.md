@@ -1,9 +1,9 @@
 # P08 — Authority B Implementation-Readiness Audit
 
-**Status:** COMPLETE / CLOSED / AUDITED PASS  
-**Phase:** P08 — Outcome Learning  
-**Authority:** Authority B — Correction / Supersession Lineage Facts  
-**Audit date:** 2026-09-09  
+**Status:** COMPLETE / CLOSED / AUDITED PASS — REPOSITORY SCOPE GATE BLOCKED
+**Phase:** P08 — Outcome Learning
+**Authority:** Authority B — Correction / Supersession Lineage Facts
+**Audit date:** 2026-09-09
 **Audit type:** Documentation-only implementation-readiness review
 
 ## 1. Audit scope and authorization boundary
@@ -32,16 +32,15 @@ The audit uses `PASS`, `FAIL`, and `BLOCKED` as follows:
 
 ## 2. Documents reviewed
 
-The documents required by the review instruction were read in the specified
+The six documents required by the review instruction were read in the specified
 order:
 
 1. `REPLIT_RULES.md`;
 2. `PROJECT_STATE.md`;
-3. `docs/P08-AUTHORITY-B-FORMAL-CLOSURE-AUDIT.md`;
-4. `docs/P08-AUTHORITY-B-SPECIFICATION-AUDIT.md`;
-5. `docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md`;
-6. `docs/P08-T07-SPECIFICATION.md`; and
-7. `docs/P08-T07-CANONICAL-RESULT-AUTHORITY-EXTENSION-SPECIFICATION.md`.
+3. `docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md`;
+4. `docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-AUDIT.md`;
+5. `docs/P08-AUTHORITY-B-SPECIFICATION-AUDIT.md`; and
+6. `docs/P08-T07-SPECIFICATION.md`.
 
 The review also checked the current repository state for the required
 documentation-only change boundary.
@@ -293,6 +292,44 @@ Any such work requires its own specification and explicit authorization. This
 does not prevent a separate limited Authority B implementation authorization
 from being requested for the two isolated paths listed below.
 
+## 4A. Repository-scope verification
+
+The requested branch-scope check was run against `origin/main`:
+
+```text
+git diff --check origin/main...HEAD
+git diff --name-only origin/main...HEAD
+git status --short
+```
+
+The exact committed diff list is:
+
+```text
+PROJECT_STATE.md
+docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-AUDIT.md
+docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md
+```
+
+This does not satisfy the requested two-file boundary because the
+implementation-readiness specification also differs from `origin/main`.
+The readiness specification was not modified by this audit because the
+permitted correction scope allowed changes only to `PROJECT_STATE.md` and this
+audit document. The repository-scope gate is therefore `BLOCKED` on the
+current branch.
+
+Relative to `origin/main`, the only changed paths are the three
+documentation/state paths listed above. The current uncommitted working-tree
+change is limited to this audit document. No source, runtime, test,
+dependency, migration, P08-T07, provider, wallet, signing, execution, API, or
+P09 path is changed.
+
+The exact requested `git diff --check origin/main...HEAD` command remains
+`BLOCKED` because the committed `HEAD` version of this audit contains four
+trailing-whitespace header lines. The current working-tree version has no
+trailing whitespace, and `git diff --check HEAD --` passes. Removing the
+committed whitespace would require a commit or history rewrite, which this
+audit explicitly does not perform.
+
 ## 5. Exact future implementation scope permitted if separately authorized
 
 Only if a later, separate implementation authorization is granted, the
@@ -326,9 +363,9 @@ for a future task only; they were not created or modified by this audit.
 
 ## 7. Final verdict
 
-All nine requested criteria pass. The Authority B
-implementation-readiness specification is sufficient to support a separate,
-future, limited implementation authorization request.
+All nine requested readiness criteria pass. The Authority B
+implementation-readiness specification is sufficient in substance to support a
+separate, future, limited implementation authorization request.
 
 ```text
 AUTHORITY B IMPLEMENTATION-READINESS SPECIFICATION
@@ -342,6 +379,12 @@ SEPARATE LIMITED IMPLEMENTATION AUTHORIZATION
 
 P09
     = NOT AUTHORIZED
+
+CURRENT BRANCH REPOSITORY-SCOPE GATE
+    = BLOCKED: AN EXTRA READINESS-SPECIFICATION DIFF EXISTS
+
+SEPARATE LIMITED IMPLEMENTATION AUTHORIZATION REQUEST
+    = NOT READY TO REQUEST FROM THIS BRANCH STATE
 ```
 
 No source code, tests, runtime, API, dependency, persistence, migration,
