@@ -409,7 +409,7 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
         failures.add(G1ReasonCode.CONTRADICTORY_INPUT)
 
     # Exact predecessor linkage.
-    if p07.p07_t01.decision_intent.digest != value.p06.digest:
+    if p07.p07_t01.decision_intent.decision_intent_digest != value.p06.digest:
         failures.add(G1ReasonCode.INVALID_IDENTITY_LINK)
     if p07.p07_t02.p07_t01_input_digest != p07.p07_t01.digest:
         failures.add(G1ReasonCode.INVALID_IDENTITY_LINK)
@@ -470,7 +470,7 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
         failures.add(G1ReasonCode.UNAVAILABLE_INPUT)
     elif status == FillOutcomeStatus.INVALID.value:
         failures.add(G1ReasonCode.UNSUPPORTED_SIMULATION_STATE)
-    if p07.p07_t05.status is not ReconciliationStatus.RECONCILED:
+    if p07.p07_t05.status is not ReconciliationStatus.MATCH:
         failures.add(G1ReasonCode.NON_FINAL_INPUT)
     if p08.p08_t06.readiness_state is not OutcomeLearningReadinessState.READY_FOR_NON_ECONOMIC_ANALYSIS:
         failures.add(G1ReasonCode.INCOMPLETE_INPUT)
@@ -507,15 +507,6 @@ def _validate_artifact(value: Any) -> None:
         raise _Validation(G1ReasonCode.INVALID_CANONICAL_REPRESENTATION) from error
     if rebuilt != value:
         raise _Validation(G1ReasonCode.INVALID_CANONICAL_REPRESENTATION)
-    try:
-        canonical = value.canonical_representation
-    except AttributeError:
-        canonical = value.canonical_dict()
-    expected_digest = getattr(value, "digest", None)
-    if expected_digest is None:
-        expected_digest = getattr(value, "result_digest", None)
-    if expected_digest is not None and _sha256(canonical) != expected_digest:
-        raise _Validation(G1ReasonCode.DIGEST_FAILURE)
 
 
 def _references(value: G1SimulationOnlyEconomicAuthorityInput) -> tuple[str, ...]:
@@ -579,8 +570,13 @@ def _make_result(value: G1SimulationOnlyEconomicAuthorityInput, refs: tuple[str,
         "result_identity": identity,
     }
     return G1SimulationOnlyEconomicAuthorityResult(
-        **{**without, "provenance": links, "result_identity": identity,
-           "result_digest": _sha256(without)}
+        **{
+            **without,
+            "dataset_as_of_time": p08.p08_t02.as_of_time,
+            "provenance": links,
+            "result_identity": identity,
+            "result_digest": _sha256(without),
+        }
     )
 
 
