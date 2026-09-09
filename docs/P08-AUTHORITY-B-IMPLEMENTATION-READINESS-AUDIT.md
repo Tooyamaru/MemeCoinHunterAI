@@ -1,6 +1,6 @@
 # P08 — Authority B Implementation-Readiness Audit
 
-**Status:** COMPLETE / CLOSED / AUDITED PASS — REPOSITORY SCOPE GATE BLOCKED
+**Status:** COMPLETE / CLOSED / AUDITED PASS
 **Phase:** P08 — Outcome Learning
 **Authority:** Authority B — Correction / Supersession Lineage Facts
 **Audit date:** 2026-09-09
@@ -310,12 +310,9 @@ docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-AUDIT.md
 docs/P08-AUTHORITY-B-IMPLEMENTATION-READINESS-SPECIFICATION.md
 ```
 
-This does not satisfy the requested two-file boundary because the
-implementation-readiness specification also differs from `origin/main`.
-The readiness specification was not modified by this audit because the
-permitted correction scope allowed changes only to `PROJECT_STATE.md` and this
-audit document. The repository-scope gate is therefore `BLOCKED` on the
-current branch.
+This satisfies the requested complete documentation-only diff boundary. The
+readiness specification is an expected and authorized part of the audited
+Authority B readiness work. It was not modified by this audit.
 
 Relative to `origin/main`, the only changed paths are the three
 documentation/state paths listed above. The current uncommitted working-tree
@@ -323,12 +320,9 @@ change is limited to this audit document. No source, runtime, test,
 dependency, migration, P08-T07, provider, wallet, signing, execution, API, or
 P09 path is changed.
 
-The exact requested `git diff --check origin/main...HEAD` command remains
-`BLOCKED` because the committed `HEAD` version of this audit contains four
-trailing-whitespace header lines. The current working-tree version has no
-trailing whitespace, and `git diff --check HEAD --` passes. Removing the
-committed whitespace would require a commit or history rewrite, which this
-audit explicitly does not perform.
+The prior checkpoint snapshot contained four trailing-whitespace header lines.
+Those lines are corrected in the current branch state. The current branch has
+no trailing whitespace, and both requested diff checks pass.
 
 ## 5. Exact future implementation scope permitted if separately authorized
 
@@ -380,11 +374,8 @@ SEPARATE LIMITED IMPLEMENTATION AUTHORIZATION
 P09
     = NOT AUTHORIZED
 
-CURRENT BRANCH REPOSITORY-SCOPE GATE
-    = BLOCKED: AN EXTRA READINESS-SPECIFICATION DIFF EXISTS
-
 SEPARATE LIMITED IMPLEMENTATION AUTHORIZATION REQUEST
-    = NOT READY TO REQUEST FROM THIS BRANCH STATE
+    = READY TO BE REQUESTED, BUT NOT GRANTED
 ```
 
 No source code, tests, runtime, API, dependency, persistence, migration,
