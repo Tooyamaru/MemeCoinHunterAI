@@ -68,6 +68,8 @@ Authority B implementation is COMPLETE / CLOSED / AUDITED PASS as a lineage-only
 
 G1 concrete economic authority boundary discovery is COMPLETE / AWAITING EXPLICIT GOVERNANCE DECISIONS; G1 implementation, G2, G3, G4, and P09 remain NOT AUTHORIZED.
 
+G1 simulation-only specification proposal is COMPLETE / AWAITING OWNER APPROVAL; G1 implementation, G2, G3, G4, and P09 remain NOT AUTHORIZED.
+
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and
 compares only explicitly supplied immutable P07-T04 ledger entries with one
