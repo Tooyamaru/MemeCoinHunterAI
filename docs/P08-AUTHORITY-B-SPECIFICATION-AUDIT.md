@@ -1,6 +1,6 @@
 # P08 — Authority B Specification and Audit
 
-**Status:** BLOCKER RESOLUTION PASS COMPLETE — PENDING FORMAL CLOSURE AUDIT — IMPLEMENTATION NOT AUTHORIZED
+**Status:** SPECIFICATION COMPLETE / CLOSED / AUDITED PASS — IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning
 **Authority:** Authority B — Correction / Supersession Lineage Facts
 **Scope:** Immutable lineage-fact authority for canonical T07 result lineage
@@ -42,8 +42,8 @@ The terms below are used normatively:
 ### 2.1 Determination
 
 Authority B is a bounded semantic authority. The final three-blocker
-resolution pass is complete, but the separate formal closure audit has not
-been performed. No implementation authorization is implied.
+resolution pass and the separate formal closure audit are complete. No
+implementation authorization is implied.
 
 Authority B owns:
 
@@ -1099,7 +1099,6 @@ those supplied semantics; B only supplies lineage facts.
 
 ### 14.3 Blocked
 
-- Formal Authority B closure audit findings recorded in Section 20.
 - Implementation-ready Authority B runtime contract and implementation
   authorization.
 - Any runtime or persistence implementation of B.
@@ -1134,11 +1133,12 @@ representation-level items, and the explicit implementation prohibition.
 Authority B remains downstream of that closed specification and cannot use this
 audit to extend Authority A's authority.
 
-## 16. Audit Conclusion and Next Governance Gate
+## 16. Historical Audit Conclusion and Former Next Governance Gate
 
-The three-blocker resolution pass is complete. Authority B is
-**RESOLVED / RECONCILED — PENDING FORMAL CLOSURE AUDIT** and remains
-implementation-unauthorized.
+At the time of this historical section, the three-blocker resolution pass was
+complete and Authority B was **RESOLVED / RECONCILED — PENDING FORMAL CLOSURE
+AUDIT**. That historical status was later superseded by the formal closure
+audit recorded in `docs/P08-AUTHORITY-B-FORMAL-CLOSURE-AUDIT.md`.
 
 The audit confirms that B owns only immutable correction/supersession lineage
 facts and their provenance, while T07 validates them and selects the canonical
@@ -1155,10 +1155,9 @@ It must not be inferred as valid, invalid, or preferentially resolved, and no
 merge implementation is authorized.
 
 Authority A compatibility, graph semantics, provenance, canonical serialization,
-explicit duplicate context, and the exact field-level T07 adapter are resolved
-at specification level. No T07 redesign is authorized. The separate formal
-closure audit is the next gate and may still fail closed if it identifies a
-semantic contradiction.
+explicit duplicate context, and the exact field-level T07 adapter were resolved
+at specification level. No T07 redesign was authorized. The separate formal
+closure audit was the former next gate and has now completed with a PASS result.
 
 The Authority B closure result remains separate from G1–G5 economic authority
 decisions.
@@ -1236,9 +1235,9 @@ formal closure audit.
 
 ### 19.1 Resolution boundary
 
-The blocker-resolution pass establishes a deterministic specification contract,
-but it does not declare Authority B closed or implementation-ready. The next
-gate is:
+The blocker-resolution pass established a deterministic specification contract.
+At the time of this historical section, it did not yet declare Authority B
+closed or implementation-ready. The former next gate was:
 
 **NEXT GATE: FORMAL AUTHORITY B SPECIFICATION CLOSURE AUDIT**
 
@@ -1370,7 +1369,8 @@ validation status may differ.
 ### 21.3 Current governance result
 
 ```text
-ALL THREE FINAL BLOCKERS RESOLVED — PENDING FORMAL CLOSURE AUDIT
+AUTHORITY B SPECIFICATION COMPLETE / CLOSED / AUDITED PASS
+IMPLEMENTATION NOT AUTHORIZED
 ```
 
 Authority B remains specification-only. Implementation remains unauthorized,
@@ -1379,4 +1379,5 @@ and no runtime, persistence, API, T07 implementation, Authority A
 implementation, P06 runtime, P07, test, dependency, or source change was
 introduced.
 
-**NEXT GATE: FORMAL AUTHORITY B SPECIFICATION CLOSURE AUDIT**
+The formal closure audit is recorded in
+`docs/P08-AUTHORITY-B-FORMAL-CLOSURE-AUDIT.md`.
