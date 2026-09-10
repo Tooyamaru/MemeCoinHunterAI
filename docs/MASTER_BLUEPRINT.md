@@ -298,7 +298,7 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **P08-T07 and later:** NOT STARTED; separate specification and authorization
   required.
 
-### P09 — DEX / JUPITER EXECUTION
+### P09 — PROVIDER-NEUTRAL CONTROLLED EXECUTION
 - **Objective:** Add provider-agnostic controlled execution only after prior validation and explicit go-live approval.
 - **Major components:** Decision intent → Risk/Capital Authorization → Execution Request → isolated signing boundary → broadcast, provider-agnostic RPC/routing/MEV interfaces, BUY and SELL pre-flight, quote/route validation, slippage/price guards, latency budgets, submission, confirmation, failure handling, wallet state, reconciliation, stale-decision rejection, independent Exit Monitor, watchdog, and emergency stop.
 - **Dependencies:** P01–P08 and explicit go-live approval.

@@ -11,17 +11,16 @@ Then read only files relevant to the current task.
 
 ## Meme Coin Hunter AI
 
-Meme Coin Hunter AI is a future AI-driven crypto intelligence and trading system. It is designed to discover and evaluate emerging Solana meme-coin opportunities while keeping intelligence, decisions, risk governance, execution, and learning logically separate.
+Meme Coin Hunter AI is a future selective, deterministic, explainable, risk-first, paper-first memecoin opportunity and decision platform. It is designed to discover and evaluate emerging Solana meme-coin opportunities while keeping intelligence, decisions, risk governance, execution, and learning logically separate.
 
 ## Current status
 
 The project is currently at P08 — Outcome Learning. P07-T01 through P07-T07
-and P08-T01 through P08-T05 are complete, closed, and audited PASS. The current
-P08-T06 boundary is implemented and audited PASS as a structural,
-non-economic readiness predicate over validated outcome evidence, and is ready
-to close. P08-T07 and later tasks remain unstarted. No provider connectivity,
-wallet, live trading, AI/ML, or P09 execution functionality has been
-implemented.
+and P08-T01 through P08-T07 are complete, closed, and audited PASS. The G2
+realization/settlement endpoint boundary discovery is complete but remains
+documentation-only, blocked, unresolved, and unauthorized pending an
+owner-approved realization/settlement source. No provider connectivity, wallet,
+live trading, AI/ML, or P09 execution functionality has been implemented.
 
 ## Architecture summary
 

@@ -379,15 +379,16 @@ Late, corrected, and superseded evidence must be governed explicitly. A replay
 must use the same approved evidence identities, versions, timestamps, and
 canonical representations to reproduce the same result.
 
-## 7. Realized Economic Calculation
+## 7. Realized Economic Result Boundary
 
-### 7.1 Ownership
+### 7.1 G3 ownership
 
-T07 owns realized P&L interpretation when the evidence and calculation
-parameters are admissible. Realized P&L is not derived from paper simulation
-alone.
+G3 owns realized P&L accounting and the canonical economic result. T07
+consumes the validated G3 result and assembles the authoritative G2/G3/G4
+interpretation; it does not calculate or reinterpret realized P&L.
 
-The conceptual accounting relationship is:
+The following non-authoritative conceptual relationship describes the supplied
+G3 result; T07 does not calculate it:
 
 ```text
 realized proceeds
