@@ -8,9 +8,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P08 — Outcome Learning
-- **Current task:** P08 — Formal Authority B Closure Audit
+- **Current task:** P08 — G1 Implementation Closure Re-Audit
 - **Current task status:** COMPLETE / CLOSED / AUDITED PASS
-- **Last updated:** 2026-09-09
+- **Last updated:** 2026-09-10
 
 ## Master progress
 
@@ -19,7 +19,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 COMPLETE / CLOSED / AUDITED PASS; P08-T05 COMPLETE / CLOSED / AUDITED PASS; P08-T06 IMPLEMENTED / AUDITED PASS / READY TO CLOSE; P08-T07 COMPLETE / CLOSED / AUDITED PASS; G1 LIMITED IMPLEMENTATION COMPLETE / TESTED; AUTHORITY B COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 NOT AUTHORIZED; later P08 tasks not started; P06 runtime and P09–P12 not started
+- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 COMPLETE / CLOSED / AUDITED PASS; P08-T05 COMPLETE / CLOSED / AUDITED PASS; P08-T06 IMPLEMENTED / AUDITED PASS / READY TO CLOSE; P08-T07 COMPLETE / CLOSED / AUDITED PASS; G1 LIMITED IMPLEMENTATION COMPLETE / CLOSED / AUDITED PASS; AUTHORITY B COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 NOT AUTHORIZED; later P08 tasks not started; P06 runtime and P09–P12 not started
 
 ## Phase status
 
@@ -66,7 +66,7 @@ within its documented boundary.
 
 Authority B implementation is COMPLETE / CLOSED / AUDITED PASS as a lineage-only deterministic boundary, confirmed by the formal closure audit in `docs/P08-AUTHORITY-B-CLOSURE-AUDIT.md`. G2, G3, G4, and P09 remain NOT AUTHORIZED.
 
-G1 simulation-only economic authority specification is COMPLETE / CLOSED / AUDITED PASS, and the limited implementation is COMPLETE / TESTED. G2, G3, G4, and P09 remain NOT AUTHORIZED.
+G1 limited implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 
 P07-T05 is the canonical Ledger ↔ State Consistency Verification / paper
 reconciliation boundary. It is deterministic, immutable, provider-neutral, and
@@ -122,11 +122,15 @@ Formal Authority B closure audit completed on 2026-09-09. The focused
 Authority B suite passed with 21 tests, and all closure criteria passed.
 
 P08-T07 focused tests: 35 passed.
-G1 focused tests: 6 passed.
+G1 focused tests: 229 passed after verification hardening.
 G1 module compile check: passed.
 Full project test suite: 769 passed with 1 non-blocking dependency warning.
 Python version: 3.13.12.
 `git diff --check`: PASS.
+G1 implementation closure re-audit completed on 2026-09-10. Former
+canonicalization, digest, provenance, duplicate, contradiction, cutoff, replay,
+and reason-precedence evidence gaps are closed. The formal re-audit is recorded
+in `docs/P08-G1-IMPLEMENTATION-CLOSURE-REAUDIT.md`.
 G1 validation preserves predecessor-owned digest contracts, accepts the real
 P07-T05 `MATCH` reconciliation status, and preserves the P08-T02 cutoff as a
 timezone-aware datetime. No remaining G1 contract mismatch was identified.
@@ -135,8 +139,8 @@ workspace change and is excluded from project changes.
 
 P08-T01 through P08-T06 are COMPLETE / CLOSED / AUDITED PASS. P08-T07 is
 COMPLETE / CLOSED / AUDITED PASS. G1 limited implementation is COMPLETE /
-TESTED. G2, G3, G4, and P09 remain NOT AUTHORIZED. No later behavior was
-introduced.
+CLOSED / AUDITED PASS. G2, G3, G4, and P09 remain NOT AUTHORIZED. No later
+behavior was introduced.
 
 P08-T01 implementation is present in:
 `core/learning/outcome_observation.py`
