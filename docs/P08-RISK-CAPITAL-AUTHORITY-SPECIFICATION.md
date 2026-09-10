@@ -220,6 +220,10 @@ The snapshot contains exactly these top-level fields:
 | `decision_intent_digest` | yes | Digest of the P06 intent to which this snapshot applies. |
 | `context_digest` | yes | Digest of the P06 context to which this snapshot applies. |
 | `simulation_reference_time` | yes | Caller-supplied UTC cutoff. |
+| `policy_cutoff_time` | yes | Sole caller-supplied UTC cutoff for policy-snapshot freshness. |
+| `risk_state_max_age_seconds` | yes | Positive canonical maximum age for `risk_state`. |
+| `paper_capital_state_max_age_seconds` | yes | Positive canonical maximum age for `paper_capital_state`. |
+| `paper_exposure_state_max_age_seconds` | yes | Positive canonical maximum age for `paper_exposure_state`. |
 | `valid_from` | yes | Earliest usable reference time. |
 | `valid_until` | yes | Latest usable reference time. |
 | `risk_state` | yes | Immutable paper-policy risk state. |
@@ -261,7 +265,7 @@ lifecycle, candidate, portfolio, chain identity, or token identity.
 | `status` | `PASS`, `BLOCK`, or `UNKNOWN`. |
 | `emergency_stop` | Boolean paper-policy stop; approval requires `false`. |
 | `risk_flags` | Sorted tuple of explicit paper-policy flags. |
-| `observed_at` | UTC time at which the risk state was observed. |
+| `as_of_time` | UTC time at which the risk state was observed. |
 | `available_at` | UTC time at which it was available to the evaluator. |
 | `state_digest` | Digest of the complete risk-state value. |
 
@@ -286,7 +290,7 @@ optimization, candidate ranking, or a new safety model.
 | `committed_before` | Virtual-paper amount committed before this lifecycle. |
 | `requested_entry` | Virtual-paper amount requested for this lifecycle admission check. |
 | `max_single_entry` | Maximum virtual-paper amount permitted for one lifecycle. |
-| `observed_at` | UTC observation time. |
+| `as_of_time` | UTC observation time. |
 | `available_at` | UTC availability time. |
 | `state_digest` | Digest of the complete capital-state value. |
 
@@ -316,7 +320,7 @@ values are rejected. Unknown does not become zero.
 | `unit` | Must equal the capital-state simulation-only unit. |
 | `exposure_before` | Virtual-paper exposure before this lifecycle. |
 | `max_total_exposure` | Maximum virtual-paper exposure for the scope. |
-| `observed_at` | UTC observation time. |
+| `as_of_time` | UTC observation time. |
 | `available_at` | UTC availability time. |
 | `state_digest` | Digest of the complete exposure-state value. |
 
@@ -331,7 +335,52 @@ values, contradictory values, and invalid nested digests are rejected.
 Exposure is a virtual paper admission limit. It is not a live position,
 wallet balance, account permission, or economic valuation.
 
-### 4.6 Policy provenance
+### 4.6 Policy freshness
+
+`policy_cutoff_time` is the sole cutoff used to evaluate the freshness of the
+required policy snapshots. It is an explicit, immutable, timezone-aware UTC
+timestamp in the policy snapshot. It must not be read from a system clock or
+derived from any other timestamp.
+
+The policy snapshot must provide these positive, canonical maximum ages in
+seconds:
+
+- `risk_state_max_age_seconds`;
+- `paper_capital_state_max_age_seconds`; and
+- `paper_exposure_state_max_age_seconds`.
+
+Each required state must provide its own timezone-aware UTC `as_of_time`. For
+each state, the evaluator computes:
+
+```text
+age = policy_cutoff_time - snapshot.as_of_time
+```
+
+The evaluator must:
+
+1. reject a missing, invalid, non-UTC, or unsupported
+   `policy_cutoff_time`, maximum-age value, or `as_of_time`;
+2. reject when `snapshot.as_of_time > policy_cutoff_time`;
+3. reject a negative computed age as `POLICY_STATE_FUTURE_DATED`;
+4. reject as `POLICY_STATE_STALE` when `age` is greater than the matching
+   positive maximum age; and
+5. accept the exact maximum-age boundary because staleness is strictly
+   `age > maximum_age`.
+
+Missing or malformed material is handled by the existing required-material,
+invalid-input, non-canonical, or unsupported-version reason codes according to
+the fixed precedence. A future or negative-age state uses exactly
+`POLICY_STATE_FUTURE_DATED`; an over-age state uses exactly
+`POLICY_STATE_STALE`. The evaluator must not use a system clock, provider
+timestamp, cache time, filesystem time, database time, ingestion time, or
+inferred time.
+
+`simulation_reference_time` remains the supplied P07 paper-simulation cutoff
+and is not replaced or inferred by `policy_cutoff_time`. The existing
+availability rule still applies: every state must be available by the
+simulation reference time.
+
+### 4.7 Policy provenance
 
 `provenance` is a bounded canonical mapping containing only references needed
 to reproduce the snapshot, including:
@@ -382,14 +431,18 @@ The policy snapshot must:
 2. verify every nested identity and digest;
 3. match the P06 intent and context digests;
 4. match candidate, chain, token, portfolio, and lifecycle scope;
-5. contain one explicit timezone-aware simulation reference time;
-6. satisfy `valid_from <= simulation_reference_time <= valid_until`;
-7. have every observation `available_at` at or before the reference time;
-8. have `risk_state.status == PASS`;
-9. have `risk_state.emergency_stop == false`;
-10. contain valid virtual-paper capital and exposure amounts;
-11. use one identical unit for capital and exposure; and
-12. pass every applicable paper limit formula.
+    5. contain one explicit timezone-aware simulation reference time and one
+       explicit timezone-aware UTC policy cutoff time;
+    6. contain positive canonical maximum ages for risk, capital, and exposure;
+    7. satisfy `valid_from <= simulation_reference_time <= valid_until`;
+    8. satisfy the complete policy freshness rules in Section 4.6;
+    9. have every observation `available_at` at or before the simulation
+       reference time;
+    10. have `risk_state.status == PASS`;
+    11. have `risk_state.emergency_stop == false`;
+    12. contain valid virtual-paper capital and exposure amounts;
+    13. use one identical unit for capital and exposure; and
+    14. pass every applicable paper limit formula.
 
 ### 5.3 Approval predicate
 
@@ -405,6 +458,7 @@ AND no P06 uncertainty or invalidation
 AND risk_state = PASS
 AND emergency_stop = false
 AND valid paper budget and exposure state
+    AND valid policy freshness for risk, capital, and exposure state
 AND requested_entry <= max_single_entry
 AND committed_before + requested_entry <= budget_total
 AND exposure_before + requested_entry <= max_total_exposure
@@ -553,6 +607,14 @@ PAPER_EXPOSURE_STATE_UNKNOWN
 PAPER_OBSERVATION_UNAVAILABLE
 ```
 
+`POLICY_STATE_FUTURE_DATED` is emitted when any required policy snapshot has
+`as_of_time > policy_cutoff_time` or a negative computed age.
+`POLICY_STATE_STALE` is emitted when a required snapshot's computed age is
+strictly greater than its matching positive maximum age. These are the only
+Safe V1 stale/future reason codes. Missing, invalid, non-UTC, or unsupported
+timestamp material uses the applicable required-material, invalid-input,
+non-canonical, or unsupported-version code instead.
+
 ### 8.4 Virtual-paper limits
 
 ```text
@@ -617,6 +679,7 @@ deterministic representation rules:
 - enum values use their explicit wire values;
 - timestamps are timezone-aware UTC values in one canonical ISO-8601 form;
 - decimal amounts are finite normalized decimal text;
+- policy maximum ages are finite, positive, normalized decimal seconds;
 - nullable values are serialized as `null`, never omitted;
 - non-string keys, opaque objects, callbacks, NaN, infinity, and binary
   floating-point amount values are rejected; and
@@ -673,9 +736,10 @@ and mapping order cannot be changed by caller insertion order.
 
 ## 11. Temporal cutoff and validity rules
 
-`simulation_reference_time` in the policy snapshot is the only Safe V1 cutoff.
-It is supplied data. The evaluator must never call a system clock or derive a
-cutoff from process time, local timezone, filesystem time, ingestion order,
+`simulation_reference_time` remains the supplied P07 paper-simulation cutoff.
+`policy_cutoff_time` is the sole supplied Safe V1 cutoff for policy-snapshot
+freshness. Both are immutable input values; neither is read from a clock or
+derived from process time, local timezone, filesystem time, ingestion order,
 network timing, or later-arriving data.
 
 All of the following must hold:
@@ -684,26 +748,40 @@ All of the following must hold:
 P06 context.reference_time <= DecisionIntent.decision_time
 DecisionIntent.decision_time <= simulation_reference_time
 valid_from <= simulation_reference_time <= valid_until
-risk_state.observed_at <= risk_state.available_at
-risk_state.available_at <= simulation_reference_time
-paper_capital_state.observed_at <= paper_capital_state.available_at
-paper_capital_state.available_at <= simulation_reference_time
-paper_exposure_state.observed_at <= paper_exposure_state.available_at
-paper_exposure_state.available_at <= simulation_reference_time
+risk_state.as_of_time <= risk_state.available_at <= simulation_reference_time
+paper_capital_state.as_of_time <= paper_capital_state.available_at <= simulation_reference_time
+paper_exposure_state.as_of_time <= paper_exposure_state.available_at <= simulation_reference_time
+risk_state.as_of_time <= policy_cutoff_time
+paper_capital_state.as_of_time <= policy_cutoff_time
+paper_exposure_state.as_of_time <= policy_cutoff_time
+risk_state_max_age_seconds > 0
+paper_capital_state_max_age_seconds > 0
+paper_exposure_state_max_age_seconds > 0
+risk_state_age = policy_cutoff_time - risk_state.as_of_time
+paper_capital_state_age = policy_cutoff_time - paper_capital_state.as_of_time
+paper_exposure_state_age = policy_cutoff_time - paper_exposure_state.as_of_time
+risk_state_age <= risk_state_max_age_seconds
+paper_capital_state_age <= paper_capital_state_max_age_seconds
+paper_exposure_state_age <= paper_exposure_state_max_age_seconds
 ```
 
 The evaluator rejects:
 
-- missing or timezone-naive timestamps;
+- missing, invalid, non-UTC, or unsupported timestamps or maximum ages;
 - future-dated values;
+- a snapshot `as_of_time` after `policy_cutoff_time`;
+- a negative policy-snapshot age;
 - a policy not yet valid at the reference time;
 - an expired policy;
 - state that became available after the reference time;
-- state stale under the explicit policy validity rules; and
+- state whose age is greater than its matching maximum age; and
 - a P06 context or decision that occurs after the reference time.
 
-No timestamp may be silently normalized in a way that changes its instant.
-All accepted timestamps are represented in the one canonical UTC form.
+The exact future and stale mappings are `POLICY_STATE_FUTURE_DATED` and
+`POLICY_STATE_STALE`, respectively, at precedence group 6 in the order already
+defined in Section 9. No timestamp may be silently normalized in a way that
+changes its instant. All accepted timestamps are represented in the one
+canonical UTC form.
 
 ## 12. Replay, duplicate, and contradiction rules
 
