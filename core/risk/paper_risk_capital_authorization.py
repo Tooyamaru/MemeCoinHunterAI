@@ -77,6 +77,44 @@ REASON_ORDER = {
 }
 KNOWN_REASONS = frozenset(REASON_ORDER)
 
+_PROVENANCE_REQUIRED_KEYS = frozenset(
+    {
+        "p05_contract_version",
+        "p05_evaluator_version",
+        "p06_contract_version",
+        "p06_ruleset_version",
+        "p06_evaluator_version",
+        "decision_intent_digest",
+        "context_digest",
+        "policy_snapshot_id",
+        "risk_governor_version",
+        "capital_authorization_version",
+        "evaluator_version",
+        "risk_state_digest",
+        "paper_capital_state_digest",
+        "paper_exposure_state_digest",
+    }
+)
+_PROVENANCE_OPTIONAL_KEYS = frozenset(
+    {"observation_packet_id", "paper_lifecycle_id", "source"}
+)
+_RESULT_PROVENANCE_REQUIRED_KEYS = _PROVENANCE_REQUIRED_KEYS | {
+    "policy_snapshot_digest"
+}
+_PROVENANCE_DIGEST_KEYS = frozenset(
+    {
+        "decision_intent_digest",
+        "context_digest",
+        "risk_state_digest",
+        "paper_capital_state_digest",
+        "paper_exposure_state_digest",
+        "policy_snapshot_digest",
+    }
+)
+_MAX_CANONICAL_DEPTH = 8
+_MAX_CANONICAL_COLLECTION_ITEMS = 64
+_MAX_CANONICAL_TEXT_LENGTH = 4096
+
 
 def _utc(value: Any, name: str) -> datetime:
     if (
@@ -127,12 +165,27 @@ def _decimal_text(value: Decimal) -> str:
     return format(Decimal("0") if value == 0 else value.normalize(), "f")
 
 
-def _canonicalize(value: Any) -> Any:
+def _canonicalize(
+    value: Any,
+    *,
+    _depth: int = 0,
+    _reject_float: bool = False,
+) -> Any:
+    if _reject_float and _depth > _MAX_CANONICAL_DEPTH:
+        raise ValueError("canonical value is too deeply nested")
     if value is None or isinstance(value, (bool, int, str)):
+        if (
+            _reject_float
+            and isinstance(value, str)
+            and len(value) > _MAX_CANONICAL_TEXT_LENGTH
+        ):
+            raise ValueError("canonical text is unbounded")
         return value
     if isinstance(value, float):
         if not math.isfinite(value):
             raise ValueError("float must be finite")
+        if _reject_float:
+            raise ValueError("float values are not canonical; use Decimal")
         return value
     if isinstance(value, Decimal):
         if not value.is_finite():
@@ -143,11 +196,29 @@ def _canonicalize(value: Any) -> Any:
     if isinstance(value, StrEnum):
         return value.value
     if isinstance(value, Mapping):
+        if _reject_float and len(value) > _MAX_CANONICAL_COLLECTION_ITEMS:
+            raise ValueError("canonical mapping is unbounded")
         if any(not isinstance(key, str) for key in value):
             raise ValueError("mapping keys must be strings")
-        return {key: _canonicalize(value[key]) for key in sorted(value)}
+        return {
+            key: _canonicalize(
+                value[key],
+                _depth=_depth + 1,
+                _reject_float=_reject_float,
+            )
+            for key in sorted(value)
+        }
     if isinstance(value, (list, tuple)):
-        return [_canonicalize(item) for item in value]
+        if _reject_float and len(value) > _MAX_CANONICAL_COLLECTION_ITEMS:
+            raise ValueError("canonical collection is unbounded")
+        return [
+            _canonicalize(
+                item,
+                _depth=_depth + 1,
+                _reject_float=_reject_float,
+            )
+            for item in value
+        ]
     raise ValueError(f"{type(value).__name__} is not canonical")
 
 
@@ -172,10 +243,42 @@ def _digest(value: Any) -> str:
     ).hexdigest()
 
 
-def _mapping(value: Any, name: str) -> Mapping[str, Any]:
+def _mapping(
+    value: Any,
+    name: str,
+    *,
+    reject_float: bool = False,
+) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise ValueError(f"{name} must be a mapping")
-    return _freeze(_canonicalize(value))
+    return _freeze(_canonicalize(value, _reject_float=reject_float))
+
+
+def _provenance(
+    value: Any,
+    name: str,
+    *,
+    required_keys: frozenset[str],
+) -> Mapping[str, Any]:
+    normalized = _mapping(value, name, reject_float=True)
+    keys = set(normalized)
+    missing = sorted(required_keys - keys)
+    if missing:
+        raise ValueError(
+            f"{name} is incomplete; missing required references: "
+            + ", ".join(missing)
+        )
+    unknown = sorted(keys - required_keys - _PROVENANCE_OPTIONAL_KEYS)
+    if unknown:
+        raise ValueError(
+            f"{name} contains unsupported references: " + ", ".join(unknown)
+        )
+    for key, item in normalized.items():
+        if key in _PROVENANCE_DIGEST_KEYS:
+            _digest_text(item, f"{name}.{key}")
+        else:
+            _text(item, f"{name}.{key}")
+    return normalized
 
 
 def _texts(value: Any, name: str) -> tuple[str, ...]:
@@ -384,6 +487,8 @@ class PaperRiskCapitalPolicySnapshot:
             _text(value, name)
         if self.contract_version != P08_POLICY_CONTRACT_VERSION:
             raise ValueError("unsupported P08 policy contract_version")
+        if self.evaluator_version != P08_AUTHORITY_EVALUATOR_VERSION:
+            raise ValueError("unsupported P08 policy evaluator_version")
         object.__setattr__(self, "scope_identity", _scope(self.scope_identity))
         _digest_text(self.decision_intent_digest, "decision_intent_digest")
         _digest_text(self.context_digest, "context_digest")
@@ -424,7 +529,15 @@ class PaperRiskCapitalPolicySnapshot:
         ):
             if not isinstance(value, expected):
                 raise ValueError(f"{name} must be a {expected.__name__}")
-        object.__setattr__(self, "provenance", _mapping(self.provenance, "provenance"))
+        object.__setattr__(
+            self,
+            "provenance",
+            _provenance(
+                self.provenance,
+                "provenance",
+                required_keys=_PROVENANCE_REQUIRED_KEYS,
+            ),
+        )
         _set_or_verify_digest(
             self,
             "policy_snapshot_digest",
@@ -575,7 +688,34 @@ class PaperRiskCapitalAuthorizationResult:
                 raise ValueError("rejected result requires a reason code")
             if self.primary_reason_code != reasons[0]:
                 raise ValueError("primary_reason_code must be first by precedence")
-        object.__setattr__(self, "provenance", _mapping(self.provenance, "provenance"))
+        if self.scope_identity["paper_lifecycle_id"] != self.paper_lifecycle_id:
+            raise ValueError(
+                "paper_lifecycle_id must match scope_identity.paper_lifecycle_id"
+            )
+        object.__setattr__(
+            self,
+            "provenance",
+            _provenance(
+                self.provenance,
+                "provenance",
+                required_keys=_RESULT_PROVENANCE_REQUIRED_KEYS,
+            ),
+        )
+        if (
+            self.provenance["decision_intent_digest"]
+            != self.decision_intent_digest
+            or self.provenance["context_digest"] != self.context_digest
+            or self.provenance["policy_snapshot_id"] != self.policy_snapshot_id
+            or self.provenance["policy_snapshot_digest"]
+            != self.policy_snapshot_digest
+        ):
+            raise ValueError("result provenance does not match result identity")
+        if (
+            "paper_lifecycle_id" in self.provenance
+            and self.provenance["paper_lifecycle_id"]
+            != self.paper_lifecycle_id
+        ):
+            raise ValueError("result provenance lifecycle identity conflicts")
         expected_authorization_id = _digest(
             {
                 "contract_version": self.contract_version,
@@ -699,13 +839,20 @@ def _validate_intent(intent: Any) -> None:
         raise ValueError("DecisionIntent contains unsupported enums")
     if intent.context_digest != intent.context.digest:
         raise ValueError("DecisionIntent context digest is invalid")
-    if intent.risk_evaluation.viability_status is not CandidateViabilityStatus.ELIGIBLE:
-        return
     if intent.context.canonical_representation != intent.context.deterministic_representation:
         raise ValueError("DecisionIntent context is not canonical")
 
 
 def _validate_policy_integrity(policy: PaperRiskCapitalPolicySnapshot) -> None:
+    if policy.contract_version != P08_POLICY_CONTRACT_VERSION:
+        raise ValueError("unsupported P08 policy contract_version")
+    if policy.evaluator_version != P08_AUTHORITY_EVALUATOR_VERSION:
+        raise ValueError("unsupported P08 policy evaluator_version")
+    _provenance(
+        policy.provenance,
+        "provenance",
+        required_keys=_PROVENANCE_REQUIRED_KEYS,
+    )
     for state, field in (
         (policy.risk_state, "state_digest"),
         (policy.paper_capital_state, "state_digest"),
@@ -748,8 +895,37 @@ def _evaluate_reasons(
 ) -> tuple[str, ...]:
     reasons: list[str] = []
     scope = policy.scope_identity
+    provenance = policy.provenance
     if policy.decision_intent_digest != intent.digest or policy.context_digest != intent.context_digest:
         reasons.append("PROVENANCE_LINKAGE_FAILURE")
+    if (
+        provenance["decision_intent_digest"] != intent.digest
+        or provenance["context_digest"] != intent.context_digest
+        or provenance["p05_contract_version"]
+        != intent.risk_evaluation.contract_version
+        or provenance["p05_evaluator_version"]
+        != intent.risk_evaluation.evaluator_version
+        or provenance["p06_contract_version"] != intent.contract_version
+        or provenance["p06_ruleset_version"] != intent.ruleset_version
+        or provenance["p06_evaluator_version"] != intent.evaluator_version
+        or provenance["risk_governor_version"] != policy.risk_governor_version
+        or provenance["capital_authorization_version"]
+        != policy.capital_authorization_version
+        or provenance["evaluator_version"] != policy.evaluator_version
+        or provenance["risk_state_digest"] != policy.risk_state.state_digest
+        or provenance["paper_capital_state_digest"]
+        != policy.paper_capital_state.state_digest
+        or provenance["paper_exposure_state_digest"]
+        != policy.paper_exposure_state.state_digest
+    ):
+        reasons.append("PROVENANCE_LINKAGE_FAILURE")
+    if provenance["policy_snapshot_id"] != policy.policy_snapshot_id:
+        reasons.append("REPLAY_IDENTITY_CONFLICT")
+    if (
+        "paper_lifecycle_id" in provenance
+        and provenance["paper_lifecycle_id"] != scope["paper_lifecycle_id"]
+    ):
+        reasons.append("DUPLICATE_LIFECYCLE_CONFLICT")
     if (
         scope["candidate_id"] != intent.candidate_id
         or scope["chain_id"] != intent.chain_id
@@ -823,10 +999,32 @@ def evaluate_paper_risk_capital_authorization(
         primary_reason_code=reasons[0] if reasons else None,
         reason_codes=reasons,
         provenance={
-            "risk_governor_version": policy_snapshot.risk_governor_version,
-            "capital_authorization_version": policy_snapshot.capital_authorization_version,
+            "p05_contract_version": decision_intent.risk_evaluation.contract_version,
+            "p05_evaluator_version": decision_intent.risk_evaluation.evaluator_version,
+            "p06_contract_version": decision_intent.contract_version,
+            "p06_ruleset_version": decision_intent.ruleset_version,
+            "p06_evaluator_version": decision_intent.evaluator_version,
+            "decision_intent_digest": decision_intent.digest,
+            "context_digest": decision_intent.context_digest,
             "policy_snapshot_id": policy_snapshot.policy_snapshot_id,
             "policy_snapshot_digest": policy_snapshot.policy_snapshot_digest,
+            "risk_governor_version": policy_snapshot.risk_governor_version,
+            "capital_authorization_version": (
+                policy_snapshot.capital_authorization_version
+            ),
+            "evaluator_version": policy_snapshot.evaluator_version,
+            "risk_state_digest": policy_snapshot.risk_state.state_digest,
+            "paper_capital_state_digest": (
+                policy_snapshot.paper_capital_state.state_digest
+            ),
+            "paper_exposure_state_digest": (
+                policy_snapshot.paper_exposure_state.state_digest
+            ),
+            **{
+                key: policy_snapshot.provenance[key]
+                for key in ("observation_packet_id", "source")
+                if key in policy_snapshot.provenance
+            },
         },
     )
 

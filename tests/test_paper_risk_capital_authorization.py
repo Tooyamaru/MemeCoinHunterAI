@@ -48,6 +48,29 @@ def _intent(**overrides):
 def _policy(intent=None, **overrides):
     intent = intent or _intent()
     reference = intent.context.reference_time
+    risk_state = RiskState(
+        status=RiskStateStatus.PASS,
+        emergency_stop=False,
+        risk_flags=(),
+        as_of_time=reference - timedelta(seconds=20),
+        available_at=reference - timedelta(seconds=10),
+    )
+    paper_capital_state = PaperCapitalState(
+        unit="paper-unit",
+        budget_total=Decimal("100"),
+        committed_before=Decimal("10"),
+        requested_entry=Decimal("20"),
+        max_single_entry=Decimal("50"),
+        as_of_time=reference - timedelta(seconds=20),
+        available_at=reference - timedelta(seconds=10),
+    )
+    paper_exposure_state = PaperExposureState(
+        unit="paper-unit",
+        exposure_before=Decimal("10"),
+        max_total_exposure=Decimal("50"),
+        as_of_time=reference - timedelta(seconds=20),
+        available_at=reference - timedelta(seconds=10),
+    )
     values = {
         "policy_snapshot_id": "policy-1",
         "risk_governor_version": "risk-governor-v1",
@@ -69,32 +92,33 @@ def _policy(intent=None, **overrides):
         "paper_exposure_state_max_age_seconds": Decimal("60"),
         "valid_from": reference - timedelta(minutes=1),
         "valid_until": reference + timedelta(minutes=5),
-        "risk_state": RiskState(
-            status=RiskStateStatus.PASS,
-            emergency_stop=False,
-            risk_flags=(),
-            as_of_time=reference - timedelta(seconds=20),
-            available_at=reference - timedelta(seconds=10),
-        ),
-        "paper_capital_state": PaperCapitalState(
-            unit="paper-unit",
-            budget_total=Decimal("100"),
-            committed_before=Decimal("10"),
-            requested_entry=Decimal("20"),
-            max_single_entry=Decimal("50"),
-            as_of_time=reference - timedelta(seconds=20),
-            available_at=reference - timedelta(seconds=10),
-        ),
-        "paper_exposure_state": PaperExposureState(
-            unit="paper-unit",
-            exposure_before=Decimal("10"),
-            max_total_exposure=Decimal("50"),
-            as_of_time=reference - timedelta(seconds=20),
-            available_at=reference - timedelta(seconds=10),
-        ),
-        "provenance": {"source": "immutable-fixture"},
+        "risk_state": risk_state,
+        "paper_capital_state": paper_capital_state,
+        "paper_exposure_state": paper_exposure_state,
     }
     values.update(overrides)
+    if "provenance" not in overrides:
+        values["provenance"] = {
+            "p05_contract_version": intent.risk_evaluation.contract_version,
+            "p05_evaluator_version": intent.risk_evaluation.evaluator_version,
+            "p06_contract_version": intent.contract_version,
+            "p06_ruleset_version": intent.ruleset_version,
+            "p06_evaluator_version": intent.evaluator_version,
+            "decision_intent_digest": values["decision_intent_digest"],
+            "context_digest": values["context_digest"],
+            "policy_snapshot_id": values["policy_snapshot_id"],
+            "risk_governor_version": values["risk_governor_version"],
+            "capital_authorization_version": values["capital_authorization_version"],
+            "evaluator_version": values["evaluator_version"],
+            "risk_state_digest": values["risk_state"].state_digest,
+            "paper_capital_state_digest": values[
+                "paper_capital_state"
+            ].state_digest,
+            "paper_exposure_state_digest": values[
+                "paper_exposure_state"
+            ].state_digest,
+            "source": "immutable-fixture",
+        }
     return PaperRiskCapitalPolicySnapshot(**values)
 
 
@@ -241,3 +265,120 @@ def test_policy_and_inputs_are_immutable():
     result = evaluate_paper_risk_capital_authorization(intent, policy)
     assert policy.canonical_representation == before
     assert result.status is AuthorizationStatus.APPROVED
+
+
+def test_unsupported_policy_evaluator_version_fails_closed():
+    intent = _intent()
+    with pytest.raises(ValueError, match="unsupported P08 policy evaluator_version"):
+        _policy(intent, evaluator_version="unsupported")
+
+    policy = _policy(intent)
+    object.__setattr__(policy, "evaluator_version", "unsupported")
+    with pytest.raises(ValueError, match="unsupported P08 policy evaluator_version"):
+        evaluate_paper_risk_capital_authorization(intent, policy)
+
+
+def test_provenance_requires_complete_references_and_rejects_nested_floats():
+    intent = _intent()
+    with pytest.raises(ValueError, match="missing required references"):
+        _policy(intent, provenance={"source": "incomplete"})
+
+    provenance = dict(_policy(intent).provenance)
+    provenance["nested"] = {"value": 1.25}
+    with pytest.raises(ValueError, match="float values are not canonical"):
+        _policy(intent, provenance=provenance)
+
+    provenance = dict(_policy(intent).provenance)
+    provenance["nested"] = {"items": [{"value": lambda: None}]}
+    with pytest.raises(ValueError, match="not canonical"):
+        _policy(intent, provenance=provenance)
+
+
+def test_provenance_is_recursively_immutable_and_digest_bound():
+    intent = _intent()
+    policy = _policy(intent)
+    with pytest.raises(TypeError):
+        policy.provenance["nested"] = {"value": "x"}
+    assert policy.digest == _policy(intent).digest
+
+    tampered = _policy(intent)
+    object.__setattr__(
+        tampered,
+        "provenance",
+        {**tampered.provenance, "source": "tampered"},
+    )
+    with pytest.raises(ValueError, match="policy_snapshot_digest"):
+        evaluate_paper_risk_capital_authorization(intent, tampered)
+
+
+def test_duplicate_and_replay_conflicts_are_stateless_and_precedence_stable():
+    intent = _intent()
+    duplicate = _policy(
+        intent,
+        provenance={**_policy(intent).provenance, "paper_lifecycle_id": "other"},
+    )
+    replay = _policy(
+        intent,
+        provenance={**_policy(intent).provenance, "policy_snapshot_id": "other"},
+    )
+    both = _policy(
+        intent,
+        provenance={
+            **_policy(intent).provenance,
+            "paper_lifecycle_id": "other",
+            "policy_snapshot_id": "other",
+        },
+    )
+
+    duplicate_result = evaluate_paper_risk_capital_authorization(intent, duplicate)
+    replay_result = evaluate_paper_risk_capital_authorization(intent, replay)
+    both_result = evaluate_paper_risk_capital_authorization(intent, both)
+
+    assert duplicate_result.primary_reason_code == "DUPLICATE_LIFECYCLE_CONFLICT"
+    assert replay_result.primary_reason_code == "REPLAY_IDENTITY_CONFLICT"
+    assert both_result.reason_codes == (
+        "DUPLICATE_LIFECYCLE_CONFLICT",
+        "REPLAY_IDENTITY_CONFLICT",
+    )
+    assert both_result.reason_codes == evaluate_paper_risk_capital_authorization(
+        intent, both
+    ).reason_codes
+
+
+def test_result_identity_scope_provenance_and_digest_are_independently_validated():
+    intent = _intent()
+    result = evaluate_paper_risk_capital_authorization(intent, _policy(intent))
+
+    with pytest.raises(ValueError, match="paper_lifecycle_id"):
+        replace(
+            result,
+            scope_identity={
+                **result.scope_identity,
+                "paper_lifecycle_id": "different",
+            },
+        )
+    with pytest.raises(ValueError, match="result provenance"):
+        replace(
+            result,
+            provenance={**result.provenance, "context_digest": "0" * 64},
+        )
+    with pytest.raises(ValueError, match="result_digest"):
+        replace(result, result_digest="0" * 64)
+    with pytest.raises(ValueError, match="authorization_id"):
+        replace(result, authorization_id="0" * 64)
+
+    assert result.digest == evaluate_paper_risk_capital_authorization(
+        intent, _policy(intent)
+    ).digest
+
+
+def test_result_requires_complete_provenance_and_preserves_paper_handoff():
+    intent = _intent()
+    result = evaluate_paper_risk_capital_authorization(intent, _policy(intent))
+    with pytest.raises(ValueError, match="missing required references"):
+        replace(result, provenance={"source": "incomplete"})
+
+    observation = result.to_authorization_observation()
+    assert observation.status.value == "PASS"
+    assert observation.observation_id == result.authorization_id
+    assert observation.scope_identity == result.scope_identity

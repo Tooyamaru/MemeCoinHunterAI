@@ -1,4 +1,4 @@
-modules = ["python-3.12", "nodejs-20", "web"]
+modules = ["python-base-3.13", "nodejs-20", "web"]
 
 [deployment]
 router = "application"
