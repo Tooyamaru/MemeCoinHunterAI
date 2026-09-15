@@ -1,6 +1,6 @@
 # P08 — Read-Only Market-Data Adapter Specification
 
-**Status:** SPECIFICATION COMPLETE / AWAITING FORMAL AUDIT / IMPLEMENTATION NOT AUTHORIZED  
+**Status:** SPECIFICATION CORRECTED / AWAITING FORMAL RE-AUDIT / IMPLEMENTATION NOT AUTHORIZED
 **Phase:** P08 — Outcome Learning  
 **Boundary:** Provider-neutral, immutable, read-only market observations  
 **Contract version:** `p08-read-only-market-data-observation-v1`  
@@ -23,6 +23,11 @@ This specification creates no implementation authority. A separate formal
 specification audit must pass before a separate implementation authorization can
 be considered. No code, test, dependency, provider, workflow, persistence, or
 external access is authorized by this document.
+
+For the single contract version `p08-read-only-market-data-observation-v1`,
+this specification is the sole normative contract. The proposal with the same
+version is a non-normative traceability document and must repeat this contract's
+rules without variation.
 
 ## 2. Architectural position
 
@@ -54,11 +59,12 @@ It does not re-admit, repair, refresh, aggregate, or rewrite P02 state.
 The contract does not select, require, or name a chain, exchange, venue, pool,
 route, wallet, endpoint, SDK, transport, vendor, or provider.
 
-`chain_id`, when supplied, is an opaque domain identity copied from an approved
-predecessor or source-neutral input. It is not a chain connection instruction,
-chain-state assertion, RPC identity, or permission. The contract remains valid
-when `chain_id` is explicitly `null` for a cross-domain candidate, provided the
-selected consumer profile does not require it.
+`chain_id` is always present and is either an opaque `CanonicalText` domain
+identity or explicit `null`. It is not a chain connection instruction,
+chain-state assertion, RPC identity, or permission. `null` is permitted only
+when no P02 predecessor is supplied and the selected consumer profile explicitly
+allows a chain-neutral candidate. When a P02 predecessor is supplied,
+`chain_id` must be the predecessor's non-null identity copied exactly.
 
 Likewise:
 
@@ -75,25 +81,47 @@ random value, or current time.
 
 ## 4. Contract vocabulary
 
-### 4.1 Canonical scalar types
+### 4.1 Canonical scalar types and hard bounds
 
-The future implementation must use these semantic types:
+The following are closed wire rules for
+`p08-read-only-market-data-observation-v1`. No implementation authorization may
+select an alternative representation:
 
 | Type | Required representation |
 |---|---|
-| `CanonicalText` | Trimmed, non-empty, bounded UTF-8 text with a documented maximum length. |
+| `CanonicalText` | Unicode text normalized to NFC, trimmed of leading/trailing Unicode whitespace, non-empty, no unpaired surrogates, at most 256 Unicode scalar values, and at most 1,024 UTF-8 bytes after normalization and trimming. |
 | `NullableCanonicalText` | `CanonicalText` or explicit `null`; omitted and `null` are different. |
 | `DecimalText` | Finite normalized decimal text; no binary floating point, NaN, or infinity. |
-| `NonNegativeInteger` | Canonical base-10 integer text or bounded integer value as fixed by the implementation authorization; negative values are rejected. |
+| `NonNegativeInteger` | Canonical ASCII base-10 integer text of 1–20 digits, with `0` as the only zero form and no leading zeroes; values are in the inclusive range `0` through `99,999,999,999,999,999,999`. |
 | `Digest256` | Exactly 64 lowercase hexadecimal characters representing SHA-256. |
 | `UtcTimestamp` | Timezone-aware instant normalized to canonical UTC serialization. |
 | `SequenceValue` | An explicit source sequence/cursor representation; it is not comparable unless its comparison policy is supplied. |
-| `BoundedMapping` | Recursively canonical mapping with sorted string keys, bounded depth/size, and no opaque objects. |
-| `ImmutableSequence` | Ordered immutable sequence; sets are forbidden. |
+| `BoundedMapping` | Recursively canonical JSON mapping with Unicode-code-point-sorted string keys, maximum depth 8 including the root, maximum 64 members per mapping, maximum 128 elements per immutable sequence, and maximum 16,384 bytes for the complete compact canonical UTF-8 representation; only approved canonical scalar values, mappings, and sequences are allowed. |
+| `ImmutableSequence` | Ordered immutable sequence of at most 128 elements; sets are forbidden. |
 
-The exact byte and size limits for bounded text and mappings must be fixed by
-the separately authorized implementation. An input that exceeds those limits
-fails closed; it is not truncated.
+An input that exceeds any stated bound, uses a non-canonical representation, or
+contains an opaque or unknown value fails closed; it is not truncated, repaired,
+or substituted.
+
+Canonical-field rejection mapping is fixed:
+
+- an absent required field produces `MISSING_REQUIRED_INPUT`;
+- a wrong runtime type, or explicit `null` for a non-nullable field, produces
+  `INVALID_TYPE`;
+- non-NFC text, untrimmed text, empty text, a text scalar/byte limit violation,
+  a negative or non-canonical `NonNegativeInteger`, a mapping/sequence
+  depth/entry/byte limit violation, an unknown mapping field, a non-string
+  mapping key, an opaque value, or a set produces
+  `INVALID_CANONICAL_REPRESENTATION`;
+- an omitted optional field is valid, and explicit `null` is valid only for a
+  field declared nullable; and
+- unsupported enum, source, adapter, metric, freshness, consumer-profile, or
+  predecessor versions use `UNSUPPORTED_VERSION`.
+
+When multiple conditions are visible, these mappings are resolved by the
+strict Section 12 precedence, with `INVALID_TYPE` before
+`MISSING_REQUIRED_INPUT`, `UNSUPPORTED_VERSION`, and
+`INVALID_CANONICAL_REPRESENTATION`.
 
 ### 4.2 Enumerations
 
@@ -133,7 +161,7 @@ exactly the following fields. Unknown fields are rejected.
 | `contract_version` | `CanonicalText` | yes | Exactly `p08-read-only-market-data-observation-v1`. |
 | `observation_id` | `CanonicalText` | yes | Stable source-observation identity, or the validated deterministic identity derived under Section 8. |
 | `candidate_id` | `CanonicalText` | yes | Deterministic analytical candidate identity. |
-| `chain_id` | `CanonicalText \| null` | yes | Opaque domain identity when supplied; explicit `null` is permitted unless the profile requires it. |
+| `chain_id` | `CanonicalText \| null` | yes | Always present; explicit `null` is permitted only for a chain-neutral profile with no P02 predecessor. A P02-linked observation must copy a non-null predecessor identity. |
 | `token_identity` | `CanonicalText` | yes | Canonical token identity supplied by the source-neutral boundary or approved predecessor. |
 | `market_subject_id` | `CanonicalText \| null` | yes | Opaque market-subject identity when supplied; never inferred from display metadata. |
 | `observation_kind` | supported enum | yes | Explicit discovery or paper-evaluation use profile. |
@@ -258,14 +286,17 @@ aggregation, feature formulas, derived metrics, or strategy thresholds.
 ### 8.1 Candidate and token identity
 
 `candidate_id` and `token_identity` are required opaque canonical identities.
-`chain_id` and `market_subject_id` are required fields whose values may be
-explicitly `null` when the selected domain and consumer profile allow it.
+`chain_id` and `market_subject_id` are required fields. `chain_id` follows the
+single nullability rule in Section 3; `market_subject_id` may be explicitly
+`null` only when the selected domain and consumer profile allow no market
+subject.
 
 When a P02 predecessor is supplied, its exact `(chain_id, token_identity)` and
 `market_subject_id` identities remain predecessor-owned and must be copied,
 validated, and linked. The adapter must not create a second token identity or
 reinterpret a P02 identity. When no such predecessor exists, the adapter may
-accept an explicitly chain-neutral token identity without inferring a chain.
+accept the explicitly chain-neutral form only under the profile rule in
+Section 3; it must not infer a chain.
 
 Identity equality is exact canonical equality. Display labels, symbols, source
 labels, wallet addresses, provider identifiers, and matching text fragments do
@@ -422,7 +453,8 @@ observation in simulation.
 
 ## 11. Canonical serialization and immutability
 
-Canonical serialization is compact UTF-8 JSON with:
+Canonical serialization is compact UTF-8 JSON with the exact scalar and mapping
+bounds in Section 4.1 and:
 
 1. Unicode NFC normalization before escaping;
 2. sorted object keys using Unicode code-point order;

@@ -7,6 +7,12 @@ paper-only evaluation
 **Proposed contract version:** `p08-read-only-market-data-observation-v1`  
 **Nature:** Immutable, deterministic, provider-neutral, read-only
 
+For the single contract version `p08-read-only-market-data-observation-v1`,
+the formal specification is the sole normative contract. This proposal is a
+non-normative traceability document and repeats the same `chain_id`, canonical
+scalar, bounded-mapping, rejection-mapping, and precedence rules without
+variation.
+
 ## 1. Purpose
 
 This proposal defines a future adapter boundary that supplies normalized,
@@ -85,7 +91,7 @@ Unknown fields are rejected; absent and `null` are not interchangeable.
 | `contract_version` | Exactly `p08-read-only-market-data-observation-v1` for this proposal. |
 | `observation_id` | Stable source-observation identity, or a deterministic identity derived from the approved identity projection. |
 | `candidate_id` | Non-empty deterministic candidate identity. |
-| `chain_id` | Non-empty canonical chain-domain identity. It is an identity value only. |
+| `chain_id` | Always present as `CanonicalText` or explicit `null`; `null` is permitted only when no P02 predecessor is supplied and the selected consumer profile explicitly allows a chain-neutral candidate. A P02-linked observation must copy the predecessor's non-null identity exactly. It is an identity value only. |
 | `token_identity` | Non-empty canonical token identity reused from the approved upstream token contract. |
 | `market_subject_id` | Explicit opaque market-subject identity when a market subject exists; it is never inferred from display metadata. |
 | `observation_kind` | Explicit supported kind, such as `DISCOVERY` or `PAPER_EVALUATION`; no implicit consumer mode is inferred. |
@@ -93,10 +99,12 @@ Unknown fields are rejected; absent and `null` are not interchangeable.
 | `availability_at` | Required timezone-aware UTC timestamp at which the observation was available to the consumer. |
 | `sequence` | Explicit source sequence/cursor when provided; otherwise explicit `null` with ordering unknown. |
 
-`candidate_id` identifies the analytical candidate. The `(chain_id,
-token_identity)` pair remains the minimum token identity. A
-`market_subject_id`, when present, distinguishes an explicitly supplied market
-subject without defining it as a venue, pool, route, or execution target.
+`candidate_id` identifies the analytical candidate. When `chain_id` is non-null,
+the `(chain_id, token_identity)` pair remains the minimum token identity. A
+chain-neutral candidate is permitted only under the `chain_id` profile rule
+above. A `market_subject_id`, when present, distinguishes an explicitly
+supplied market subject without defining it as a venue, pool, route, or
+execution target.
 
 An observation must not derive identity from a display name, symbol, object
 address, process identity, random value, insertion order, or current time.
@@ -186,6 +194,48 @@ authorized by the consumer's versioned field policy.
 This proposal does not define formulas, source coverage, valuation, cross-source
 aggregation, or feature derivation for any field.
 
+### 4.5 Canonical scalar types and hard bounds
+
+The following are the closed wire rules for
+`p08-read-only-market-data-observation-v1`; no implementation authorization may
+select an alternative representation:
+
+| Type | Required representation |
+|---|---|
+| `CanonicalText` | Unicode text normalized to NFC, trimmed of leading/trailing Unicode whitespace, non-empty, no unpaired surrogates, at most 256 Unicode scalar values, and at most 1,024 UTF-8 bytes after normalization and trimming. |
+| `NullableCanonicalText` | `CanonicalText` or explicit `null`; omitted and `null` are different. |
+| `DecimalText` | Finite normalized decimal text; no binary floating point, NaN, or infinity. |
+| `NonNegativeInteger` | Canonical ASCII base-10 integer text of 1–20 digits, with `0` as the only zero form and no leading zeroes; values are in the inclusive range `0` through `99,999,999,999,999,999,999`. |
+| `Digest256` | Exactly 64 lowercase hexadecimal characters representing SHA-256. |
+| `UtcTimestamp` | Timezone-aware instant normalized to canonical UTC serialization. |
+| `SequenceValue` | An explicit source sequence/cursor representation; it is not comparable unless its comparison policy is supplied. |
+| `BoundedMapping` | Recursively canonical JSON mapping with Unicode-code-point-sorted string keys, maximum depth 8 including the root, maximum 64 members per mapping, maximum 128 elements per immutable sequence, and maximum 16,384 bytes for the complete compact canonical UTF-8 representation; only approved canonical scalar values, mappings, and sequences are allowed. |
+| `ImmutableSequence` | Ordered immutable sequence of at most 128 elements; sets are forbidden. |
+
+An input that exceeds any stated bound, uses a non-canonical representation, or
+contains an opaque or unknown value fails closed; it is not truncated, repaired,
+or substituted.
+
+Canonical-field rejection mapping is fixed:
+
+- an absent required field produces `MISSING_REQUIRED_INPUT`;
+- a wrong runtime type, or explicit `null` for a non-nullable field, produces
+  `INVALID_TYPE`;
+- non-NFC text, untrimmed text, empty text, a text scalar/byte limit violation,
+  a negative or non-canonical `NonNegativeInteger`, a mapping/sequence
+  depth/entry/byte limit violation, an unknown mapping field, a non-string
+  mapping key, an opaque value, or a set produces
+  `INVALID_CANONICAL_REPRESENTATION`;
+- an omitted optional field is valid, and explicit `null` is valid only for a
+  field declared nullable; and
+- unsupported enum, source, adapter, field, freshness, consumer-profile, or
+  predecessor versions use `UNSUPPORTED_VERSION`.
+
+When multiple conditions are visible, these mappings are resolved by the
+strict Section 8 precedence, with `INVALID_TYPE` before
+`MISSING_REQUIRED_INPUT`, `UNSUPPORTED_VERSION`, and
+`INVALID_CANONICAL_REPRESENTATION`.
+
 ## 5. Cutoff and freshness semantics
 
 Every validation call must supply an explicit immutable evaluation context:
@@ -265,8 +315,8 @@ authorization, or simulation result. P07 must validate and own its own
 
 ## 7. Canonicalization and immutability
 
-The future implementation must use the repository's established canonical
-representation rules:
+The canonical representation uses the exact scalar and mapping bounds in
+Section 4.5 and the repository's established rules:
 
 - mappings have sorted string keys;
 - sequences have explicit semantic order;
@@ -342,8 +392,7 @@ preference. `VALID` is used only when the complete required material is valid.
 `MISSING_REQUIRED_INPUT` covers absent required observation, context, field, or
 cutoff material. `INCOMPLETE_INPUT` covers a structurally present observation
 whose required consumer fields are explicitly unavailable or missing under the
-selected profile. A future implementation must document the exact distinction
-without allowing either state to pass.
+selected profile. Neither state may pass.
 
 ## 9. Replay, duplicate, contradiction, and ordering behavior
 
