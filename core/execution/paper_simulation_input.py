@@ -23,7 +23,13 @@ from core.decision import (
 )
 
 
-P07_T01_CONTRACT_VERSION = "p07-t01-v1"
+P07_T01_CONTRACT_VERSION = "p07-t01-v2"
+P07_T01_LEGACY_CONTRACT_VERSION = "p07-t01-v1"
+RISK_CAPITAL_AUTHORITY_CONTRACT_VERSION = "p08-risk-capital-authority-v1"
+RISK_CAPITAL_AUTHORITY_EVALUATOR_VERSION = (
+    "p08-risk-capital-authority-evaluator-v1"
+)
+PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY = "PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY"
 NOT_APPLICABLE = "NOT_APPLICABLE"
 _DIGEST_LENGTH = 64
 
@@ -235,7 +241,7 @@ class AuthorizationObservation:
 
     def with_authorization_reference(
         self,
-        reference: "RiskCapitalAuthorizationReference",
+        reference: "RiskCapitalAuthorizationReference | None",
     ) -> "AuthorizationObservation":
         return replace(
             self,
@@ -557,16 +563,10 @@ class PaperSimulationInput:
         object.__setattr__(self, "decision_intent", identity)
         if not isinstance(self.authorization_observation, AuthorizationObservation):
             raise ValueError("authorization_observation must be an AuthorizationObservation")
-        if self.authorization_observation.authorization_reference is not None:
-            reference = self.authorization_observation.authorization_reference
-            if (
-                reference.decision_intent_digest
-                != self.decision_intent.decision_intent_digest
-                or reference.context_digest != self.decision_intent.context_digest
-            ):
-                raise ValueError(
-                    "authorization_reference does not match DecisionIntent"
-                )
+        if self.contract_version == P07_T01_CONTRACT_VERSION:
+            self._validate_v2_admission()
+        elif self.contract_version != P07_T01_LEGACY_CONTRACT_VERSION:
+            raise ValueError("UNSUPPORTED_VERSION: unsupported P07-T01 contract_version")
         if not isinstance(self.execution_observation, ExecutionObservation):
             raise ValueError("execution_observation must be an ExecutionObservation")
         if not isinstance(self.simulation_configuration, SimulationConfigurationIdentity):
@@ -575,14 +575,110 @@ class PaperSimulationInput:
             raise ValueError("initial_paper_state must be an InitialPaperStateIdentity")
         if not isinstance(self.replay_identity, ReplayIdentity):
             raise ValueError("replay_identity must be a ReplayIdentity")
-        if self.contract_version != P07_T01_CONTRACT_VERSION:
-            raise ValueError("unsupported P07-T01 contract_version")
         object.__setattr__(self, "simulation_reference_time", _to_utc(
             self.simulation_reference_time, "simulation_reference_time"
         ))
         self._validate_temporal_boundary()
         self._validate_status_boundary()
         _set_or_verify_digest(self, "input_digest", self._canonical_without_digest())
+
+    def _validate_v2_admission(self) -> None:
+        authorization = self.authorization_observation
+        if authorization.status is not ObservationStatus.PASS:
+            raise ValueError(
+                "AUTHORIZATION_NOT_APPROVED: v2 Safe V1 admission requires PASS"
+            )
+        if authorization.authorization_reference is None:
+            raise ValueError(
+                "MISSING_REQUIRED_INPUT: v2 admission requires "
+                "authorization_reference"
+            )
+        reference = authorization.authorization_reference
+        try:
+            _validate_reference_integrity(reference)
+        except ValueError as error:
+            raise ValueError(
+                "INVALID_IDENTITY_LINK: invalid authorization_reference"
+            ) from error
+        if (
+            reference.decision_intent_digest
+            != self.decision_intent.decision_intent_digest
+            or reference.context_digest != self.decision_intent.context_digest
+        ):
+            raise ValueError(
+                "INVALID_IDENTITY_LINK: authorization_reference does not match "
+                "DecisionIntent"
+            )
+        if (
+            reference.contract_version
+            != RISK_CAPITAL_AUTHORITY_CONTRACT_VERSION
+            or reference.evaluator_version
+            != RISK_CAPITAL_AUTHORITY_EVALUATOR_VERSION
+            or reference.authorization_effect
+            != PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY
+            or authorization.contract_version
+            != RISK_CAPITAL_AUTHORITY_CONTRACT_VERSION
+        ):
+            raise ValueError(
+                "INVALID_IDENTITY_LINK: unsupported Risk/Capital reference"
+            )
+        if authorization.reason_codes or authorization.unknown_reasons:
+            raise ValueError(
+                "AUTHORIZATION_NOT_APPROVED: approved authorization must have "
+                "no reason codes"
+            )
+        expected_scope_keys = {
+            "paper_lifecycle_id",
+            "paper_portfolio_id",
+            "candidate_id",
+            "chain_id",
+            "token_identity",
+        }
+        if set(reference.scope_identity) != expected_scope_keys:
+            raise ValueError(
+                "INVALID_IDENTITY_LINK: invalid Risk/Capital scope_identity"
+            )
+        if (
+            reference.paper_lifecycle_id
+            != reference.scope_identity["paper_lifecycle_id"]
+            or reference.scope_identity != authorization.scope_identity
+            or reference.scope_identity["candidate_id"]
+            != self.decision_intent.candidate_id
+            or reference.scope_identity["chain_id"] != self.decision_intent.chain_id
+            or reference.scope_identity["token_identity"]
+            != self.decision_intent.token_identity
+        ):
+            raise ValueError(
+                "INVALID_IDENTITY_LINK: Risk/Capital scope does not match P06"
+            )
+        try:
+            rebuilt_observation = AuthorizationObservation(
+                observation_id=authorization.observation_id,
+                status=authorization.status,
+                scope_identity=authorization.scope_identity,
+                observed_at=authorization.observed_at,
+                valid_from=authorization.valid_from,
+                valid_until=authorization.valid_until,
+                contract_version=authorization.contract_version,
+                risk_governor_version=authorization.risk_governor_version,
+                capital_authorization_version=authorization.capital_authorization_version,
+                reason_codes=authorization.reason_codes,
+                unknown_reasons=authorization.unknown_reasons,
+                observation_digest=authorization.observation_digest,
+                authorization_reference=reference,
+            )
+        except (TypeError, ValueError) as error:
+            if "observation_digest" in str(error):
+                raise ValueError(
+                    "DIGEST_MISMATCH: invalid authorization observation digest"
+                ) from error
+            raise ValueError(
+                "INVALID_IDENTITY_LINK: invalid authorization observation"
+            ) from error
+        if rebuilt_observation != authorization:
+            raise ValueError(
+                "DIGEST_MISMATCH: authorization observation is not canonical"
+            )
 
     def _validate_temporal_boundary(self) -> None:
         reference = self.simulation_reference_time
@@ -694,6 +790,27 @@ def _set_or_verify_digest(instance: Any, field: str, value: Any) -> None:
             raise ValueError(f"{field} does not match canonical representation")
     else:
         object.__setattr__(instance, field, expected)
+
+
+def _validate_reference_integrity(
+    reference: RiskCapitalAuthorizationReference,
+) -> None:
+    rebuilt = RiskCapitalAuthorizationReference(
+        authorization_id=reference.authorization_id,
+        authorization_digest=reference.authorization_digest,
+        decision_intent_digest=reference.decision_intent_digest,
+        context_digest=reference.context_digest,
+        paper_lifecycle_id=reference.paper_lifecycle_id,
+        scope_identity=reference.scope_identity,
+        contract_version=reference.contract_version,
+        risk_governor_version=reference.risk_governor_version,
+        capital_authorization_version=reference.capital_authorization_version,
+        authorization_effect=reference.authorization_effect,
+        evaluator_version=reference.evaluator_version,
+        reference_digest=reference.reference_digest,
+    )
+    if rebuilt != reference:
+        raise ValueError("authorization_reference is not canonical")
 
 
 def _freeze_mapping(value: Mapping[str, Any], name: str) -> Mapping[str, Any]:
@@ -815,8 +932,12 @@ __all__ = [
     "ObservationStatus",
     "P06DecisionIntentIdentity",
     "P07_T01_CONTRACT_VERSION",
+    "P07_T01_LEGACY_CONTRACT_VERSION",
+    "PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY",
     "PaperPositionExposureStateIdentity",
     "PaperSimulationInput",
+    "RISK_CAPITAL_AUTHORITY_CONTRACT_VERSION",
+    "RISK_CAPITAL_AUTHORITY_EVALUATOR_VERSION",
     "RiskCapitalAuthorizationReference",
     "ReplayIdentity",
     "SimulationConfigurationIdentity",

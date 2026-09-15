@@ -12,6 +12,9 @@ from core.execution import (
     PaperSimulationResult,
     PaperSimulationResultHistory,
 )
+from core.execution.paper_simulation_input import (
+    P07_T01_LEGACY_CONTRACT_VERSION,
+)
 from core.execution.paper_fill_outcome import TradeSide
 from core.execution.paper_ledger import create_paper_ledger_entry
 from core.execution.paper_position_exposure_state import (
@@ -245,6 +248,50 @@ def test_real_p06_p07_p08_chain_is_recognized() -> None:
     assert result.finality_state is G1FinalityState.FINAL
     assert result.reason_code is G1ReasonCode.RECOGNIZED_COMPLETE
     assert len(result.provenance) == 15
+
+
+def test_v2_missing_reference_has_required_input_precedence() -> None:
+    value = _real_p06_p07_p08_chain()
+    object.__setattr__(
+        value.p07.p07_t01.authorization_observation,
+        "authorization_reference",
+        None,
+    )
+
+    result = evaluate_g1(value)
+
+    assert result is not None
+    assert result.recognition_state is G1RecognitionState.NOT_RECOGNIZED
+    assert result.reason_code is G1ReasonCode.MISSING_REQUIRED_INPUT
+
+
+def test_v2_tampered_reference_is_an_invalid_identity_link() -> None:
+    value = _real_p06_p07_p08_chain()
+    reference = value.p07.p07_t01.authorization_observation.authorization_reference
+    assert reference is not None
+    object.__setattr__(reference, "authorization_digest", "0" * 64)
+
+    result = evaluate_g1(value)
+
+    assert result is not None
+    assert result.recognition_state is G1RecognitionState.NOT_RECOGNIZED
+    assert result.reason_code is G1ReasonCode.INVALID_IDENTITY_LINK
+
+
+def test_legacy_v1_input_is_readable_but_not_recognized_by_g1() -> None:
+    value = _real_p06_p07_p08_chain()
+    legacy_input = replace(
+        value.p07.p07_t01,
+        contract_version=P07_T01_LEGACY_CONTRACT_VERSION,
+        input_digest=None,
+    )
+    value = replace(value, p07=replace(value.p07, p07_t01=legacy_input))
+
+    result = evaluate_g1(value)
+
+    assert result is not None
+    assert result.recognition_state is G1RecognitionState.NOT_RECOGNIZED
+    assert result.reason_code is G1ReasonCode.UNSUPPORTED_VERSION
 
 
 def test_canonicalization_is_order_and_unicode_stable() -> None:

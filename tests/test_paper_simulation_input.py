@@ -16,6 +16,10 @@ from core.execution import (
     SimulationConfigurationIdentity,
 )
 from core.execution.paper_simulation_input import RiskCapitalAuthorizationReference
+from core.execution.paper_simulation_input import (
+    P07_T01_CONTRACT_VERSION,
+    P07_T01_LEGACY_CONTRACT_VERSION,
+)
 from core.risk.paper_risk_capital_authorization import (
     evaluate_paper_risk_capital_authorization,
 )
@@ -128,7 +132,7 @@ def _replay(**overrides):
     return ReplayIdentity(**values)
 
 
-def _input(**overrides):
+def _legacy_input(**overrides):
     values = {
         "decision_intent": _intent(),
         "authorization_observation": _authorization(),
@@ -137,6 +141,35 @@ def _input(**overrides):
         "initial_paper_state": _state(),
         "simulation_reference_time": REFERENCE,
         "replay_identity": _replay(),
+        "contract_version": P07_T01_LEGACY_CONTRACT_VERSION,
+    }
+    values.update(overrides)
+    return PaperSimulationInput(**values)
+
+
+def _input(**overrides):
+    intent = _risk_intent()
+    authorization = evaluate_paper_risk_capital_authorization(
+        intent,
+        _risk_policy(intent),
+    )
+    reference = intent.context.reference_time
+    values = {
+        "decision_intent": intent,
+        "authorization_observation": AuthorizationObservation.from_risk_capital_result(
+            authorization
+        ),
+        "execution_observation": _execution(
+            observation_time=reference - timedelta(seconds=10),
+            availability_time=reference - timedelta(seconds=5),
+        ),
+        "simulation_configuration": _configuration(),
+        "initial_paper_state": _state(
+            as_of_time=reference - timedelta(seconds=20),
+        ),
+        "simulation_reference_time": reference,
+        "replay_identity": _replay(),
+        "contract_version": P07_T01_CONTRACT_VERSION,
     }
     values.update(overrides)
     return PaperSimulationInput(**values)
@@ -161,13 +194,15 @@ def _approved_linked_input():
             as_of_time=reference - timedelta(seconds=20),
         ),
         simulation_reference_time=reference,
+        contract_version=P07_T01_CONTRACT_VERSION,
     ), authorization
 
 
 def test_valid_input_is_immutable_and_provider_neutral():
     value = _input()
 
-    assert value.contract_version == "p07-t01-v1"
+    assert value.contract_version == "p07-t01-v2"
+    assert value.authorization_observation.authorization_reference is not None
     assert len(value.digest) == 64
     assert value.decision_intent.intent.is_decision is True
     assert value.decision_intent.intent.is_authorization is False
@@ -181,10 +216,20 @@ def test_valid_input_is_immutable_and_provider_neutral():
 def test_p06_digest_identity_and_version_mismatches_are_rejected():
     intent = _intent()
     with pytest.raises(ValueError, match="decision_intent_digest"):
-        _input(decision_intent=type(_input().decision_intent)(intent, decision_intent_digest="0" * 64))
+        _legacy_input(
+            decision_intent=type(_input().decision_intent)(
+                intent,
+                decision_intent_digest="0" * 64,
+            )
+        )
     with pytest.raises(ValueError, match="p06_t01_ruleset_version"):
-        type(_input().decision_intent)(intent, p06_t01_ruleset_version="unsupported")
-    assert _input(decision_intent=intent).decision_intent.context_digest == intent.context_digest
+        type(_input().decision_intent)(
+            intent,
+            p06_t01_ruleset_version="unsupported",
+        )
+    assert _legacy_input(
+        decision_intent=intent
+    ).decision_intent.context_digest == intent.context_digest
 
 
 @pytest.mark.parametrize("status", [ObservationStatus.FAIL, ObservationStatus.UNKNOWN])
@@ -195,11 +240,11 @@ def test_authorization_fail_and_unknown_are_preserved_and_fail_closed(status):
     observation = _authorization(**kwargs)
     assert observation.status is status
     with pytest.raises(ValueError):
-        _input(authorization_observation=observation)
+        _legacy_input(authorization_observation=observation)
 
 
 def test_authorization_not_required_is_explicit():
-    value = _input(
+    value = _legacy_input(
         authorization_observation=_authorization(
             status=ObservationStatus.NOT_REQUIRED,
             valid_until=REFERENCE + timedelta(minutes=5),
@@ -223,16 +268,17 @@ def test_linked_approval_reference_is_immutable_and_canonical():
 
 def test_missing_mismatched_and_tampered_approval_linkage_fails_closed():
     linked, authorization = _approved_linked_input()
-    missing = _input(
-        decision_intent=linked.decision_intent.intent,
-        authorization_observation=linked.authorization_observation.with_authorization_reference(
-            None  # type: ignore[arg-type]
-        ),
-        execution_observation=linked.execution_observation,
-        initial_paper_state=linked.initial_paper_state,
-        simulation_reference_time=linked.simulation_reference_time,
-    )
-    assert missing.authorization_observation.authorization_reference is None
+    with pytest.raises(ValueError, match="MISSING_REQUIRED_INPUT"):
+        _input(
+            decision_intent=linked.decision_intent.intent,
+            authorization_observation=linked.authorization_observation.with_authorization_reference(
+                None
+            ),
+            execution_observation=linked.execution_observation,
+            initial_paper_state=linked.initial_paper_state,
+            simulation_reference_time=linked.simulation_reference_time,
+            contract_version=P07_T01_CONTRACT_VERSION,
+        )
 
     mismatched_intent = _risk_intent(
         expected_edge_assumptions=("different paper admission",),
@@ -257,6 +303,7 @@ def test_missing_mismatched_and_tampered_approval_linkage_fails_closed():
             initial_paper_state=linked.initial_paper_state,
             simulation_reference_time=linked.simulation_reference_time,
             replay_identity=linked.replay_identity,
+            contract_version=P07_T01_CONTRACT_VERSION,
             input_digest=linked.digest,
         )
 
@@ -277,9 +324,9 @@ def test_pass_authorization_requires_validity_and_execution_state_quality():
     with pytest.raises(ValueError, match="valid_until"):
         _authorization(valid_until=REFERENCE - timedelta(minutes=3))
     with pytest.raises(ValueError, match="execution observation"):
-        _input(execution_observation=_execution(quality=ObservationQuality.INVALID))
+        _legacy_input(execution_observation=_execution(quality=ObservationQuality.INVALID))
     with pytest.raises(ValueError, match="initial paper state"):
-        _input(initial_paper_state=_state(state_quality=ObservationQuality.FAIL))
+        _legacy_input(initial_paper_state=_state(state_quality=ObservationQuality.FAIL))
 
 
 def test_nested_digest_validation_and_unknown_fields():
@@ -299,6 +346,8 @@ def test_canonicalization_and_digest_are_stable():
         execution_observation=_execution(
             subject_identity={"token_identity": "token-1"},
             source_provenance={"source": "fixture"},
+            observation_time=first.simulation_reference_time - timedelta(seconds=10),
+            availability_time=first.simulation_reference_time - timedelta(seconds=5),
         )
     )
     assert first.canonical_representation == second.canonical_representation
@@ -320,8 +369,12 @@ def test_timestamp_and_decimal_canonicalization_helpers_are_deterministic():
 )
 def test_future_data_is_rejected(field):
     if field == "simulation_reference_time":
+        value = _input()
         with pytest.raises(ValueError, match="future"):
-            _input(simulation_reference_time=REFERENCE - timedelta(minutes=1))
+            _input(
+                simulation_reference_time=value.simulation_reference_time
+                - timedelta(minutes=1)
+            )
     elif field == "execution_observation":
         with pytest.raises(ValueError, match="future"):
             _input(

@@ -36,6 +36,7 @@ from core.execution.paper_reconciliation import (
 )
 from core.execution.paper_simulation_input import (
     P07_T01_CONTRACT_VERSION,
+    P07_T01_LEGACY_CONTRACT_VERSION,
     PaperSimulationInput,
     RiskCapitalAuthorizationReference,
 )
@@ -402,10 +403,35 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
                  p08.p08_t05, p08.p08_t06)
     if value.risk_capital_authorization is not None:
         artifacts = artifacts + (value.risk_capital_authorization,)
+    p07_input = p07.p07_t01
+    reference = p07_input.authorization_observation.authorization_reference
+    reference_invalid = False
+    if p07_input.contract_version == P07_T01_LEGACY_CONTRACT_VERSION:
+        failures.add(G1ReasonCode.UNSUPPORTED_VERSION)
+    elif p07_input.contract_version != P07_T01_CONTRACT_VERSION:
+        failures.add(G1ReasonCode.UNSUPPORTED_VERSION)
+    elif reference is None:
+        failures.add(G1ReasonCode.MISSING_REQUIRED_INPUT)
+        reference_invalid = True
+    else:
+        try:
+            _validate_artifact(reference)
+        except _Validation:
+            failures.add(G1ReasonCode.INVALID_IDENTITY_LINK)
+            reference_invalid = True
+        if not _p07_reference_linkage_is_valid(value):
+            failures.add(G1ReasonCode.INVALID_IDENTITY_LINK)
+            reference_invalid = True
     for artifact in artifacts:
         try:
             _validate_artifact(artifact)
         except _Validation as error:
+            if artifact in (
+                p07_input,
+                p08.p08_t01,
+                p08.p08_t02,
+            ) and reference_invalid:
+                continue
             failures.add(error.reason)
     if h.contract_version != P07_T07_CONTRACT_VERSION:
         failures.add(G1ReasonCode.UNSUPPORTED_VERSION)
@@ -423,7 +449,8 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
             reconciliation=p07.p07_t05,
         )
     except (AttributeError, TypeError, ValueError):
-        failures.add(G1ReasonCode.DIGEST_FAILURE)
+        if not reference_invalid:
+            failures.add(G1ReasonCode.DIGEST_FAILURE)
 
     # Exact predecessor linkage.
     if p07.p07_t01.decision_intent.decision_intent_digest != value.p06.digest:
@@ -537,7 +564,7 @@ def _references(value: G1SimulationOnlyEconomicAuthorityInput) -> tuple[str, ...
         link("p06_decision_intent", value.p06.digest, value.p06.digest,
              value.p06.contract_version, value.p06.evaluator_version),
         link("p07_simulation_input", p07.p07_t01.digest, p07.p07_t01.digest,
-             P07_T01_CONTRACT_VERSION, "NOT_APPLICABLE"),
+             p07.p07_t01.contract_version, "NOT_APPLICABLE"),
         link("p07_fill_outcome", p07.p07_t02.fill_id, p07.p07_t02.outcome_digest,
              P07_T02_CONTRACT_VERSION, p07.p07_t02.fill_model_version),
         link("p07_position_exposure", p07.p07_t03.transition_digest, p07.p07_t03.transition_digest,
@@ -613,6 +640,62 @@ def _lifecycle_consistent(authority: G1AuthorityAReference, artifact: Any) -> bo
     return True
 
 
+def _p07_reference_linkage_is_valid(
+    value: G1SimulationOnlyEconomicAuthorityInput,
+) -> bool:
+    p07_input = value.p07.p07_t01
+    observation = p07_input.authorization_observation
+    reference = observation.authorization_reference
+    if not isinstance(reference, RiskCapitalAuthorizationReference):
+        return False
+    try:
+        if (
+            reference.authorization_id != observation.observation_id
+            or reference.scope_identity != observation.scope_identity
+            or reference.decision_intent_digest
+            != p07_input.decision_intent.decision_intent_digest
+            or reference.context_digest != p07_input.decision_intent.context_digest
+        ):
+            return False
+        if set(reference.scope_identity) != {
+            "paper_lifecycle_id",
+            "paper_portfolio_id",
+            "candidate_id",
+            "chain_id",
+            "token_identity",
+        }:
+            return False
+        if (
+            reference.paper_lifecycle_id
+            != reference.scope_identity["paper_lifecycle_id"]
+            or reference.scope_identity["candidate_id"]
+            != p07_input.decision_intent.candidate_id
+            or reference.scope_identity["chain_id"]
+            != p07_input.decision_intent.chain_id
+            or reference.scope_identity["token_identity"]
+            != p07_input.decision_intent.token_identity
+        ):
+            return False
+        rebuilt_observation = type(observation)(
+            observation_id=observation.observation_id,
+            status=observation.status,
+            scope_identity=observation.scope_identity,
+            observed_at=observation.observed_at,
+            valid_from=observation.valid_from,
+            valid_until=observation.valid_until,
+            contract_version=observation.contract_version,
+            risk_governor_version=observation.risk_governor_version,
+            capital_authorization_version=observation.capital_authorization_version,
+            reason_codes=observation.reason_codes,
+            unknown_reasons=observation.unknown_reasons,
+            observation_digest=observation.observation_digest,
+            authorization_reference=reference,
+        )
+        return rebuilt_observation == observation
+    except (AttributeError, KeyError, TypeError, ValueError, _Validation):
+        return False
+
+
 def _risk_capital_linkage(
     value: G1SimulationOnlyEconomicAuthorityInput,
 ) -> bool:
@@ -623,6 +706,8 @@ def _risk_capital_linkage(
         reference,
         RiskCapitalAuthorizationReference,
     ):
+        return False
+    if value.p07.p07_t01.contract_version != P07_T01_CONTRACT_VERSION:
         return False
     try:
         if not is_dataclass(authorization):
@@ -664,7 +749,7 @@ def _risk_capital_linkage(
                 "unknown_reasons",
             )
         )
-    except (AttributeError, KeyError, TypeError, ValueError):
+    except (AttributeError, KeyError, TypeError, ValueError, _Validation):
         return False
 
 
