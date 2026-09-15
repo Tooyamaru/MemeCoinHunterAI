@@ -1,6 +1,6 @@
 # P08 — P07 Risk/Capital Admission Contract Specification
 
-**Status:** SPECIFICATION CORRECTED / AWAITING FORMAL RE-AUDIT
+**Status:** SPECIFICATION CORRECTED / AWAITING SECOND FORMAL RE-AUDIT
 **Project:** MemeCoinHunterAI  
 **Phase:** P08 — Outcome Learning  
 **Boundary:** P06 `DecisionIntent` → Safe V1 Risk/Capital → P07-T01  
@@ -190,8 +190,16 @@ finality_state    = NOT_APPLICABLE
 reason_code       = UNSUPPORTED_VERSION
 ```
 
-The exact G1 refusal for a v2 artifact whose required reference is missing or
-does not match the actual Risk/Capital result is:
+The exact G1 refusal for a v2 artifact whose required reference is missing is:
+
+```text
+recognition_state = NOT_RECOGNIZED
+finality_state    = NOT_APPLICABLE
+reason_code       = MISSING_REQUIRED_INPUT
+```
+
+The exact G1 refusal for a v2 artifact whose present reference is mismatched,
+invalid, or tampered is:
 
 ```text
 recognition_state = NOT_RECOGNIZED
@@ -199,19 +207,11 @@ finality_state    = NOT_APPLICABLE
 reason_code       = INVALID_IDENTITY_LINK
 ```
 
-For the current recognition contract, the missing-reference case has one
-canonical mapping, regardless of which internal validator observes it first:
-
-```text
-v2 PASS with no authorization_reference
-    → recognition_state = NOT_RECOGNIZED
-    → finality_state    = NOT_APPLICABLE
-    → reason_code       = MISSING_REQUIRED_INPUT
-```
-
-`INVALID_IDENTITY_LINK` is reserved for a present reference or supplied
-authorization material whose identity linkage is wrong. The G1 precedence
-checks `MISSING_REQUIRED_INPUT` before `INVALID_IDENTITY_LINK`.
+The missing-reference case has one canonical mapping regardless of which
+internal validator observes it first. `INVALID_IDENTITY_LINK` is reserved for
+a present reference or supplied authorization material whose identity linkage
+is wrong, invalid, or tampered. The G1 precedence checks
+`MISSING_REQUIRED_INPUT` before `INVALID_IDENTITY_LINK`.
 
 Direct P07-T01 v2 admission rejects a missing required reference with
 `MISSING_REQUIRED_INPUT` before a simulation lifecycle can begin.
@@ -956,7 +956,8 @@ For this contract:
 - v2 missing reference always maps to `MISSING_REQUIRED_INPUT`, before
   `INVALID_IDENTITY_LINK`, regardless of which internal validator notices it;
 - v2 reference/result/P06 mismatch maps to `INVALID_IDENTITY_LINK`;
-- reference or result digest tampering maps to `DIGEST_FAILURE`;
+- a present reference with digest tampering maps to `INVALID_IDENTITY_LINK`;
+- supplied Risk/Capital result digest tampering maps to `DIGEST_FAILURE`;
 - contradictory lifecycle/history material maps to
   `CONTRADICTORY_INPUT`; and
 - stale or future-inconsistent linked material maps to `STALE_INPUT`.
@@ -974,7 +975,7 @@ substitutes failed evidence.
 | Reference ID differs from observation ID | `PROVENANCE_LINKAGE_FAILURE` | `INVALID_IDENTITY_LINK` |
 | Reference P06 digest differs | `PROVENANCE_LINKAGE_FAILURE` | `INVALID_IDENTITY_LINK` |
 | Reference scope/lifecycle differs | `SCOPE_MISMATCH` | `INVALID_IDENTITY_LINK` |
-| Reference digest tampered | `DIGEST_MISMATCH` | `DIGEST_FAILURE` |
+| Reference digest tampered | `DIGEST_MISMATCH` | `INVALID_IDENTITY_LINK` |
 | Authorization result digest differs | `DIGEST_MISMATCH` | `DIGEST_FAILURE` |
 | `FAIL`, `UNKNOWN`, or required-path `NOT_REQUIRED` | `AUTHORIZATION_NOT_APPROVED` | `FAILED_INPUT`, `UNKNOWN_INPUT`, or `INVALID_IDENTITY_LINK` by predecessor state |
 | Expired approval | `AUTHORIZATION_STALE` | `STALE_INPUT` |
@@ -1073,10 +1074,13 @@ The authorized future focused suite must cover:
     contradictory repeated input;
 17. legacy v1 remains readable only as legacy evidence and is refused by G1
     with `NOT_RECOGNIZED / NOT_APPLICABLE / UNSUPPORTED_VERSION`;
-18. v2 missing or mismatched reference is refused by G1 and cannot recognize;
-19. the real opportunity/risk → P06 → Risk/Capital → P07 → P07 result/history
+18. v2 missing reference is refused by G1 with
+    `NOT_RECOGNIZED / NOT_APPLICABLE / MISSING_REQUIRED_INPUT`;
+19. a present but mismatched, invalid, or tampered v2 reference is refused by
+    G1 with `NOT_RECOGNIZED / NOT_APPLICABLE / INVALID_IDENTITY_LINK`;
+20. the real opportunity/risk → P06 → Risk/Capital → P07 → P07 result/history
     → P08 → G1 composition remains recognized only when fully linked; and
-20. no test introduces provider, wallet, signer, live execution, settlement,
+21. no test introduces provider, wallet, signer, live execution, settlement,
     accounting, realized P&L, classification, G2, G3, G4, or P09 behavior.
 
 ## 15. Separate governance gates

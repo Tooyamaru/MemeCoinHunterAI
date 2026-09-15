@@ -1,10 +1,18 @@
 # P08 — P07 Risk/Capital Admission Contract Proposal
 
-**Status:** DOCUMENTATION-ONLY PROPOSAL / IMPLEMENTATION NOT AUTHORIZED  
+**Status:** SUPERSEDED / NON-NORMATIVE HISTORICAL PROPOSAL
 **Phase:** P08 — Outcome Learning  
 **Project:** MemeCoinHunterAI  
 **Boundary:** P06 `DecisionIntent` → Risk/Capital paper admission → P07-T01  
 **Purpose:** Resolve blocker B-01 from the paper-lifecycle readiness re-audit
+
+This document is preserved as a historical record only. Its former
+eighteen-field `RiskCapitalAuthorizationReference` schema has no current
+contract authority and must not be used for implementation, validation, or
+compatibility decisions. The corrected specification
+`docs/P08-P07-RISK-CAPITAL-ADMISSION-CONTRACT-SPECIFICATION.md` is the sole
+normative Safe V1 source and defines the canonical twelve-field reference
+schema. Implementation remains separately unauthorized.
 
 ## 1. Executive proposal
 
