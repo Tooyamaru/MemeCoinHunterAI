@@ -1,8 +1,8 @@
 # P08 — P07 Risk/Capital Admission `p07-t01-v2` Implementation Audit
 
-**Audit date:** 2026-09-15  
-**Project:** MemeCoinHunterAI  
-**Audit type:** Documentation-only formal implementation audit  
+**Audit date:** 2026-09-15
+**Project:** MemeCoinHunterAI
+**Audit type:** Documentation-only formal implementation audit
 **Scope:** Repository root only; nested stale mirrors were not used.
 
 ## Overall verdict
