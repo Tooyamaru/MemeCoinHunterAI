@@ -1,9 +1,9 @@
 # P08 — P07 Risk/Capital Admission Contract Specification Second Formal Re-Audit
 
-**Audit date:** 2026-09-15  
-**Project:** MemeCoinHunterAI  
-**Audit type:** Documentation-only formal specification second re-audit  
-**Checkpoint requested:** `main` at `63b2392`  
+**Audit date:** 2026-09-15
+**Project:** MemeCoinHunterAI
+**Audit type:** Documentation-only formal specification second re-audit
+**Checkpoint requested:** `main` at `63b2392`
 **Audited specification:** `docs/P08-P07-RISK-CAPITAL-ADMISSION-CONTRACT-SPECIFICATION.md`
 
 ## Overall verdict
