@@ -1,6 +1,6 @@
 # P08 — P07 Risk/Capital Admission Contract Specification
 
-**Status:** SPECIFICATION COMPLETE / AWAITING FORMAL AUDIT  
+**Status:** SPECIFICATION CORRECTED / AWAITING FORMAL RE-AUDIT
 **Project:** MemeCoinHunterAI  
 **Phase:** P08 — Outcome Learning  
 **Boundary:** P06 `DecisionIntent` → Safe V1 Risk/Capital → P07-T01  
@@ -126,6 +126,25 @@ The reference does not introduce a second authorization evaluator. Its
 Risk/Capital evaluator. The enclosing P07-T01 v2 contract identifies the
 reference-required admission schema.
 
+The exact supported-version matrix for this linked path is:
+
+| Boundary | Supported version | Compatibility rule |
+|---|---|---|
+| P07-T01 new required-entry input | `p07-t01-v2` | Requires one valid reference for `PASS`. |
+| P07-T01 legacy input | `p07-t01-v1` | Legacy/read-only evidence only; never a current admission. |
+| P07-T02 | `p07-t02-v1` | Preserves the v2 T01 input identity; no v2 reinterpretation. |
+| P07-T03 | `p07-t03-v1` | Preserves the v2 T01 input identity through predecessor links. |
+| P07-T04 | `p07-t04-v1` | Preserves the v2 T01 input identity through ledger provenance. |
+| P07-T05 | `p07-t05-v1` | Preserves the v2 T01 input identity through reconciliation provenance. |
+| P07-T06 | `p07-t06-v1` | Preserves the v2 T01 input digest; it does not re-evaluate Risk/Capital. |
+| P07-T07 | `p07-t07-v1` | Stores only validated T06 results and transitively protects the v2 input digest. |
+| G1 current-recognition path | `p07-t01-v2` plus the P07-T02 through T07 versions above | A v1 T01 artifact is unsupported legacy evidence. |
+
+The matrix describes the future v2 recognition path. It does not change the
+current v1 runtime or authorize implementation. Until a separate
+implementation authorization passes, the current source remains a v1
+implementation and no v2 artifact can be produced by runtime.
+
 ### 3.2 Version compatibility
 
 Any change to a field's:
@@ -179,6 +198,20 @@ recognition_state = NOT_RECOGNIZED
 finality_state    = NOT_APPLICABLE
 reason_code       = INVALID_IDENTITY_LINK
 ```
+
+For the current recognition contract, the missing-reference case has one
+canonical mapping, regardless of which internal validator observes it first:
+
+```text
+v2 PASS with no authorization_reference
+    → recognition_state = NOT_RECOGNIZED
+    → finality_state    = NOT_APPLICABLE
+    → reason_code       = MISSING_REQUIRED_INPUT
+```
+
+`INVALID_IDENTITY_LINK` is reserved for a present reference or supplied
+authorization material whose identity linkage is wrong. The G1 precedence
+checks `MISSING_REQUIRED_INPUT` before `INVALID_IDENTITY_LINK`.
 
 Direct P07-T01 v2 admission rejects a missing required reference with
 `MISSING_REQUIRED_INPUT` before a simulation lifecycle can begin.
@@ -315,24 +348,44 @@ field.
 
 The immutable reference contains exactly these fields:
 
-| Field | Type | Required | Meaning |
-|---|---|---:|---|
-| `authorization_id` | lowercase SHA-256 text | yes | Exact Risk/Capital authorization identity. |
-| `authorization_digest` | lowercase SHA-256 text | yes | Exact digest of the complete Risk/Capital result. |
-| `decision_intent_digest` | lowercase SHA-256 text | yes | Exact P06 `DecisionIntent` digest. |
-| `context_digest` | lowercase SHA-256 text | yes | Exact P06 context digest. |
-| `paper_lifecycle_id` | canonical text | yes | Exact paper lifecycle identity. |
-| `scope_identity` | bounded canonical mapping | yes | Exact Risk/Capital scope. |
-| `contract_version` | canonical text | yes | Must be `p08-risk-capital-authority-v1`. |
-| `risk_governor_version` | canonical text | yes | Exact Risk Governor version. |
-| `capital_authorization_version` | canonical text | yes | Exact capital-authorization version. |
-| `authorization_effect` | canonical text | yes | Must be `PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY`. |
-| `evaluator_version` | canonical text | yes | Must be `p08-risk-capital-authority-evaluator-v1`. |
-| `reference_digest` | lowercase SHA-256 text | derived and verified | Digest of every other reference field. |
+| Field | Type | Required | Canonical/null policy | Meaning |
+|---|---|---:|---|---|
+| `authorization_id` | lowercase SHA-256 text | yes | Non-null; exactly 64 lowercase hexadecimal characters. | Exact Risk/Capital authorization identity. |
+| `authorization_digest` | lowercase SHA-256 text | yes | Non-null; exactly 64 lowercase hexadecimal characters. | Exact digest of the complete Risk/Capital result. |
+| `decision_intent_digest` | lowercase SHA-256 text | yes | Non-null; exactly 64 lowercase hexadecimal characters. | Exact P06 `DecisionIntent` digest. |
+| `context_digest` | lowercase SHA-256 text | yes | Non-null; exactly 64 lowercase hexadecimal characters. | Exact P06 context digest. |
+| `paper_lifecycle_id` | canonical text | yes | Non-null; trimmed, non-empty, bounded UTF-8 text. | Exact paper lifecycle identity. |
+| `scope_identity` | bounded canonical mapping | yes | Non-null; exact five-key mapping in Section 5.2; no nullable members. | Exact Risk/Capital scope. |
+| `contract_version` | canonical text | yes | Non-null; exactly `p08-risk-capital-authority-v1`. | Safe V1 Risk/Capital authority contract version. |
+| `risk_governor_version` | canonical text | yes | Non-null; trimmed, non-empty, bounded UTF-8 text. | Exact Risk Governor version. |
+| `capital_authorization_version` | canonical text | yes | Non-null; trimmed, non-empty, bounded UTF-8 text. | Exact capital-authorization version. |
+| `authorization_effect` | canonical text | yes | Non-null; exactly `PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY`. | Fixed paper-only effect. |
+| `evaluator_version` | canonical text | yes | Non-null; exactly `p08-risk-capital-authority-evaluator-v1`. | Safe V1 evaluator version. |
+| `reference_digest` | lowercase SHA-256 text | derived and verified | Non-null after derivation; exactly 64 lowercase hexadecimal characters. | Digest of every other reference field. |
 
 No additional semantic fields are permitted. In particular, the reference
 contains no provider, wallet, account, key, signer, order, transaction,
 settlement, accounting, valuation, realized P&L, ROI, or classification field.
+
+This twelve-field schema is the one canonical P07/G1 reference schema. It
+matches the current P07 field names and types and does not introduce a second
+reference-schema version. The complete Risk/Capital result remains the source
+for required linked provenance that is intentionally not duplicated in this
+bounded reference:
+
+| Result-only linked provenance | Type | Required/null policy |
+|---|---|---|
+| `policy_snapshot_id` | canonical text | Required and non-null in the complete result. |
+| `policy_snapshot_digest` | lowercase SHA-256 text | Derived, verified, required, and non-null in the complete result. |
+| `simulation_reference_time` | timezone-aware UTC timestamp | Required and non-null in the complete result. |
+| `valid_from` | timezone-aware UTC timestamp | Required and non-null in the complete result. |
+| `valid_until` | timezone-aware UTC timestamp | Required and non-null for an approved result. |
+
+These result-only fields are verified against the supplied P07
+`simulation_reference_time` and observation validity fields. They are not
+reconstructed from the reference and are not nullable substitutes for missing
+reference fields. The complete result and the observation must be supplied to
+G1; the reference alone never proves those result-only fields.
 
 The reference is created by the value-preserving handoff from the actual
 immutable Risk/Capital result. Its construction must preserve:
@@ -403,7 +456,10 @@ The reference is valid only when:
 10. lifecycle and scope values agree across P06, Risk/Capital, and P07;
 11. authority and evaluator versions agree across the handoff;
 12. the referenced result has `status == APPROVED`; and
-13. the approval is valid at the explicit P07 simulation reference time.
+13. where the complete result is supplied, its policy identity, policy digest,
+    simulation reference time, and validity bounds are present, canonical,
+    digest-valid, and agree with the P07 observation;
+14. the approval is valid at the explicit P07 simulation reference time.
 
 P07 validates the reference and its duplicated identity links. P07 does not
 re-evaluate Risk/Capital predicates. G1 validates the complete authorization
@@ -461,6 +517,22 @@ The following values must also agree:
 - Risk/Capital evaluator version; and
 - fixed authorization effect.
 
+The following complete-result fields are also required for the linked path but
+are not duplicated in the twelve-field reference:
+
+```text
+Risk/Capital result.policy_snapshot_id
+Risk/Capital result.policy_snapshot_digest
+Risk/Capital result.simulation_reference_time
+Risk/Capital result.valid_from
+Risk/Capital result.valid_until
+```
+
+They must be copied or verified from the actual immutable result and compared
+to the P07 observation and input cutoff. A missing or contradictory result-only
+field fails closed; P07 and G1 must not infer it from an ID, digest, label, or
+timestamp.
+
 The P07 observation is a value-preserving handoff, not a new approval. P07
 must not accept an observation whose ID, digest, status, scope, validity,
 version, reason, or reference differs from the actual Risk/Capital result.
@@ -515,6 +587,9 @@ P06 context.reference_time
     <= P06 decision_time
     <= P07 simulation_reference_time
 
+authorization_observation.observed_at
+    <= P07 simulation_reference_time
+
 authorization.valid_from
     <= P07 simulation_reference_time
     <= authorization.valid_until
@@ -527,9 +602,21 @@ initial_paper_state.as_of_time
     <= P07 simulation_reference_time
 ```
 
-Naive timestamps, invalid offsets, future observations, expired approvals, and
-impossible ordering fail closed. No wall-clock call, external lookup, or
-freshness inference is permitted.
+The sole P07 cutoff source is
+`PaperSimulationInput.simulation_reference_time`. Every timestamp above must be
+timezone-aware, normalized to UTC, and compared as an instant. A future
+authorization is any supplied `observed_at` or `valid_from` strictly greater
+than the cutoff. It fails with `AUTHORIZATION_FUTURE_DATED`. An authorization
+is stale when `valid_until` is strictly less than the cutoff. It fails with
+`AUTHORIZATION_STALE`. The equality boundaries are valid:
+`observed_at == cutoff`, `valid_from == cutoff`, and `valid_until == cutoff`
+are not future or stale.
+
+Missing, malformed, naive, offset-invalid, or otherwise non-canonical cutoff
+material fails with `REFERENCE_TIME_INVALID` under the fixed precedence.
+Missing or malformed authorization validity fields use the applicable missing,
+invalid, or non-canonical category before temporal classification. No wall-clock
+call, external lookup, or freshness inference is permitted.
 
 ## 8. Canonical serialization and digest rules
 
@@ -635,6 +722,26 @@ reference_digest
 observation_digest
 input_digest
 ```
+
+The twelve reference fields above are the complete reference-carried
+provenance. The following result-only fields are required linked provenance and
+must remain available through the separately supplied complete Risk/Capital
+result and its value-preserving observation handoff:
+
+```text
+policy_snapshot_id
+policy_snapshot_digest
+simulation_reference_time
+valid_from
+valid_until
+```
+
+P07-T01 retains the reference-carried fields in the observation and input
+digests. It retains the result-only fields by requiring the linked handoff to
+validate them before admission; it does not copy them into the reference or
+reconstruct them later. P07-T06 preserves the T01 input digest, and P07-T07
+preserves the T06 result and its input digest, so the complete v2 linkage is
+protected transitively without changing the v1 T06/T07 field contracts.
 
 No link is reconstructed from a partial field. No link is dropped because a
 generic observation also contains a matching label.
@@ -846,8 +953,8 @@ For this contract:
 
 - legacy `p07-t01-v1` in the current recognition path maps to
   `UNSUPPORTED_VERSION`;
-- v2 missing reference maps to `MISSING_REQUIRED_INPUT` if the missing
-  required artifact is detected at G1 input validation;
+- v2 missing reference always maps to `MISSING_REQUIRED_INPUT`, before
+  `INVALID_IDENTITY_LINK`, regardless of which internal validator notices it;
 - v2 reference/result/P06 mismatch maps to `INVALID_IDENTITY_LINK`;
 - reference or result digest tampering maps to `DIGEST_FAILURE`;
 - contradictory lifecycle/history material maps to
@@ -862,13 +969,13 @@ substitutes failed evidence.
 | Condition | Direct v2 P07 admission | G1 current-recognition path |
 |---|---|---|
 | Missing authorization observation | `MISSING_REQUIRED_INPUT` | `MISSING_REQUIRED_INPUT` |
-| Generic `PASS` without reference | `MISSING_REQUIRED_INPUT` | `MISSING_REQUIRED_INPUT` or `INVALID_IDENTITY_LINK` according to first failed validation boundary; never recognized |
+| Generic `PASS` without reference | `MISSING_REQUIRED_INPUT` | `MISSING_REQUIRED_INPUT` |
 | Missing actual Risk/Capital result | P07 may validate only the bounded handoff; no approval is implied | `MISSING_REQUIRED_INPUT` |
 | Reference ID differs from observation ID | `PROVENANCE_LINKAGE_FAILURE` | `INVALID_IDENTITY_LINK` |
 | Reference P06 digest differs | `PROVENANCE_LINKAGE_FAILURE` | `INVALID_IDENTITY_LINK` |
 | Reference scope/lifecycle differs | `SCOPE_MISMATCH` | `INVALID_IDENTITY_LINK` |
 | Reference digest tampered | `DIGEST_MISMATCH` | `DIGEST_FAILURE` |
-| Authorization result digest differs | `DIGEST_MISMATCH` | `DIGEST_FAILURE` or `INVALID_IDENTITY_LINK` by validation precedence |
+| Authorization result digest differs | `DIGEST_MISMATCH` | `DIGEST_FAILURE` |
 | `FAIL`, `UNKNOWN`, or required-path `NOT_REQUIRED` | `AUTHORIZATION_NOT_APPROVED` | `FAILED_INPUT`, `UNKNOWN_INPUT`, or `INVALID_IDENTITY_LINK` by predecessor state |
 | Expired approval | `AUTHORIZATION_STALE` | `STALE_INPUT` |
 | Future-dated approval or observation | `AUTHORIZATION_FUTURE_DATED` | `STALE_INPUT` |
@@ -1011,13 +1118,14 @@ No gate is satisfied by this specification alone.
 
 This specification task is complete when:
 
-- this document is marked `SPECIFICATION COMPLETE / AWAITING FORMAL AUDIT`;
+- this document is marked `SPECIFICATION CORRECTED / AWAITING FORMAL RE-AUDIT`;
 - the exact v2 and reference contracts are documented;
 - legacy handling and exact G1 refusal are documented;
 - propagation and fail-closed behavior are documented;
 - the eight-file future scope is documented;
 - the separate implementation-authorization gate is documented;
-- `PROJECT_STATE.md` contains the synchronized state sentence;
+- `PROJECT_STATE.md` remains unchanged until the formal re-audit passes; the
+  synchronized state sentence is not part of this correction;
 - no runtime, test, dependency, environment, provider, or future-phase file is
   changed by this specification task; and
 - no commit or push is performed.
