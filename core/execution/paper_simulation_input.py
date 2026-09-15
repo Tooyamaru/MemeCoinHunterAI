@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from decimal import Decimal
 from enum import StrEnum
@@ -136,6 +136,7 @@ class AuthorizationObservation:
     reason_codes: tuple[str, ...] = ()
     unknown_reasons: tuple[str, ...] = ()
     observation_digest: str | None = None
+    authorization_reference: "RiskCapitalAuthorizationReference | None" = None
 
     def __post_init__(self) -> None:
         _require_text(self.observation_id, "observation_id")
@@ -157,6 +158,28 @@ class AuthorizationObservation:
         object.__setattr__(self, "unknown_reasons", _texts(self.unknown_reasons, "unknown_reasons"))
         if self.status is ObservationStatus.UNKNOWN and not self.unknown_reasons:
             raise ValueError("UNKNOWN authorization requires unknown_reasons")
+        if self.authorization_reference is not None:
+            if not isinstance(
+                self.authorization_reference,
+                RiskCapitalAuthorizationReference,
+            ):
+                raise ValueError(
+                    "authorization_reference must be a "
+                    "RiskCapitalAuthorizationReference"
+                )
+            reference = self.authorization_reference
+            if (
+                reference.authorization_id != self.observation_id
+                or reference.scope_identity != self.scope_identity
+                or reference.contract_version != self.contract_version
+                or reference.risk_governor_version
+                != self.risk_governor_version
+                or reference.capital_authorization_version
+                != self.capital_authorization_version
+            ):
+                raise ValueError(
+                    "authorization_reference does not match observation"
+                )
         _set_or_verify_digest(self, "observation_digest", self._canonical_without_digest())
 
     def _canonical_without_digest(self) -> Mapping[str, Any]:
@@ -172,11 +195,148 @@ class AuthorizationObservation:
             "capital_authorization_version": self.capital_authorization_version,
             "reason_codes": self.reason_codes,
             "unknown_reasons": self.unknown_reasons,
+            "authorization_reference": (
+                self.authorization_reference.canonical_representation
+                if self.authorization_reference is not None
+                else None
+            ),
         }
 
     @property
     def canonical_representation(self) -> Mapping[str, Any]:
         return _freeze({**self._canonical_without_digest(), "observation_digest": self.observation_digest})
+
+    deterministic_representation = property(lambda self: self.canonical_representation)
+
+    @classmethod
+    def from_risk_capital_result(cls, result: Any) -> "AuthorizationObservation":
+        """Create a linked observation from the existing Risk/Capital handoff."""
+
+        if not hasattr(result, "to_authorization_observation"):
+            raise ValueError("result must provide to_authorization_observation")
+        observation = result.to_authorization_observation()
+        reference = RiskCapitalAuthorizationReference.from_authorization_result(result)
+        return cls(
+            observation_id=observation.observation_id,
+            status=observation.status,
+            scope_identity=observation.scope_identity,
+            observed_at=observation.observed_at,
+            valid_from=observation.valid_from,
+            valid_until=observation.valid_until,
+            contract_version=observation.contract_version,
+            risk_governor_version=observation.risk_governor_version,
+            capital_authorization_version=observation.capital_authorization_version,
+            reason_codes=observation.reason_codes,
+            unknown_reasons=observation.unknown_reasons,
+            authorization_reference=reference,
+        )
+
+    from_risk_capital_authorization = from_risk_capital_result
+
+    def with_authorization_reference(
+        self,
+        reference: "RiskCapitalAuthorizationReference",
+    ) -> "AuthorizationObservation":
+        return replace(
+            self,
+            authorization_reference=reference,
+            observation_digest=None,
+        )
+
+
+@dataclass(frozen=True)
+class RiskCapitalAuthorizationReference:
+    """Bounded immutable reference to one exact Risk/Capital approval."""
+
+    authorization_id: str
+    authorization_digest: str
+    decision_intent_digest: str
+    context_digest: str
+    paper_lifecycle_id: str
+    scope_identity: Mapping[str, Any]
+    contract_version: str
+    risk_governor_version: str
+    capital_authorization_version: str
+    authorization_effect: str
+    evaluator_version: str
+    reference_digest: str | None = None
+
+    def __post_init__(self) -> None:
+        for value, name in (
+            (self.authorization_id, "authorization_id"),
+            (self.authorization_digest, "authorization_digest"),
+            (self.decision_intent_digest, "decision_intent_digest"),
+            (self.context_digest, "context_digest"),
+        ):
+            _require_digest(value, name)
+        for value, name in (
+            (self.paper_lifecycle_id, "paper_lifecycle_id"),
+            (self.contract_version, "contract_version"),
+            (self.risk_governor_version, "risk_governor_version"),
+            (self.capital_authorization_version, "capital_authorization_version"),
+            (self.authorization_effect, "authorization_effect"),
+            (self.evaluator_version, "evaluator_version"),
+        ):
+            _require_text(value, name)
+        object.__setattr__(
+            self,
+            "scope_identity",
+            _freeze_mapping(self.scope_identity, "scope_identity"),
+        )
+        _set_or_verify_digest(
+            self,
+            "reference_digest",
+            self._canonical_without_digest(),
+        )
+
+    @classmethod
+    def from_authorization_result(cls, result: Any) -> "RiskCapitalAuthorizationReference":
+        try:
+            return cls(
+                authorization_id=result.authorization_id,
+                authorization_digest=result.digest,
+                decision_intent_digest=result.decision_intent_digest,
+                context_digest=result.context_digest,
+                paper_lifecycle_id=result.paper_lifecycle_id,
+                scope_identity=result.scope_identity,
+                contract_version=result.contract_version,
+                risk_governor_version=result.provenance["risk_governor_version"],
+                capital_authorization_version=result.provenance[
+                    "capital_authorization_version"
+                ],
+                authorization_effect=result.authorization_effect,
+                evaluator_version=result.evaluator_version,
+            )
+        except (AttributeError, KeyError, TypeError) as error:
+            raise ValueError(
+                "result is not a Risk/Capital authorization"
+            ) from error
+
+    from_risk_capital_authorization = from_authorization_result
+
+    def _canonical_without_digest(self) -> Mapping[str, Any]:
+        return {
+            "authorization_id": self.authorization_id,
+            "authorization_digest": self.authorization_digest,
+            "decision_intent_digest": self.decision_intent_digest,
+            "context_digest": self.context_digest,
+            "paper_lifecycle_id": self.paper_lifecycle_id,
+            "scope_identity": self.scope_identity,
+            "contract_version": self.contract_version,
+            "risk_governor_version": self.risk_governor_version,
+            "capital_authorization_version": self.capital_authorization_version,
+            "authorization_effect": self.authorization_effect,
+            "evaluator_version": self.evaluator_version,
+        }
+
+    @property
+    def canonical_representation(self) -> Mapping[str, Any]:
+        return _freeze(
+            {
+                **self._canonical_without_digest(),
+                "reference_digest": self.reference_digest,
+            }
+        )
 
     deterministic_representation = property(lambda self: self.canonical_representation)
 
@@ -397,6 +557,16 @@ class PaperSimulationInput:
         object.__setattr__(self, "decision_intent", identity)
         if not isinstance(self.authorization_observation, AuthorizationObservation):
             raise ValueError("authorization_observation must be an AuthorizationObservation")
+        if self.authorization_observation.authorization_reference is not None:
+            reference = self.authorization_observation.authorization_reference
+            if (
+                reference.decision_intent_digest
+                != self.decision_intent.decision_intent_digest
+                or reference.context_digest != self.decision_intent.context_digest
+            ):
+                raise ValueError(
+                    "authorization_reference does not match DecisionIntent"
+                )
         if not isinstance(self.execution_observation, ExecutionObservation):
             raise ValueError("execution_observation must be an ExecutionObservation")
         if not isinstance(self.simulation_configuration, SimulationConfigurationIdentity):
@@ -647,6 +817,7 @@ __all__ = [
     "P07_T01_CONTRACT_VERSION",
     "PaperPositionExposureStateIdentity",
     "PaperSimulationInput",
+    "RiskCapitalAuthorizationReference",
     "ReplayIdentity",
     "SimulationConfigurationIdentity",
 ]

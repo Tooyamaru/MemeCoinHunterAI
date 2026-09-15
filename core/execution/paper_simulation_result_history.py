@@ -107,6 +107,7 @@ class PaperSimulationResultHistory:
         | None = None,
     ) -> None:
         self._results_by_digest: dict[str, PaperSimulationResult] = {}
+        self._results_by_input_digest: dict[str, PaperSimulationResult] = {}
         if results is not None:
             if not isinstance(results, (tuple, list)):
                 raise ValueError("results must be a tuple or list")
@@ -157,12 +158,21 @@ class PaperSimulationResultHistory:
         existing = self._results_by_digest.get(digest)
         if existing is not None:
             return self._result(
-                outcome=PaperSimulationResultHistoryOutcome.DUPLICATE,
-                result=existing,
+                outcome=PaperSimulationResultHistoryOutcome.INVALID_INPUT,
+                result=None,
                 results=current,
-                reason_codes=("RESULT_ALREADY_STORED",),
+                reason_codes=("SIMULATION_INPUT_ALREADY_STORED",),
+            )
+        existing_input = self._results_by_input_digest.get(result.input_digest)
+        if existing_input is not None:
+            return self._result(
+                outcome=PaperSimulationResultHistoryOutcome.INVALID_INPUT,
+                result=None,
+                results=current,
+                reason_codes=("CONTRADICTORY_SIMULATION_INPUT",),
             )
         self._results_by_digest[digest] = result
+        self._results_by_input_digest[result.input_digest] = result
         return self._result(
             outcome=PaperSimulationResultHistoryOutcome.STORED,
             result=result,

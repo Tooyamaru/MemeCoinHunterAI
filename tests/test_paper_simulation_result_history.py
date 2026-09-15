@@ -11,15 +11,15 @@ from core.execution import (
 
 def make_result(**overrides):
     values = {
-        "input_digest": "i",
-        "fill_digest": "f",
-        "transition_digest": "t",
-        "ledger_digest": "l",
-        "reconciliation_digest": "r",
+        "input_digest": "1" * 64,
+        "fill_digest": "2" * 64,
+        "transition_digest": "3" * 64,
+        "ledger_digest": "4" * 64,
+        "reconciliation_digest": "5" * 64,
         "status": "FILLED",
         "filled_quantity": "10",
         "unfilled_quantity": "0",
-        "position_state_digest": "p",
+        "position_state_digest": "6" * 64,
         "reconciliation_status": "RECONCILED",
     }
     values.update(overrides)
@@ -42,8 +42,8 @@ def test_valid_result_is_stored_and_provenance_is_preserved():
     assert history.digest == stored.history_digest
     assert result.status == "FILLED"
     assert result.reconciliation_status == "RECONCILED"
-    assert result.input_digest == "i"
-    assert result.position_state_digest == "p"
+    assert result.input_digest == "1" * 64
+    assert result.position_state_digest == "6" * 64
 
 
 def test_duplicate_does_not_add_or_replace_result():
@@ -52,16 +52,37 @@ def test_duplicate_does_not_add_or_replace_result():
 
     duplicate = history.append(make_result())
 
-    assert duplicate.outcome is PaperSimulationResultHistoryOutcome.DUPLICATE
+    assert duplicate.outcome is PaperSimulationResultHistoryOutcome.INVALID_INPUT
     assert duplicate.accepted is False
-    assert duplicate.result is result
+    assert duplicate.result is None
     assert duplicate.results == (result,)
+    assert duplicate.reason_codes == ("SIMULATION_INPUT_ALREADY_STORED",)
     assert history.result_count == 1
 
 
+def test_contradictory_result_with_same_simulation_input_is_rejected():
+    result = make_result()
+    history = PaperSimulationResultHistory((result,))
+
+    contradictory = history.append(
+        make_result(
+            fill_digest="7" * 64,
+            status="FAILED",
+            filled_quantity="0",
+            unfilled_quantity="10",
+        )
+    )
+
+    assert contradictory.outcome is PaperSimulationResultHistoryOutcome.INVALID_INPUT
+    assert contradictory.accepted is False
+    assert contradictory.result is None
+    assert contradictory.reason_codes == ("CONTRADICTORY_SIMULATION_INPUT",)
+    assert history.results == (result,)
+
+
 def test_history_order_and_digest_are_deterministic():
-    first = make_result(input_digest="a")
-    second = make_result(input_digest="b")
+    first = make_result(input_digest="a" * 64)
+    second = make_result(input_digest="b" * 64)
 
     left = PaperSimulationResultHistory((first, second))
     right = PaperSimulationResultHistory((second, first))
@@ -110,15 +131,15 @@ def test_unsupported_version_is_rejected():
             return "p07-t99-v1"
 
     result = UnsupportedResult(
-        input_digest="i",
-        fill_digest="f",
-        transition_digest="t",
-        ledger_digest="l",
-        reconciliation_digest="r",
+        input_digest="1" * 64,
+        fill_digest="2" * 64,
+        transition_digest="3" * 64,
+        ledger_digest="4" * 64,
+        reconciliation_digest="5" * 64,
         status="FILLED",
         filled_quantity="10",
         unfilled_quantity="0",
-        position_state_digest="p",
+        position_state_digest="6" * 64,
         reconciliation_status="RECONCILED",
     )
 

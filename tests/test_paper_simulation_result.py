@@ -8,15 +8,15 @@ from core.execution.paper_simulation_result import (
 
 def make_result(**overrides):
     values = {
-        "input_digest": "i",
-        "fill_digest": "f",
-        "transition_digest": "t",
-        "ledger_digest": "l",
-        "reconciliation_digest": "r",
+        "input_digest": "1" * 64,
+        "fill_digest": "2" * 64,
+        "transition_digest": "3" * 64,
+        "ledger_digest": "4" * 64,
+        "reconciliation_digest": "5" * 64,
         "status": "FILLED",
         "filled_quantity": "10",
         "unfilled_quantity": "0",
-        "position_state_digest": "p",
+        "position_state_digest": "6" * 64,
         "reconciliation_status": "RECONCILED",
     }
     values.update(overrides)

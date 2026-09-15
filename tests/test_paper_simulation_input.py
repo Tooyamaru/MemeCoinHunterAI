@@ -1,4 +1,4 @@
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
@@ -15,6 +15,10 @@ from core.execution import (
     ReplayIdentity,
     SimulationConfigurationIdentity,
 )
+from core.execution.paper_simulation_input import RiskCapitalAuthorizationReference
+from core.risk.paper_risk_capital_authorization import (
+    evaluate_paper_risk_capital_authorization,
+)
 from core.opportunity import (
     OpportunityRecordHistory,
     evaluate_opportunity_score,
@@ -22,6 +26,10 @@ from core.opportunity import (
     materialize_opportunity_record,
 )
 from tests.test_opportunity_score import _evaluation
+from tests.test_paper_risk_capital_authorization import (
+    _intent as _risk_intent,
+    _policy as _risk_policy,
+)
 
 
 UTC = timezone.utc
@@ -134,6 +142,28 @@ def _input(**overrides):
     return PaperSimulationInput(**values)
 
 
+def _approved_linked_input():
+    intent = _risk_intent()
+    authorization = evaluate_paper_risk_capital_authorization(
+        intent,
+        _risk_policy(intent),
+    )
+    reference = intent.context.reference_time
+    observation = AuthorizationObservation.from_risk_capital_result(authorization)
+    return _input(
+        decision_intent=intent,
+        authorization_observation=observation,
+        execution_observation=_execution(
+            observation_time=reference - timedelta(seconds=10),
+            availability_time=reference - timedelta(seconds=5),
+        ),
+        initial_paper_state=_state(
+            as_of_time=reference - timedelta(seconds=20),
+        ),
+        simulation_reference_time=reference,
+    ), authorization
+
+
 def test_valid_input_is_immutable_and_provider_neutral():
     value = _input()
 
@@ -176,6 +206,59 @@ def test_authorization_not_required_is_explicit():
         )
     )
     assert value.authorization_observation.status is ObservationStatus.NOT_REQUIRED
+
+
+def test_linked_approval_reference_is_immutable_and_canonical():
+    value, authorization = _approved_linked_input()
+    reference = value.authorization_observation.authorization_reference
+
+    assert isinstance(reference, RiskCapitalAuthorizationReference)
+    assert reference.authorization_id == authorization.authorization_id
+    assert reference.authorization_digest == authorization.digest
+    with pytest.raises(FrozenInstanceError):
+        reference.authorization_digest = "0" * 64
+    with pytest.raises(TypeError):
+        reference.scope_identity["changed"] = True
+
+
+def test_missing_mismatched_and_tampered_approval_linkage_fails_closed():
+    linked, authorization = _approved_linked_input()
+    missing = _input(
+        decision_intent=linked.decision_intent.intent,
+        authorization_observation=linked.authorization_observation.with_authorization_reference(
+            None  # type: ignore[arg-type]
+        ),
+        execution_observation=linked.execution_observation,
+        initial_paper_state=linked.initial_paper_state,
+        simulation_reference_time=linked.simulation_reference_time,
+    )
+    assert missing.authorization_observation.authorization_reference is None
+
+    mismatched_intent = _risk_intent(
+        expected_edge_assumptions=("different paper admission",),
+    )
+    mismatched = RiskCapitalAuthorizationReference.from_authorization_result(
+        evaluate_paper_risk_capital_authorization(
+            mismatched_intent,
+            _risk_policy(mismatched_intent),
+        )
+    )
+    with pytest.raises(ValueError, match="does not match observation"):
+        linked.authorization_observation.with_authorization_reference(mismatched)
+
+    tampered = linked.authorization_observation.authorization_reference
+    object.__setattr__(tampered, "authorization_digest", "0" * 64)
+    with pytest.raises(ValueError, match="authorization_reference|digest"):
+        PaperSimulationInput(
+            decision_intent=linked.decision_intent.intent,
+            authorization_observation=linked.authorization_observation,
+            execution_observation=linked.execution_observation,
+            simulation_configuration=linked.simulation_configuration,
+            initial_paper_state=linked.initial_paper_state,
+            simulation_reference_time=linked.simulation_reference_time,
+            replay_identity=linked.replay_identity,
+            input_digest=linked.digest,
+        )
 
 
 def test_pass_authorization_requires_validity_and_execution_state_quality():

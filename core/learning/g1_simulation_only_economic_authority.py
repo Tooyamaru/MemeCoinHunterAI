@@ -37,6 +37,7 @@ from core.execution.paper_reconciliation import (
 from core.execution.paper_simulation_input import (
     P07_T01_CONTRACT_VERSION,
     PaperSimulationInput,
+    RiskCapitalAuthorizationReference,
 )
 from core.execution.paper_simulation_result import (
     P07_T06_CONTRACT_VERSION,
@@ -182,6 +183,8 @@ class G1P07HistorySnapshot:
             raise ValueError("P07-T07 history snapshot must not be empty")
         if not all(isinstance(result, PaperSimulationResult) for result in self.results):
             raise ValueError("history results must be PaperSimulationResult values")
+        if len({result.input_digest for result in self.results}) != len(self.results):
+            raise ValueError("history contains repeated simulation input identity")
         ordered = tuple(
             sorted(self.results, key=lambda value: _canonical_json(value.canonical_dict()))
         )
@@ -232,6 +235,7 @@ class G1SimulationOnlyEconomicAuthorityInput:
     p08: G1P08Predecessors
     contract_version: str = G1_CONTRACT_VERSION
     evaluator_version: str = G1_EVALUATOR_VERSION
+    risk_capital_authorization: Any | None = None
 
 
 @dataclass(frozen=True)
@@ -396,6 +400,8 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
                  *p07.p07_t04, p07.p07_t05, p07.p07_t06, *h.results,
                  p08.p08_t01, p08.p08_t02, p08.p08_t03, p08.p08_t04,
                  p08.p08_t05, p08.p08_t06)
+    if value.risk_capital_authorization is not None:
+        artifacts = artifacts + (value.risk_capital_authorization,)
     for artifact in artifacts:
         try:
             _validate_artifact(artifact)
@@ -407,6 +413,17 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
         failures.add(G1ReasonCode.DIGEST_FAILURE)
     if len({r.digest for r in h.results}) != len(h.results):
         failures.add(G1ReasonCode.CONTRADICTORY_INPUT)
+    try:
+        PaperSimulationResult.validate_predecessors(
+            p07.p07_t06,
+            simulation_input=p07.p07_t01,
+            fill_outcome=p07.p07_t02,
+            transition=p07.p07_t03,
+            ledger_entries=p07.p07_t04,
+            reconciliation=p07.p07_t05,
+        )
+    except (AttributeError, TypeError, ValueError):
+        failures.add(G1ReasonCode.DIGEST_FAILURE)
 
     # Exact predecessor linkage.
     if p07.p07_t01.decision_intent.decision_intent_digest != value.p06.digest:
@@ -482,6 +499,8 @@ def _classify(value: G1SimulationOnlyEconomicAuthorityInput) -> G1ReasonCode | N
         failures.add(G1ReasonCode.INCOMPLETE_INPUT)
     if p07.p07_t06.status != "FILLED" or p07.p07_t06.reconciliation_status != "RECONCILED":
         failures.add(G1ReasonCode.NON_FINAL_INPUT)
+    if not _risk_capital_linkage(value):
+        failures.add(G1ReasonCode.INVALID_IDENTITY_LINK)
     return _first(failures) if failures else None
 
 
@@ -592,6 +611,61 @@ def _lifecycle_consistent(authority: G1AuthorityAReference, artifact: Any) -> bo
         ):
             return False
     return True
+
+
+def _risk_capital_linkage(
+    value: G1SimulationOnlyEconomicAuthorityInput,
+) -> bool:
+    authorization = value.risk_capital_authorization
+    observation = value.p07.p07_t01.authorization_observation
+    reference = observation.authorization_reference
+    if authorization is None or not isinstance(
+        reference,
+        RiskCapitalAuthorizationReference,
+    ):
+        return False
+    try:
+        if not is_dataclass(authorization):
+            return False
+        _validate_artifact(authorization)
+        _validate_artifact(reference)
+        if str(authorization.status) != "APPROVED":
+            return False
+        if (
+            authorization.authorization_id != reference.authorization_id
+            or authorization.digest != reference.authorization_digest
+            or authorization.decision_intent_digest != value.p06.digest
+            or authorization.context_digest != value.p06.context_digest
+            or reference.decision_intent_digest != value.p06.digest
+            or reference.context_digest != value.p06.context_digest
+            or authorization.paper_lifecycle_id != reference.paper_lifecycle_id
+            or authorization.scope_identity != reference.scope_identity
+            or authorization.scope_identity != observation.scope_identity
+            or authorization.contract_version != reference.contract_version
+            or authorization.evaluator_version != reference.evaluator_version
+            or authorization.authorization_effect != reference.authorization_effect
+            or authorization.authorization_id != observation.observation_id
+        ):
+            return False
+        expected = authorization.to_authorization_observation()
+        return all(
+            getattr(expected, name) == getattr(observation, name)
+            for name in (
+                "observation_id",
+                "status",
+                "scope_identity",
+                "observed_at",
+                "valid_from",
+                "valid_until",
+                "contract_version",
+                "risk_governor_version",
+                "capital_authorization_version",
+                "reason_codes",
+                "unknown_reasons",
+            )
+        )
+    except (AttributeError, KeyError, TypeError, ValueError):
+        return False
 
 
 def _texts(value: Any) -> bool:

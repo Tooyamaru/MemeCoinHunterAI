@@ -2,12 +2,26 @@
 
 from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 
 import pytest
 
-from core.execution import PaperSimulationResult, PaperSimulationResultHistory
+from core.execution import (
+    AuthorizationObservation,
+    PaperSimulationInput,
+    PaperSimulationResult,
+    PaperSimulationResultHistory,
+)
+from core.execution.paper_fill_outcome import TradeSide
 from core.execution.paper_ledger import create_paper_ledger_entry
+from core.execution.paper_position_exposure_state import (
+    ValuationContext,
+    transition_paper_state,
+)
 from core.execution.paper_reconciliation import reconcile_paper_ledger
+from core.risk.paper_risk_capital_authorization import (
+    evaluate_paper_risk_capital_authorization,
+)
 from core.learning import (
     create_outcome_evidence_evaluation,
     create_outcome_evidence_evaluation_snapshot,
@@ -30,12 +44,85 @@ from core.learning.g1_simulation_only_economic_authority import (
     _first,
     _sha256,
 )
-from tests.test_paper_ledger import _bundle
+from tests.test_paper_fill_outcome import _evaluate
+from tests.test_paper_ledger import (
+    ASSET,
+    _accounting,
+    _state,
+    _valuation,
+)
 from tests.test_paper_reconciliation import _expectation
+from tests.test_paper_risk_capital_authorization import (
+    _intent as _risk_intent,
+    _policy as _risk_policy,
+)
+from tests.test_paper_simulation_input import (
+    _configuration,
+    _execution,
+    _replay,
+    _state as _initial_state,
+)
 
 
 def _real_p06_p07_p08_chain() -> G1SimulationOnlyEconomicAuthorityInput:
-    simulation_input, fill_outcome, transition, ledger_entry = _bundle()
+    p06_intent = _risk_intent()
+    risk_capital_authorization = evaluate_paper_risk_capital_authorization(
+        p06_intent,
+        _risk_policy(p06_intent),
+    )
+    reference = p06_intent.context.reference_time
+    simulation_input = PaperSimulationInput(
+        decision_intent=p06_intent,
+        authorization_observation=AuthorizationObservation.from_risk_capital_result(
+            risk_capital_authorization
+        ),
+        execution_observation=_execution(
+            observation_time=reference - timedelta(seconds=10),
+            availability_time=reference - timedelta(seconds=5),
+        ),
+        simulation_configuration=_configuration(),
+        initial_paper_state=_initial_state(
+            as_of_time=reference - timedelta(seconds=20),
+        ),
+        simulation_reference_time=reference,
+        replay_identity=_replay(),
+    )
+    fill_outcome = _evaluate(
+        simulation_input=simulation_input,
+        side=TradeSide.BUY,
+        requested_quantity=Decimal("2"),
+        executable_liquidity=Decimal("2"),
+        quote_observation_time=reference - timedelta(seconds=2),
+        fill_time=reference - timedelta(seconds=1),
+    )
+    valuation = replace(
+        _valuation(),
+        observed_at=reference - timedelta(seconds=2),
+        availability_time=reference - timedelta(seconds=1),
+        observation_digest=None,
+    )
+    transition = transition_paper_state(
+        fill_outcome,
+        _paper_state(reference),
+        target_asset_identity=ASSET,
+        valuation_context=ValuationContext((valuation,)),
+        accounting_context=replace(
+            _accounting(),
+            observed_at=reference - timedelta(seconds=3),
+            availability_time=reference - timedelta(seconds=2),
+            context_digest=None,
+        ),
+        transition_reference_time=reference,
+    )
+    ledger_entry = create_paper_ledger_entry(
+        simulation_input,
+        fill_outcome,
+        transition,
+        ledger_stream_identity={"stream": "paper-test"},
+        sequence_number=1,
+        previous_entry_digest=None,
+        ledger_reference_time=reference,
+    )
     reconciliation = reconcile_paper_ledger(
         (ledger_entry,),
         _expectation(ledger_entry),
@@ -95,6 +182,25 @@ def _real_p06_p07_p08_chain() -> G1SimulationOnlyEconomicAuthorityInput:
             evaluation_snapshot,
             readiness,
         ),
+        risk_capital_authorization=risk_capital_authorization,
+    )
+
+
+def _paper_state(reference: datetime):
+    state = _state()
+    exposure_asset = replace(
+        state.exposure.asset_exposures[0],
+        valuation_timestamp=reference - timedelta(seconds=2),
+    )
+    exposure = replace(
+        state.exposure,
+        asset_exposures=(exposure_asset,),
+    )
+    return replace(
+        state,
+        exposure=exposure,
+        as_of_time=reference - timedelta(seconds=1),
+        state_digest=None,
     )
 
 
