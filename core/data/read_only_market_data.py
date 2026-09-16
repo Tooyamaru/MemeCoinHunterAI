@@ -881,6 +881,8 @@ def _request_fingerprint(
     observation: ReadOnlyMarketDataObservation,
     context: EvaluationContext,
     processing_context: ProcessingContext,
+    *,
+    context_identity: str | None = None,
 ) -> str:
     return hashlib.sha256(
         canonical_bytes(
@@ -888,7 +890,11 @@ def _request_fingerprint(
                 "observation_digest": observation.observation_digest,
                 "evaluation_context": _context_material(context),
                 "predecessor_context_identity": context.predecessor_context_digest,
-                "prior_context_identity": processing_context.context_digest,
+                "prior_context_identity": (
+                    processing_context.context_digest
+                    if context_identity is None
+                    else context_identity
+                ),
             }
         )
     ).hexdigest()
@@ -1243,6 +1249,16 @@ def _check_processing_context(
         if request in processing_context.replay_fingerprints:
             reasons.add(ReasonCode.REPLAY)
             return reasons
+        if processing_context.prior_context_identity is not None:
+            replay_request = _request_fingerprint(
+                observation,
+                context,
+                processing_context,
+                context_identity=processing_context.prior_context_identity,
+            )
+            if replay_request in processing_context.replay_fingerprints:
+                reasons.add(ReasonCode.REPLAY)
+                return reasons
         existing = processing_context.accepted_fingerprints.get(observation.observation_id)
         if existing is not None:
             if existing == observation.observation_digest:

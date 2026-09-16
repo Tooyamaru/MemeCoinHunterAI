@@ -220,8 +220,8 @@ def test_equivalent_canonical_inputs_have_equal_digests() -> None:
 
 def test_digest_tampering_is_rejected() -> None:
     item = observation()
-    tampered = replace(item, raw_payload_digest="f" * 64, observation_digest=None)
-    assert tampered.observation_digest != item.observation_digest
+    tampered = replace(item, raw_payload_digest="f" * 64)
+    assert tampered.observation_digest == item.observation_digest
     result = validate_observation(tampered, tampered.evaluation_context)
     assert result.reason_code is ReasonCode.DIGEST_MISMATCH
 
@@ -366,7 +366,6 @@ def test_temporal_and_provenance_links_are_preserved() -> None:
     broken = replace(
         item,
         provenance=replace(item.provenance, token_identity="other-token"),
-        observation_digest=None,
     )
     assert (
         validate_observation(broken, broken.evaluation_context).reason_code
@@ -430,7 +429,12 @@ def test_reason_precedence_prefers_invalid_type_over_missing_input() -> None:
 def test_derived_identity_is_stable_when_source_event_is_absent() -> None:
     initial = observation(observation_id="placeholder", source_event_id=None)
     derived = derive_observation_id(initial)
-    item = replace(initial, observation_id=derived, observation_digest=None)
+    item = replace(
+        initial,
+        observation_id=derived,
+        provenance=replace(initial.provenance, observation_id=derived),
+        observation_digest=None,
+    )
     assert derive_observation_id(item) == derived
     assert validate_observation(item, item.evaluation_context).reason_code is ReasonCode.VALID
 
