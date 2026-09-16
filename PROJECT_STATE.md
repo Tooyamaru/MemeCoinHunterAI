@@ -10,7 +10,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current task:** P08 — G2 Realization / Settlement Endpoint Boundary Discovery
 - **Current task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Last updated:** 2026-09-10
+- **Last updated:** 2026-09-16
 
 ## Master progress
 
@@ -24,6 +24,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P07 Risk/Capital admission contract specification is COMPLETE / CLOSED / AUDITED PASS; a separate P07 v2 implementation authorization is required before code may be created. G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - P07 v2 Risk/Capital admission implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - Read-only Market Data Adapter specification is COMPLETE / CLOSED / AUDITED PASS; limited implementation is AUTHORIZED; G2, G3, G4, and P09 remain NOT AUTHORIZED.
+- Read-only Market Data Adapter implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 
 ## Phase status
 
