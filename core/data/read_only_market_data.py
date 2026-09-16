@@ -539,6 +539,10 @@ def _mapping_shape_reasons(value: Any) -> set[ReasonCode]:
                 non_nullable=_NON_NULLABLE_SOURCE,
             )
         )
+        if isinstance(source, Mapping):
+            if "source_metadata" in source and source["source_metadata"] is not None:
+                if not isinstance(source["source_metadata"], Mapping):
+                    reasons.add(ReasonCode.INVALID_TYPE)
 
     provenance = value.get("provenance", _MISSING)
     if provenance is not _MISSING:
@@ -549,6 +553,10 @@ def _mapping_shape_reasons(value: Any) -> set[ReasonCode]:
                 non_nullable=_NON_NULLABLE_PROVENANCE,
             )
         )
+        if isinstance(provenance, Mapping):
+            if "field_provenance" in provenance and provenance["field_provenance"] is not None:
+                if not isinstance(provenance["field_provenance"], Mapping):
+                    reasons.add(ReasonCode.INVALID_TYPE)
 
     context = value.get("evaluation_context", _MISSING)
     if context is not _MISSING:
@@ -863,9 +871,9 @@ class ReadOnlyMarketDataObservation:
             )
             if isinstance(name, str)
         }
-        source = _mapping_or_empty(value.get("source"))
-        provenance = _mapping_or_empty(value.get("provenance"))
-        context = _mapping_or_empty(value.get("evaluation_context"))
+        source_value = value.get("source")
+        provenance_value = value.get("provenance")
+        context_value = value.get("evaluation_context")
         return cls(
             contract_version=value.get("contract_version"),
             observation_id=value.get("observation_id"),
@@ -878,17 +886,33 @@ class ReadOnlyMarketDataObservation:
             availability_at=value.get("availability_at"),
             sequence=value.get("sequence"),
             ordering_status=value.get("ordering_status"),
-            source=source if isinstance(source, SourceEnvelope) else SourceEnvelope.from_mapping(source),
+            source=(
+                source_value
+                if isinstance(source_value, SourceEnvelope)
+                else (
+                    SourceEnvelope.from_mapping(source_value)
+                    if isinstance(source_value, Mapping)
+                    else source_value
+                )
+            ),
             provenance=(
-                provenance
-                if isinstance(provenance, ProvenanceEnvelope)
-                else ProvenanceEnvelope.from_mapping(provenance)
+                provenance_value
+                if isinstance(provenance_value, ProvenanceEnvelope)
+                else (
+                    ProvenanceEnvelope.from_mapping(provenance_value)
+                    if isinstance(provenance_value, Mapping)
+                    else provenance_value
+                )
             ),
             metrics=metrics,
             evaluation_context=(
-                context
-                if isinstance(context, EvaluationContext)
-                else EvaluationContext.from_mapping(context)
+                context_value
+                if isinstance(context_value, EvaluationContext)
+                else (
+                    EvaluationContext.from_mapping(context_value)
+                    if isinstance(context_value, Mapping)
+                    else context_value
+                )
             ),
             raw_payload_digest=value.get("raw_payload_digest"),
             observation_digest=value.get("observation_digest"),
@@ -1115,6 +1139,9 @@ def derive_observation_id(
     """Derive the fixed identity used when no source event identity exists."""
 
     if isinstance(observation, Mapping):
+        mapping_reasons = _mapping_input_reasons(observation)
+        if mapping_reasons:
+            raise _ContractError(_first(mapping_reasons) or ReasonCode.INVALID_TYPE)
         observation = ReadOnlyMarketDataObservation.from_mapping(observation)
     if not isinstance(observation, ReadOnlyMarketDataObservation):
         raise ValueError("observation is required")
@@ -1213,19 +1240,30 @@ def _first(reasons: set[ReasonCode]) -> ReasonCode | None:
     return None
 
 
-def _check_time_window(window: Any) -> None:
+def _check_time_window(window: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
     if not isinstance(window, TimeWindow):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
-    _timestamp(window.start)
-    _timestamp(window.end)
-    _enum(window.boundary, FreshnessBoundary)
-    if window.start > window.end:
-        raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        return {ReasonCode.INVALID_TYPE}
+    _collect_reason(reasons, lambda: _timestamp(window.start))
+    _collect_reason(reasons, lambda: _timestamp(window.end))
+    _collect_reason(reasons, lambda: _enum(window.boundary, FreshnessBoundary))
+    if (
+        isinstance(window.start, datetime)
+        and isinstance(window.end, datetime)
+        and window.start.tzinfo is not None
+        and window.end.tzinfo is not None
+        and window.start.utcoffset() is not None
+        and window.end.utcoffset() is not None
+        and window.start > window.end
+    ):
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    return reasons
 
 
-def _check_value_shape(metric_name: str, value: Any) -> None:
+def _check_value_shape(metric_name: str, value: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
     if not isinstance(value, Mapping):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
+        return {ReasonCode.INVALID_TYPE}
     expected = {
         "price": {"amount", "quote_asset"},
         "liquidity": {"amount", "valuation_unit", "valuation_context"},
@@ -1235,18 +1273,28 @@ def _check_value_shape(metric_name: str, value: Any) -> None:
         "transactions": {"count"},
     }[metric_name]
     if set(value) != expected or not all(isinstance(key, str) for key in value):
-        raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
     for key in value:
-        _canonical_text(key)
+        _collect_reason(reasons, lambda key=key: _canonical_text(key))
     if metric_name in {"holders", "transactions"}:
-        _non_negative_integer(value["count"])
+        if "count" in value:
+            _collect_reason(reasons, lambda: _non_negative_integer(value["count"]))
     else:
-        _decimal_text(value["amount"])
+        if "amount" in value:
+            _collect_reason(reasons, lambda: _decimal_text(value["amount"]))
         if metric_name == "price":
-            _canonical_text(value["quote_asset"])
+            if "quote_asset" in value:
+                _collect_reason(reasons, lambda: _canonical_text(value["quote_asset"]))
         elif metric_name == "liquidity":
-            _canonical_text(value["valuation_unit"])
-            _canonical_text(value["valuation_context"])
+            if "valuation_unit" in value:
+                _collect_reason(
+                    reasons, lambda: _canonical_text(value["valuation_unit"])
+                )
+            if "valuation_context" in value:
+                _collect_reason(
+                    reasons, lambda: _canonical_text(value["valuation_context"])
+                )
+    return reasons
 
 
 def _collect_reason(reasons: set[ReasonCode], check: Any) -> None:
@@ -1275,9 +1323,9 @@ def _check_metric(metric_name: str, metric: Any) -> set[ReasonCode]:
     for value in (metric.unit, metric.semantic_version, metric.reference_semantics, metric.source_field):
         _collect_reason(reasons, lambda value=value: _nullable_text(value))
     if metric.measurement_window is not None:
-        _collect_reason(reasons, lambda: _check_time_window(metric.measurement_window))
+        reasons.update(_check_time_window(metric.measurement_window))
     if metric.value is not None:
-        _collect_reason(reasons, lambda: _check_value_shape(metric_name, metric.value))
+        reasons.update(_check_value_shape(metric_name, metric.value))
     if status is FieldStatus.PRESENT:
         if metric.unit is None or metric.semantic_version is None:
             reasons.add(ReasonCode.INVALID_TYPE)
@@ -1295,122 +1343,420 @@ def _check_metric(metric_name: str, metric: Any) -> set[ReasonCode]:
     return reasons
 
 
-def _check_context(context: EvaluationContext) -> None:
-    _timestamp(context.cutoff_time)
-    _version(context.freshness_policy_version)
+def _check_context(context: Any) -> set[ReasonCode]:
+    if not isinstance(context, EvaluationContext):
+        return {ReasonCode.INVALID_TYPE}
+    reasons: set[ReasonCode] = set()
+    _collect_reason(reasons, lambda: _timestamp(context.cutoff_time))
+    _collect_reason(reasons, lambda: _version(context.freshness_policy_version))
     if context.max_age_seconds is not None:
-        maximum = _decimal_text(context.max_age_seconds)
-        if Decimal(maximum) < Decimal("0"):
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
-    _enum(context.freshness_boundary, FreshnessBoundary)
-    _version(context.consumer_profile_version)
+        _collect_reason(reasons, lambda: _decimal_text(context.max_age_seconds))
+        try:
+            if Decimal(context.max_age_seconds) < Decimal("0"):
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        except (InvalidOperation, TypeError, ValueError):
+            pass
+    _collect_reason(
+        reasons, lambda: _enum(context.freshness_boundary, FreshnessBoundary)
+    )
+    _collect_reason(reasons, lambda: _version(context.consumer_profile_version))
     if not isinstance(context.required_fields, tuple) or not isinstance(
         context.permitted_optional_fields, tuple
     ):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
+        reasons.add(ReasonCode.INVALID_TYPE)
     for sequence in (context.required_fields, context.permitted_optional_fields):
+        if not isinstance(sequence, tuple):
+            continue
         if len(sequence) > MAX_IMMUTABLE_SEQUENCE_ELEMENTS:
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
-        if tuple(sorted(sequence)) != sequence or len(set(sequence)) != len(sequence):
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        if all(isinstance(item, str) for item in sequence):
+            if tuple(sorted(sequence)) != sequence or len(set(sequence)) != len(sequence):
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
         for item in sequence:
-            _canonical_text(item)
-            if item not in _SUPPORTED_METRICS:
-                raise _ContractError(ReasonCode.UNSUPPORTED_FIELD)
-    if set(context.required_fields) & set(context.permitted_optional_fields):
-        raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+            _collect_reason(reasons, lambda item=item: _canonical_text(item))
+            if isinstance(item, str) and item not in _SUPPORTED_METRICS:
+                reasons.add(ReasonCode.UNSUPPORTED_FIELD)
+    if (
+        isinstance(context.required_fields, tuple)
+        and isinstance(context.permitted_optional_fields, tuple)
+        and all(isinstance(item, str) for item in context.required_fields)
+        and all(isinstance(item, str) for item in context.permitted_optional_fields)
+        and set(context.required_fields) & set(context.permitted_optional_fields)
+    ):
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
     if not isinstance(context.processing_context_identity, str):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
-    _canonical_text(context.processing_context_identity)
+        reasons.add(ReasonCode.INVALID_TYPE)
+    else:
+        _collect_reason(
+            reasons, lambda: _canonical_text(context.processing_context_identity)
+        )
     if context.predecessor_context_digest is not None:
-        _digest(context.predecessor_context_digest)
+        _collect_reason(reasons, lambda: _digest(context.predecessor_context_digest))
+    return reasons
 
 
-def _check_source(source: SourceEnvelope) -> None:
+def _check_source(source: Any) -> set[ReasonCode]:
     if not isinstance(source, SourceEnvelope):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
+        return {ReasonCode.INVALID_TYPE}
+    reasons: set[ReasonCode] = set()
     if not isinstance(source.source_metadata, Mapping):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
-    _canonical_text(source.source_id)
-    _nullable_text(source.source_event_id)
-    _version(source.source_contract_version)
-    _version(source.adapter_contract_version, exact=CONTRACT_VERSION)
+        reasons.add(ReasonCode.INVALID_TYPE)
+    _collect_reason(reasons, lambda: _canonical_text(source.source_id))
+    _collect_reason(reasons, lambda: _nullable_text(source.source_event_id))
+    _collect_reason(reasons, lambda: _version(source.source_contract_version))
+    _collect_reason(
+        reasons,
+        lambda: _version(source.adapter_contract_version, exact=CONTRACT_VERSION),
+    )
     if source.source_observed_at is not None:
-        _timestamp(source.source_observed_at)
-    _validate_bounded(source.source_metadata)
+        _collect_reason(reasons, lambda: _timestamp(source.source_observed_at))
+    if isinstance(source.source_metadata, Mapping):
+        _collect_reason(reasons, lambda: _validate_bounded(source.source_metadata))
+    return reasons
 
 
-def _check_provenance(provenance: ProvenanceEnvelope) -> None:
+def _check_provenance(provenance: Any) -> set[ReasonCode]:
     if not isinstance(provenance, ProvenanceEnvelope):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
+        return {ReasonCode.INVALID_TYPE}
+    reasons: set[ReasonCode] = set()
     if not isinstance(provenance.field_provenance, Mapping):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
-    _canonical_text(provenance.source_id)
-    _nullable_text(provenance.source_event_id)
-    _canonical_text(provenance.candidate_id)
-    _nullable_text(provenance.chain_id)
-    _canonical_text(provenance.token_identity)
-    _nullable_text(provenance.market_subject_id)
-    _canonical_text(provenance.observation_id)
-    _timestamp(provenance.observed_at)
-    _timestamp(provenance.availability_at)
-    _timestamp(provenance.cutoff_time)
-    _version(provenance.freshness_policy_version)
-    _version(provenance.consumer_profile_version)
+        reasons.add(ReasonCode.INVALID_TYPE)
+    _collect_reason(reasons, lambda: _canonical_text(provenance.source_id))
+    _collect_reason(reasons, lambda: _nullable_text(provenance.source_event_id))
+    _collect_reason(reasons, lambda: _canonical_text(provenance.candidate_id))
+    _collect_reason(reasons, lambda: _nullable_text(provenance.chain_id))
+    _collect_reason(reasons, lambda: _canonical_text(provenance.token_identity))
+    _collect_reason(reasons, lambda: _nullable_text(provenance.market_subject_id))
+    _collect_reason(reasons, lambda: _canonical_text(provenance.observation_id))
+    _collect_reason(reasons, lambda: _timestamp(provenance.observed_at))
+    _collect_reason(reasons, lambda: _timestamp(provenance.availability_at))
+    _collect_reason(reasons, lambda: _timestamp(provenance.cutoff_time))
+    _collect_reason(
+        reasons, lambda: _version(provenance.freshness_policy_version)
+    )
+    _collect_reason(
+        reasons, lambda: _version(provenance.consumer_profile_version)
+    )
     if provenance.predecessor_digest is not None:
-        _digest(provenance.predecessor_digest)
-    _validate_bounded(provenance.field_provenance)
+        _collect_reason(reasons, lambda: _digest(provenance.predecessor_digest))
+    if isinstance(provenance.field_provenance, Mapping):
+        _collect_reason(
+            reasons, lambda: _validate_bounded(provenance.field_provenance)
+        )
+    return reasons
 
 
 def _check_observation_structure(
     observation: ReadOnlyMarketDataObservation,
 ) -> set[ReasonCode]:
     reasons: set[ReasonCode] = set()
-    try:
-        _version(observation.contract_version, exact=CONTRACT_VERSION)
-        _canonical_text(observation.observation_id)
-        _canonical_text(observation.candidate_id)
-        _nullable_text(observation.chain_id)
-        _canonical_text(observation.token_identity)
-        _nullable_text(observation.market_subject_id)
-        _enum(observation.observation_kind, ObservationKind)
-        _timestamp(observation.observed_at)
-        _timestamp(observation.availability_at)
-        if observation.sequence is not None and not (
-            (isinstance(observation.sequence, int) and not isinstance(observation.sequence, bool))
-            or isinstance(observation.sequence, str)
-        ):
-            raise _ContractError(ReasonCode.INVALID_TYPE)
-        if isinstance(observation.sequence, str):
-            _canonical_text(observation.sequence)
-        if isinstance(observation.sequence, int) and observation.sequence < 0:
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
-        _enum(observation.ordering_status, OrderingStatus)
-        _check_source(observation.source)
-        _check_provenance(observation.provenance)
-        if not isinstance(observation.metrics, Mapping):
-            raise _ContractError(ReasonCode.INVALID_TYPE)
+    _collect_reason(
+        reasons,
+        lambda: _version(observation.contract_version, exact=CONTRACT_VERSION),
+    )
+    _collect_reason(reasons, lambda: _canonical_text(observation.observation_id))
+    _collect_reason(reasons, lambda: _canonical_text(observation.candidate_id))
+    _collect_reason(reasons, lambda: _nullable_text(observation.chain_id))
+    _collect_reason(reasons, lambda: _canonical_text(observation.token_identity))
+    _collect_reason(reasons, lambda: _nullable_text(observation.market_subject_id))
+    _collect_reason(
+        reasons, lambda: _enum(observation.observation_kind, ObservationKind)
+    )
+    _collect_reason(reasons, lambda: _timestamp(observation.observed_at))
+    _collect_reason(reasons, lambda: _timestamp(observation.availability_at))
+    if observation.sequence is not None and not (
+        (isinstance(observation.sequence, int) and not isinstance(observation.sequence, bool))
+        or isinstance(observation.sequence, str)
+    ):
+        reasons.add(ReasonCode.INVALID_TYPE)
+    if isinstance(observation.sequence, str):
+        _collect_reason(reasons, lambda: _canonical_text(observation.sequence))
+    if isinstance(observation.sequence, int) and observation.sequence < 0:
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    _collect_reason(
+        reasons, lambda: _enum(observation.ordering_status, OrderingStatus)
+    )
+    reasons.update(_check_source(observation.source))
+    reasons.update(_check_provenance(observation.provenance))
+    if not isinstance(observation.metrics, Mapping):
+        reasons.add(ReasonCode.INVALID_TYPE)
+    else:
         if len(observation.metrics) > MAX_BOUNDED_MAPPING_MEMBERS:
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
         if not all(isinstance(key, str) for key in observation.metrics):
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
         for key in observation.metrics:
-            _canonical_text(key)
+            if not isinstance(key, str):
+                continue
+            _collect_reason(reasons, lambda key=key: _canonical_text(key))
             if key not in _SUPPORTED_METRICS:
-                raise _ContractError(ReasonCode.UNSUPPORTED_FIELD)
-            _check_metric(key, observation.metrics[key])
+                reasons.add(ReasonCode.UNSUPPORTED_FIELD)
+            else:
+                reasons.update(_check_metric(key, observation.metrics[key]))
         if not _REQUIRED_METRICS.issubset(observation.metrics):
-            raise _ContractError(ReasonCode.MISSING_REQUIRED_INPUT)
-        _check_context(observation.evaluation_context)
-        _digest(observation.raw_payload_digest)
-        _digest(observation.observation_digest)
+            reasons.add(ReasonCode.MISSING_REQUIRED_INPUT)
+    reasons.update(_check_context(observation.evaluation_context))
+    _collect_reason(reasons, lambda: _digest(observation.raw_payload_digest))
+    _collect_reason(reasons, lambda: _digest(observation.observation_digest))
+    try:
         encoded = canonical_bytes(_observation_material(observation, include_digest=True))
         if len(encoded) > MAX_BOUNDED_MAPPING_BYTES:
-            raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
-    except _ContractError as exc:
-        reasons.add(exc.reason)
-    except (AttributeError, TypeError, ValueError):
-        reasons.add(ReasonCode.INVALID_TYPE)
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    except (AttributeError, TypeError, ValueError, _ContractError):
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    return reasons
+
+
+def _raw_time_window_reasons(value: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
+    if not isinstance(value, Mapping):
+        return {ReasonCode.INVALID_TYPE}
+    reasons.update(
+        _shape_mapping(
+            value,
+            fields=_TIME_WINDOW_FIELDS,
+            non_nullable=_NON_NULLABLE_TIME_WINDOW,
+        )
+    )
+    if "start" in value:
+        _collect_reason(reasons, lambda: _timestamp(value["start"]))
+    if "end" in value:
+        _collect_reason(reasons, lambda: _timestamp(value["end"]))
+    if "boundary" in value:
+        _collect_reason(
+            reasons, lambda: _enum(value["boundary"], FreshnessBoundary)
+        )
+    start = value.get("start")
+    end = value.get("end")
+    if (
+        isinstance(start, datetime)
+        and isinstance(end, datetime)
+        and start.tzinfo is not None
+        and end.tzinfo is not None
+        and start.utcoffset() is not None
+        and end.utcoffset() is not None
+        and start > end
+    ):
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    return reasons
+
+
+def _raw_metric_reasons(metric_name: str, value: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
+    if not isinstance(value, Mapping):
+        return {ReasonCode.INVALID_TYPE}
+    reasons.update(
+        _shape_mapping(
+            value,
+            fields=_METRIC_FIELDS,
+            non_nullable=_NON_NULLABLE_METRIC,
+        )
+    )
+    if "status" in value:
+        _collect_reason(reasons, lambda: _enum(value["status"], FieldStatus))
+    for name in ("unit", "semantic_version", "reference_semantics", "source_field"):
+        if name in value:
+            _collect_reason(reasons, lambda name=name: _nullable_text(value[name]))
+    if "measurement_window" in value and value["measurement_window"] is not None:
+        reasons.update(_raw_time_window_reasons(value["measurement_window"]))
+    if "value" in value and value["value"] is not None:
+        reasons.update(_check_value_shape(metric_name, value["value"]))
+    if "field_digest" in value:
+        _collect_reason(reasons, lambda: _digest(value["field_digest"]))
+
+    status = value.get("status")
+    try:
+        status = _enum(status, FieldStatus)
+    except _ContractError:
+        status = None
+    if status is not None:
+        metric_value = value.get("value", _MISSING)
+        if metric_value is not _MISSING:
+            if metric_value is not None and status is not FieldStatus.PRESENT:
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+            if metric_value is None and status is FieldStatus.PRESENT:
+                reasons.add(ReasonCode.INVALID_TYPE)
+        if status is FieldStatus.PRESENT:
+            if value.get("unit") is None or value.get("semantic_version") is None:
+                reasons.add(ReasonCode.INVALID_TYPE)
+            if metric_name in {"volume", "transactions"} and value.get(
+                "measurement_window"
+            ) is None:
+                reasons.add(ReasonCode.INVALID_TYPE)
+            if metric_name == "asset_age" and value.get("reference_semantics") is None:
+                reasons.add(ReasonCode.INVALID_TYPE)
+    return reasons
+
+
+def _raw_source_reasons(value: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
+    if not isinstance(value, Mapping):
+        return {ReasonCode.INVALID_TYPE}
+    for name, check in (
+        ("source_id", lambda item: _canonical_text(item)),
+        ("source_event_id", lambda item: _nullable_text(item)),
+        ("source_contract_version", lambda item: _version(item)),
+        (
+            "adapter_contract_version",
+            lambda item: _version(item, exact=CONTRACT_VERSION),
+        ),
+        ("source_observed_at", lambda item: _timestamp(item)),
+    ):
+        if name in value and value[name] is not None:
+            _collect_reason(reasons, lambda check=check, name=name: check(value[name]))
+    metadata = value.get("source_metadata", _MISSING)
+    if metadata is not _MISSING and metadata is not None:
+        if not isinstance(metadata, Mapping):
+            reasons.add(ReasonCode.INVALID_TYPE)
+        else:
+            _collect_reason(reasons, lambda: _validate_bounded(metadata))
+    return reasons
+
+
+def _raw_provenance_reasons(value: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
+    if not isinstance(value, Mapping):
+        return {ReasonCode.INVALID_TYPE}
+    for name, check in (
+        ("source_id", _canonical_text),
+        ("source_event_id", _nullable_text),
+        ("candidate_id", _canonical_text),
+        ("chain_id", _nullable_text),
+        ("token_identity", _canonical_text),
+        ("market_subject_id", _nullable_text),
+        ("observation_id", _canonical_text),
+        ("observed_at", _timestamp),
+        ("availability_at", _timestamp),
+        ("cutoff_time", _timestamp),
+        ("freshness_policy_version", _version),
+        ("consumer_profile_version", _version),
+        ("predecessor_digest", _digest),
+    ):
+        if name in value and value[name] is not None:
+            _collect_reason(reasons, lambda check=check, name=name: check(value[name]))
+    field_provenance = value.get("field_provenance", _MISSING)
+    if field_provenance is not _MISSING and field_provenance is not None:
+        if not isinstance(field_provenance, Mapping):
+            reasons.add(ReasonCode.INVALID_TYPE)
+        else:
+            _collect_reason(
+                reasons, lambda: _validate_bounded(field_provenance)
+            )
+    return reasons
+
+
+def _raw_context_reasons(value: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
+    if not isinstance(value, Mapping):
+        return {ReasonCode.INVALID_TYPE}
+    if "cutoff_time" in value:
+        _collect_reason(reasons, lambda: _timestamp(value["cutoff_time"]))
+    if "freshness_policy_version" in value:
+        _collect_reason(reasons, lambda: _version(value["freshness_policy_version"]))
+    if "max_age_seconds" in value and value["max_age_seconds"] is not None:
+        _collect_reason(reasons, lambda: _decimal_text(value["max_age_seconds"]))
+        try:
+            if Decimal(value["max_age_seconds"]) < Decimal("0"):
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        except (InvalidOperation, TypeError, ValueError):
+            pass
+    if "freshness_boundary" in value:
+        _collect_reason(
+            reasons, lambda: _enum(value["freshness_boundary"], FreshnessBoundary)
+        )
+    if "consumer_profile_version" in value:
+        _collect_reason(reasons, lambda: _version(value["consumer_profile_version"]))
+    for name in ("required_fields", "permitted_optional_fields"):
+        sequence = value.get(name, _MISSING)
+        if sequence is _MISSING or sequence is None:
+            continue
+        if not isinstance(sequence, (list, tuple)):
+            reasons.add(ReasonCode.INVALID_TYPE)
+            continue
+        if len(sequence) > MAX_IMMUTABLE_SEQUENCE_ELEMENTS:
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        if all(isinstance(item, str) for item in sequence):
+            if tuple(sorted(sequence)) != tuple(sequence) or len(set(sequence)) != len(sequence):
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        for item in sequence:
+            _collect_reason(reasons, lambda item=item: _canonical_text(item))
+            if isinstance(item, str) and item not in _SUPPORTED_METRICS:
+                reasons.add(ReasonCode.UNSUPPORTED_FIELD)
+    required = value.get("required_fields")
+    optional = value.get("permitted_optional_fields")
+    if (
+        isinstance(required, (list, tuple))
+        and isinstance(optional, (list, tuple))
+        and all(isinstance(item, str) for item in required)
+        and all(isinstance(item, str) for item in optional)
+    ):
+        if set(required) & set(optional):
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    if "predecessor_context_digest" in value and value["predecessor_context_digest"] is not None:
+        _collect_reason(
+            reasons, lambda: _digest(value["predecessor_context_digest"])
+        )
+    if "processing_context_identity" in value:
+        _collect_reason(
+            reasons, lambda: _canonical_text(value["processing_context_identity"])
+        )
+    return reasons
+
+
+def _mapping_input_reasons(value: Any) -> set[ReasonCode]:
+    """Collect mapping-boundary faults without collapsing omitted fields to null."""
+
+    reasons = _mapping_shape_reasons(value)
+    if not isinstance(value, Mapping):
+        return reasons
+
+    for name, check in (
+        ("contract_version", lambda item: _version(item, exact=CONTRACT_VERSION)),
+        ("observation_id", _canonical_text),
+        ("candidate_id", _canonical_text),
+        ("chain_id", _nullable_text),
+        ("token_identity", _canonical_text),
+        ("market_subject_id", _nullable_text),
+        ("observation_kind", lambda item: _enum(item, ObservationKind)),
+        ("observed_at", _timestamp),
+        ("availability_at", _timestamp),
+        ("ordering_status", lambda item: _enum(item, OrderingStatus)),
+        ("raw_payload_digest", _digest),
+        ("observation_digest", _digest),
+    ):
+        if name in value and value[name] is not None:
+            _collect_reason(reasons, lambda check=check, name=name: check(value[name]))
+
+    if "sequence" in value and value["sequence"] is not None:
+        sequence = value["sequence"]
+        if isinstance(sequence, str):
+            _collect_reason(reasons, lambda: _canonical_text(sequence))
+        elif isinstance(sequence, int) and not isinstance(sequence, bool):
+            if sequence < 0:
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        else:
+            reasons.add(ReasonCode.INVALID_TYPE)
+
+    if "source" in value:
+        reasons.update(_raw_source_reasons(value["source"]))
+    if "provenance" in value:
+        reasons.update(_raw_provenance_reasons(value["provenance"]))
+    if "evaluation_context" in value:
+        reasons.update(_raw_context_reasons(value["evaluation_context"]))
+
+    metrics = value.get("metrics", _MISSING)
+    if metrics is not _MISSING and metrics is not None:
+        if isinstance(metrics, Mapping):
+            if len(metrics) > MAX_BOUNDED_MAPPING_MEMBERS:
+                reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+            for name, metric in metrics.items():
+                if not isinstance(name, str):
+                    continue
+                _collect_reason(reasons, lambda name=name: _canonical_text(name))
+                if name in _SUPPORTED_METRICS:
+                    reasons.update(_raw_metric_reasons(name, metric))
+        else:
+            reasons.add(ReasonCode.INVALID_TYPE)
     return reasons
 
 
@@ -1585,10 +1931,28 @@ def validate_observation(
     if not isinstance(processing_context, ProcessingContext):
         return _result(reason=ReasonCode.INVALID_TYPE, observation=None, context=context)
     if isinstance(observation, Mapping):
+        mapping_reasons = _mapping_input_reasons(observation)
+        mapping_reason = _first(mapping_reasons)
+        if mapping_reason is not None:
+            return _result(
+                reason=mapping_reason,
+                observation=None,
+                context=context,
+            )
         try:
             observation = ReadOnlyMarketDataObservation.from_mapping(observation)
-        except Exception:
-            return _result(reason=ReasonCode.INVALID_TYPE, observation=None, context=context)
+        except _ContractError as exc:
+            return _result(
+                reason=exc.reason,
+                observation=None,
+                context=context,
+            )
+        except (AttributeError, TypeError, ValueError):
+            return _result(
+                reason=ReasonCode.INVALID_TYPE,
+                observation=None,
+                context=context,
+            )
     if not isinstance(observation, ReadOnlyMarketDataObservation):
         return _result(reason=ReasonCode.INVALID_TYPE, observation=None, context=context)
 

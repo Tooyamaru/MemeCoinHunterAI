@@ -187,6 +187,88 @@ def observation(
     )
 
 
+def observation_mapping(item: ReadOnlyMarketDataObservation) -> dict[str, object]:
+    def window_mapping(window: TimeWindow | None) -> dict[str, object] | None:
+        if window is None:
+            return None
+        return {
+            "start": window.start,
+            "end": window.end,
+            "boundary": window.boundary.value,
+        }
+
+    def metric_mapping(metric: MetricEnvelope) -> dict[str, object]:
+        return {
+            "status": metric.status.value,
+            "value": dict(metric.value) if metric.value is not None else None,
+            "unit": metric.unit,
+            "semantic_version": metric.semantic_version,
+            "measurement_window": window_mapping(metric.measurement_window),
+            "reference_semantics": metric.reference_semantics,
+            "source_field": metric.source_field,
+            "field_digest": metric.field_digest,
+        }
+
+    source = item.source
+    provenance = item.provenance
+    context_value = item.evaluation_context
+    return {
+        "contract_version": item.contract_version,
+        "observation_id": item.observation_id,
+        "candidate_id": item.candidate_id,
+        "chain_id": item.chain_id,
+        "token_identity": item.token_identity,
+        "market_subject_id": item.market_subject_id,
+        "observation_kind": item.observation_kind.value,
+        "observed_at": item.observed_at,
+        "availability_at": item.availability_at,
+        "sequence": item.sequence,
+        "ordering_status": item.ordering_status.value,
+        "source": {
+            "source_id": source.source_id,
+            "source_event_id": source.source_event_id,
+            "source_contract_version": source.source_contract_version,
+            "adapter_contract_version": source.adapter_contract_version,
+            "source_observed_at": source.source_observed_at,
+            "source_metadata": dict(source.source_metadata),
+        },
+        "provenance": {
+            "source_id": provenance.source_id,
+            "source_event_id": provenance.source_event_id,
+            "candidate_id": provenance.candidate_id,
+            "chain_id": provenance.chain_id,
+            "token_identity": provenance.token_identity,
+            "market_subject_id": provenance.market_subject_id,
+            "observation_id": provenance.observation_id,
+            "observed_at": provenance.observed_at,
+            "availability_at": provenance.availability_at,
+            "cutoff_time": provenance.cutoff_time,
+            "freshness_policy_version": provenance.freshness_policy_version,
+            "consumer_profile_version": provenance.consumer_profile_version,
+            "predecessor_digest": provenance.predecessor_digest,
+            "field_provenance": {
+                key: dict(value) for key, value in provenance.field_provenance.items()
+            },
+        },
+        "metrics": {
+            name: metric_mapping(metric) for name, metric in item.metrics.items()
+        },
+        "evaluation_context": {
+            "cutoff_time": context_value.cutoff_time,
+            "freshness_policy_version": context_value.freshness_policy_version,
+            "max_age_seconds": context_value.max_age_seconds,
+            "freshness_boundary": context_value.freshness_boundary.value,
+            "consumer_profile_version": context_value.consumer_profile_version,
+            "required_fields": list(context_value.required_fields),
+            "permitted_optional_fields": list(context_value.permitted_optional_fields),
+            "predecessor_context_digest": context_value.predecessor_context_digest,
+            "processing_context_identity": context_value.processing_context_identity,
+        },
+        "raw_payload_digest": item.raw_payload_digest,
+        "observation_digest": item.observation_digest,
+    }
+
+
 def test_valid_discovery_and_paper_evaluation_are_accepted() -> None:
     for kind in (ObservationKind.DISCOVERY, ObservationKind.PAPER_EVALUATION):
         item = observation(kind=kind)
@@ -268,6 +350,274 @@ def test_chain_id_null_is_only_valid_for_chain_neutral_profile() -> None:
 def test_scalar_and_mapping_bounds_fail_closed(item: ReadOnlyMarketDataObservation) -> None:
     result = validate_observation(item, item.evaluation_context)
     assert result.reason_code is ReasonCode.INVALID_CANONICAL_REPRESENTATION
+
+
+@pytest.mark.parametrize(
+    "location",
+    [
+        "top",
+        "source",
+        "provenance",
+        "evaluation_context",
+        "metric",
+        "metric_value",
+        "measurement_window",
+    ],
+)
+def test_closed_mapping_schemas_reject_unknown_fields(location: str) -> None:
+    item = observation()
+    payload = observation_mapping(item)
+    if location == "top":
+        payload["unexpected"] = "value"
+    elif location == "source":
+        payload["source"]["unexpected"] = "value"  # type: ignore[index]
+    elif location == "provenance":
+        payload["provenance"]["unexpected"] = "value"  # type: ignore[index]
+    elif location == "evaluation_context":
+        payload["evaluation_context"]["unexpected"] = "value"  # type: ignore[index]
+    elif location == "metric":
+        payload["metrics"]["price"]["unexpected"] = "value"  # type: ignore[index]
+    elif location == "metric_value":
+        payload["metrics"]["price"]["value"]["unexpected"] = "value"  # type: ignore[index]
+    else:
+        payload["metrics"]["volume"]["measurement_window"]["unexpected"] = "value"  # type: ignore[index]
+
+    result = validate_observation(payload, item.evaluation_context)
+    assert result.reason_code is ReasonCode.INVALID_CANONICAL_REPRESENTATION
+
+
+def test_bounded_metadata_allows_specification_defined_arbitrary_keys() -> None:
+    item = observation(
+        source_metadata={"provider_label": "local", "nested": {"trace": "kept"}}
+    )
+    payload = observation_mapping(item)
+    assert (
+        validate_observation(payload, item.evaluation_context).reason_code
+        is ReasonCode.VALID
+    )
+
+    provenance_values = {
+        key: {**value, "trace": "kept"}
+        for key, value in item.provenance.field_provenance.items()
+    }
+    with_extra_provenance = replace(
+        item,
+        provenance=replace(
+            item.provenance, field_provenance=provenance_values
+        ),
+        observation_digest=None,
+    )
+    assert (
+        validate_observation(
+            with_extra_provenance, with_extra_provenance.evaluation_context
+        ).reason_code
+        is ReasonCode.VALID
+    )
+
+
+def test_mapping_omitted_required_field_differs_from_explicit_null() -> None:
+    item = observation()
+    omitted = observation_mapping(item)
+    omitted.pop("candidate_id")
+    assert (
+        validate_observation(omitted, item.evaluation_context).reason_code
+        is ReasonCode.MISSING_REQUIRED_INPUT
+    )
+
+    explicit_null = observation_mapping(item)
+    explicit_null["candidate_id"] = None
+    assert (
+        validate_observation(explicit_null, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_TYPE
+    )
+
+    no_max_age = context(max_age_seconds=None)
+    nullable = observation(evaluation_context=no_max_age)
+    nullable_payload = observation_mapping(nullable)
+    nullable_payload["evaluation_context"]["max_age_seconds"] = None  # type: ignore[index]
+    assert (
+        validate_observation(nullable_payload, no_max_age).reason_code
+        is ReasonCode.VALID
+    )
+
+    omitted_optional = observation_mapping(nullable)
+    omitted_optional["evaluation_context"].pop("max_age_seconds")  # type: ignore[index]
+    assert (
+        validate_observation(omitted_optional, no_max_age).reason_code
+        is ReasonCode.MISSING_REQUIRED_INPUT
+    )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ("source", "source_metadata"),
+        ("provenance", "field_provenance"),
+        ("metrics",),
+        ("source",),
+        ("provenance",),
+        ("evaluation_context",),
+    ],
+)
+def test_bounded_and_required_mapping_roots_are_enforced(
+    path: tuple[str, ...],
+) -> None:
+    item = observation()
+    payload = observation_mapping(item)
+    target: dict[str, object] = payload
+    for part in path[:-1]:
+        target = target[part]  # type: ignore[assignment,index]
+    target[path[-1]] = []  # type: ignore[index]
+
+    assert (
+        validate_observation(payload, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_TYPE
+    )
+
+
+def test_mapping_reason_precedence_is_global_and_fail_closed() -> None:
+    item = observation()
+    payload = observation_mapping(item)
+    payload["contract_version"] = "p08-read-only-market-data-observation-v2"
+    payload["chain_id"] = 123
+    assert (
+        validate_observation(payload, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_TYPE
+    )
+
+    missing = observation_mapping(item)
+    missing.pop("candidate_id")
+    missing["contract_version"] = "p08-read-only-market-data-observation-v2"
+    assert (
+        validate_observation(missing, item.evaluation_context).reason_code
+        is ReasonCode.MISSING_REQUIRED_INPUT
+    )
+
+
+@pytest.mark.parametrize("amount", [float("nan"), float("inf"), 1.25])
+def test_non_canonical_numeric_values_fail_with_type_reason(amount: float) -> None:
+    item = observation()
+    payload = observation_mapping(item)
+    payload["metrics"]["price"]["value"]["amount"] = amount  # type: ignore[index]
+    assert (
+        validate_observation(payload, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_TYPE
+    )
+
+
+def test_unavailable_and_invalid_metric_statuses_are_not_usable() -> None:
+    for status in (FieldStatus.UNAVAILABLE, FieldStatus.INVALID):
+        item = observation()
+        changed_metrics = dict(item.metrics)
+        changed_metrics["price"] = replace(
+            changed_metrics["price"],
+            status=status,
+            value=None,
+            field_digest=None,
+        )
+        changed = replace(item, metrics=changed_metrics, observation_digest=None)
+        result = validate_observation(changed, changed.evaluation_context)
+        assert result.reason_code is ReasonCode.UNAVAILABLE_INPUT
+        assert result.accepted is False
+
+    item = observation()
+    changed_metrics = dict(item.metrics)
+    changed_metrics["price"] = replace(
+        changed_metrics["price"],
+        status=FieldStatus.MISSING,
+        value=None,
+        field_digest=None,
+    )
+    changed = replace(item, metrics=changed_metrics, observation_digest=None)
+    assert (
+        validate_observation(changed, changed.evaluation_context).reason_code
+        is ReasonCode.INCOMPLETE_INPUT
+    )
+
+
+def test_timestamp_enum_and_null_mapping_behavior_is_canonical() -> None:
+    item = observation()
+    naive = observation_mapping(item)
+    naive["observed_at"] = OBSERVED_AT.replace(tzinfo=None)
+    assert (
+        validate_observation(naive, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_CANONICAL_REPRESENTATION
+    )
+
+    unsupported_enum = observation_mapping(item)
+    unsupported_enum["observation_kind"] = "UNKNOWN"
+    assert (
+        validate_observation(unsupported_enum, item.evaluation_context).reason_code
+        is ReasonCode.UNSUPPORTED_VERSION
+    )
+
+    bad_boundary = observation_mapping(item)
+    bad_boundary["evaluation_context"]["freshness_boundary"] = "UNKNOWN"  # type: ignore[index]
+    assert (
+        validate_observation(bad_boundary, item.evaluation_context).reason_code
+        is ReasonCode.UNSUPPORTED_VERSION
+    )
+
+
+def test_missing_sequence_and_unknown_ordering_are_not_guessed() -> None:
+    item = replace(
+        observation(),
+        sequence=None,
+        ordering_status=OrderingStatus.UNKNOWN,
+        observation_digest=None,
+    )
+    result = validate_observation(item, item.evaluation_context)
+    assert result.reason_code is ReasonCode.VALID
+
+    payload = observation_mapping(item)
+    assert (
+        validate_observation(payload, item.evaluation_context).reason_code
+        is ReasonCode.VALID
+    )
+
+
+def test_mapping_depth_sequence_and_byte_limits_fail_closed() -> None:
+    item = observation()
+    deep: dict[str, object] = {"leaf": "value"}
+    for _ in range(8):
+        deep = {"nested": deep}
+    payload = observation_mapping(item)
+    payload["source"]["source_metadata"] = deep  # type: ignore[index]
+    assert (
+        validate_observation(payload, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_CANONICAL_REPRESENTATION
+    )
+
+    long_sequence = observation_mapping(item)
+    long_sequence["provenance"]["field_provenance"]["price"]["values"] = [  # type: ignore[index]
+        "value"
+    ] * 129
+    assert (
+        validate_observation(long_sequence, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_CANONICAL_REPRESENTATION
+    )
+
+    oversized = observation_mapping(item)
+    oversized["source"]["source_metadata"] = {"value": "x" * 16_000}  # type: ignore[index]
+    assert (
+        validate_observation(oversized, item.evaluation_context).reason_code
+        is ReasonCode.INVALID_CANONICAL_REPRESENTATION
+    )
+
+
+def test_predecessor_and_caller_mappings_are_not_mutated() -> None:
+    metadata = {"nested": {"field": "value"}}
+    item = observation(source_metadata=metadata)
+    payload = observation_mapping(item)
+    before = {
+        "metadata": {"nested": {"field": "value"}},
+        "payload": observation_mapping(item),
+    }
+
+    result = validate_observation(payload, item.evaluation_context)
+    assert result.reason_code is ReasonCode.VALID
+    assert metadata == before["metadata"]
+    assert payload == before["payload"]
 
 
 def test_nested_mapping_depth_and_sequence_bounds_fail_closed() -> None:
