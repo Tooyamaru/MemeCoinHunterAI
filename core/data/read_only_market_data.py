@@ -7,7 +7,7 @@ caller and returns deterministic evidence-only results.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from enum import StrEnum
@@ -355,6 +355,256 @@ def _mapping(value: Any, name: str) -> Mapping[str, Any]:
     return value
 
 
+def _mapping_or_empty(value: Any) -> Mapping[str, Any]:
+    return value if isinstance(value, Mapping) else {}
+
+
+_MISSING = object()
+_TOP_LEVEL_FIELDS = frozenset(
+    {
+        "contract_version",
+        "observation_id",
+        "candidate_id",
+        "chain_id",
+        "token_identity",
+        "market_subject_id",
+        "observation_kind",
+        "observed_at",
+        "availability_at",
+        "sequence",
+        "ordering_status",
+        "source",
+        "provenance",
+        "metrics",
+        "evaluation_context",
+        "raw_payload_digest",
+        "observation_digest",
+    }
+)
+_SOURCE_FIELDS = frozenset(
+    {
+        "source_id",
+        "source_event_id",
+        "source_contract_version",
+        "adapter_contract_version",
+        "source_observed_at",
+        "source_metadata",
+    }
+)
+_PROVENANCE_FIELDS = frozenset(
+    {
+        "source_id",
+        "source_event_id",
+        "candidate_id",
+        "chain_id",
+        "token_identity",
+        "market_subject_id",
+        "observation_id",
+        "observed_at",
+        "availability_at",
+        "cutoff_time",
+        "freshness_policy_version",
+        "consumer_profile_version",
+        "predecessor_digest",
+        "field_provenance",
+    }
+)
+_CONTEXT_FIELDS = frozenset(
+    {
+        "cutoff_time",
+        "freshness_policy_version",
+        "max_age_seconds",
+        "freshness_boundary",
+        "consumer_profile_version",
+        "required_fields",
+        "permitted_optional_fields",
+        "predecessor_context_digest",
+        "processing_context_identity",
+    }
+)
+_METRIC_FIELDS = frozenset(
+    {
+        "status",
+        "value",
+        "unit",
+        "semantic_version",
+        "measurement_window",
+        "reference_semantics",
+        "source_field",
+        "field_digest",
+    }
+)
+_TIME_WINDOW_FIELDS = frozenset({"start", "end", "boundary"})
+_METRIC_VALUE_FIELDS = {
+    "price": frozenset({"amount", "quote_asset"}),
+    "liquidity": frozenset({"amount", "valuation_unit", "valuation_context"}),
+    "volume": frozenset({"amount"}),
+    "asset_age": frozenset({"amount"}),
+    "holders": frozenset({"count"}),
+    "transactions": frozenset({"count"}),
+}
+_NON_NULLABLE_TOP_LEVEL = frozenset(
+    {
+        "contract_version",
+        "observation_id",
+        "candidate_id",
+        "token_identity",
+        "observation_kind",
+        "observed_at",
+        "availability_at",
+        "ordering_status",
+        "source",
+        "provenance",
+        "metrics",
+        "evaluation_context",
+        "raw_payload_digest",
+        "observation_digest",
+    }
+)
+_NON_NULLABLE_SOURCE = frozenset(
+    {
+        "source_id",
+        "source_contract_version",
+        "adapter_contract_version",
+        "source_metadata",
+    }
+)
+_NON_NULLABLE_PROVENANCE = frozenset(
+    {
+        "source_id",
+        "candidate_id",
+        "token_identity",
+        "observation_id",
+        "observed_at",
+        "availability_at",
+        "cutoff_time",
+        "freshness_policy_version",
+        "consumer_profile_version",
+        "field_provenance",
+    }
+)
+_NON_NULLABLE_CONTEXT = frozenset(
+    {
+        "cutoff_time",
+        "freshness_policy_version",
+        "freshness_boundary",
+        "consumer_profile_version",
+        "required_fields",
+        "permitted_optional_fields",
+        "processing_context_identity",
+    }
+)
+_NON_NULLABLE_METRIC = frozenset({"status", "field_digest"})
+_NON_NULLABLE_TIME_WINDOW = frozenset({"start", "end", "boundary"})
+
+
+def _shape_mapping(
+    value: Any,
+    *,
+    fields: frozenset[str],
+    non_nullable: frozenset[str],
+) -> set[ReasonCode]:
+    if not isinstance(value, Mapping):
+        return {ReasonCode.INVALID_TYPE}
+    reasons: set[ReasonCode] = set()
+    if not all(isinstance(key, str) for key in value):
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    if set(value) - fields:
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    for name in fields:
+        if name not in value:
+            reasons.add(ReasonCode.MISSING_REQUIRED_INPUT)
+        elif name in non_nullable and value[name] is None:
+            reasons.add(ReasonCode.INVALID_TYPE)
+    return reasons
+
+
+def _mapping_shape_reasons(value: Any) -> set[ReasonCode]:
+    """Classify mapping shape before conversion loses omitted/null distinctions."""
+
+    reasons = _shape_mapping(
+        value,
+        fields=_TOP_LEVEL_FIELDS,
+        non_nullable=_NON_NULLABLE_TOP_LEVEL,
+    )
+    if not isinstance(value, Mapping):
+        return reasons
+
+    source = value.get("source", _MISSING)
+    if source is not _MISSING:
+        reasons.update(
+            _shape_mapping(
+                source,
+                fields=_SOURCE_FIELDS,
+                non_nullable=_NON_NULLABLE_SOURCE,
+            )
+        )
+
+    provenance = value.get("provenance", _MISSING)
+    if provenance is not _MISSING:
+        reasons.update(
+            _shape_mapping(
+                provenance,
+                fields=_PROVENANCE_FIELDS,
+                non_nullable=_NON_NULLABLE_PROVENANCE,
+            )
+        )
+
+    context = value.get("evaluation_context", _MISSING)
+    if context is not _MISSING:
+        context_reasons = _shape_mapping(
+            context,
+            fields=_CONTEXT_FIELDS,
+            non_nullable=_NON_NULLABLE_CONTEXT,
+        )
+        if isinstance(context, Mapping):
+            for name in ("required_fields", "permitted_optional_fields"):
+                if name in context and context[name] is not None and not isinstance(
+                    context[name], (list, tuple)
+                ):
+                    context_reasons.add(ReasonCode.INVALID_TYPE)
+        reasons.update(context_reasons)
+
+    metrics = value.get("metrics", _MISSING)
+    if metrics is not _MISSING:
+        if not isinstance(metrics, Mapping):
+            reasons.add(ReasonCode.INVALID_TYPE)
+        else:
+            for name, metric in metrics.items():
+                if not isinstance(name, str):
+                    reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+                    continue
+                if name not in _SUPPORTED_METRICS:
+                    reasons.add(ReasonCode.UNSUPPORTED_FIELD)
+                    continue
+                metric_reasons = _shape_mapping(
+                    metric,
+                    fields=_METRIC_FIELDS,
+                    non_nullable=_NON_NULLABLE_METRIC,
+                )
+                if isinstance(metric, Mapping):
+                    value_mapping = metric.get("value", _MISSING)
+                    if value_mapping is not _MISSING and value_mapping is not None:
+                        expected = _METRIC_VALUE_FIELDS[name]
+                        value_reasons = _shape_mapping(
+                            value_mapping,
+                            fields=expected,
+                            non_nullable=expected,
+                        )
+                        metric_reasons.update(value_reasons)
+                    window = metric.get("measurement_window", _MISSING)
+                    if window is not _MISSING and window is not None:
+                        metric_reasons.update(
+                            _shape_mapping(
+                                window,
+                                fields=_TIME_WINDOW_FIELDS,
+                                non_nullable=_NON_NULLABLE_TIME_WINDOW,
+                            )
+                        )
+                reasons.update(metric_reasons)
+    return reasons
+
+
 @dataclass(frozen=True)
 class TimeWindow:
     start: datetime
@@ -511,14 +761,20 @@ class EvaluationContext:
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any]) -> EvaluationContext:
+        required_fields = value.get("required_fields", ())
+        permitted_optional_fields = value.get("permitted_optional_fields", ())
+        if not isinstance(required_fields, (list, tuple)):
+            required_fields = ()
+        if not isinstance(permitted_optional_fields, (list, tuple)):
+            permitted_optional_fields = ()
         return cls(
             cutoff_time=value.get("cutoff_time"),
             freshness_policy_version=value.get("freshness_policy_version"),
             max_age_seconds=value.get("max_age_seconds"),
             freshness_boundary=value.get("freshness_boundary"),
             consumer_profile_version=value.get("consumer_profile_version"),
-            required_fields=tuple(value.get("required_fields", ())),
-            permitted_optional_fields=tuple(value.get("permitted_optional_fields", ())),
+            required_fields=tuple(required_fields),
+            permitted_optional_fields=tuple(permitted_optional_fields),
             predecessor_context_digest=value.get("predecessor_context_digest"),
             processing_context_identity=value.get("processing_context_identity"),
         )
@@ -587,13 +843,29 @@ class ReadOnlyMarketDataObservation:
             name: (
                 item
                 if isinstance(item, MetricEnvelope)
-                else MetricEnvelope.from_mapping(item)
+                else (
+                    MetricEnvelope.from_mapping(item)
+                    if isinstance(item, Mapping)
+                    else MetricEnvelope(
+                        status=None,
+                        value=None,
+                        unit=None,
+                        semantic_version=None,
+                        measurement_window=None,
+                        reference_semantics=None,
+                        source_field=None,
+                        field_digest=None,
+                    )
+                )
             )
-            for name, item in metrics_value.items()
+            for name, item in (
+                metrics_value.items() if isinstance(metrics_value, Mapping) else ()
+            )
+            if isinstance(name, str)
         }
-        source = value.get("source")
-        provenance = value.get("provenance")
-        context = value.get("evaluation_context")
+        source = _mapping_or_empty(value.get("source"))
+        provenance = _mapping_or_empty(value.get("provenance"))
+        context = _mapping_or_empty(value.get("evaluation_context"))
         return cls(
             contract_version=value.get("contract_version"),
             observation_id=value.get("observation_id"),
@@ -977,31 +1249,50 @@ def _check_value_shape(metric_name: str, value: Any) -> None:
             _canonical_text(value["valuation_context"])
 
 
-def _check_metric(metric_name: str, metric: Any) -> None:
+def _collect_reason(reasons: set[ReasonCode], check: Any) -> None:
+    try:
+        check()
+    except _ContractError as exc:
+        reasons.add(exc.reason)
+    except (AttributeError, TypeError, ValueError):
+        reasons.add(ReasonCode.INVALID_TYPE)
+
+
+def _check_metric(metric_name: str, metric: Any) -> set[ReasonCode]:
+    reasons: set[ReasonCode] = set()
     if not isinstance(metric, MetricEnvelope):
-        raise _ContractError(ReasonCode.INVALID_TYPE)
-    status = _enum(metric.status, FieldStatus)
-    if metric.value is not None and status is not FieldStatus.PRESENT:
-        raise _ContractError(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
-    if metric.value is None and status is FieldStatus.PRESENT:
-        raise _ContractError(ReasonCode.INVALID_TYPE)
+        return {ReasonCode.INVALID_TYPE}
+    status: FieldStatus | None = None
+    try:
+        status = _enum(metric.status, FieldStatus)
+    except _ContractError as exc:
+        reasons.add(exc.reason)
+    if status is not None:
+        if metric.value is not None and status is not FieldStatus.PRESENT:
+            reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+        if metric.value is None and status is FieldStatus.PRESENT:
+            reasons.add(ReasonCode.INVALID_TYPE)
     for value in (metric.unit, metric.semantic_version, metric.reference_semantics, metric.source_field):
-        _nullable_text(value)
+        _collect_reason(reasons, lambda value=value: _nullable_text(value))
     if metric.measurement_window is not None:
-        _check_time_window(metric.measurement_window)
+        _collect_reason(reasons, lambda: _check_time_window(metric.measurement_window))
     if metric.value is not None:
-        _check_value_shape(metric_name, metric.value)
+        _collect_reason(reasons, lambda: _check_value_shape(metric_name, metric.value))
     if status is FieldStatus.PRESENT:
         if metric.unit is None or metric.semantic_version is None:
-            raise _ContractError(ReasonCode.INVALID_TYPE)
+            reasons.add(ReasonCode.INVALID_TYPE)
         if metric_name in {"volume", "transactions"} and metric.measurement_window is None:
-            raise _ContractError(ReasonCode.INVALID_TYPE)
+            reasons.add(ReasonCode.INVALID_TYPE)
         if metric_name == "asset_age" and metric.reference_semantics is None:
-            raise _ContractError(ReasonCode.INVALID_TYPE)
-    _digest(metric.field_digest)
-    expected = sha256_digest(_metric_material(metric, include_digest=False))
-    if metric.field_digest != expected:
-        raise _ContractError(ReasonCode.DIGEST_MISMATCH)
+            reasons.add(ReasonCode.INVALID_TYPE)
+    _collect_reason(reasons, lambda: _digest(metric.field_digest))
+    try:
+        expected = sha256_digest(_metric_material(metric, include_digest=False))
+        if metric.field_digest != expected:
+            reasons.add(ReasonCode.DIGEST_MISMATCH)
+    except (TypeError, ValueError, _ContractError):
+        reasons.add(ReasonCode.INVALID_CANONICAL_REPRESENTATION)
+    return reasons
 
 
 def _check_context(context: EvaluationContext) -> None:
@@ -1038,6 +1329,8 @@ def _check_context(context: EvaluationContext) -> None:
 def _check_source(source: SourceEnvelope) -> None:
     if not isinstance(source, SourceEnvelope):
         raise _ContractError(ReasonCode.INVALID_TYPE)
+    if not isinstance(source.source_metadata, Mapping):
+        raise _ContractError(ReasonCode.INVALID_TYPE)
     _canonical_text(source.source_id)
     _nullable_text(source.source_event_id)
     _version(source.source_contract_version)
@@ -1049,6 +1342,8 @@ def _check_source(source: SourceEnvelope) -> None:
 
 def _check_provenance(provenance: ProvenanceEnvelope) -> None:
     if not isinstance(provenance, ProvenanceEnvelope):
+        raise _ContractError(ReasonCode.INVALID_TYPE)
+    if not isinstance(provenance.field_provenance, Mapping):
         raise _ContractError(ReasonCode.INVALID_TYPE)
     _canonical_text(provenance.source_id)
     _nullable_text(provenance.source_event_id)
