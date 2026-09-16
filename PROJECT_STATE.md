@@ -23,7 +23,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - Risk/Capital Authority limited implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - P07 Risk/Capital admission contract specification is COMPLETE / CLOSED / AUDITED PASS; a separate P07 v2 implementation authorization is required before code may be created. G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - P07 v2 Risk/Capital admission implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
-- Read-only Market Data Adapter specification is COMPLETE / AWAITING FORMAL AUDIT; implementation remains NOT AUTHORIZED.
+- Read-only Market Data Adapter specification is COMPLETE / CLOSED / AUDITED PASS; limited implementation is AUTHORIZED; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 
 ## Phase status
 
