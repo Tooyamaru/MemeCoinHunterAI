@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: inspection
+    description: Read-only market inspection operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /inspections:
+    post:
+      operationId: inspectToken
+      tags: [inspection]
+      summary: Inspect all DexScreener pairs for one token
+      description: Performs one explicit, read-only inspection without ranking, approval, or trading behavior.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenInspectionInput"
+      responses:
+        "200":
+          description: Inspection report, including all returned pairs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InspectionReport"
+        "400":
+          description: Invalid chain or token input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Inspection concurrency limit reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Inspector or source failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "504":
+          description: Inspector execution timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +78,259 @@ components:
           type: string
       required:
         - status
+    TokenInspectionInput:
+      type: object
+      additionalProperties: false
+      properties:
+        chainId:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^[A-Za-z0-9._~-]+$"
+        tokenAddress:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: "^[A-Za-z0-9._~-]+$"
+      required: [chainId, tokenAddress]
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        detail:
+          type: ["string", "null"]
+      required: [error, code]
+    TokenRef:
+      type: object
+      additionalProperties: true
+      properties:
+        address:
+          type: ["string", "null"]
+        name:
+          type: ["string", "null"]
+        symbol:
+          type: ["string", "null"]
+    WindowValues:
+      type: object
+      additionalProperties: true
+      properties:
+        m5:
+          type: ["string", "null"]
+        h1:
+          type: ["string", "null"]
+        h6:
+          type: ["string", "null"]
+        h24:
+          type: ["string", "null"]
+    TransactionWindow:
+      type: object
+      additionalProperties: true
+      properties:
+        buys:
+          type: ["string", "null"]
+        sells:
+          type: ["string", "null"]
+    TransactionWindows:
+      type: object
+      additionalProperties: true
+      properties:
+        m5:
+          oneOf:
+            - $ref: "#/components/schemas/TransactionWindow"
+            - type: "null"
+        h1:
+          oneOf:
+            - $ref: "#/components/schemas/TransactionWindow"
+            - type: "null"
+        h6:
+          oneOf:
+            - $ref: "#/components/schemas/TransactionWindow"
+            - type: "null"
+        h24:
+          oneOf:
+            - $ref: "#/components/schemas/TransactionWindow"
+            - type: "null"
+    Liquidity:
+      allOf:
+        - $ref: "#/components/schemas/WindowValues"
+        - type: object
+          properties:
+            usd:
+              type: ["string", "null"]
+            base:
+              type: ["string", "null"]
+            quote:
+              type: ["string", "null"]
+    InspectionFinding:
+      type: object
+      additionalProperties: true
+      properties:
+        code:
+          type: string
+        source_field:
+          type: ["string", "null"]
+        value: {}
+      required: [code]
+    PairInspection:
+      type: object
+      additionalProperties: true
+      properties:
+        source_pair_created_at:
+          type: ["string", "null"]
+        field_provenance:
+          type: object
+          additionalProperties: true
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/InspectionFinding"
+      required: [field_provenance, findings]
+    InspectionPair:
+      type: object
+      additionalProperties: true
+      properties:
+        pairAddress:
+          type: ["string", "null"]
+        chainId:
+          type: ["string", "null"]
+        dexId:
+          type: ["string", "null"]
+        url:
+          type: ["string", "null"]
+        baseToken:
+          oneOf:
+            - $ref: "#/components/schemas/TokenRef"
+            - type: "null"
+        quoteToken:
+          oneOf:
+            - $ref: "#/components/schemas/TokenRef"
+            - type: "null"
+        priceNative:
+          type: ["string", "null"]
+        priceUsd:
+          type: ["string", "null"]
+        fdv:
+          type: ["string", "null"]
+        marketCap:
+          type: ["string", "null"]
+        liquidity:
+          oneOf:
+            - $ref: "#/components/schemas/Liquidity"
+            - type: "null"
+        volume:
+          oneOf:
+            - $ref: "#/components/schemas/WindowValues"
+            - type: "null"
+        priceChange:
+          oneOf:
+            - $ref: "#/components/schemas/WindowValues"
+            - type: "null"
+        txns:
+          oneOf:
+            - $ref: "#/components/schemas/TransactionWindows"
+            - type: "null"
+        pairCreatedAt:
+          type: ["string", "null"]
+        inspection:
+          $ref: "#/components/schemas/PairInspection"
+      required: [inspection]
+    AttemptLog:
+      type: object
+      properties:
+        attempt:
+          type: number
+        status_code:
+          type: ["number", "null"]
+        response_bytes:
+          type: number
+        received_at:
+          type: ["string", "null"]
+        error:
+          type: ["string", "null"]
+      required: [attempt, status_code, response_bytes, received_at]
+    InspectionRequest:
+      type: object
+      properties:
+        endpoint:
+          type: string
+        chain_id:
+          type: string
+        token_address:
+          type: string
+        attempts:
+          type: number
+        retry_count:
+          type: number
+        attempt_log:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttemptLog"
+      required: [endpoint, chain_id, token_address, attempts, retry_count, attempt_log]
+    InspectionReceipt:
+      type: object
+      properties:
+        received_at:
+          type: ["string", "null"]
+        http_status:
+          type: ["number", "null"]
+        response_bytes:
+          type: number
+      required: [received_at, http_status, response_bytes]
+    UnavailableField:
+      type: object
+      properties:
+        field:
+          type: string
+        reason:
+          type: string
+      required: [field, reason]
+    InspectionEvidence:
+      type: object
+      properties:
+        p08_acceptance:
+          type: string
+        p08_observed_at:
+          type: ["string", "null"]
+        asset_age:
+          type: object
+          additionalProperties: true
+        unavailable_fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/UnavailableField"
+      required: [p08_acceptance, p08_observed_at, asset_age, unavailable_fields]
+    InspectionPayload:
+      type: object
+      properties:
+        raw_payload_sha256:
+          type: ["string", "null"]
+        pair_count:
+          type: number
+        pairs:
+          type: array
+          items:
+            $ref: "#/components/schemas/InspectionPair"
+      required: [raw_payload_sha256, pair_count, pairs]
+    InspectionReport:
+      type: object
+      properties:
+        tool_version:
+          type: string
+        source:
+          type: string
+        request:
+          $ref: "#/components/schemas/InspectionRequest"
+        receipt:
+          $ref: "#/components/schemas/InspectionReceipt"
+        payload:
+          $ref: "#/components/schemas/InspectionPayload"
+        evidence:
+          $ref: "#/components/schemas/InspectionEvidence"
+        error:
+          type: ["object", "null"]
+          additionalProperties: true
+      required: [tool_version, source, request, receipt, payload, evidence]
 
