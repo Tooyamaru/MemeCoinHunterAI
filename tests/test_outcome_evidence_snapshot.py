@@ -288,7 +288,25 @@ def test_snapshot_rejects_t02_and_t04_version_or_digest_tampering():
 def test_snapshot_rejects_wrong_dataset_and_duplicate_evaluations():
     dataset = _dataset()
     wrong_dataset = _two_observation_dataset()
-    wrong_evaluation = _evaluations(wrong_dataset)[0]
+    evaluation = _evaluations(dataset)[0]
+    wrong_evaluation_fields = {
+        key: value
+        for key, value in evaluation.canonical_representation.items()
+    }
+    wrong_evaluation_fields["source_dataset_digest"] = wrong_dataset.digest
+    wrong_evaluation_digest = hashlib.sha256(
+        json.dumps(
+            wrong_evaluation_fields,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    wrong_evaluation = replace(
+        evaluation,
+        source_dataset_digest=wrong_dataset.digest,
+        result_digest=wrong_evaluation_digest,
+    )
     with pytest.raises(ValueError, match="dataset"):
         create_outcome_evidence_evaluation_snapshot(
             dataset,

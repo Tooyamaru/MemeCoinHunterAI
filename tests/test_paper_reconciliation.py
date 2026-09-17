@@ -1,5 +1,5 @@
 from dataclasses import FrozenInstanceError
-from datetime import timedelta
+from datetime import timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -309,7 +309,9 @@ def test_provider_neutral_and_no_random_or_clock_dependency():
     result = reconcile_paper_ledger((entry,), _expectation(entry))
 
     assert result.timestamps["comparison_reference_time"] == (
-        "2026-08-21T12:00:00.000000Z"
+        REFERENCE.astimezone(timezone.utc)
+        .isoformat(timespec="microseconds")
+        .replace("+00:00", "Z")
     )
     assert result.timestamps["observation_time"] is None
     assert result.reconciliation_model_version == (

@@ -223,7 +223,7 @@ def test_snapshot_rejects_result_from_different_dataset():
     other_observation = _observation()
     other_result = replace(
         other_observation.paper_result,
-        fill_digest="different-fill-digest",
+        fill_digest="f" * 64,
     )
     other_observation = create_outcome_learning_observation(
         other_observation.decision_intent,
