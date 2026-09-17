@@ -126,9 +126,21 @@ export interface InspectionPair {
  }
 
 export interface AttemptLog {
+  /**
+     * @minimum 1
+     * @maximum 2
+     */
   attempt: number;
-  /** @nullable */
+  /**
+     * @minimum 100
+     * @maximum 599
+     * @nullable
+     */
   status_code: number | null;
+  /**
+     * @minimum 0
+     * @maximum 1048576
+     */
   response_bytes: number;
   /** @nullable */
   received_at: string | null;
@@ -140,7 +152,15 @@ export interface InspectionRequest {
   endpoint: string;
   chain_id: string;
   token_address: string;
+  /**
+     * @minimum 1
+     * @maximum 2
+     */
   attempts: number;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
   retry_count: number;
   attempt_log: AttemptLog[];
 }
@@ -148,8 +168,16 @@ export interface InspectionRequest {
 export interface InspectionReceipt {
   /** @nullable */
   received_at: string | null;
-  /** @nullable */
+  /**
+     * @minimum 100
+     * @maximum 599
+     * @nullable
+     */
   http_status: number | null;
+  /**
+     * @minimum 0
+     * @maximum 1048576
+     */
   response_bytes: number;
 }
 
@@ -171,6 +199,10 @@ export interface InspectionEvidence {
 export interface InspectionPayload {
   /** @nullable */
   raw_payload_sha256: string | null;
+  /**
+     * @minimum 0
+     * @maximum 128
+     */
   pair_count: number;
   pairs: InspectionPair[];
 }

@@ -7,9 +7,21 @@
  */
 
 export interface AttemptLog {
+  /**
+     * @minimum 1
+     * @maximum 2
+     */
   attempt: number;
-  /** @nullable */
+  /**
+     * @minimum 100
+     * @maximum 599
+     * @nullable
+     */
   status_code: number | null;
+  /**
+     * @minimum 0
+     * @maximum 1048576
+     */
   response_bytes: number;
   /** @nullable */
   received_at: string | null;

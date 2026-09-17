@@ -10,6 +10,10 @@ import type { InspectionPair } from './inspectionPair';
 export interface InspectionPayload {
   /** @nullable */
   raw_payload_sha256: string | null;
+  /**
+     * @minimum 0
+     * @maximum 128
+     */
   pair_count: number;
   pairs: InspectionPair[];
 }

@@ -11,7 +11,15 @@ export interface InspectionRequest {
   endpoint: string;
   chain_id: string;
   token_address: string;
+  /**
+     * @minimum 1
+     * @maximum 2
+     */
   attempts: number;
+  /**
+     * @minimum 0
+     * @maximum 1
+     */
   retry_count: number;
   attempt_log: AttemptLog[];
 }

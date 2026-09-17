@@ -241,11 +241,17 @@ components:
       type: object
       properties:
         attempt:
-          type: number
+          type: integer
+          minimum: 1
+          maximum: 2
         status_code:
-          type: ["number", "null"]
+          type: ["integer", "null"]
+          minimum: 100
+          maximum: 599
         response_bytes:
-          type: number
+          type: integer
+          minimum: 0
+          maximum: 1048576
         received_at:
           type: ["string", "null"]
         error:
@@ -261,9 +267,13 @@ components:
         token_address:
           type: string
         attempts:
-          type: number
+          type: integer
+          minimum: 1
+          maximum: 2
         retry_count:
-          type: number
+          type: integer
+          minimum: 0
+          maximum: 1
         attempt_log:
           type: array
           items:
@@ -275,9 +285,13 @@ components:
         received_at:
           type: ["string", "null"]
         http_status:
-          type: ["number", "null"]
+          type: ["integer", "null"]
+          minimum: 100
+          maximum: 599
         response_bytes:
-          type: number
+          type: integer
+          minimum: 0
+          maximum: 1048576
       required: [received_at, http_status, response_bytes]
     UnavailableField:
       type: object
@@ -308,7 +322,9 @@ components:
         raw_payload_sha256:
           type: ["string", "null"]
         pair_count:
-          type: number
+          type: integer
+          minimum: 0
+          maximum: 128
         pairs:
           type: array
           items:

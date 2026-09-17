@@ -36,6 +36,30 @@ export const InspectTokenBody = zod.object({
   "tokenAddress": zod.string().min(1).max(inspectTokenBodyTokenAddressMax).regex(inspectTokenBodyTokenAddressRegExp)
 })
 
+export const inspectTokenResponseRequestAttemptsMax = 2;
+
+export const inspectTokenResponseRequestRetryCountMin = 0;
+export const inspectTokenResponseRequestRetryCountMax = 1;
+
+export const inspectTokenResponseRequestAttemptLogItemAttemptMax = 2;
+
+export const inspectTokenResponseRequestAttemptLogItemStatusCodeMin = 100;
+export const inspectTokenResponseRequestAttemptLogItemStatusCodeMax = 599;
+
+export const inspectTokenResponseRequestAttemptLogItemResponseBytesMin = 0;
+export const inspectTokenResponseRequestAttemptLogItemResponseBytesMax = 1048576;
+
+export const inspectTokenResponseReceiptHttpStatusMin = 100;
+export const inspectTokenResponseReceiptHttpStatusMax = 599;
+
+export const inspectTokenResponseReceiptResponseBytesMin = 0;
+export const inspectTokenResponseReceiptResponseBytesMax = 1048576;
+
+export const inspectTokenResponsePayloadPairCountMin = 0;
+export const inspectTokenResponsePayloadPairCountMax = 128;
+
+
+
 export const InspectTokenResponse = zod.object({
   "tool_version": zod.string(),
   "source": zod.string(),
@@ -43,24 +67,24 @@ export const InspectTokenResponse = zod.object({
   "endpoint": zod.string(),
   "chain_id": zod.string(),
   "token_address": zod.string(),
-  "attempts": zod.number(),
-  "retry_count": zod.number(),
+  "attempts": zod.number().int().min(1).max(inspectTokenResponseRequestAttemptsMax),
+  "retry_count": zod.number().int().min(inspectTokenResponseRequestRetryCountMin).max(inspectTokenResponseRequestRetryCountMax),
   "attempt_log": zod.array(zod.object({
-  "attempt": zod.number(),
-  "status_code": zod.number().nullable(),
-  "response_bytes": zod.number(),
+  "attempt": zod.number().int().min(1).max(inspectTokenResponseRequestAttemptLogItemAttemptMax),
+  "status_code": zod.number().int().min(inspectTokenResponseRequestAttemptLogItemStatusCodeMin).max(inspectTokenResponseRequestAttemptLogItemStatusCodeMax).nullable(),
+  "response_bytes": zod.number().int().min(inspectTokenResponseRequestAttemptLogItemResponseBytesMin).max(inspectTokenResponseRequestAttemptLogItemResponseBytesMax),
   "received_at": zod.string().nullable(),
   "error": zod.string().nullish()
 }))
 }),
   "receipt": zod.object({
   "received_at": zod.string().nullable(),
-  "http_status": zod.number().nullable(),
-  "response_bytes": zod.number()
+  "http_status": zod.number().int().min(inspectTokenResponseReceiptHttpStatusMin).max(inspectTokenResponseReceiptHttpStatusMax).nullable(),
+  "response_bytes": zod.number().int().min(inspectTokenResponseReceiptResponseBytesMin).max(inspectTokenResponseReceiptResponseBytesMax)
 }),
   "payload": zod.object({
   "raw_payload_sha256": zod.string().nullable(),
-  "pair_count": zod.number(),
+  "pair_count": zod.number().int().min(inspectTokenResponsePayloadPairCountMin).max(inspectTokenResponsePayloadPairCountMax),
   "pairs": zod.array(zod.object({
   "pairAddress": zod.string().nullish(),
   "chainId": zod.string().nullish(),

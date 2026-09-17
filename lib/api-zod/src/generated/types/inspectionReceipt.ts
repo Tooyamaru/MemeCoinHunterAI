@@ -9,7 +9,15 @@
 export interface InspectionReceipt {
   /** @nullable */
   received_at: string | null;
-  /** @nullable */
+  /**
+     * @minimum 100
+     * @maximum 599
+     * @nullable
+     */
   http_status: number | null;
+  /**
+     * @minimum 0
+     * @maximum 1048576
+     */
   response_bytes: number;
 }
