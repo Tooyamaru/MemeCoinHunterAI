@@ -37,7 +37,7 @@ from tests.test_paper_risk_capital_authorization import (
 
 
 UTC = timezone.utc
-REFERENCE = datetime(2026, 8, 21, 12, 0, tzinfo=UTC)
+REFERENCE = _risk_intent().context.reference_time
 
 
 def _intent(**overrides):

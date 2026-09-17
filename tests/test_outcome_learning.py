@@ -16,14 +16,14 @@ def _observation() -> OutcomeLearningObservation:
     simulation_input = _input()
     result = PaperSimulationResult(
         input_digest=simulation_input.digest,
-        fill_digest="f",
-        transition_digest="t",
-        ledger_digest="l",
-        reconciliation_digest="r",
+        fill_digest="a" * 64,
+        transition_digest="b" * 64,
+        ledger_digest="c" * 64,
+        reconciliation_digest="d" * 64,
         status="FILLED",
         filled_quantity="10",
         unfilled_quantity="0",
-        position_state_digest="p",
+        position_state_digest="e" * 64,
         reconciliation_status="RECONCILED",
     )
     history = PaperSimulationResultHistory((result,))

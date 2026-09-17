@@ -15,7 +15,7 @@ def _second_observation():
     observation = _observation()
     result = replace(
         observation.paper_result,
-        fill_digest="fill-2",
+        fill_digest="f" * 64,
     )
     from core.execution import PaperSimulationResultHistory
     from core.learning import create_outcome_learning_observation
