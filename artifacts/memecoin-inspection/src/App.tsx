@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useInspectToken } from "@workspace/api-client-react";
 import type {
   InspectionPair,
@@ -49,7 +49,7 @@ function WindowGrid({
       <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {WINDOWS.map(([key, windowLabel]) => (
-          <div key={key} className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+          <div key={String(key)} className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
             <div className="text-[11px] font-medium text-slate-500">{windowLabel}</div>
             <div className="mt-1 break-all font-mono text-sm text-slate-800">
               {displayValue(values?.[key])}{values?.[key] != null && unit ? ` ${unit}` : ""}
@@ -121,7 +121,7 @@ function PairCard({ pair, index }: { pair: InspectionPair; index: number }) {
                   | null
                   | undefined;
                 return (
-                  <div key={key} className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+                  <div key={String(key)} className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
                     <div className="text-[11px] font-medium text-slate-500">{windowLabel}</div>
                     <div className="mt-1 font-mono text-xs text-slate-800">
                       B {displayValue(transaction?.buys)} · S {displayValue(transaction?.sells)}
@@ -161,17 +161,49 @@ function InspectionPage() {
   const [chainId, setChainId] = useState("ethereum");
   const [tokenAddress, setTokenAddress] = useState("");
   const [report, setReport] = useState<InspectionReport | null>(null);
-  const inspection = useInspectToken({
-    mutation: {
-      onSuccess: setReport,
-    },
-  });
+  const [activeRequestKey, setActiveRequestKey] = useState<string | null>(null);
+  const inputKeyRef = useRef("");
+  const requestSequenceRef = useRef(0);
+  const inputKey = `${chainId.trim()}\u0000${tokenAddress.trim()}`;
+  inputKeyRef.current = inputKey;
+  const inspection = useInspectToken();
+
+  function updateChainId(value: string) {
+    requestSequenceRef.current += 1;
+    setChainId(value);
+    setReport(null);
+    setActiveRequestKey(null);
+  }
+
+  function updateTokenAddress(value: string) {
+    requestSequenceRef.current += 1;
+    setTokenAddress(value);
+    setReport(null);
+    setActiveRequestKey(null);
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (inspection.isPending) return;
+    const nextChainId = chainId.trim();
+    const nextTokenAddress = tokenAddress.trim();
+    const requestKey = `${nextChainId}\u0000${nextTokenAddress}`;
+    const requestSequence = ++requestSequenceRef.current;
     setReport(null);
-    inspection.mutate({ data: { chainId: chainId.trim(), tokenAddress: tokenAddress.trim() } });
+    setActiveRequestKey(requestKey);
+    inspection.mutate(
+      { data: { chainId: nextChainId, tokenAddress: nextTokenAddress } },
+      {
+        onSuccess: (nextReport) => {
+          if (
+            requestSequenceRef.current === requestSequence &&
+            inputKeyRef.current === requestKey
+          ) {
+            setReport(nextReport);
+          }
+        },
+      },
+    );
   }
 
   const errorMessage =
@@ -234,7 +266,7 @@ function InspectionPage() {
           </Card>
         )}
 
-        {inspection.isError && !inspection.isPending && (
+        {inspection.isError && !inspection.isPending && activeRequestKey === inputKey && (
           <Card className="border-rose-200 bg-rose-50">
             <CardContent className="flex items-start gap-3 py-5 text-rose-950">
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
@@ -280,7 +312,7 @@ function InspectionPage() {
             {report.payload.pairs.length === 0 ? (
               <Card className="border-dashed border-slate-300 bg-white/60"><CardContent className="py-12 text-center text-sm text-slate-500">The source returned no pairs for this token.</CardContent></Card>
             ) : (
-              report.payload.pairs.map((pair, index) => <PairCard key={`${pair.pairAddress ?? "pair"}-${index}`} pair={pair} index={index} />)
+              report.payload.pairs.map((pair: InspectionPair, index: number) => <PairCard key={`${pair.pairAddress ?? "pair"}-${index}`} pair={pair} index={index} />)
             )}
             <details className="rounded-xl border border-slate-200 bg-white">
               <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-slate-700">Report provenance</summary>

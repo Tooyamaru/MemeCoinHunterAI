@@ -1,6 +1,6 @@
-# [Project name]
+# Meme Coin Hunter AI — Memecoin Inspection
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Read-only workspace for inspecting all source-returned DexScreener pairs for a token without ranking, approval, or trading behavior.
 
 ## Run & Operate
 
@@ -10,6 +10,9 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- The managed artifact workflows provide `PORT` and `BASE_PATH`; one-off frontend builds need both values, for example `PORT=19234 BASE_PATH=/ pnpm --filter @workspace/memecoin-inspection run build`.
+- `pnpm --filter @workspace/api-server run test` — run mocked HTTP bridge/endpoint checks
+- `uv run pytest -q tests/test_dexscreener_inspection.py` — run the focused Python inspector checks
 
 ## Stack
 
@@ -22,23 +25,29 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/memecoin-inspection` — responsive inspection UI
+- `artifacts/api-server/src/routes/inspection.ts` — validated Express bridge to the fixed Python inspector module
+- `core/data/dexscreener_inspection.py` and `core/data/dexscreener_transport.py` — source-shaped inspection and bounded transport contracts
+- `lib/api-spec/openapi.yaml` — API source of truth; generated clients and validators live in `lib/api-client-react` and `lib/api-zod`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The UI requires an explicit submit and renders every returned pair in source order; it does not rank or select a pair.
+- The bridge validates request input before spawning `python3 -m core.data.dexscreener_inspection`, bounds execution, and validates the returned report against generated Zod schemas.
+- Receipt timestamps are labeled “Data received at”; P08 acceptance remains `NOT_ATTEMPTED` with a null observation time.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Users enter a chain and token address, submit one inspection, and review source metrics, unavailable values, findings, response metadata, and collapsible provenance details.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+No additional preferences recorded.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Do not add wallet, signing, trading, downstream admission, or automatic live-request behavior to this inspection app.
+- Build generated workspace declarations before package-level typechecks with `pnpm run typecheck:libs`.
 
 ## Pointers
 
