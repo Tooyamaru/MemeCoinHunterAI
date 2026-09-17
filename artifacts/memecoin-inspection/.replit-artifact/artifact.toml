@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Memecoin Inspection"
+description = "A read-only inspection workspace for reviewing DexScreener token pairs and their source metadata without ranking, approval, or trading actions."
+version = "1.0.0"
+id = "artifacts/memecoin-inspection"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19234
+
+[services.development]
+run = "pnpm --filter @workspace/memecoin-inspection run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/memecoin-inspection", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/memecoin-inspection/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19234"
+BASE_PATH = "/"
