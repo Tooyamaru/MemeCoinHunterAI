@@ -4,21 +4,21 @@ Read-only workspace for inspecting all source-returned DexScreener pairs for a t
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (managed workflow port 8080)
+- `pnpm --filter @workspace/memecoin-inspection run dev` — run the frontend (managed workflow port 19234)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
 - The managed artifact workflows provide `PORT` and `BASE_PATH`; one-off frontend builds need both values, for example `PORT=19234 BASE_PATH=/ pnpm --filter @workspace/memecoin-inspection run build`.
 - `pnpm --filter @workspace/api-server run test` — run mocked HTTP bridge/endpoint checks
+- `pnpm --filter @workspace/memecoin-inspection run test` — run Chromium-backed mocked frontend interaction checks against `APP_URL` (defaults to the proxied preview)
 - `uv run pytest -q tests/test_dexscreener_inspection.py` — run the focused Python inspector checks
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
+- pnpm workspaces, Node.js 20, Python 3.13, TypeScript 5.9
 - API: Express 5
-- DB: PostgreSQL + Drizzle ORM
+- Frontend: React, Vite, Tailwind CSS
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
@@ -48,6 +48,7 @@ No additional preferences recorded.
 
 - Do not add wallet, signing, trading, downstream admission, or automatic live-request behavior to this inspection app.
 - Build generated workspace declarations before package-level typechecks with `pnpm run typecheck:libs`.
+- The API bridge resolves `python3` from the Python 3.13 Replit module; verify with `python3 --version` in the API workflow environment.
 
 ## Pointers
 

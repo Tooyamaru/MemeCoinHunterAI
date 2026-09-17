@@ -1,0 +1,463 @@
+import assert from "node:assert/strict";
+import { createHash, randomBytes } from "node:crypto";
+import { connect } from "node:net";
+import test from "node:test";
+
+const APP_URL = process.env.APP_URL ?? "http://127.0.0.1:80/";
+const CHROMIUM_PATH = process.env.CHROMIUM_PATH ?? "/repl/tools/bin/chromium";
+
+const successReceivedAt = "2026-09-17T03:00:00.000000Z";
+
+function makeReport(pairs, receivedAt = successReceivedAt) {
+  return {
+    tool_version: "dexscreener-inspection-v1",
+    source: "DexScreener",
+    request: {
+      endpoint: "https://api.dexscreener.com/token-pairs/v1/ethereum/0xsuccess",
+      chain_id: "ethereum",
+      token_address: "0xsuccess",
+      attempts: 1,
+      retry_count: 0,
+      attempt_log: [
+        {
+          attempt: 1,
+          status_code: 200,
+          response_bytes: 42,
+          received_at: receivedAt,
+        },
+      ],
+    },
+    receipt: {
+      received_at: receivedAt,
+      http_status: 200,
+      response_bytes: 42,
+    },
+    payload: {
+      raw_payload_sha256: null,
+      pair_count: pairs.length,
+      pairs,
+    },
+    evidence: {
+      p08_acceptance: "NOT_ATTEMPTED",
+      p08_observed_at: null,
+      asset_age: { status: "UNAVAILABLE" },
+      unavailable_fields: [],
+    },
+  };
+}
+
+const successPair = {
+  pairAddress: "0xpair",
+  chainId: "ethereum",
+  dexId: "mock-dex",
+  url: "https://example.test/pair",
+  baseToken: { address: "0xsuccess", name: "Mock Token", symbol: "MOCK" },
+  quoteToken: { address: "0xusd", name: "USD Coin", symbol: "USDC" },
+  priceNative: "0.000000000001",
+  priceUsd: "0.000000000000000001",
+  fdv: null,
+  marketCap: "123.4500",
+  liquidity: {
+    m5: "1.0000",
+    h1: null,
+    h6: "3",
+    h24: "4",
+    usd: "5.0000",
+    base: null,
+    quote: "7",
+  },
+  volume: { m5: "8.0000", h1: null, h6: "10", h24: "11" },
+  priceChange: { m5: "-1.25", h1: null, h6: "2.5", h24: "3.75" },
+  txns: {
+    m5: { buys: "12", sells: "13" },
+    h1: null,
+    h6: { buys: "14", sells: "15" },
+    h24: { buys: "16", sells: "17" },
+  },
+  pairCreatedAt: null,
+  inspection: {
+    source_pair_created_at: null,
+    field_provenance: {},
+    findings: [{ code: "MOCK_FINDING", source_field: "fdv", value: null }],
+  },
+};
+
+function frame(payload, opcode = 1) {
+  const data = Buffer.from(payload);
+  const mask = randomBytes(4);
+  let header;
+
+  if (data.length < 126) {
+    header = Buffer.from([0x80 | opcode, 0x80 | data.length]);
+  } else if (data.length < 65536) {
+    header = Buffer.alloc(4);
+    header[0] = 0x80 | opcode;
+    header[1] = 0x80 | 126;
+    header.writeUInt16BE(data.length, 2);
+  } else {
+    header = Buffer.alloc(10);
+    header[0] = 0x80 | opcode;
+    header[1] = 0x80 | 127;
+    header.writeBigUInt64BE(BigInt(data.length), 2);
+  }
+
+  const masked = Buffer.from(data);
+  for (let index = 0; index < masked.length; index += 1) {
+    masked[index] ^= mask[index % 4];
+  }
+  return Buffer.concat([header, mask, masked]);
+}
+
+class DevToolsConnection {
+  #socket;
+  #buffer = Buffer.alloc(0);
+  #handshakeComplete = false;
+  #nextId = 1;
+  #pending = new Map();
+  #listeners = new Map();
+
+  constructor(webSocketUrl) {
+    const url = new URL(webSocketUrl);
+    this.#socket = connect(Number(url.port), url.hostname);
+    this.#socket.on("data", (chunk) => this.#onData(chunk));
+    this.#socket.on("error", (error) => {
+      for (const { reject } of this.#pending.values()) reject(error);
+      this.#pending.clear();
+    });
+
+    this.ready = new Promise((resolve, reject) => {
+      this.#socket.once("connect", () => {
+        const key = randomBytes(16).toString("base64");
+        this.#socket.write(
+          [
+            `GET ${url.pathname} HTTP/1.1`,
+            `Host: ${url.host}`,
+            "Upgrade: websocket",
+            "Connection: Upgrade",
+            `Sec-WebSocket-Key: ${key}`,
+            "Sec-WebSocket-Version: 13",
+            "",
+            "",
+          ].join("\r\n"),
+        );
+      });
+      this.#socket.once("error", reject);
+      this.#resolveHandshake = resolve;
+      this.#rejectHandshake = reject;
+    });
+  }
+
+  #resolveHandshake;
+  #rejectHandshake;
+
+  on(method, listener) {
+    const listeners = this.#listeners.get(method) ?? [];
+    listeners.push(listener);
+    this.#listeners.set(method, listeners);
+  }
+
+  async send(method, params = {}) {
+    await this.ready;
+    const id = this.#nextId++;
+    const message = JSON.stringify({ id, method, params });
+    this.#socket.write(frame(message));
+    return new Promise((resolve, reject) => {
+      this.#pending.set(id, { resolve, reject });
+    });
+  }
+
+  close() {
+    this.#socket.destroy();
+  }
+
+  #onData(chunk) {
+    this.#buffer = Buffer.concat([this.#buffer, chunk]);
+
+    if (!this.#handshakeComplete) {
+      const headerEnd = this.#buffer.indexOf("\r\n\r\n");
+      if (headerEnd < 0) return;
+      const handshake = this.#buffer.subarray(0, headerEnd).toString();
+      this.#buffer = this.#buffer.subarray(headerEnd + 4);
+      if (!handshake.startsWith("HTTP/1.1 101")) {
+        this.#rejectHandshake(new Error(`DevTools websocket handshake failed: ${handshake}`));
+        return;
+      }
+      this.#handshakeComplete = true;
+      this.#resolveHandshake();
+    }
+
+    while (this.#buffer.length >= 2) {
+      const first = this.#buffer[0];
+      const second = this.#buffer[1];
+      let length = second & 0x7f;
+      let offset = 2;
+
+      if (length === 126) {
+        if (this.#buffer.length < 4) return;
+        length = this.#buffer.readUInt16BE(2);
+        offset = 4;
+      } else if (length === 127) {
+        if (this.#buffer.length < 10) return;
+        length = Number(this.#buffer.readBigUInt64BE(2));
+        offset = 10;
+      }
+
+      const masked = (second & 0x80) !== 0;
+      const maskOffset = masked ? 4 : 0;
+      if (this.#buffer.length < offset + maskOffset + length) return;
+
+      let payload = this.#buffer.subarray(
+        offset + maskOffset,
+        offset + maskOffset + length,
+      );
+      if (masked) {
+        const mask = this.#buffer.subarray(offset, offset + 4);
+        payload = Buffer.from(payload);
+        for (let index = 0; index < payload.length; index += 1) {
+          payload[index] ^= mask[index % 4];
+        }
+      }
+      this.#buffer = this.#buffer.subarray(offset + maskOffset + length);
+
+      const opcode = first & 0x0f;
+      if (opcode === 0x9) {
+        this.#socket.write(frame(payload, 0xa));
+      } else if (opcode === 0x1) {
+        this.#onMessage(JSON.parse(payload.toString()));
+      } else if (opcode === 0x8) {
+        this.close();
+        return;
+      }
+    }
+  }
+
+  #onMessage(message) {
+    if (message.id !== undefined) {
+      const pending = this.#pending.get(message.id);
+      if (!pending) return;
+      this.#pending.delete(message.id);
+      if (message.error) {
+        pending.reject(new Error(JSON.stringify(message.error)));
+      } else {
+        pending.resolve(message.result);
+      }
+      return;
+    }
+
+    for (const listener of this.#listeners.get(message.method) ?? []) {
+      listener(message.params);
+    }
+  }
+}
+
+async function waitForDebugger(child) {
+  return new Promise((resolve, reject) => {
+    let output = "";
+    const onData = (chunk) => {
+      output += chunk.toString();
+      const match = output.match(/DevTools listening on (ws:\/\/[^\s]+)/);
+      if (match) resolve(match[1]);
+    };
+    child.stdout.on("data", onData);
+    child.stderr.on("data", onData);
+    child.once("error", reject);
+    child.once("exit", (code) => {
+      reject(new Error(`Chromium exited before DevTools was ready (${code})\n${output}`));
+    });
+  });
+}
+
+async function startBrowser() {
+  const child = (await import("node:child_process")).spawn(CHROMIUM_PATH, [
+    "--headless=new",
+    "--no-sandbox",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--remote-debugging-port=0",
+    `--user-data-dir=/tmp/memecoin-inspection-${process.pid}`,
+    "about:blank",
+  ]);
+  const browserUrl = await waitForDebugger(child);
+  const browser = new DevToolsConnection(browserUrl);
+  await browser.ready;
+  const browserPort = new URL(browserUrl).port;
+  const targetResponse = await fetch(
+    `http://127.0.0.1:${browserPort}/json/new?${encodeURIComponent("about:blank")}`,
+    { method: "PUT" },
+  );
+  assert.equal(targetResponse.status, 200);
+  const target = await targetResponse.json();
+  browser.close();
+
+  const page = new DevToolsConnection(target.webSocketDebuggerUrl);
+  await page.ready;
+  return {
+    page,
+    close() {
+      page.close();
+      child.kill("SIGTERM");
+    },
+  };
+}
+
+async function evaluate(page, expression) {
+  const result = await page.send("Runtime.evaluate", {
+    expression,
+    awaitPromise: true,
+    returnByValue: true,
+  });
+  if (result.exceptionDetails) {
+    throw new Error(result.exceptionDetails.text ?? "Browser evaluation failed");
+  }
+  return result.result?.value;
+}
+
+async function waitFor(condition, timeout = 5000) {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    if (await condition()) return;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error("Timed out waiting for browser condition");
+}
+
+function responseBody(body) {
+  return Buffer.from(JSON.stringify(body)).toString("base64");
+}
+
+async function fulfill(page, request, status, body) {
+  await page.send("Fetch.fulfillRequest", {
+    requestId: request.requestId,
+    responseCode: status,
+    responseHeaders: [
+      { name: "content-type", value: "application/json" },
+      { name: "content-length", value: String(Buffer.byteLength(JSON.stringify(body))) },
+    ],
+    body: responseBody(body),
+  });
+}
+
+test("the rendered inspection flow uses one mocked request and rejects stale UI results", async (t) => {
+  const browser = await startBrowser();
+  t.after(() => browser.close());
+  const { page } = browser;
+  const requests = [];
+  const pausedRequests = [];
+  const queuedResponses = [];
+  const requestWaiters = [];
+
+  page.on("Fetch.requestPaused", async (request) => {
+    if (!request.request.url.endsWith("/api/inspections")) {
+      await page.send("Fetch.continueRequest", { requestId: request.requestId });
+      return;
+    }
+
+    requests.push(request);
+    for (const resolve of requestWaiters.splice(0)) resolve(request);
+    const response = queuedResponses.shift();
+    if (response) {
+      await fulfill(page, request, response.status, response.body);
+    } else {
+      pausedRequests.push(request);
+    }
+  });
+
+  await page.send("Runtime.enable");
+  await page.send("Page.enable");
+  await page.send("Fetch.enable", {
+    patterns: [{ urlPattern: "*", requestStage: "Request" }],
+  });
+  await page.send("Page.navigate", { url: APP_URL });
+  await waitFor(() => evaluate(page, "Boolean(document.querySelector('input[placeholder=\"0x...\"]'))"));
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  assert.equal(requests.length, 0, "the app must not inspect automatically on page load");
+
+  const setToken = async (value) => {
+    await evaluate(
+      page,
+      `(() => {
+        const input = document.querySelector('input[placeholder="0x..."]');
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+        setter.call(input, ${JSON.stringify(value)});
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      })()`,
+    );
+  };
+  const submit = () =>
+    evaluate(page, `document.querySelector('button[type="submit"]').click()`);
+  const bodyText = () => evaluate(page, "document.body.innerText");
+  const nextRequest = (expectedCount) =>
+    requests.length >= expectedCount
+      ? Promise.resolve(requests[expectedCount - 1])
+      : new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error("Timed out waiting for inspection request")), 5000);
+          requestWaiters.push((request) => {
+            clearTimeout(timer);
+            resolve(request);
+          });
+        });
+
+  await setToken("0xsuccess");
+  await submit();
+  const firstRequest = await nextRequest(1);
+  assert.deepEqual(JSON.parse(firstRequest.request.postData), {
+    chainId: "ethereum",
+    tokenAddress: "0xsuccess",
+  });
+  assert.equal(
+    await evaluate(page, "document.querySelector('button[type=\"submit\"]').disabled"),
+    true,
+    "a pending request must disable the submit button",
+  );
+  await submit();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  assert.equal(requests.length, 1, "a pending request must block duplicate submissions");
+  assert.match(await bodyText(), /Inspecting…/);
+  pausedRequests.shift();
+  await fulfill(page, firstRequest, 200, makeReport([successPair]));
+  await waitFor(async () => (await bodyText()).includes("MOCK / USDC"));
+
+  const expectedReceivedAt = await evaluate(
+    page,
+    `new Date(${JSON.stringify(successReceivedAt)}).toLocaleString()`,
+  );
+  const successText = await bodyText();
+  assert.match(successText, /0\.000000000000000001 USD/);
+  assert.match(successText, /123\.4500 USD/);
+  assert.match(successText, /Unavailable/);
+  assert.match(successText, /-1\.25 %/);
+  assert.ok(successText.includes(expectedReceivedAt), "receipt time should be formatted and visible");
+
+  await setToken("0xstale");
+  await submit();
+  const staleRequest = await nextRequest(2);
+  await setToken("0xnew");
+  await fulfill(page, staleRequest, 200, makeReport([successPair]));
+  await waitFor(async () => !(await bodyText()).includes("Inspecting…"));
+  const afterStaleText = await bodyText();
+  assert.ok(!afterStaleText.includes("MOCK / USDC"), "an older response must not render for changed input");
+  assert.ok(afterStaleText.includes("No inspection yet"), "changed input should return to the empty state");
+
+  queuedResponses.push({
+    status: 200,
+    body: makeReport([], null),
+  });
+  await submit();
+  await nextRequest(3);
+  await waitFor(async () => (await bodyText()).includes("The source returned no pairs for this token."));
+
+  await setToken("0xerror");
+  queuedResponses.push({
+    status: 502,
+    body: {
+      error: "The inspection returned an invalid report.",
+      code: "INVALID_INSPECTOR_REPORT",
+      detail: "The mocked inspector response was invalid.",
+    },
+  });
+  await submit();
+  await nextRequest(4);
+  await waitFor(async () => (await bodyText()).includes("Inspection unavailable"));
+  assert.ok((await bodyText()).includes("Inspection unavailable"));
+});
