@@ -245,6 +245,25 @@ def test_normalization_preserves_pairs_digest_decimal_scale_and_provenance() -> 
     assert report["receipt"]["received_at"] == RECEIVED_AT
 
 
+def test_complete_report_is_acyclic_and_json_serializable() -> None:
+    report = inspect_response(response_contract(fixture_bytes()))
+
+    serialized = json.dumps(report, ensure_ascii=False, indent=2)
+    parsed = json.loads(serialized)
+
+    assert parsed["payload"]["pair_count"] == 2
+    assert (
+        parsed["payload"]["pairs"][0]["inspection"]["field_provenance"][
+            "pairs[0]"
+        ]["normalized_value"]["pairAddress"]
+        == "0x1111111111111111111111111111111111111111"
+    )
+    assert (
+        parsed["payload"]["pairs"][0]["inspection"]["findings"][0]["value"]
+        == {"buys": "1", "sells": "2"}
+    )
+
+
 def test_report_is_not_a_p08_observation_and_never_uses_receipt_or_pair_time() -> None:
     report = inspect_response(response_contract(fixture_bytes()))
     assert report["evidence"]["p08_acceptance"] == "NOT_ATTEMPTED"
@@ -346,26 +365,103 @@ def test_normalization_has_zero_network_calls() -> None:
     assert calls == []
 
 
-def test_cli_requires_explicit_arguments_and_prints_only_report(
+def test_cli_success_uses_mocked_transport_and_prints_complete_report(
     capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def no_network(*args: Any, **kwargs: Any) -> Any:
-        raise ConnectionFailureError("simulated offline transport")
+    calls: list[tuple[str, str]] = []
 
-    monkeypatch.setattr(
-        "core.data.dexscreener_inspection.inspect_token",
-        no_network,
-    )
+    def mocked_transport(chain_id: str, token_address: str) -> TokenPairsResponse:
+        calls.append((chain_id, token_address))
+        return response_contract(fixture_bytes())
+
     code = main(
         [
             "--chain-id",
             "ethereum",
             "--token-address",
             "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        ]
+        ],
+        transport=mocked_transport,
     )
     captured = capsys.readouterr()
+    report = json.loads(captured.out)
+
+    assert code == 0
+    assert calls == [
+        ("ethereum", "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    ]
+    assert set(report) == {
+        "tool_version",
+        "source",
+        "request",
+        "receipt",
+        "payload",
+        "evidence",
+    }
+    assert report["tool_version"] == "dexscreener-inspection-v1"
+    assert report["source"] == "DexScreener"
+    assert report["request"] == {
+        "endpoint": ENDPOINT,
+        "chain_id": "ethereum",
+        "token_address": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "attempts": 1,
+        "retry_count": 0,
+        "attempt_log": [
+            {
+                "attempt": 1,
+                "status_code": 200,
+                "response_bytes": len(fixture_bytes()),
+                "received_at": RECEIVED_AT,
+            }
+        ],
+    }
+    assert report["receipt"] == {
+        "received_at": RECEIVED_AT,
+        "http_status": 200,
+        "response_bytes": len(fixture_bytes()),
+    }
+    assert report["payload"]["raw_payload_sha256"] == hashlib.sha256(
+        fixture_bytes()
+    ).hexdigest()
+    assert report["payload"]["pair_count"] == 2
+    assert len(report["payload"]["pairs"]) == 2
+    assert report["payload"]["pairs"][0]["priceUsd"] == "1.2300"
+    assert report["payload"]["pairs"][0]["liquidity"]["usd"] == "987654.3200"
+    assert report["payload"]["pairs"][0]["volume"]["h24"] == "123456.7800"
+    assert report["evidence"]["p08_acceptance"] == "NOT_ATTEMPTED"
+    assert report["evidence"]["p08_observed_at"] is None
+
+
+def test_cli_error_report_is_json_serializable(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def no_network(*args: Any, **kwargs: Any) -> Any:
+        raise ConnectionFailureError("simulated offline transport")
+
+    code = main(
+        [
+            "--chain-id",
+            "ethereum",
+            "--token-address",
+            "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        ],
+        transport=no_network,
+    )
+    captured = capsys.readouterr()
+    report = json.loads(captured.out)
+
     assert code == 1
-    assert '"code": "CONNECTION_FAILURE"' in captured.out
+    assert report["request"]["endpoint"] == ENDPOINT
+    assert report["payload"] == {
+        "raw_payload_sha256": None,
+        "pair_count": 0,
+        "pairs": [],
+    }
+    assert report["error"] == {
+        "code": "CONNECTION_FAILURE",
+        "message": "simulated offline transport",
+        "path": None,
+    }
+    assert report["evidence"]["p08_acceptance"] == "NOT_ATTEMPTED"
+    assert report["evidence"]["p08_observed_at"] is None
     assert "Authorization" not in captured.out

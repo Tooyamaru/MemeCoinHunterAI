@@ -8,6 +8,7 @@ or any discovery, decision, paper-admission, wallet, or execution boundary.
 from __future__ import annotations
 
 import argparse
+import copy
 from decimal import Decimal, InvalidOperation
 import hashlib
 import json
@@ -138,9 +139,14 @@ def _normalize_value(
     else:
         raise InvalidSourceShapeError(f"unsupported JSON value at {path}", path=path)
 
+    provenance_value = (
+        copy.deepcopy(normalized)
+        if isinstance(normalized, (dict, list))
+        else normalized
+    )
     field_provenance[path] = {
         "source_field": path,
-        "normalized_value": normalized,
+        "normalized_value": provenance_value,
     }
     return normalized
 
@@ -323,7 +329,7 @@ def inspect_response(response: TokenPairsResponse) -> dict[str, Any]:
                     f"pair at index {index} must normalize to an object",
                     path=f"pairs[{index}]",
                 )
-            findings = _pair_findings(raw_pair, index=index)
+            findings = _pair_findings(normalized_pair, index=index)
             inspection: dict[str, Any] = {
                 "field_provenance": provenance,
                 "findings": findings,
@@ -444,10 +450,18 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(
+    argv: list[str] | None = None,
+    *,
+    transport: Callable[..., TokenPairsResponse] = fetch_token_pairs,
+) -> int:
     args = _build_parser().parse_args(argv)
     try:
-        report = inspect_token(args.chain_id, args.token_address)
+        report = inspect_token(
+            args.chain_id,
+            args.token_address,
+            transport=transport,
+        )
     except (DexScreenerTransportError, InspectionError, ValueError) as error:
         report = _error_report(
             error,
