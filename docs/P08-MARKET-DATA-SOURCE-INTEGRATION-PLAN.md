@@ -1,242 +1,390 @@
 # P08 — Market-Data Source Integration Plan
 
-**Status:** SOURCE DECISION BLOCKED / DOCUMENTATION-ONLY
+**Status:** IMPLEMENTATION BLOCKERS CONFIRMED / INSPECTION TOOL RECOMMENDED
 **Contract:** `p08-read-only-market-data-observation-v1`
 **Scope:** Official CoinGecko and DexScreener documentation only
 **Implementation authorization:** None
 
 ## 1. Decision
 
-Neither source currently satisfies the complete P08 read-only market-data
-observation contract. No provider is selected for implementation.
+Neither considered source can currently produce an accepted P08 observation
+without undocumented semantics or derived values. The recommended next scope is
+therefore a minimal, read-only DexScreener fetch-and-inspect tool for one
+explicit token address. It must preserve the source response and report
+unavailable P08 evidence; it must not construct a `ReadOnlyMarketDataObservation`,
+claim P08 acceptance, feed discovery or decisions, or authorize paper admission.
 
-CoinGecko is the closest conditional candidate for a minimal, address-scoped
-lookup because its official on-chain token endpoints provide price, volume,
-reserve/liquidity-like data, and a source timestamp field. It still cannot be
-accepted under the current contract because the documented response does not
-provide source-supplied asset age, an observation timestamp for the complete
-market snapshot, or an exact timestamp-bounded measurement window for its
-rolling volume field. DexScreener has the same asset-age problem and additionally
-does not document a market-observation timestamp.
+DexScreener is recommended for this narrow inspection scope because its official
+endpoint is address-scoped, its documentation exposes pair market fields, and
+the documented endpoint does not require a CoinGecko plan or API key. This is
+not a recommendation that DexScreener satisfies the P08 contract. CoinGecko
+remains a conditional comparison only; its documented on-chain endpoints use
+API-key authentication and still lack the source semantics required for P08.
 
-The validator must not be weakened, and fetch time must not be substituted for
-`observed_at`. The smallest contract-preserving resolution is to approve a
-source response or source composition that explicitly supplies:
+The audited validator and downstream contracts remain unchanged. Do not change
+`required_fields` to make incomplete source data appear accepted.
 
-1. one observation timestamp applying to the returned market fields;
-2. a source-supplied asset-origin/asset-age value with unit and reference
-   semantics; and
-3. the exact measurement window required for rolling volume.
+## 2. Required versus optional metrics
 
-Until those facts are documented by the selected source and a source-to-adapter
-contract is approved, no source adapter, dependency, network call, or fixture
-implementation may be added.
+The distinction is between structural metric presence and consumer acceptance.
+The implementation defines `_REQUIRED_METRICS` as
+`{"price", "liquidity", "volume", "asset_age"}` and `_OPTIONAL_METRICS` as
+`{"holders", "transactions"}` in
+`core/data/read_only_market_data.py`.
 
-## 2. Existing contract that must remain unchanged
+`_check_observation_structure` requires all four names in `_REQUIRED_METRICS` to
+exist in `observation.metrics`. It does not require all four to be
+`PRESENT` at that structural step. `_check_metric` permits `MISSING`,
+`UNAVAILABLE`, and `INVALID` only with `value=None`; a `PRESENT` metric must
+have a value, unit, semantic version, and any metric-specific context.
+`_check_metrics` then applies the caller-supplied
+`EvaluationContext.required_fields` and
+`EvaluationContext.permitted_optional_fields`:
 
-The future source-specific layer must translate into the existing
-`ReadOnlyMarketDataObservation` contract. It must not modify the provider-neutral
-validator or its authorized files.
+- a required field that is absent or `MISSING` returns `INCOMPLETE_INPUT`;
+- a required field that is `UNAVAILABLE` or `INVALID` returns
+  `UNAVAILABLE_INPUT`;
+- any `UNAVAILABLE` or `INVALID` metric present in the mapping also returns
+  `UNAVAILABLE_INPUT`, even when it is not required;
+- an optional `holders` or `transactions` envelope is rejected as
+  `UNSUPPORTED_FIELD` unless its name is in `permitted_optional_fields`;
+- an optional field may be omitted entirely; and
+- `PRESENT` is not universally mandatory in the validator, but is mandatory
+  for every field that the selected consumer profile puts in
+  `required_fields`.
 
-The integration must preserve:
+The relevant implementation symbols are `_REQUIRED_METRICS`,
+`_OPTIONAL_METRICS`, `_check_observation_structure`, `_check_metric`,
+`_check_metrics`, and `validate_observation`.
 
-- exact P02 predecessor `chain_id`, `token_identity`, market-subject identity,
-  source identity, predecessor digest, and provenance;
-- source-supplied `observed_at`; transport receipt or processing time may only
-  be represented as explicit availability context when supplied by the caller;
-- explicit `PRESENT`, `MISSING`, `UNAVAILABLE`, and `INVALID` metric envelopes;
-- source units, semantic versions, reference semantics, and measurement windows;
-- raw-payload and observation SHA-256 digests;
-- deterministic canonical serialization and immutable values;
-- bounded requests and bounded response processing; and
-- fail-closed behavior for missing, contradictory, stale, future, unsupported, or
-  semantically insufficient data.
+| Metric | Envelope must exist in a P08 observation? | When must it be `PRESENT`? | Is `MISSING`/`UNAVAILABLE` permitted? | Current consumer rule |
+|---|---:|---|---|---|
+| `price` | Yes; it is in `_REQUIRED_METRICS` and Section 7 of the specification. | When `price` is in `required_fields`; discovery requires every selected required field, and a paper profile using market conditions must require it. | Structurally yes with `value: null`; acceptance no when required. | `tests/test_read_only_market_data.py` fixture `context()` uses `("asset_age", "liquidity", "price", "volume")`. |
+| `liquidity` | Yes; it is in `_REQUIRED_METRICS`. | Same required-field rule as `price`. | Structurally yes; a required missing/unavailable value fails closed. | Same focused paper-evaluation fixture; Section 10.2 requires it for market-condition profiles. |
+| `volume` | Yes; it is in `_REQUIRED_METRICS`. | Same required-field rule, and `_check_metric` requires a `measurement_window` when it is `PRESENT`. | Structurally yes; a required missing/unavailable value fails closed. | Same focused fixture; Section 10.2 requires it for market-condition profiles. |
+| `asset_age` | Yes; it is in `_REQUIRED_METRICS`. | Same required-field rule, and `_check_metric` requires `reference_semantics` when it is `PRESENT`. | Structurally yes; a required missing/unavailable value fails closed. | Same focused fixture; Section 10.2 expressly requires asset-age semantics for market-condition profiles. |
+| `holders` | No. It is optional and may be omitted. | Only when explicitly included in `required_fields` and permitted by the profile. | Omission is allowed; an explicit unavailable/invalid envelope still produces `UNAVAILABLE_INPUT`. | Section 10 permits it only when explicitly supplied and version-authorized. |
+| `transactions` | No. It is optional and may be omitted. | Only when explicitly included in `required_fields` and permitted; `_check_metric` also requires a `measurement_window` when `PRESENT`. | Omission is allowed; an explicit unavailable/invalid envelope still produces `UNAVAILABLE_INPUT`. | Section 10 permits it only when explicitly supplied and version-authorized. |
 
-No source field may be converted into `asset_age`, `observed_at`, liquidity,
-zero, a healthy value, or a usable measurement merely because it is nearby in
-meaning. `asset_age` is distinct from P08 `data_age`.
+The normative rules are `docs/P08-READ-ONLY-MARKET-DATA-ADAPTER-SPECIFICATION.md`
+Sections 5, 7, 10.1, and 10.2. The code does not contain a production profile
+registry: requiredness is caller-supplied through `EvaluationContext`. The
+focused test fixture is evidence of the current exercised
+`paper-evaluation-v1` shape, not permission to change downstream profiles.
 
-## 3. Official-source comparison
+## 3. Timestamp compatibility
 
-| Contract need | CoinGecko official documentation | DexScreener official documentation | Result |
-|---|---|---|---|
-| Token lookup identity | `GET /api/v3/onchain/tokens/multi?tokens=network:address,...` returns network and address. `GET /api/v3/onchain/simple/networks/{network}/token_price/{addresses}` accepts comma-separated contract addresses and documents up to 100 addresses. | `GET /token-pairs/v1/{chainId}/{tokenAddress}` returns pairs for a token; pair identity includes chain and pair address. | Both can locate token-related records, subject to an explicit identity policy. |
-| Discovery | `GET /api/v3/onchain/search/pools?query=...` searches pool address, token name, symbol, or contract address and returns up to 20 pools per page. | `GET /latest/dex/search?q=...` provides pair search; token-pair lookup provides address-scoped discovery. | Both expose discovery-like lookup, but neither establishes P08 acceptance by itself. |
-| Price | `price_usd` or `token_prices` is source-supplied and can map to `price` with quote asset `USD`. | `priceUsd` is source-supplied and can map to `price` with quote asset `USD`. | Potentially compatible, subject to source contract and timestamp. |
-| Liquidity | `total_reserve_in_usd` is documented as total reserve, not as a complete observation of the P08 `liquidity` field. Mapping it to liquidity requires an approved semantic alias and valuation context. | `liquidity.usd` is explicitly returned, but is pair-specific and requires deterministic pair selection. | Neither is contract-ready without an explicit semantic and subject-selection policy. |
-| Volume | `volume_usd.h24` or `h24_volume_usd` is source-supplied with a 24-hour label. The documentation does not give exact UTC start/end instants for the rolling window. | `volume.h24` is source-supplied with a 24-hour label. The documentation does not give exact UTC start/end instants. | Neither can populate the required exact `TimeWindow` without deriving or inventing boundaries. |
-| Asset age | The documented token and simple-price responses do not supply token age or a token-origin timestamp. `last_trade_timestamp` is a last-trade field, not asset age. | `pairCreatedAt`/`pool_created_at` identifies pair or pool creation, not token age; turning it into age would be a derived value and may not identify the token’s origin. | Blocking for both. |
-| Source observation time | `last_trade_timestamp` is documented as the last trade timestamp. It is not documented as the observation instant for price, reserve, and volume in the same response. | No market-field observation/update timestamp is documented. `pairCreatedAt` is creation time, not observation time. | Blocking for both. |
-| Optional transactions | The reviewed CoinGecko token-price responses do not provide the required P08 transaction-count envelope. | Pair responses expose transaction counts by documented windows, but exact window-boundary timestamps are still not supplied. | Optional only; never substitute for required volume or age. |
-| Holders | Not supplied by the reviewed endpoints. | Not supplied by the reviewed endpoints. | Must be explicit `MISSING` or `UNAVAILABLE`, never zero. |
-| Raw payload/provenance | The JSON response can be retained by a future source-specific layer for canonical raw-payload hashing and bounded metadata. | The JSON response can likewise be retained and hashed. | Transport/parser responsibility, not validator responsibility. |
-| Freshness and bounded access | On-chain simple price documents up to 100 addresses per request, real-time/cacheless paid behavior, and 60-second demo/keyless cache behavior. CoinGecko rate limits are plan-dependent; demo documents 100 calls/minute. | Official API reference documents 300 requests/minute for search, pair, and token-pairs endpoints. | Both permit bounded lookup, but rate limits do not solve missing contract semantics. |
-
-## 4. Conditional closest candidate: CoinGecko
-
-If CoinGecko later documents the missing source facts, the smallest integration
-should be an address-scoped lookup, not an unbounded universe scan.
-
-### 4.1 Conditional request shape
-
-Primary candidate:
+`observed_at` is required for every observation by the Section 5 top-level
+contract. The implementation checks it in `_check_observation_structure` and
+uses it for freshness in `_check_freshness`. The required relationship is:
 
 ```text
-GET https://pro-api.coingecko.com/api/v3/onchain/tokens/multi
-    ?tokens=<network>:<address>,<network>:<address>
+observed_at <= availability_at <= evaluation_context.cutoff_time
 ```
 
-The official example uses the `x-cg-pro-api-key` header and the Pro API host.
-The integration must receive credentials only through the workspace secret
-mechanism; this plan does not acquire, register, or display credentials.
+`source.source_observed_at` is nullable at the structural level, but when it is
+present `_check_provenance_links` requires exact equality with
+`observation.observed_at`. Provenance also copies `observed_at` and
+`availability_at`; these are not interchangeable.
 
-For a minimal price/reserve lookup, the documented alternative is:
+For this plan:
+
+- a source observation time must describe the returned market fields, not merely
+  a related event;
+- local receipt time is retained as `received_at` in the inspection report and
+  is never emitted as P08 `observed_at`;
+- HTTP `Date` and fetch/processing time are local transport facts, not source
+  observation facts;
+- DexScreener `pairCreatedAt` is pair creation time, not observation time; and
+- CoinGecko `last_trade_timestamp` is documented as last-trade time, not as the
+  observation instant for price, reserve, and rolling volume in the response.
+
+Using any of those timestamps as `observed_at` would require undocumented
+matching semantics and would violate Section 9 rules 8–10. The inspection tool
+must therefore output `p08_observed_at: null` and an explicit
+`p08_acceptance: "NOT_ATTEMPTED"` for every result.
+
+## 4. Confirmed and conditional source blockers
+
+### 4.1 CoinGecko
+
+The official candidate endpoints are:
 
 ```text
+GET https://pro-api.coingecko.com/api/v3/onchain/tokens/multi?tokens=<network>:<address>
 GET https://pro-api.coingecko.com/api/v3/onchain/simple/networks/{network}/token_price/{addresses}
 ```
 
-The documented address bound is 100 per request. The future transport must also
-enforce a configured maximum URL length, response-byte limit, timeout, and
-address count before sending a request. It must not silently split a request
-unless the caller explicitly supplies deterministic batch boundaries.
+The documentation shows the `x-cg-pro-api-key` header. The simple token-price
+endpoint documents up to 100 addresses, `token_prices`,
+`h24_volume_usd`, `total_reserve_in_usd`, and `last_trade_timestamp`.
+The multi-token endpoint documents token identity, price, reserve, rolling
+volume, transactions in included pool data, and last-trade fields.
 
-### 4.2 Conditional identity and field translation
+Confirmed blockers:
 
-Only a P02-linked identity may be accepted for downstream use. A future
-translation would:
-
-- copy P02 `chain_id` and `token_identity` exactly;
-- use CoinGecko’s network/address only to verify the supplied opaque identity,
-  never to replace it with a name, symbol, or CoinGecko coin ID;
-- use a token or explicitly selected top-pool identifier as
-  `market_subject_id` only under an approved deterministic subject policy;
-- preserve `source_event_id` as explicit `null` unless CoinGecko documents a
-  stable event identity;
-- map `price_usd`/`token_prices` to `price` with `quote_asset: "USD"` only
-  after the source timestamp and semantic contract are resolved;
-- map `volume_usd.h24`/`h24_volume_usd` only if the source supplies the exact
-  measurement window required by P08;
-- keep `total_reserve_in_usd` as unavailable until its equivalence to P08
-  liquidity is explicitly approved; and
-- emit `asset_age`, holders, and transactions as explicit unavailable/missing
-  envelopes when the source does not supply them.
-
-The last three rules are deliberate fail-closed behavior. They do not permit a
-consumer profile that requires those fields to accept the observation.
-
-## 5. DexScreener disposition
-
-DexScreener is not selected as a fallback. Its documented pair data is useful
-for pair lookup and includes price, liquidity, volume, transactions, and
-`pairCreatedAt`. However:
-
-1. `pairCreatedAt` is pair creation time, not token age and not market
+1. no documented source-supplied token-origin or asset-age value;
+2. `last_trade_timestamp` is not documented as a complete market snapshot
    observation time;
-2. no source observation/update timestamp for the returned market fields is
-   documented;
-3. a token can have multiple pairs, so choosing one requires an approved
-   deterministic market-subject policy; and
-4. documented rolling windows such as `h24` do not provide exact UTC window
-   endpoints for the P08 `TimeWindow`.
+3. rolling `h24` values are named windows but no exact UTC start and end
+   timestamps are supplied for the P08 `TimeWindow`; and
+4. `total_reserve_in_usd` is not documented as the P08 liquidity semantic and
+   would need an approved source-field semantic contract.
 
-Using fetch time, pair creation time, or a chosen pair’s latest-looking field to
-repair any of these gaps would violate the current contract.
+Conditional issues:
 
-## 6. Future implementation boundary after blocker resolution
+- API-key and plan access are transport requirements, not proof of semantic
+  compatibility;
+- `price_usd`/`token_prices` could map to P08 price if a source contract
+  supplies compatible snapshot timing; and
+- `total_reserve_in_usd` could be retained as an inspectable source field, but
+  must remain unavailable for P08 liquidity unless its semantic equivalence is
+  separately approved.
 
-No files in this section are authorized now. If an approved source contract
-resolves the blockers, the implementation should be confined to these new
-source-specific files:
+The official rate-limit documentation says paid limits depend on plan, demo
+access is 100 calls/minute, and keyless access is IP-rate-limited. The plan
+does not recommend acquiring a paid CoinGecko plan.
 
-```text
-core/data/coingecko_transport.py
-core/data/coingecko_market_data_source.py
-tests/test_coingecko_market_data_source.py
-tests/fixtures/coingecko_market_data/token_observation.json
-```
+### 4.2 DexScreener
 
-The responsibilities would remain separate:
-
-1. `coingecko_transport.py`: HTTPS transport, authentication header injection,
-   timeout, response-size limit, status/error translation, bounded retries only
-   for explicitly retryable failures, and no normalization.
-2. `coingecko_market_data_source.py`: deterministic parsing, source-to-P08
-   translation, identity/provenance links, explicit missing states, raw-payload
-   canonical bytes, and digest construction. It must not modify
-   `core/data/read_only_market_data.py`.
-3. `tests/test_coingecko_market_data_source.py`: offline contract and transport
-   boundary tests.
-4. `tests/fixtures/coingecko_market_data/`: bounded, redacted, deterministic
-   JSON fixtures only; no live calls or credentials.
-
-No provider-specific code may be placed in the provider-neutral validator,
-discovery contracts, market-observation contracts, P05/P06/P07 boundaries, or
-any execution, wallet, persistence, or deployment path.
-
-## 7. Required failure and retry behavior
-
-The future source layer must fail closed and preserve bounded provenance for:
-
-- HTTP 400, 401, 403, 408, 429, 500, 503, and undocumented response shapes;
-- authentication or plan restriction failures;
-- timeout, connection, malformed JSON, oversized body, and unexpected content
-  type;
-- missing token records, duplicate token records, conflicting pair records, and
-  source fields with incompatible types;
-- absent source observation timestamp, absent asset age, absent exact volume
-  window, or unresolved liquidity semantics; and
-- any source value that cannot be represented by the current P08 field contract.
-
-Retries must be bounded, deterministic, and limited to explicitly retryable
-transport/server conditions. Do not retry authentication, plan, validation, or
-contract-shape failures. A retry must never change the observation timestamp or
-make stale data fresh.
-
-## 8. Offline verification and manual inspection
-
-After blocker resolution and separate implementation authorization, verification
-must include:
+The official lookup endpoint selected for the inspection tool is:
 
 ```text
-uv run pytest -q tests/test_coingecko_market_data_source.py
-uv run python -m compileall -q core/data/coingecko_transport.py core/data/coingecko_market_data_source.py
-git diff --check
-git diff --no-index --check /dev/null tests/fixtures/coingecko_market_data/<fixture>.json
+GET https://api.dexscreener.com/token-pairs/v1/{chainId}/{tokenAddress}
 ```
 
-Tests must cover deterministic request construction, batch bounds, timeout and
-response-size rejection, each documented status class, redacted provenance,
-canonical raw-payload and observation digests, identity preservation,
-source-observation-time requirements, exact volume-window requirements,
-explicit missing/unavailable values, stale/future observations, duplicate and
-contradictory records, and zero network calls.
+The official API reference documents a 300-requests-per-minute limit for this
+endpoint and returns pools/pairs for the supplied token address. Pair records
+document price, liquidity, volume, transactions, and `pairCreatedAt`.
+The endpoint is an address/pair lookup, not candidate discovery.
 
-Manual inspection command:
+Confirmed blockers for P08 acceptance:
+
+1. no market-field observation/update timestamp is documented;
+2. `pairCreatedAt` is pair creation time, not token age and not observation
+   time; and
+3. rolling fields such as `volume.h24` do not include exact UTC window
+   endpoints.
+
+Conditional issues:
+
+- a token may return multiple pairs, so the inspector must retain every returned
+  pair and must not choose, aggregate, or rank one;
+- `priceUsd` and `liquidity.usd` are inspectable source fields but cannot be
+  treated as a validated P08 snapshot without source timing; and
+- `transactions.h24` is optional source evidence only and cannot repair missing
+  required volume or asset age.
+
+The absence of a documented authorization header for this DexScreener endpoint
+supports the no-credential inspection scope; it does not establish authority,
+freshness, or P08 acceptance.
+
+### 4.3 Discovery versus lookup
+
+`/token-pairs/v1/{chainId}/{tokenAddress}` and CoinGecko’s address endpoints
+inspect a token that the caller already selected. They do not discover a
+candidate universe.
+
+DexScreener `/latest/dex/search?q` and CoinGecko
+`/onchain/search/pools?query=...` are search/discovery-like endpoints, but their
+results are not safety, eligibility, liquidity, or authorization decisions.
+They are out of the minimal scope. No search result may be promoted into a P08
+candidate without a separately authorized discovery translation and profile.
+
+## 5. Recommended implementation scope: DexScreener inspection only
+
+This is the one concrete recommended next implementation. It produces
+inspectable real source data while explicitly preserving the unresolved P08
+evidence. It does not resolve downstream eligibility.
+
+### 5.1 Exact future files requiring authorization
+
+No files in this section are authorized now. A future authorization should name
+exactly:
 
 ```text
-uv run python - <<'PY'
-from pathlib import Path
-print(Path("docs/P08-MARKET-DATA-SOURCE-INTEGRATION-PLAN.md").read_text())
-PY
+core/data/dexscreener_transport.py
+core/data/dexscreener_inspection.py
+tests/test_dexscreener_inspection.py
+tests/fixtures/dexscreener/token_pairs.json
 ```
 
-The inspection must confirm that this plan remains the only file created by the
-planning task and that no credentials, account registration, paid request,
-wallet, signing, trading, dependency, workflow, or project-state change was
-introduced.
+Responsibilities:
 
-## 9. Official documentation reviewed
+1. `dexscreener_transport.py` performs one bounded HTTPS request and returns raw
+   response bytes plus explicit transport metadata. It does not normalize
+   market fields.
+2. `dexscreener_inspection.py` parses and normalizes the response for human and
+   test inspection. It must retain every returned pair, keep source field names,
+   expose unavailable P08 evidence, and provide the proposed CLI.
+3. `tests/test_dexscreener_inspection.py` tests transport and normalization
+   offline with no provider calls.
+4. `tests/fixtures/dexscreener/token_pairs.json` is a bounded, redacted,
+   deterministic fixture containing the official response shape; it is not a
+   live cache.
 
-Only these official documentation pages are used for the provider comparison:
+The inspector must not import or modify
+`core/data/read_only_market_data.py`, and it must not return
+`ValidationResult(VALID)`.
+
+### 5.2 Bounded request and retry policy
+
+One invocation accepts exactly one explicit `chain_id` and one token address:
+
+- request count: at most 1 initial request plus 1 retry;
+- endpoint: `/token-pairs/v1/{chainId}/{tokenAddress}`;
+- timeout: 10 seconds per attempt;
+- response-size limit: 1 MiB; reject, never truncate, larger responses;
+- pair-count limit: 128 returned pairs; reject, never truncate, larger arrays;
+- retry: one fixed 1-second retry only for HTTP 408, 429, 500, 502, 503, or
+  504 and transport connection/reset failures;
+- no retry for 400, 401, 403, 404, malformed JSON, oversized responses, or
+  invalid source shapes; and
+- no pagination, search, batching, pair selection, aggregation, ranking, or
+  fallback provider.
+
+The retry count, HTTP status, response byte count, endpoint, and local receipt
+time must be included in the inspection provenance. No retry may change or
+invent a source observation time.
+
+### 5.3 Lossless normalization and provenance
+
+The inspector must:
+
+- hash the exact response bytes before parsing as `raw_payload_sha256`;
+- parse JSON numeric tokens without binary floating point, using decimal-preserving
+  parsing and rendering normalized numeric values as strings;
+- retain the exact raw payload digest and the source field path for every
+  normalized value;
+- preserve source strings and decimal scale where the parser can observe them;
+- report non-finite, malformed, or unrepresentable numeric fields as explicit
+  invalid evidence rather than rounding or dropping them;
+- record local `received_at` separately from all source timestamps;
+- retain `pairCreatedAt` as `source_pair_created_at` only; and
+- emit `p08_observed_at: null`, `asset_age.status: "UNAVAILABLE"`, and
+  `p08_acceptance: "NOT_ATTEMPTED"` because the source does not document the
+  required semantics.
+
+The output is an inspection report, not a P08 observation. It may include
+`priceUsd`, `liquidity.usd`, `volume.*`, and `txns.*` under a source-preserving
+`pairs` array, but it must not rename them into accepted P08 metric envelopes
+or claim that they satisfy the P08 units, windows, or freshness rules.
+
+### 5.4 Proposed executable manual command
+
+After the four files above receive separate authorization, the manual command
+should make one public read-only request for an explicit token and print the
+fetched/normalized report:
+
+```text
+uv run python -m core.data.dexscreener_inspection \
+  --chain-id ethereum \
+  --token-address 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+```
+
+Expected top-level output fields are:
+
+```text
+tool_version
+source
+request.endpoint
+request.chain_id
+request.token_address
+request.attempts
+receipt.received_at
+receipt.http_status
+receipt.response_bytes
+payload.raw_payload_sha256
+payload.pair_count
+payload.pairs[]
+payload.pairs[].pairAddress
+payload.pairs[].chainId
+payload.pairs[].dexId
+payload.pairs[].baseToken
+payload.pairs[].quoteToken
+payload.pairs[].priceUsd
+payload.pairs[].liquidity
+payload.pairs[].volume
+payload.pairs[].txns
+payload.pairs[].pairCreatedAt
+evidence.p08_acceptance
+evidence.p08_observed_at
+evidence.asset_age.status
+evidence.unavailable_fields
+```
+
+The command must not print credentials, Authorization headers, or private
+payload data. It must make clear that the report is real fetched source data
+with local receipt provenance, not an accepted market observation.
+
+## 6. Offline tests and acceptance criteria
+
+The future focused suite must use the fixture and fake transport only. It must
+cover:
+
+- exact URL and one-address request construction;
+- one-request plus one-retry bounds;
+- timeout, connection failure, each retryable status, each non-retryable
+  status, malformed JSON, oversized body, and over-limit pair arrays;
+- raw-byte SHA-256 preservation;
+- decimal and integer values without binary-float conversion or silent
+  rounding;
+- preservation of every returned pair and source field;
+- duplicate pair records and conflicting source fields as explicit inspection
+  findings, never implicit selection;
+- distinct `received_at` and `pairCreatedAt` fields;
+- `p08_observed_at: null` and `p08_acceptance: "NOT_ATTEMPTED"`;
+- explicit unavailable asset age and missing exact observation/window evidence;
+- zero network calls in normalization tests; and
+- no imports or behavior from P05, P06, P07, execution, wallet, persistence,
+  or the P08 validator beyond documenting the boundary.
+
+Acceptance criteria for the inspection scope:
+
+1. only the four explicitly authorized future paths are changed;
+2. the tool performs at most one request and one bounded retry;
+3. the exact source payload is digestable and all returned source fields remain
+   inspectable;
+4. numeric values are not converted through binary floating point;
+5. receipt time is never labeled `observed_at`;
+6. pair creation time is never labeled asset age or observation time;
+7. no P08 `VALID` result, candidate decision, paper admission, ranking, or
+   discovery claim is produced; and
+8. focused offline tests and the manual command produce the documented report
+   fields.
+
+This alternative delivers inspectable real data but does not resolve downstream
+eligibility. A future P08-accepted integration would still require a separate
+source contract that supplies a complete market observation timestamp, source
+asset-age semantics, and exact volume windows. Relaxing `required_fields` or
+relabeling source timestamps would be a contract change requiring a new
+specification, audit, implementation authorization, and downstream impact
+review; it is not part of this plan.
+
+## 7. Original blockers: confirmed versus conditional
+
+| Original blocker | Determination | Basis |
+|---|---|---|
+| No documented source observation timestamp for DexScreener market fields | Confirmed | Official endpoint documents pair fields and `pairCreatedAt`, but not a market snapshot/update time. |
+| `pairCreatedAt` cannot stand in for `observed_at` or asset age | Confirmed | It is pair creation time and has different semantics. |
+| CoinGecko `last_trade_timestamp` cannot automatically stand in for `observed_at` | Confirmed | It is documented as last-trade time, not complete-response observation time. |
+| Neither reviewed source supplies P08 asset age | Confirmed | The reviewed official response fields contain no token-origin age value with P08 reference semantics. |
+| Rolling `h24` values lack exact P08 `TimeWindow` endpoints | Confirmed for current docs; conditional only if a future source contract documents exact boundaries | Current docs provide window labels, not UTC start/end timestamps. |
+| CoinGecko reserve can be P08 liquidity | Conditional, not accepted | Requires a separately approved semantic alias and valuation context. |
+| Pair selection can produce one P08 market subject | Conditional, not accepted | Requires a deterministic subject-selection contract; the inspector retains all pairs instead. |
+| A source can be used without a credential | Conditional by source | DexScreener’s selected endpoint has no documented auth requirement; CoinGecko’s official examples require API-key headers and plan/rate-limit rules. |
+
+## 8. Official documentation reviewed
+
+Only these official provider pages support the comparison:
 
 - CoinGecko — [Tokens Data by Token Addresses across Networks](https://docs.coingecko.com/reference/tokens-data-contract-addresses-multi)
 - CoinGecko — [Token Price by Token Addresses](https://docs.coingecko.com/reference/onchain-simple-price)
 - CoinGecko — [Search Pools & Tokens](https://docs.coingecko.com/reference/search-pools)
-- CoinGecko — [Coin Data by Token Address](https://docs.coingecko.com/reference/coins-contract-address)
 - CoinGecko — [Authentication](https://docs.coingecko.com/reference/authentication)
 - CoinGecko — [Errors and Rate Limits](https://docs.coingecko.com/docs/errors-and-rate-limits)
 - DexScreener — [API Reference](https://docs.dexscreener.com/api/reference)
 
-This document does not treat third-party descriptions, undocumented response
-fields, provider SDK behavior, or observed live responses as contract evidence.
+No live request, credential acquisition, paid request, source change, validator
+change, dependency change, workflow change, project-state change, commit, or
+push is authorized by this plan.
