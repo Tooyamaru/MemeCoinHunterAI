@@ -1,0 +1,77 @@
+[
+  {
+    "chainId": "ethereum",
+    "dexId": "uniswap",
+    "url": "https://dexscreener.com/ethereum/0x1111111111111111111111111111111111111111",
+    "pairAddress": "0x1111111111111111111111111111111111111111",
+    "labels": ["v2"],
+    "baseToken": {
+      "address": "0x2222222222222222222222222222222222222222",
+      "name": "Example Token",
+      "symbol": "EXAMPLE"
+    },
+    "quoteToken": {
+      "address": "0x3333333333333333333333333333333333333333",
+      "name": "Wrapped Ether",
+      "symbol": "WETH"
+    },
+    "priceNative": 0.0001234500,
+    "priceUsd": 1.2300,
+    "txns": {
+      "m5": {"buys": 1, "sells": 2},
+      "h1": {"buys": 4, "sells": 5},
+      "h6": {"buys": 20, "sells": 21},
+      "h24": {"buys": 100, "sells": 101}
+    },
+    "volume": {
+      "h24": 123456.7800,
+      "h6": 45678.90,
+      "h1": 7890.1,
+      "m5": 123.00
+    },
+    "priceChange": {
+      "m5": -0.10,
+      "h1": 1.2300,
+      "h6": 4.5,
+      "h24": 12.3400
+    },
+    "liquidity": {
+      "usd": 987654.3200,
+      "base": 800000.00,
+      "quote": 100.5
+    },
+    "fdv": 12345678.9000,
+    "marketCap": 12000000,
+    "pairCreatedAt": 1710000000000
+  },
+  {
+    "chainId": "ethereum",
+    "dexId": "sushiswap",
+    "url": "https://dexscreener.com/ethereum/0x4444444444444444444444444444444444444444",
+    "pairAddress": "0x4444444444444444444444444444444444444444",
+    "baseToken": {
+      "address": "0x2222222222222222222222222222222222222222",
+      "name": "Example Token",
+      "symbol": "EXAMPLE"
+    },
+    "quoteToken": {
+      "address": "0x5555555555555555555555555555555555555555",
+      "name": "USD Coin",
+      "symbol": "USDC"
+    },
+    "priceNative": 1.2300,
+    "priceUsd": 1.2300,
+    "txns": {
+      "h24": {"buys": 8, "sells": 9}
+    },
+    "volume": {
+      "h24": 2345.6700
+    },
+    "liquidity": {
+      "usd": 34567.8900,
+      "base": 28000.00,
+      "quote": 34567.89
+    },
+    "pairCreatedAt": 1710000000001
+  }
+]
