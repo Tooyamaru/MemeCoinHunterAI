@@ -5,3 +5,4 @@
 - [Validation wrapper assertions](validation-wrapper-assertions.md) — behavioral tests should assert fail-closed outcomes, not fragile internal wrapper error wording.
 - [Replit Python 3.13 module](replit-python-313-module.md) — this environment exposes Python 3.13 through the supported base module, with uv-managed project dependencies.
 - [G1 predecessor contracts](g1-predecessor-contracts.md) — defer digest checks to P06/P07/P08-owned canonical contracts; P07-T05 success is MATCH while P07-T06 uses RECONCILED.
+- [Provider candidate admission](provider-candidate-admission.md) — latest provider profiles remain explicitly unadmitted until source event and ordering evidence exists.

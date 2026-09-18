@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CandidateListingResponse,
   ErrorResponse,
   HealthStatus,
   InspectionWithTemporalEvidence,
@@ -202,3 +203,75 @@ export const useInspectToken = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getInspectTokenMutationOptions(options));
     }
+
+export const getListCandidateTokensUrl = () => {
+
+
+
+
+  return `/api/candidate-listings`
+}
+
+/**
+ * Performs one explicit, read-only request to DexScreener's documented latest token-profiles endpoint. The result preserves provider order and is an unadmitted provider listing, not comprehensive discovery, ranking, approval, or investment quality.
+ * @summary Load a bounded DexScreener token-profile listing
+ */
+export const listCandidateTokens = async ( options?: Parameters<typeof customFetch>[1]): Promise<CandidateListingResponse> => {
+
+  return customFetch<CandidateListingResponse>(getListCandidateTokensUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCandidateTokensQueryKey = () => {
+    return [
+    `/api/candidate-listings`
+    ] as const;
+    }
+
+
+export const getListCandidateTokensQueryOptions = <TData = Awaited<ReturnType<typeof listCandidateTokens>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCandidateTokens>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCandidateTokensQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCandidateTokens>>> = ({ signal }) => listCandidateTokens({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCandidateTokens>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCandidateTokensQueryResult = NonNullable<Awaited<ReturnType<typeof listCandidateTokens>>>
+export type ListCandidateTokensQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Load a bounded DexScreener token-profile listing
+ */
+
+export function useListCandidateTokens<TData = Awaited<ReturnType<typeof listCandidateTokens>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCandidateTokens>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCandidateTokensQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

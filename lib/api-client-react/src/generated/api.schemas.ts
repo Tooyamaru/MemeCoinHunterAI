@@ -24,6 +24,132 @@ export interface TokenInspectionInput {
   tokenAddress: string;
 }
 
+export interface CandidateLink {
+  /** @nullable */
+  type: string | null;
+  /** @nullable */
+  label: string | null;
+  /** @nullable */
+  url: string | null;
+}
+
+export type CandidateListingEntryProviderEntryType = typeof CandidateListingEntryProviderEntryType[keyof typeof CandidateListingEntryProviderEntryType];
+
+
+export const CandidateListingEntryProviderEntryType = {
+  object: 'object',
+  array: 'array',
+  null: 'null',
+  string: 'string',
+  number: 'number',
+  boolean: 'boolean',
+} as const;
+
+export type CandidateListingEntryStatus = typeof CandidateListingEntryStatus[keyof typeof CandidateListingEntryStatus];
+
+
+export const CandidateListingEntryStatus = {
+  SELECTABLE: 'SELECTABLE',
+  DUPLICATE: 'DUPLICATE',
+  MISSING_IDENTITY: 'MISSING_IDENTITY',
+  INVALID: 'INVALID',
+} as const;
+
+export interface CandidateListingEntry {
+  /**
+     * @minimum 0
+     * @maximum 49
+     */
+  provider_index: number;
+  provider_entry_type: CandidateListingEntryProviderEntryType;
+  /** @nullable */
+  chainId: string | null;
+  /** @nullable */
+  tokenAddress: string | null;
+  /** @nullable */
+  url: string | null;
+  /** @nullable */
+  icon: string | null;
+  /** @nullable */
+  header: string | null;
+  /** @nullable */
+  description: string | null;
+  links: CandidateLink[] | null;
+  status: CandidateListingEntryStatus;
+  inspectable: boolean;
+  /**
+     * @minimum 0
+     * @maximum 49
+     * @nullable
+     */
+  duplicate_of_index: number | null;
+  /** @maxItems 20 */
+  issues: string[];
+}
+
+export type CandidateListingResponseSource = typeof CandidateListingResponseSource[keyof typeof CandidateListingResponseSource];
+
+
+export const CandidateListingResponseSource = {
+  DexScreener: 'DexScreener',
+} as const;
+
+export type CandidateListingResponseAdmissionStatus = typeof CandidateListingResponseAdmissionStatus[keyof typeof CandidateListingResponseAdmissionStatus];
+
+
+export const CandidateListingResponseAdmissionStatus = {
+  NOT_ADMITTED: 'NOT_ADMITTED',
+} as const;
+
+export type CandidateListingResponseCompleteness = typeof CandidateListingResponseCompleteness[keyof typeof CandidateListingResponseCompleteness];
+
+
+export const CandidateListingResponseCompleteness = {
+  BOUNDED_PROVIDER_LISTING: 'BOUNDED_PROVIDER_LISTING',
+} as const;
+
+export interface CandidateListingResponse {
+  source: CandidateListingResponseSource;
+  endpoint: string;
+  selection_basis: string;
+  admission_status: CandidateListingResponseAdmissionStatus;
+  completeness: CandidateListingResponseCompleteness;
+  /**
+     * @minimum 1
+     * @maximum 50
+     */
+  limit: number;
+  received_at: string;
+  /**
+     * @minimum 200
+     * @maximum 299
+     */
+  http_status: number;
+  /**
+     * @minimum 0
+     * @maximum 1048576
+     */
+  response_bytes: number;
+  truncated: boolean;
+  /** @maxItems 50 */
+  candidates: CandidateListingEntry[];
+  /**
+     * @minimum 0
+     * @maximum 50
+     */
+  selectable_count: number;
+  /**
+     * @minimum 0
+     * @maximum 50
+     */
+  invalid_count: number;
+  /**
+     * @minimum 0
+     * @maximum 50
+     */
+  duplicate_count: number;
+}
+
 export interface ErrorResponse {
   error: string;
   code: string;

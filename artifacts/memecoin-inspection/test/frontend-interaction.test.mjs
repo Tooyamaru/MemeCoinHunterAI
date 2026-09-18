@@ -389,11 +389,48 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   t.after(() => browser.close());
   const { page } = browser;
   const requests = [];
+  const candidateRequests = [];
   const pausedRequests = [];
   const queuedResponses = [];
   const requestWaiters = [];
 
   page.on("Fetch.requestPaused", async (request) => {
+    if (request.request.url.endsWith("/api/candidate-listings")) {
+      candidateRequests.push(request);
+      await fulfill(page, request, 200, {
+        source: "DexScreener",
+        endpoint: "https://api.dexscreener.com/token-profiles/latest/v1",
+        selection_basis: "Provider order from the documented latest token-profiles listing.",
+        admission_status: "NOT_ADMITTED",
+        completeness: "BOUNDED_PROVIDER_LISTING",
+        limit: 50,
+        received_at: successReceivedAt,
+        http_status: 200,
+        response_bytes: 123,
+        truncated: false,
+        candidates: [
+          {
+            provider_index: 0,
+            provider_entry_type: "object",
+            chainId: "ethereum",
+            tokenAddress: "0xcandidate",
+            url: "https://example.test/profile",
+            icon: null,
+            header: null,
+            description: "Candidate Alpha",
+            links: null,
+            status: "SELECTABLE",
+            inspectable: true,
+            duplicate_of_index: null,
+            issues: [],
+          },
+        ],
+        selectable_count: 1,
+        invalid_count: 0,
+        duplicate_count: 0,
+      });
+      return;
+    }
     if (!request.request.url.endsWith("/api/inspections")) {
       await page.send("Fetch.continueRequest", { requestId: request.requestId });
       return;
@@ -418,6 +455,34 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   await waitFor(() => evaluate(page, "Boolean(document.querySelector('input[placeholder=\"0x...\"]'))"));
   await new Promise((resolve) => setTimeout(resolve, 300));
   assert.equal(requests.length, 0, "the app must not inspect automatically on page load");
+  assert.equal(candidateRequests.length, 0, "the app must not load candidates automatically on page load");
+
+  const bodyText = () => evaluate(page, "document.body.innerText");
+  await evaluate(
+    page,
+    `Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Load candidates")).click()`,
+  );
+  await waitFor(async () => (await bodyText()).includes("Candidate Alpha"));
+  assert.equal(candidateRequests.length, 1, "candidate discovery must use one explicit request");
+  assert.equal(requests.length, 0, "loading candidates must not inspect a token");
+
+  await evaluate(
+    page,
+    `Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Select for inspection")).click()`,
+  );
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  assert.equal(candidateRequests.length, 1, "selecting a candidate must not reload the listing");
+  assert.equal(requests.length, 0, "selecting a candidate must not inspect automatically");
+  assert.deepEqual(
+    await evaluate(
+      page,
+      `({
+        chainId: document.querySelector('input[placeholder="ethereum"]').value,
+        tokenAddress: document.querySelector('input[placeholder="0x..."]').value
+      })`,
+    ),
+    { chainId: "ethereum", tokenAddress: "0xcandidate" },
+  );
 
   const setToken = async (value) => {
     await evaluate(
@@ -433,7 +498,6 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   };
   const submit = () =>
     evaluate(page, `document.querySelector('button[type="submit"]').click()`);
-  const bodyText = () => evaluate(page, "document.body.innerText");
   const nextRequest = (expectedCount) =>
     requests.length >= expectedCount
       ? Promise.resolve(requests[expectedCount - 1])

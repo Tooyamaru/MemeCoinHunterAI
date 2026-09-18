@@ -217,3 +217,74 @@ export const InspectTokenResponse = zod.object({
 }),
   "evaluation_time": zod.string()
 })
+
+
+/**
+ * Performs one explicit, read-only request to DexScreener's documented latest token-profiles endpoint. The result preserves provider order and is an unadmitted provider listing, not comprehensive discovery, ranking, approval, or investment quality.
+ * @summary Load a bounded DexScreener token-profile listing
+ */
+export const listCandidateTokensResponseLimitMax = 50;
+
+export const listCandidateTokensResponseHttpStatusMin = 200;
+export const listCandidateTokensResponseHttpStatusMax = 299;
+
+export const listCandidateTokensResponseResponseBytesMin = 0;
+export const listCandidateTokensResponseResponseBytesMax = 1048576;
+
+export const listCandidateTokensResponseCandidatesItemProviderIndexMin = 0;
+export const listCandidateTokensResponseCandidatesItemProviderIndexMax = 49;
+
+export const listCandidateTokensResponseCandidatesItemLinksOneMax = 20;
+
+export const listCandidateTokensResponseCandidatesItemDuplicateOfIndexMin = 0;
+export const listCandidateTokensResponseCandidatesItemDuplicateOfIndexMax = 49;
+
+export const listCandidateTokensResponseCandidatesItemIssuesMax = 20;
+
+export const listCandidateTokensResponseCandidatesMax = 50;
+
+export const listCandidateTokensResponseSelectableCountMin = 0;
+export const listCandidateTokensResponseSelectableCountMax = 50;
+
+export const listCandidateTokensResponseInvalidCountMin = 0;
+export const listCandidateTokensResponseInvalidCountMax = 50;
+
+export const listCandidateTokensResponseDuplicateCountMin = 0;
+export const listCandidateTokensResponseDuplicateCountMax = 50;
+
+
+
+export const ListCandidateTokensResponse = zod.object({
+  "source": zod.enum(['DexScreener']),
+  "endpoint": zod.string().url(),
+  "selection_basis": zod.string(),
+  "admission_status": zod.enum(['NOT_ADMITTED']),
+  "completeness": zod.enum(['BOUNDED_PROVIDER_LISTING']),
+  "limit": zod.number().int().min(1).max(listCandidateTokensResponseLimitMax),
+  "received_at": zod.coerce.date(),
+  "http_status": zod.number().int().min(listCandidateTokensResponseHttpStatusMin).max(listCandidateTokensResponseHttpStatusMax),
+  "response_bytes": zod.number().int().min(listCandidateTokensResponseResponseBytesMin).max(listCandidateTokensResponseResponseBytesMax),
+  "truncated": zod.boolean(),
+  "candidates": zod.array(zod.object({
+  "provider_index": zod.number().int().min(listCandidateTokensResponseCandidatesItemProviderIndexMin).max(listCandidateTokensResponseCandidatesItemProviderIndexMax),
+  "provider_entry_type": zod.enum(['object', 'array', 'null', 'string', 'number', 'boolean']),
+  "chainId": zod.string().nullable(),
+  "tokenAddress": zod.string().nullable(),
+  "url": zod.string().nullable(),
+  "icon": zod.string().nullable(),
+  "header": zod.string().nullable(),
+  "description": zod.string().nullable(),
+  "links": zod.union([zod.array(zod.object({
+  "type": zod.string().nullable(),
+  "label": zod.string().nullable(),
+  "url": zod.string().nullable()
+})).max(listCandidateTokensResponseCandidatesItemLinksOneMax),zod.null()]),
+  "status": zod.enum(['SELECTABLE', 'DUPLICATE', 'MISSING_IDENTITY', 'INVALID']),
+  "inspectable": zod.boolean(),
+  "duplicate_of_index": zod.number().int().min(listCandidateTokensResponseCandidatesItemDuplicateOfIndexMin).max(listCandidateTokensResponseCandidatesItemDuplicateOfIndexMax).nullable(),
+  "issues": zod.array(zod.string()).max(listCandidateTokensResponseCandidatesItemIssuesMax)
+})).max(listCandidateTokensResponseCandidatesMax),
+  "selectable_count": zod.number().int().min(listCandidateTokensResponseSelectableCountMin).max(listCandidateTokensResponseSelectableCountMax),
+  "invalid_count": zod.number().int().min(listCandidateTokensResponseInvalidCountMin).max(listCandidateTokensResponseInvalidCountMax),
+  "duplicate_count": zod.number().int().min(listCandidateTokensResponseDuplicateCountMin).max(listCandidateTokensResponseDuplicateCountMax)
+})

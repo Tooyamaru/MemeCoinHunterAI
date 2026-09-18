@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: inspection
     description: Read-only market inspection operations
+  - name: candidate-discovery
+    description: Bounded provider candidate listings without canonical admission
 paths:
   /healthz:
     get:
@@ -69,6 +71,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /candidate-listings:
+    get:
+      operationId: listCandidateTokens
+      tags: [candidate-discovery]
+      summary: Load a bounded DexScreener token-profile listing
+      description: >
+        Performs one explicit, read-only request to DexScreener's documented
+        latest token-profiles endpoint. The result preserves provider order and
+        is an unadmitted provider listing, not comprehensive discovery, ranking,
+        approval, or investment quality.
+      responses:
+        "200":
+          description: Bounded provider candidate listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateListingResponse"
+        "429":
+          description: Candidate listing concurrency limit reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Provider or response validation failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "504":
+          description: Provider request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -93,6 +130,142 @@ components:
           maxLength: 128
           pattern: "^[A-Za-z0-9._~-]+$"
       required: [chainId, tokenAddress]
+    CandidateLink:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: ["string", "null"]
+        label:
+          type: ["string", "null"]
+        url:
+          type: ["string", "null"]
+      required: [type, label, url]
+    CandidateListingEntry:
+      type: object
+      additionalProperties: false
+      properties:
+        provider_index:
+          type: integer
+          minimum: 0
+          maximum: 49
+        provider_entry_type:
+          type: string
+          enum: [object, array, "null", string, number, boolean]
+        chainId:
+          type: ["string", "null"]
+        tokenAddress:
+          type: ["string", "null"]
+        url:
+          type: ["string", "null"]
+        icon:
+          type: ["string", "null"]
+        header:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        links:
+          oneOf:
+            - type: array
+              maxItems: 20
+              items:
+                $ref: "#/components/schemas/CandidateLink"
+            - type: "null"
+        status:
+          type: string
+          enum: [SELECTABLE, DUPLICATE, MISSING_IDENTITY, INVALID]
+        inspectable:
+          type: boolean
+        duplicate_of_index:
+          type: ["integer", "null"]
+          minimum: 0
+          maximum: 49
+        issues:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+      required:
+        - provider_index
+        - provider_entry_type
+        - chainId
+        - tokenAddress
+        - url
+        - icon
+        - header
+        - description
+        - links
+        - status
+        - inspectable
+        - duplicate_of_index
+        - issues
+    CandidateListingResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        source:
+          type: string
+          enum: [DexScreener]
+        endpoint:
+          type: string
+          format: uri
+        selection_basis:
+          type: string
+        admission_status:
+          type: string
+          enum: [NOT_ADMITTED]
+        completeness:
+          type: string
+          enum: [BOUNDED_PROVIDER_LISTING]
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 50
+        received_at:
+          type: string
+          format: date-time
+        http_status:
+          type: integer
+          minimum: 200
+          maximum: 299
+        response_bytes:
+          type: integer
+          minimum: 0
+          maximum: 1048576
+        truncated:
+          type: boolean
+        candidates:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/CandidateListingEntry"
+        selectable_count:
+          type: integer
+          minimum: 0
+          maximum: 50
+        invalid_count:
+          type: integer
+          minimum: 0
+          maximum: 50
+        duplicate_count:
+          type: integer
+          minimum: 0
+          maximum: 50
+      required:
+        - source
+        - endpoint
+        - selection_basis
+        - admission_status
+        - completeness
+        - limit
+        - received_at
+        - http_status
+        - response_bytes
+        - truncated
+        - candidates
+        - selectable_count
+        - invalid_count
+        - duplicate_count
     ErrorResponse:
       type: object
       properties:

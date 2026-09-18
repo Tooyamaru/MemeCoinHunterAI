@@ -1,6 +1,12 @@
 import { FormEvent, useRef, useState } from "react";
-import { useInspectToken } from "@workspace/api-client-react";
+import { useMutation } from "@tanstack/react-query";
+import {
+  listCandidateTokens,
+  useInspectToken,
+} from "@workspace/api-client-react";
 import type {
+  CandidateListingEntry,
+  CandidateListingResponse,
   InspectionPair,
   InspectionWithTemporalEvidence,
   TemporalEvidenceRecord,
@@ -286,6 +292,140 @@ function PairCard({
   );
 }
 
+function CandidateListingPanel({
+  listing,
+  isPending,
+  isError,
+  errorMessage,
+  onLoad,
+  onSelect,
+}: {
+  listing: CandidateListingResponse | undefined;
+  isPending: boolean;
+  isError: boolean;
+  errorMessage: string;
+  onLoad: () => void;
+  onSelect: (candidate: CandidateListingEntry) => void;
+}) {
+  return (
+    <Card className="border-slate-200 shadow-sm">
+      <CardHeader className="pb-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <CardTitle className="text-lg">Provider candidate listing</CardTitle>
+            <CardDescription>
+              Load one bounded list from DexScreener's documented latest token-profiles endpoint.
+            </CardDescription>
+          </div>
+          <Button
+            type="button"
+            onClick={onLoad}
+            disabled={isPending}
+            variant="outline"
+            className="min-h-10 border-emerald-200 text-emerald-800 hover:bg-emerald-50"
+          >
+            {isPending ? <LoaderCircle className="animate-spin" /> : <Database />}
+            {isPending ? "Loading candidates…" : "Load candidates"}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="rounded-lg border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm leading-6 text-amber-950">
+          <div className="font-semibold">Provider listing only</div>
+          <div>
+            Origin: DexScreener latest token profiles · selection basis: provider order ·
+            canonical discovery admission: <span className="font-semibold">NOT_ADMITTED</span>.
+            This is not comprehensive discovery, ranking, approval, or investment quality.
+          </div>
+        </div>
+
+        {isError && (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+            <div className="font-semibold">Candidate listing unavailable</div>
+            <div className="mt-1">{errorMessage}</div>
+          </div>
+        )}
+
+        {!listing && !isPending && !isError && (
+          <div className="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
+            No provider listing loaded. Loading candidates is always explicit.
+          </div>
+        )}
+
+        {listing && !isPending && (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+              <span>
+                {listing.candidates.length} provider entries · {listing.selectable_count} selectable ·{" "}
+                {listing.invalid_count} unavailable or invalid
+              </span>
+              <span>Received {formatReceivedAt(listing.received_at)}</span>
+            </div>
+            {listing.candidates.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500">
+                The provider returned an empty listing.
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                {listing.candidates.map((candidate) => {
+                  const identity =
+                    candidate.chainId && candidate.tokenAddress
+                      ? `${candidate.chainId} · ${candidate.tokenAddress}`
+                      : "Chain or token identity unavailable";
+                  const label =
+                    candidate.description ||
+                    candidate.tokenAddress ||
+                    `Provider entry ${candidate.provider_index + 1}`;
+                  const canInspect = candidate.inspectable && candidate.chainId && candidate.tokenAddress;
+                  return (
+                    <div
+                      key={candidate.provider_index}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                            #{candidate.provider_index + 1}
+                          </span>
+                          <span
+                            className={
+                              candidate.status === "SELECTABLE" || candidate.status === "DUPLICATE"
+                                ? "rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                                : "rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600"
+                            }
+                          >
+                            {candidate.status}
+                          </span>
+                        </div>
+                        <div className="mt-1 truncate text-sm font-semibold text-slate-900">{label}</div>
+                        <div className="mt-1 break-all font-mono text-xs text-slate-500">{identity}</div>
+                        {candidate.issues.length > 0 && (
+                          <div className="mt-1 text-xs text-slate-500">
+                            {candidate.issues.join(" · ")}
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={!canInspect}
+                        onClick={() => onSelect(candidate)}
+                        className="shrink-0"
+                      >
+                        Select for inspection
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function InspectionPage() {
   const [chainId, setChainId] = useState("ethereum");
   const [tokenAddress, setTokenAddress] = useState("");
@@ -296,6 +436,9 @@ function InspectionPage() {
   const inputKey = `${chainId.trim()}\u0000${tokenAddress.trim()}`;
   inputKeyRef.current = inputKey;
   const inspection = useInspectToken();
+  const candidateListing = useMutation({
+    mutationFn: () => listCandidateTokens(),
+  });
 
   function updateChainId(value: string) {
     requestSequenceRef.current += 1;
@@ -335,6 +478,15 @@ function InspectionPage() {
     );
   }
 
+  function selectCandidate(candidate: CandidateListingEntry) {
+    if (!candidate.chainId || !candidate.tokenAddress) return;
+    requestSequenceRef.current += 1;
+    setChainId(candidate.chainId);
+    setTokenAddress(candidate.tokenAddress);
+    setResult(null);
+    setActiveRequestKey(null);
+  }
+
   const errorMessage =
     inspection.error instanceof Error
       ? inspection.error.message
@@ -365,6 +517,20 @@ function InspectionPage() {
       </header>
 
       <div className="mx-auto max-w-6xl space-y-6 px-5 py-7 sm:px-8 lg:py-10">
+        <CandidateListingPanel
+          listing={candidateListing.data}
+          isPending={candidateListing.isPending}
+          isError={candidateListing.isError}
+          errorMessage={
+            candidateListing.error instanceof Error
+              ? candidateListing.error.message
+              : "The provider listing could not be loaded. Try the explicit action again."
+          }
+          onLoad={() => {
+            if (!candidateListing.isPending) candidateListing.mutate();
+          }}
+          onSelect={selectCandidate}
+        />
         <Card className="border-slate-200 shadow-sm">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Start an inspection</CardTitle>

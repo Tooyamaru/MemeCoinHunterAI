@@ -7,6 +7,14 @@
  */
 
 export * from './attemptLog';
+export * from './candidateLink';
+export * from './candidateListingEntry';
+export * from './candidateListingEntryProviderEntryType';
+export * from './candidateListingEntryStatus';
+export * from './candidateListingResponse';
+export * from './candidateListingResponseAdmissionStatus';
+export * from './candidateListingResponseCompleteness';
+export * from './candidateListingResponseSource';
 export * from './errorResponse';
 export * from './healthStatus';
 export * from './inspectionEvidence';
