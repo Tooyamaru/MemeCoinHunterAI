@@ -106,6 +106,20 @@ absent from the pair and its field provenance, while explicit `null` remains
 present with a normalized null provenance value. The source pair projection,
 raw-payload digest, and occurrence identity retain that distinction.
 
+The pair-field policy at this boundary is:
+
+| Field(s) | Policy |
+| --- | --- |
+| `pairAddress`, `chainId` | Mandatory structural identity; omission, `null`, or malformed text fails closed. |
+| `baseToken`, `quoteToken`, `liquidity`, `txns` | Optional source mappings; omission or `null` remains unavailable, while a present non-mapping value fails closed. |
+| `priceUsd` | Optional finite numeric text; omission or `null` remains unavailable, while a malformed present value fails closed. |
+| `volume` | Optional mapping; omission or `null` leaves the rolling-volume label unavailable. A present `h24` value must be finite numeric text. |
+| `pairCreatedAt` | Optional finite numeric text; omission or `null` remains unavailable, while a malformed present value fails closed. |
+
+Optional fields never become eligibility requirements, and no pair is dropped
+because one is unavailable. Fields not represented in the temporal record
+remain preserved in the source-shaped inspection report.
+
 ### 3.3 Volume, age, and digest evidence
 
 `volume_window.source_label` preserves `h24` when the current pair report
@@ -123,10 +137,10 @@ module does not claim independent raw-byte verification because it receives the
 report, not the original response bytes. A deterministic digest of the bounded
 temporal evidence projection is available for replay and comparison.
 
-Accepting an omitted `pairCreatedAt` is backward-compatible within this
-contract version: the output shape and nullable meaning are unchanged, valid
-present values retain their existing representation, and malformed present
-values remain rejected.
+Accepting omitted or null optional market fields is backward-compatible within
+this contract version: the output shape and nullable meaning are unchanged,
+valid present values retain their existing representation, and malformed
+present values remain rejected. Mandatory identity fields remain required.
 
 ## 4. Output and compatibility rules
 
@@ -154,8 +168,9 @@ The focused offline tests cover:
 6. UNKNOWN source freshness despite recent receipt;
 7. no receipt, pair, or trade-time substitution for source observation time;
 8. unavailable token-origin age and unknown rolling volume endpoints;
-9. immutable inputs, deterministic output, canonical serialization, and digest stability;
-10. no automatic P08 acceptance or downstream authorization.
+9. optional market-field omission, null, valid, and malformed-value policy;
+10. immutable inputs, deterministic output, canonical serialization, and digest stability;
+11. no automatic P08 acceptance or downstream authorization.
 
 ## 6. Remaining boundary
 

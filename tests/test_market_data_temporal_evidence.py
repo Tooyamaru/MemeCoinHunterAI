@@ -113,6 +113,75 @@ def test_missing_null_and_present_pair_creation_preserve_order_and_digest() -> N
     )
 
 
+@pytest.mark.parametrize(
+    ("field", "malformed"),
+    [
+        ("baseToken", "malformed"),
+        ("quoteToken", "malformed"),
+        ("priceUsd", "not-a-number"),
+        ("liquidity", "malformed"),
+        ("volume", {"h24": "not-a-number"}),
+        ("txns", "malformed"),
+        ("pairCreatedAt", "not-a-number"),
+    ],
+)
+@pytest.mark.parametrize("state", ["omitted", "null", "valid", "malformed"])
+def test_optional_market_field_policy(
+    field: str,
+    malformed: object,
+    state: str,
+) -> None:
+    pair = deepcopy(raw_pairs()[0])
+    if state == "omitted":
+        pair.pop(field)
+    elif state == "null":
+        pair[field] = None
+    elif state == "malformed":
+        pair[field] = malformed
+
+    if state == "malformed":
+        with pytest.raises(TemporalEvidenceError, match=field):
+            convert_inspection_report(
+                inspected_report(pairs=[pair]),
+                evaluation_time=REFERENCE_TIME,
+            )
+        return
+
+    result = convert_inspection_report(
+        inspected_report(pairs=[pair]),
+        evaluation_time=REFERENCE_TIME,
+    )
+
+    assert len(result.records) == 1
+    if field == "volume":
+        assert result.records[0].volume_window.source_label == (
+            "h24" if state == "valid" else None
+        )
+    if field == "pairCreatedAt":
+        assert result.records[0].pair_created_at_source_value == (
+            "1710000000000" if state == "valid" else None
+        )
+
+
+@pytest.mark.parametrize("field", ["pairAddress", "chainId"])
+@pytest.mark.parametrize("state", ["omitted", "null"])
+def test_structural_pair_identity_fields_remain_required(
+    field: str,
+    state: str,
+) -> None:
+    pair = deepcopy(raw_pairs()[0])
+    if state == "omitted":
+        pair.pop(field)
+    else:
+        pair[field] = None
+
+    with pytest.raises(TemporalEvidenceError, match=field):
+        convert_inspection_report(
+            inspected_report(pairs=[pair]),
+            evaluation_time=REFERENCE_TIME,
+        )
+
+
 @pytest.mark.parametrize("value", ["not-a-number", "NaN", "Infinity"])
 def test_present_malformed_pair_creation_fails_closed(value: str) -> None:
     pairs = raw_pairs()

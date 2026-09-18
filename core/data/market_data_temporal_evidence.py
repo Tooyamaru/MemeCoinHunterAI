@@ -377,16 +377,7 @@ def convert_inspection_report(
     records: list[MarketDataTemporalEvidence] = []
     for index, pair_value in enumerate(pairs):
         pair = _mapping(pair_value, f"payload.pairs[{index}]")
-        for field_name in (
-            "pairAddress",
-            "chainId",
-            "baseToken",
-            "quoteToken",
-            "priceUsd",
-            "liquidity",
-            "volume",
-            "txns",
-        ):
+        for field_name in ("pairAddress", "chainId"):
             if field_name not in pair:
                 raise TemporalEvidenceError(
                     f"payload.pairs[{index}] missing {field_name}"
@@ -401,11 +392,33 @@ def convert_inspection_report(
             pair["pairAddress"],
             f"payload.pairs[{index}].pairAddress",
         )
-        volume = _mapping(pair["volume"], f"payload.pairs[{index}].volume")
-        source_label = "h24" if "h24" in volume else None
+        for field_name in ("baseToken", "quoteToken", "liquidity", "txns"):
+            _optional_mapping(
+                pair,
+                field_name,
+                f"payload.pairs[{index}].{field_name}",
+            )
+        price_usd = pair.get("priceUsd")
+        if price_usd is not None:
+            _finite_numeric_text(
+                price_usd,
+                f"payload.pairs[{index}].priceUsd",
+            )
+        volume = _optional_mapping(
+            pair,
+            "volume",
+            f"payload.pairs[{index}].volume",
+        )
+        source_label = None
+        if volume is not None and "h24" in volume and volume["h24"] is not None:
+            _finite_numeric_text(
+                volume["h24"],
+                f"payload.pairs[{index}].volume.h24",
+            )
+            source_label = "h24"
         pair_created = pair.get("pairCreatedAt")
         if pair_created is not None:
-            pair_created = _pair_created_at_text(
+            pair_created = _finite_numeric_text(
                 pair_created,
                 f"payload.pairs[{index}].pairCreatedAt",
             )
@@ -493,7 +506,18 @@ def _unavailable_reason(
     raise TemporalEvidenceError(f"missing unavailable evidence for {field}")
 
 
-def _pair_created_at_text(value: Any, path: str) -> str:
+def _optional_mapping(
+    pair: Mapping[str, Any],
+    field: str,
+    path: str,
+) -> Mapping[str, Any] | None:
+    value = pair.get(field)
+    if value is None:
+        return None
+    return _mapping(value, path)
+
+
+def _finite_numeric_text(value: Any, path: str) -> str:
     normalized = _canonical_text(value, path)
     try:
         parsed = Decimal(normalized)

@@ -101,6 +101,32 @@ def test_bridge_preserves_omitted_pair_creation_with_one_fetch() -> None:
     ] == [None, "1710000000000", None]
 
 
+def test_bridge_preserves_pairs_with_different_missing_market_fields() -> None:
+    pairs = json.loads(FIXTURE_PATH.read_text())["pairs"]
+    pairs[0].pop("priceUsd")
+    pairs[1]["liquidity"] = None
+    pairs[2].pop("volume")
+    calls: list[tuple[str, str]] = []
+
+    result = bridge.inspect_token_with_temporal(
+        "chain-A",
+        "token-A",
+        transport=mocked_transport(calls, pairs),
+        evaluation_clock=lambda: EVALUATION_TIME,
+    )
+
+    assert calls == [("chain-A", "token-A")]
+    assert result["report"]["payload"]["pair_count"] == 3
+    assert [
+        record["market_subject_id"]
+        for record in result["temporal_evidence"]["records"]
+    ] == ["chain-A:Pool-A", "chain-A:Pool-A", "chain-A:Pool-B"]
+    assert [
+        record["volume_window"]["source_label"]
+        for record in result["temporal_evidence"]["records"]
+    ] == ["h24", "h24", None]
+
+
 def test_empty_report_keeps_converter_empty_and_receipt_evaluation_distinct() -> None:
     body = b"[]"
     calls = 0
