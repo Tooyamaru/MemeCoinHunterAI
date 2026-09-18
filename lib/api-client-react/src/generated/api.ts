@@ -22,7 +22,7 @@ import type {
 import type {
   ErrorResponse,
   HealthStatus,
-  InspectionReport,
+  InspectionWithTemporalEvidence,
   TokenInspectionInput
 } from './api.schemas';
 
@@ -143,9 +143,9 @@ export const getInspectTokenUrl = () => {
  * Performs one explicit, read-only inspection without ranking, approval, or trading behavior.
  * @summary Inspect all DexScreener pairs for one token
  */
-export const inspectToken = async (tokenInspectionInput: TokenInspectionInput, options?: Parameters<typeof customFetch>[1]): Promise<InspectionReport> => {
+export const inspectToken = async (tokenInspectionInput: TokenInspectionInput, options?: Parameters<typeof customFetch>[1]): Promise<InspectionWithTemporalEvidence> => {
 
-  return customFetch<InspectionReport>(getInspectTokenUrl(),
+  return customFetch<InspectionWithTemporalEvidence>(getInspectTokenUrl(),
   {
     ...options,
     method: 'POST',

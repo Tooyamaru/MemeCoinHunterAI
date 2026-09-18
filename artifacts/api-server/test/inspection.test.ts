@@ -42,6 +42,20 @@ const report = {
   },
 };
 
+const responseBody = {
+  report,
+  temporal_evidence: {
+    contract_version: "p08-market-data-temporal-evidence-v1",
+    source_id: "DexScreener",
+    token_identity: "0xabc",
+    chain_id: "ethereum",
+    raw_payload_digest: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    p08_acceptance: "NOT_ATTEMPTED",
+    records: [],
+  },
+  evaluation_time: "2026-09-17T03:00:12.000000Z",
+};
+
 function startTestServer(inspector: InspectorRunner): Promise<{
   server: Server;
   url: string;
@@ -73,7 +87,7 @@ test("success returns the validated report through the endpoint", async () => {
   const calls: Array<{ chainId: string; tokenAddress: string }> = [];
   const { server, url } = await startTestServer(async (input) => {
     calls.push(input);
-    return JSON.stringify(report);
+    return JSON.stringify(responseBody);
   });
 
   try {
@@ -87,7 +101,7 @@ test("success returns the validated report through the endpoint", async () => {
     });
 
     assert.equal(response.status, 200);
-    assert.deepEqual(await response.json(), report);
+    assert.deepEqual(await response.json(), responseBody);
     assert.deepEqual(calls, [{ chainId: "ethereum", tokenAddress: "0xabc" }]);
   } finally {
     await closeTestServer(server);
@@ -98,7 +112,7 @@ test("invalid input is rejected before the inspector is invoked", async () => {
   let calls = 0;
   const { server, url } = await startTestServer(async () => {
     calls += 1;
-    return JSON.stringify(report);
+    return JSON.stringify(responseBody);
   });
 
   try {
@@ -130,27 +144,33 @@ test("malformed and invalid inspector output fail closed", async (t) => {
       "invalid report",
       async () => JSON.stringify({ payload: { pairs: [] } }),
       502,
-      "INVALID_INSPECTOR_REPORT",
+      "INVALID_INSPECTION_RESPONSE",
     ],
     [
       "negative pair count",
-      async () =>
+       async () =>
         JSON.stringify({
-          ...report,
-          payload: { ...report.payload, pair_count: -1 },
+          ...responseBody,
+          report: {
+            ...report,
+            payload: { ...report.payload, pair_count: -1 },
+          },
         }),
       502,
-      "INVALID_INSPECTOR_REPORT",
+       "INVALID_INSPECTION_RESPONSE",
     ],
     [
       "fractional pair count",
-      async () =>
+       async () =>
         JSON.stringify({
-          ...report,
-          payload: { ...report.payload, pair_count: 0.5 },
+          ...responseBody,
+          report: {
+            ...report,
+            payload: { ...report.payload, pair_count: 0.5 },
+          },
         }),
       502,
-      "INVALID_INSPECTOR_REPORT",
+       "INVALID_INSPECTION_RESPONSE",
     ],
     [
       "process failure",

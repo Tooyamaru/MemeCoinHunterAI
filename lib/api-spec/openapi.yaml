@@ -44,7 +44,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/InspectionReport"
+                $ref: "#/components/schemas/InspectionWithTemporalEvidence"
         "400":
           description: Invalid chain or token input
           content:
@@ -349,4 +349,153 @@ components:
           type: ["object", "null"]
           additionalProperties: true
       required: [tool_version, source, request, receipt, payload, evidence]
+    TemporalSourceFreshness:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [UNKNOWN]
+        reason:
+          type: string
+      required: [status, reason]
+    TemporalReceiptRecency:
+      type: object
+      additionalProperties: false
+      properties:
+        reference_time:
+          type: string
+        age_seconds:
+          type: string
+      required: [reference_time, age_seconds]
+    TemporalVolumeWindow:
+      type: object
+      additionalProperties: false
+      properties:
+        source_label:
+          type: ["string", "null"]
+        exact_window:
+          type: "null"
+      required: [source_label, exact_window]
+    TemporalAssetAge:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [UNAVAILABLE]
+        amount:
+          type: "null"
+        unit:
+          type: "null"
+        reference_semantics:
+          type: "null"
+        source_field:
+          type: "null"
+        reason:
+          type: string
+      required:
+        [status, amount, unit, reference_semantics, source_field, reason]
+    TemporalEvidenceRecord:
+      type: object
+      additionalProperties: false
+      properties:
+        contract_version:
+          type: string
+        source_id:
+          type: string
+        source_event_id:
+          type: "null"
+        token_identity:
+          type: string
+        chain_id:
+          type: string
+        market_subject_id:
+          type: string
+        occurrence_id:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+        source_observed_at:
+          type: "null"
+        received_at:
+          type: string
+        source_freshness:
+          $ref: "#/components/schemas/TemporalSourceFreshness"
+        receipt_recency:
+          $ref: "#/components/schemas/TemporalReceiptRecency"
+        volume_window:
+          $ref: "#/components/schemas/TemporalVolumeWindow"
+        asset_age:
+          $ref: "#/components/schemas/TemporalAssetAge"
+        pair_created_at_source_value:
+          type: ["string", "null"]
+        raw_payload_digest:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+        p08_acceptance:
+          type: string
+          enum: [NOT_ATTEMPTED]
+      required:
+        [
+          contract_version,
+          source_id,
+          source_event_id,
+          token_identity,
+          chain_id,
+          market_subject_id,
+          occurrence_id,
+          source_observed_at,
+          received_at,
+          source_freshness,
+          receipt_recency,
+          volume_window,
+          asset_age,
+          pair_created_at_source_value,
+          raw_payload_digest,
+          p08_acceptance,
+        ]
+    TemporalEvidenceReport:
+      type: object
+      additionalProperties: false
+      properties:
+        contract_version:
+          type: string
+        source_id:
+          type: string
+        token_identity:
+          type: string
+        chain_id:
+          type: string
+        raw_payload_digest:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+        p08_acceptance:
+          type: string
+          enum: [NOT_ATTEMPTED]
+        records:
+          type: array
+          maxItems: 128
+          items:
+            $ref: "#/components/schemas/TemporalEvidenceRecord"
+      required:
+        [
+          contract_version,
+          source_id,
+          token_identity,
+          chain_id,
+          raw_payload_digest,
+          p08_acceptance,
+          records,
+        ]
+    InspectionWithTemporalEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        report:
+          $ref: "#/components/schemas/InspectionReport"
+        temporal_evidence:
+          $ref: "#/components/schemas/TemporalEvidenceReport"
+        evaluation_time:
+          type: string
+      required: [report, temporal_evidence, evaluation_time]
 

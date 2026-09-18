@@ -222,3 +222,103 @@ export interface InspectionReport {
   /** @nullable */
   error?: InspectionReportError;
 }
+
+export type TemporalSourceFreshnessStatus = typeof TemporalSourceFreshnessStatus[keyof typeof TemporalSourceFreshnessStatus];
+
+
+export const TemporalSourceFreshnessStatus = {
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export interface TemporalSourceFreshness {
+  status: TemporalSourceFreshnessStatus;
+  reason: string;
+}
+
+export interface TemporalReceiptRecency {
+  reference_time: string;
+  age_seconds: string;
+}
+
+export interface TemporalVolumeWindow {
+  /** @nullable */
+  source_label: string | null;
+  /** @nullable */
+  exact_window: null;
+}
+
+export type TemporalAssetAgeStatus = typeof TemporalAssetAgeStatus[keyof typeof TemporalAssetAgeStatus];
+
+
+export const TemporalAssetAgeStatus = {
+  UNAVAILABLE: 'UNAVAILABLE',
+} as const;
+
+export interface TemporalAssetAge {
+  status: TemporalAssetAgeStatus;
+  /** @nullable */
+  amount: null;
+  /** @nullable */
+  unit: null;
+  /** @nullable */
+  reference_semantics: null;
+  /** @nullable */
+  source_field: null;
+  reason: string;
+}
+
+export type TemporalEvidenceRecordP08Acceptance = typeof TemporalEvidenceRecordP08Acceptance[keyof typeof TemporalEvidenceRecordP08Acceptance];
+
+
+export const TemporalEvidenceRecordP08Acceptance = {
+  NOT_ATTEMPTED: 'NOT_ATTEMPTED',
+} as const;
+
+export interface TemporalEvidenceRecord {
+  contract_version: string;
+  source_id: string;
+  /** @nullable */
+  source_event_id: null;
+  token_identity: string;
+  chain_id: string;
+  market_subject_id: string;
+  /** @pattern ^[0-9a-f]{64}$ */
+  occurrence_id: string;
+  /** @nullable */
+  source_observed_at: null;
+  received_at: string;
+  source_freshness: TemporalSourceFreshness;
+  receipt_recency: TemporalReceiptRecency;
+  volume_window: TemporalVolumeWindow;
+  asset_age: TemporalAssetAge;
+  /** @nullable */
+  pair_created_at_source_value: string | null;
+  /** @pattern ^[0-9a-f]{64}$ */
+  raw_payload_digest: string;
+  p08_acceptance: TemporalEvidenceRecordP08Acceptance;
+}
+
+export type TemporalEvidenceReportP08Acceptance = typeof TemporalEvidenceReportP08Acceptance[keyof typeof TemporalEvidenceReportP08Acceptance];
+
+
+export const TemporalEvidenceReportP08Acceptance = {
+  NOT_ATTEMPTED: 'NOT_ATTEMPTED',
+} as const;
+
+export interface TemporalEvidenceReport {
+  contract_version: string;
+  source_id: string;
+  token_identity: string;
+  chain_id: string;
+  /** @pattern ^[0-9a-f]{64}$ */
+  raw_payload_digest: string;
+  p08_acceptance: TemporalEvidenceReportP08Acceptance;
+  /** @maxItems 128 */
+  records: TemporalEvidenceRecord[];
+}
+
+export interface InspectionWithTemporalEvidence {
+  report: InspectionReport;
+  temporal_evidence: TemporalEvidenceReport;
+  evaluation_time: string;
+}

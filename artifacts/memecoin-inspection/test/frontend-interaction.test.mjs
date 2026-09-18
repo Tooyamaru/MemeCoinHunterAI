@@ -9,7 +9,7 @@ const CHROMIUM_PATH = process.env.CHROMIUM_PATH ?? "/repl/tools/bin/chromium";
 const successReceivedAt = "2026-09-17T03:00:00.000000Z";
 
 function makeReport(pairs, receivedAt = successReceivedAt) {
-  return {
+  const report = {
     tool_version: "dexscreener-inspection-v1",
     source: "DexScreener",
     request: {
@@ -43,6 +43,53 @@ function makeReport(pairs, receivedAt = successReceivedAt) {
       asset_age: { status: "UNAVAILABLE" },
       unavailable_fields: [],
     },
+  };
+
+  return {
+    report,
+    temporal_evidence: {
+      contract_version: "p08-market-data-temporal-evidence-v1",
+      source_id: "DexScreener",
+      token_identity: "0xsuccess",
+      chain_id: "ethereum",
+      raw_payload_digest: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      p08_acceptance: "NOT_ATTEMPTED",
+      records: pairs.map((pair, index) => ({
+        contract_version: "p08-market-data-temporal-evidence-v1",
+        source_id: "DexScreener",
+        source_event_id: null,
+        token_identity: "0xsuccess",
+        chain_id: "ethereum",
+        market_subject_id: `ethereum:${pair.pairAddress}`,
+        occurrence_id: `${"a".repeat(63)}${index.toString(16)}`,
+        source_observed_at: null,
+        received_at: receivedAt ?? successReceivedAt,
+        source_freshness: {
+          status: "UNKNOWN",
+          reason: "NO_DOCUMENTED_MARKET_FIELD_OBSERVATION_TIMESTAMP",
+        },
+        receipt_recency: {
+          reference_time: "2026-09-17T03:00:12.000000Z",
+          age_seconds: "12",
+        },
+        volume_window: {
+          source_label: "h24",
+          exact_window: null,
+        },
+        asset_age: {
+          status: "UNAVAILABLE",
+          amount: null,
+          unit: null,
+          reference_semantics: null,
+          source_field: null,
+          reason: "NO_DOCUMENTED_TOKEN_ORIGIN_SEMANTICS",
+        },
+        pair_created_at_source_value: pair.pairCreatedAt,
+        raw_payload_digest: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        p08_acceptance: "NOT_ATTEMPTED",
+      })),
+    },
+    evaluation_time: "2026-09-17T03:00:12.000000Z",
   };
 }
 
@@ -417,6 +464,10 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   pausedRequests.shift();
   await fulfill(page, firstRequest, 200, makeReport([successPair]));
   await waitFor(async () => (await bodyText()).includes("MOCK / USDC"));
+  await evaluate(
+    page,
+    `document.querySelectorAll("details").forEach((details) => { details.open = true; })`,
+  );
 
   const expectedReceivedAt = await evaluate(
     page,
@@ -428,6 +479,11 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   assert.match(successText, /Unavailable/);
   assert.match(successText, /-1\.25 %/);
   assert.ok(successText.includes(expectedReceivedAt), "receipt time should be formatted and visible");
+  assert.match(successText, /Source observation time/);
+  assert.match(successText, /Source freshness/);
+  assert.match(successText, /Receipt age at evaluation/i);
+  assert.match(successText, /12 seconds/);
+  assert.match(successText, /Evaluation timestamp/);
 
   await setToken("0xstale");
   await submit();
@@ -441,11 +497,18 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
 
   queuedResponses.push({
     status: 200,
-    body: makeReport([], null),
+    body: makeReport([], successReceivedAt),
   });
   await submit();
   await nextRequest(3);
-  await waitFor(async () => (await bodyText()).includes("The source returned no pairs for this token."));
+  await waitFor(async () => (await bodyText()).includes("No pairs returned"));
+  const emptyText = await bodyText();
+  assert.match(emptyText, /0 pairs returned/);
+  assert.match(emptyText, /No pairs returned/);
+  assert.match(emptyText, /no pair-level temporal records/i);
+  assert.ok(emptyText.includes(expectedReceivedAt), "empty report must preserve receipt time");
+  assert.match(emptyText, /Source observation time: Unavailable/i);
+  assert.match(emptyText, /Source freshness: Unknown/i);
 
   await setToken("0xerror");
   queuedResponses.push({

@@ -10,7 +10,7 @@ import {
 
 const execFileAsync = promisify(execFile);
 const PYTHON_EXECUTABLE = "python3";
-const INSPECTOR_MODULE = "core.data.dexscreener_inspection";
+const INSPECTOR_MODULE = "core.data.dexscreener_temporal_bridge";
 const INSPECTOR_TIMEOUT_MS = 15_000;
 const MAX_INSPECTOR_OUTPUT_BYTES = 8 * 1024 * 1024;
 const MAX_CONCURRENT_INSPECTIONS = 2;
@@ -149,9 +149,9 @@ export function createInspectionRouter(
         return errorResponse(
           res,
           502,
-          "INVALID_INSPECTOR_REPORT",
-          "The inspection returned an invalid report.",
-          "The inspector response did not match the published report contract.",
+          "INVALID_INSPECTION_RESPONSE",
+          "The inspection returned an invalid response.",
+          "The inspector response did not match the published inspection and temporal-evidence contract.",
         );
       }
 

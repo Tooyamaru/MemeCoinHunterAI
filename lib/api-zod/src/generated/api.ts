@@ -36,55 +36,61 @@ export const InspectTokenBody = zod.object({
   "tokenAddress": zod.string().min(1).max(inspectTokenBodyTokenAddressMax).regex(inspectTokenBodyTokenAddressRegExp)
 })
 
-export const inspectTokenResponseRequestAttemptsMax = 2;
+export const inspectTokenResponseReportRequestAttemptsMax = 2;
 
-export const inspectTokenResponseRequestRetryCountMin = 0;
-export const inspectTokenResponseRequestRetryCountMax = 1;
+export const inspectTokenResponseReportRequestRetryCountMin = 0;
+export const inspectTokenResponseReportRequestRetryCountMax = 1;
 
-export const inspectTokenResponseRequestAttemptLogItemAttemptMax = 2;
+export const inspectTokenResponseReportRequestAttemptLogItemAttemptMax = 2;
 
-export const inspectTokenResponseRequestAttemptLogItemStatusCodeMin = 100;
-export const inspectTokenResponseRequestAttemptLogItemStatusCodeMax = 599;
+export const inspectTokenResponseReportRequestAttemptLogItemStatusCodeMin = 100;
+export const inspectTokenResponseReportRequestAttemptLogItemStatusCodeMax = 599;
 
-export const inspectTokenResponseRequestAttemptLogItemResponseBytesMin = 0;
-export const inspectTokenResponseRequestAttemptLogItemResponseBytesMax = 1048576;
+export const inspectTokenResponseReportRequestAttemptLogItemResponseBytesMin = 0;
+export const inspectTokenResponseReportRequestAttemptLogItemResponseBytesMax = 1048576;
 
-export const inspectTokenResponseReceiptHttpStatusMin = 100;
-export const inspectTokenResponseReceiptHttpStatusMax = 599;
+export const inspectTokenResponseReportReceiptHttpStatusMin = 100;
+export const inspectTokenResponseReportReceiptHttpStatusMax = 599;
 
-export const inspectTokenResponseReceiptResponseBytesMin = 0;
-export const inspectTokenResponseReceiptResponseBytesMax = 1048576;
+export const inspectTokenResponseReportReceiptResponseBytesMin = 0;
+export const inspectTokenResponseReportReceiptResponseBytesMax = 1048576;
 
-export const inspectTokenResponsePayloadPairCountMin = 0;
-export const inspectTokenResponsePayloadPairCountMax = 128;
+export const inspectTokenResponseReportPayloadPairCountMin = 0;
+export const inspectTokenResponseReportPayloadPairCountMax = 128;
+
+export const inspectTokenResponseTemporalEvidenceRawPayloadDigestRegExp = new RegExp('^[0-9a-f]{64}$');
+export const inspectTokenResponseTemporalEvidenceRecordsItemOccurrenceIdRegExp = new RegExp('^[0-9a-f]{64}$');
+export const inspectTokenResponseTemporalEvidenceRecordsItemRawPayloadDigestRegExp = new RegExp('^[0-9a-f]{64}$');
+export const inspectTokenResponseTemporalEvidenceRecordsMax = 128;
 
 
 
 export const InspectTokenResponse = zod.object({
+  "report": zod.object({
   "tool_version": zod.string(),
   "source": zod.string(),
   "request": zod.object({
   "endpoint": zod.string(),
   "chain_id": zod.string(),
   "token_address": zod.string(),
-  "attempts": zod.number().int().min(1).max(inspectTokenResponseRequestAttemptsMax),
-  "retry_count": zod.number().int().min(inspectTokenResponseRequestRetryCountMin).max(inspectTokenResponseRequestRetryCountMax),
+  "attempts": zod.number().int().min(1).max(inspectTokenResponseReportRequestAttemptsMax),
+  "retry_count": zod.number().int().min(inspectTokenResponseReportRequestRetryCountMin).max(inspectTokenResponseReportRequestRetryCountMax),
   "attempt_log": zod.array(zod.object({
-  "attempt": zod.number().int().min(1).max(inspectTokenResponseRequestAttemptLogItemAttemptMax),
-  "status_code": zod.number().int().min(inspectTokenResponseRequestAttemptLogItemStatusCodeMin).max(inspectTokenResponseRequestAttemptLogItemStatusCodeMax).nullable(),
-  "response_bytes": zod.number().int().min(inspectTokenResponseRequestAttemptLogItemResponseBytesMin).max(inspectTokenResponseRequestAttemptLogItemResponseBytesMax),
+  "attempt": zod.number().int().min(1).max(inspectTokenResponseReportRequestAttemptLogItemAttemptMax),
+  "status_code": zod.number().int().min(inspectTokenResponseReportRequestAttemptLogItemStatusCodeMin).max(inspectTokenResponseReportRequestAttemptLogItemStatusCodeMax).nullable(),
+  "response_bytes": zod.number().int().min(inspectTokenResponseReportRequestAttemptLogItemResponseBytesMin).max(inspectTokenResponseReportRequestAttemptLogItemResponseBytesMax),
   "received_at": zod.string().nullable(),
   "error": zod.string().nullish()
 }))
 }),
   "receipt": zod.object({
   "received_at": zod.string().nullable(),
-  "http_status": zod.number().int().min(inspectTokenResponseReceiptHttpStatusMin).max(inspectTokenResponseReceiptHttpStatusMax).nullable(),
-  "response_bytes": zod.number().int().min(inspectTokenResponseReceiptResponseBytesMin).max(inspectTokenResponseReceiptResponseBytesMax)
+  "http_status": zod.number().int().min(inspectTokenResponseReportReceiptHttpStatusMin).max(inspectTokenResponseReportReceiptHttpStatusMax).nullable(),
+  "response_bytes": zod.number().int().min(inspectTokenResponseReportReceiptResponseBytesMin).max(inspectTokenResponseReportReceiptResponseBytesMax)
 }),
   "payload": zod.object({
   "raw_payload_sha256": zod.string().nullable(),
-  "pair_count": zod.number().int().min(inspectTokenResponsePayloadPairCountMin).max(inspectTokenResponsePayloadPairCountMax),
+  "pair_count": zod.number().int().min(inspectTokenResponseReportPayloadPairCountMin).max(inspectTokenResponseReportPayloadPairCountMax),
   "pairs": zod.array(zod.object({
   "pairAddress": zod.string().nullish(),
   "chainId": zod.string().nullish(),
@@ -166,4 +172,48 @@ export const InspectTokenResponse = zod.object({
 }))
 }),
   "error": zod.record(zod.string(), zod.unknown()).nullish()
+}),
+  "temporal_evidence": zod.object({
+  "contract_version": zod.string(),
+  "source_id": zod.string(),
+  "token_identity": zod.string(),
+  "chain_id": zod.string(),
+  "raw_payload_digest": zod.string().regex(inspectTokenResponseTemporalEvidenceRawPayloadDigestRegExp),
+  "p08_acceptance": zod.enum(['NOT_ATTEMPTED']),
+  "records": zod.array(zod.object({
+  "contract_version": zod.string(),
+  "source_id": zod.string(),
+  "source_event_id": zod.null(),
+  "token_identity": zod.string(),
+  "chain_id": zod.string(),
+  "market_subject_id": zod.string(),
+  "occurrence_id": zod.string().regex(inspectTokenResponseTemporalEvidenceRecordsItemOccurrenceIdRegExp),
+  "source_observed_at": zod.null(),
+  "received_at": zod.string(),
+  "source_freshness": zod.object({
+  "status": zod.enum(['UNKNOWN']),
+  "reason": zod.string()
+}),
+  "receipt_recency": zod.object({
+  "reference_time": zod.string(),
+  "age_seconds": zod.string()
+}),
+  "volume_window": zod.object({
+  "source_label": zod.string().nullable(),
+  "exact_window": zod.null()
+}),
+  "asset_age": zod.object({
+  "status": zod.enum(['UNAVAILABLE']),
+  "amount": zod.null(),
+  "unit": zod.null(),
+  "reference_semantics": zod.null(),
+  "source_field": zod.null(),
+  "reason": zod.string()
+}),
+  "pair_created_at_source_value": zod.string().nullable(),
+  "raw_payload_digest": zod.string().regex(inspectTokenResponseTemporalEvidenceRecordsItemRawPayloadDigestRegExp),
+  "p08_acceptance": zod.enum(['NOT_ATTEMPTED'])
+})).max(inspectTokenResponseTemporalEvidenceRecordsMax)
+}),
+  "evaluation_time": zod.string()
 })

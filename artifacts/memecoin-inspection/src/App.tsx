@@ -2,7 +2,8 @@ import { FormEvent, useRef, useState } from "react";
 import { useInspectToken } from "@workspace/api-client-react";
 import type {
   InspectionPair,
-  InspectionReport,
+  InspectionWithTemporalEvidence,
+  TemporalEvidenceRecord,
   WindowValues,
 } from "@workspace/api-client-react";
 import { AlertCircle, ChevronDown, Database, LoaderCircle, Search } from "lucide-react";
@@ -61,7 +62,15 @@ function WindowGrid({
   );
 }
 
-function PairCard({ pair, index }: { pair: InspectionPair; index: number }) {
+function PairCard({
+  pair,
+  index,
+  temporalRecord,
+}: {
+  pair: InspectionPair;
+  index: number;
+  temporalRecord: TemporalEvidenceRecord | undefined;
+}) {
   const base = pair.baseToken?.symbol || pair.baseToken?.name || "Unknown base";
   const quote = pair.quoteToken?.symbol || pair.quoteToken?.name || "Unknown quote";
   const pairLabel = `${base} / ${quote}`;
@@ -107,7 +116,7 @@ function PairCard({ pair, index }: { pair: InspectionPair; index: number }) {
           ))}
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
-          <WindowGrid label="Volume · source windows" values={pair.volume} unit="USD" />
+          <WindowGrid label="Volume · rolling source windows" values={pair.volume} unit="USD" />
           <WindowGrid label="Price change · source windows" values={pair.priceChange} unit="%" />
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
@@ -146,6 +155,30 @@ function PairCard({ pair, index }: { pair: InspectionPair; index: number }) {
               <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Source pair created at</div>
               <div className="mt-1 font-mono text-xs text-slate-700">{displayValue(pair.inspection.source_pair_created_at)}</div>
             </div>
+            <div className="grid gap-4 border-t border-slate-200 pt-4 sm:grid-cols-2">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Source observation time</div>
+                <div className="mt-1 text-sm text-slate-700">Unavailable</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Source freshness</div>
+                <div className="mt-1 text-sm text-slate-700">{temporalRecord?.source_freshness.status ?? "Unknown"}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Data received at</div>
+                <div className="mt-1 font-mono text-xs text-slate-700">{formatReceivedAt(temporalRecord?.received_at ?? null)}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Receipt age at evaluation</div>
+                <div className="mt-1 text-sm text-slate-700">
+                  {temporalRecord ? `${temporalRecord.receipt_recency.age_seconds} seconds` : "Unavailable"}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Token-origin age</div>
+                <div className="mt-1 text-sm text-slate-700">Unavailable</div>
+              </div>
+            </div>
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Findings</div>
               <pre className="mt-2 max-h-48 overflow-auto rounded-md bg-slate-950 p-3 text-xs text-slate-200">{JSON.stringify(pair.inspection.findings, null, 2)}</pre>
@@ -160,7 +193,7 @@ function PairCard({ pair, index }: { pair: InspectionPair; index: number }) {
 function InspectionPage() {
   const [chainId, setChainId] = useState("ethereum");
   const [tokenAddress, setTokenAddress] = useState("");
-  const [report, setReport] = useState<InspectionReport | null>(null);
+  const [result, setResult] = useState<InspectionWithTemporalEvidence | null>(null);
   const [activeRequestKey, setActiveRequestKey] = useState<string | null>(null);
   const inputKeyRef = useRef("");
   const requestSequenceRef = useRef(0);
@@ -171,14 +204,14 @@ function InspectionPage() {
   function updateChainId(value: string) {
     requestSequenceRef.current += 1;
     setChainId(value);
-    setReport(null);
+    setResult(null);
     setActiveRequestKey(null);
   }
 
   function updateTokenAddress(value: string) {
     requestSequenceRef.current += 1;
     setTokenAddress(value);
-    setReport(null);
+    setResult(null);
     setActiveRequestKey(null);
   }
 
@@ -189,17 +222,17 @@ function InspectionPage() {
     const nextTokenAddress = tokenAddress.trim();
     const requestKey = `${nextChainId}\u0000${nextTokenAddress}`;
     const requestSequence = ++requestSequenceRef.current;
-    setReport(null);
+    setResult(null);
     setActiveRequestKey(requestKey);
     inspection.mutate(
       { data: { chainId: nextChainId, tokenAddress: nextTokenAddress } },
       {
-        onSuccess: (nextReport) => {
+        onSuccess: (nextResult) => {
           if (
             requestSequenceRef.current === requestSequence &&
             inputKeyRef.current === requestKey
           ) {
-            setReport(nextReport);
+            setResult(nextResult);
           }
         },
       },
@@ -210,6 +243,8 @@ function InspectionPage() {
     inspection.error instanceof Error
       ? inspection.error.message
       : "The inspection could not be completed. Check the inputs and try again.";
+  const report = result?.report;
+  const temporalEvidence = result?.temporal_evidence;
 
   return (
     <main className="min-h-screen bg-[#f5f8f7] text-slate-950">
@@ -300,19 +335,27 @@ function InspectionPage() {
                 </h2>
               </div>
               <div className="text-right text-sm text-slate-500">
-                <div>Data received at</div>
-                <div className="font-medium text-slate-700">{formatReceivedAt(report.receipt.received_at)}</div>
+                 <div>Data received at</div>
+                 <div className="font-medium text-slate-700">{formatReceivedAt(report.receipt.received_at)}</div>
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
+             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">Source</div><div className="mt-1 font-medium">{report.source}</div></div>
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">Response size</div><div className="mt-1 font-medium">{report.receipt.response_bytes.toLocaleString()} bytes</div></div>
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">Attempts</div><div className="mt-1 font-medium">{report.request.attempts} · {report.request.retry_count} retry</div></div>
+               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3"><div className="text-xs text-slate-500">P08 acceptance</div><div className="mt-1 font-medium">{report.evidence.p08_acceptance}</div></div>
             </div>
+             <Card className="border-amber-200 bg-amber-50/70">
+               <CardContent className="space-y-2 py-4 text-sm text-amber-950">
+                 <div className="font-semibold">Temporal evidence</div>
+                 <div>Source observation time: <span className="font-medium">Unavailable</span> · Source freshness: <span className="font-medium">Unknown</span></div>
+                 <div className="text-amber-900/80">A recent receipt confirms when this response arrived, not when the source last observed the market. Rolling volume labels remain source windows, not exact UTC boundaries.</div>
+               </CardContent>
+             </Card>
             {report.payload.pairs.length === 0 ? (
-              <Card className="border-dashed border-slate-300 bg-white/60"><CardContent className="py-12 text-center text-sm text-slate-500">The source returned no pairs for this token.</CardContent></Card>
+               <Card className="border-dashed border-slate-300 bg-white/60"><CardContent className="py-12 text-center text-sm text-slate-500"><div className="font-medium text-slate-700">No pairs returned</div><div className="mt-2">The source returned no pair-level temporal records for this token.</div></CardContent></Card>
             ) : (
-              report.payload.pairs.map((pair: InspectionPair, index: number) => <PairCard key={`${pair.pairAddress ?? "pair"}-${index}`} pair={pair} index={index} />)
+               report.payload.pairs.map((pair: InspectionPair, index: number) => <PairCard key={`${pair.pairAddress ?? "pair"}-${index}`} pair={pair} index={index} temporalRecord={temporalEvidence?.records[index]} />)
             )}
             <details className="rounded-xl border border-slate-200 bg-white">
               <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-slate-700">Report provenance</summary>
@@ -320,6 +363,8 @@ function InspectionPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div><div className="text-xs text-slate-500">Raw payload SHA-256</div><div className="mt-1 break-all font-mono text-xs">{displayValue(report.payload.raw_payload_sha256)}</div></div>
                   <div><div className="text-xs text-slate-500">P08 observed at</div><div className="mt-1 font-mono text-xs">{displayValue(report.evidence.p08_observed_at)}</div></div>
+                   <div><div className="text-xs text-slate-500">Evaluation timestamp</div><div className="mt-1 font-mono text-xs">{formatReceivedAt(result?.evaluation_time ?? null)}</div></div>
+                   <div><div className="text-xs text-slate-500">Temporal records</div><div className="mt-1 font-medium">{temporalEvidence?.records.length ?? 0}</div></div>
                 </div>
               </div>
             </details>
