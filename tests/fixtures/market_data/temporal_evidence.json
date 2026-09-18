@@ -1,0 +1,91 @@
+{
+  "pairs": [
+    {
+      "pairAddress": "Pool-A",
+      "chainId": "chain-A",
+      "dexId": "dex-one",
+      "baseToken": {
+        "address": "token-A",
+        "name": "Token A",
+        "symbol": "TKA"
+      },
+      "quoteToken": {
+        "address": "usd",
+        "name": "USD",
+        "symbol": "USD"
+      },
+      "priceUsd": "1.25",
+      "liquidity": {
+        "usd": "100000"
+      },
+      "volume": {
+        "h24": "500.5"
+      },
+      "txns": {
+        "h24": {
+          "buys": 7,
+          "sells": 3
+        }
+      },
+      "pairCreatedAt": 1710000000000
+    },
+    {
+      "pairAddress": "Pool-A",
+      "chainId": "chain-A",
+      "dexId": "dex-one",
+      "baseToken": {
+        "address": "token-A",
+        "name": "Token A",
+        "symbol": "TKA"
+      },
+      "quoteToken": {
+        "address": "usd",
+        "name": "USD",
+        "symbol": "USD"
+      },
+      "priceUsd": "1.26",
+      "liquidity": {
+        "usd": "100100"
+      },
+      "volume": {
+        "h24": "501.5"
+      },
+      "txns": {
+        "h24": {
+          "buys": 8,
+          "sells": 3
+        }
+      },
+      "pairCreatedAt": 1710000000000
+    },
+    {
+      "pairAddress": "Pool-B",
+      "chainId": "chain-A",
+      "dexId": "dex-two",
+      "baseToken": {
+        "address": "token-A",
+        "name": "Token A",
+        "symbol": "TKA"
+      },
+      "quoteToken": {
+        "address": "usd",
+        "name": "USD",
+        "symbol": "USD"
+      },
+      "priceUsd": "2",
+      "liquidity": {
+        "usd": "200000"
+      },
+      "volume": {
+        "h24": "1000"
+      },
+      "txns": {
+        "h24": {
+          "buys": 10,
+          "sells": 4
+        }
+      },
+      "pairCreatedAt": null
+    }
+  ]
+}
