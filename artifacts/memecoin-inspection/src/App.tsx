@@ -6,6 +6,11 @@ import type {
   TemporalEvidenceRecord,
   WindowValues,
 } from "@workspace/api-client-react";
+import {
+  summarizeActivity,
+  summarizeAvailability,
+  type AnalysisMetric,
+} from "./descriptive-analysis";
 import { AlertCircle, ChevronDown, Database, LoaderCircle, Search } from "lucide-react";
 import { Route, Router as WouterRouter, Switch, useLocation } from "wouter";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -57,6 +62,96 @@ function WindowGrid({
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function analysisMetricText(metric: AnalysisMetric) {
+  if (metric.status === "available") return metric.value ?? "Unavailable";
+  return metric.detail ?? (metric.status === "invalid" ? "Invalid source value" : "Unavailable");
+}
+
+function analysisStatusText(status: AnalysisMetric["status"]) {
+  if (status === "available") return "Available";
+  if (status === "invalid") return "Invalid";
+  return "Unavailable";
+}
+
+function CurrentLiquidity({ values }: { values: InspectionPair["liquidity"] }) {
+  return (
+    <div className="space-y-2">
+      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+        Liquidity · current source values
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          ["USD", values?.usd, "USD"],
+          ["Base", values?.base, undefined],
+          ["Quote", values?.quote, undefined],
+        ].map(([label, value, unit]) => (
+          <div key={label as string} className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+            <div className="text-[11px] font-medium text-slate-500">{label as string}</div>
+            <div className="mt-1 break-all font-mono text-sm text-slate-800">
+              {displayValue(value)}{value != null && unit ? ` ${unit}` : ""}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DescriptiveAnalysis({ pair }: { pair: InspectionPair }) {
+  const activity = summarizeActivity(pair);
+  const availability = summarizeAvailability(pair);
+
+  return (
+    <div className="space-y-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-4">
+      <div>
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-800">
+          Descriptive analysis
+        </div>
+        <div className="mt-1 text-sm font-semibold text-slate-900">Activity summary</div>
+        <div className="mt-1 text-xs leading-5 text-slate-600">
+          Based on the source-reported 24h rolling window. Transaction-count share is not buying pressure or volume share.
+        </div>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          ["Buys", activity.buys],
+          ["Sells", activity.sells],
+          ["Total transactions", activity.total],
+          ["Buy transaction share", activity.buyShare],
+        ].map(([label, metric]) => (
+          <div key={label as string} className="rounded-lg border border-emerald-100 bg-white/80 px-3 py-2">
+            <div className="text-[11px] font-medium text-slate-500">{label as string}</div>
+            <div className="mt-1 break-words font-mono text-sm font-semibold text-slate-900">
+              {analysisMetricText(metric as AnalysisMetric)}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div>
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+          Data availability
+        </div>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {availability.map(({ label, metric }) => (
+            <div key={label} className="rounded-lg border border-slate-200 bg-white/80 px-3 py-2">
+              <div className="text-[11px] font-medium text-slate-500">{label}</div>
+              <div className="mt-1 text-xs font-semibold text-slate-800">
+                {analysisStatusText(metric.status)}
+              </div>
+              <div className="mt-1 break-words font-mono text-xs text-slate-700">
+                {analysisMetricText(metric)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="text-xs leading-5 text-slate-600">
+        This describes the returned report only. Source freshness remains Unknown; receipt time does not establish source freshness; P08 acceptance remains NOT_ATTEMPTED.
       </div>
     </div>
   );
@@ -115,12 +210,13 @@ function PairCard({
             </div>
           ))}
         </div>
+        <DescriptiveAnalysis pair={pair} />
         <div className="grid gap-5 lg:grid-cols-2">
           <WindowGrid label="Volume · rolling source windows" values={pair.volume} unit="USD" />
           <WindowGrid label="Price change · source windows" values={pair.priceChange} unit="%" />
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
-          <WindowGrid label="Liquidity · source windows" values={pair.liquidity} unit="USD" />
+          <CurrentLiquidity values={pair.liquidity} />
           <div className="space-y-2">
             <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Transaction counts</div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

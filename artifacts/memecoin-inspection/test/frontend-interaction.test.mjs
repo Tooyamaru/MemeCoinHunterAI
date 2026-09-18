@@ -476,6 +476,14 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   const successText = await bodyText();
   assert.match(successText, /0\.000000000000000001 USD/);
   assert.match(successText, /123\.4500 USD/);
+  assert.match(successText, /Activity summary/);
+  assert.match(successText, /Total transactions/);
+  assert.match(successText, /33/);
+  assert.match(successText, /48\.5%/);
+  assert.match(successText, /Current USD liquidity/);
+  assert.match(successText, /5\.0000 USD/);
+  assert.match(successText, /Source-reported 24h volume/);
+  assert.match(successText, /DATA AVAILABILITY/);
   assert.match(successText, /Unavailable/);
   assert.match(successText, /-1\.25 %/);
   assert.ok(successText.includes(expectedReceivedAt), "receipt time should be formatted and visible");
