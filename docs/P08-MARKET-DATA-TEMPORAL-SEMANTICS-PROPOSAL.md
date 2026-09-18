@@ -98,6 +98,14 @@ The market subject identifies the pair identity. The occurrence identity keeps
 duplicate or conflicting entries separately identifiable. `source_event_id`
 remains `null` because the current report does not supply one.
 
+`pairCreatedAt` may be omitted or explicitly `null`. Both states produce
+`pair_created_at_source_value = null`, which is an unavailable pair-creation
+evidence value and never a fabricated timestamp or calculated pair age. The
+source-shaped inspector report preserves the distinction: omission remains
+absent from the pair and its field provenance, while explicit `null` remains
+present with a normalized null provenance value. The source pair projection,
+raw-payload digest, and occurrence identity retain that distinction.
+
 ### 3.3 Volume, age, and digest evidence
 
 `volume_window.source_label` preserves `h24` when the current pair report
@@ -107,12 +115,18 @@ are inferred.
 `asset_age` is always `UNAVAILABLE` with the inspector’s documented
 token-origin reason. Pair creation is preserved separately as
 `pair_created_at_source_value`, without converting or asserting timestamp-unit
-semantics. Pair creation never populates token-origin age.
+semantics. When present, it must be finite numeric text; malformed present
+values fail closed. Pair creation never populates token-origin age.
 
 The inspector’s `raw_payload_sha256` is preserved as supplied. The temporal
 module does not claim independent raw-byte verification because it receives the
 report, not the original response bytes. A deterministic digest of the bounded
 temporal evidence projection is available for replay and comparison.
+
+Accepting an omitted `pairCreatedAt` is backward-compatible within this
+contract version: the output shape and nullable meaning are unchanged, valid
+present values retain their existing representation, and malformed present
+values remain rejected.
 
 ## 4. Output and compatibility rules
 

@@ -74,6 +74,57 @@ def test_actual_inspector_report_converts_one_record_per_pair() -> None:
     assert result.records[2].pair_created_at_source_value is None
 
 
+def test_missing_null_and_present_pair_creation_preserve_order_and_digest() -> None:
+    pairs = raw_pairs()
+    omitted = deepcopy(pairs[0])
+    omitted.pop("pairCreatedAt")
+    pairs = [omitted, deepcopy(pairs[1]), deepcopy(pairs[2])]
+
+    report = inspected_report(pairs=pairs)
+    source_pairs = report["payload"]["pairs"]
+    assert "pairCreatedAt" not in source_pairs[0]
+    assert "pairCreatedAt" not in source_pairs[0]["inspection"]["field_provenance"]
+    assert source_pairs[0]["inspection"].get("source_pair_created_at") is None
+    assert source_pairs[2]["pairCreatedAt"] is None
+    assert source_pairs[2]["inspection"]["field_provenance"][
+        "pairs[2].pairCreatedAt"
+    ] == {
+        "source_field": "pairs[2].pairCreatedAt",
+        "normalized_value": None,
+    }
+    assert source_pairs[2]["inspection"]["source_pair_created_at"] is None
+
+    result = convert_inspection_report(report, evaluation_time=REFERENCE_TIME)
+
+    assert [record.market_subject_id for record in result.records] == [
+        "chain-A:Pool-A",
+        "chain-A:Pool-A",
+        "chain-A:Pool-B",
+    ]
+    assert [
+        record.pair_created_at_source_value for record in result.records
+    ] == [None, "1710000000000", None]
+    assert len({record.occurrence_id for record in result.records}) == 3
+    assert '"pair_created_at_source_value":null' in canonical_json(
+        result.as_mapping()
+    )
+    assert temporal_evidence_digest(result) == temporal_evidence_digest(
+        convert_inspection_report(report, evaluation_time=REFERENCE_TIME)
+    )
+
+
+@pytest.mark.parametrize("value", ["not-a-number", "NaN", "Infinity"])
+def test_present_malformed_pair_creation_fails_closed(value: str) -> None:
+    pairs = raw_pairs()
+    pairs[0]["pairCreatedAt"] = value
+
+    with pytest.raises(TemporalEvidenceError, match="pairCreatedAt"):
+        convert_inspection_report(
+            inspected_report(pairs=pairs),
+            evaluation_time=REFERENCE_TIME,
+        )
+
+
 def test_duplicate_and_conflicting_pairs_remain_distinct_occurrences() -> None:
     result = convert_inspection_report(
         inspected_report(),

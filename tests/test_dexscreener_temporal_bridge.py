@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -16,10 +17,18 @@ RECEIVED_AT = "2026-09-18T10:00:00.000000Z"
 EVALUATION_TIME = datetime(2026, 9, 18, 10, 0, 12, 500000, tzinfo=timezone.utc)
 
 
-def mocked_transport(calls: list[tuple[str, str]]):
+def mocked_transport(
+    calls: list[tuple[str, str]],
+    pairs: list[dict[str, object]] | None = None,
+):
     def transport(chain_id: str, token_address: str) -> TokenPairsResponse:
         calls.append((chain_id, token_address))
-        body = json.dumps(json.loads(FIXTURE_PATH.read_text())["pairs"]).encode()
+        source_pairs = (
+            json.loads(FIXTURE_PATH.read_text())["pairs"]
+            if pairs is None
+            else pairs
+        )
+        body = json.dumps(source_pairs).encode()
         return TokenPairsResponse(
             endpoint=f"https://api.dexscreener.com/token-pairs/v1/{chain_id}/{token_address}",
             chain_id=chain_id,
@@ -66,6 +75,30 @@ def test_bridge_composes_real_inspector_and_converter_with_one_fetch() -> None:
     assert temporal["records"][0]["source_freshness"]["status"] == "UNKNOWN"
     assert temporal["records"][0]["receipt_recency"]["age_seconds"] == "12.5"
     assert temporal["records"][0]["pair_created_at_source_value"] == "1710000000000"
+
+
+def test_bridge_preserves_omitted_pair_creation_with_one_fetch() -> None:
+    pairs = json.loads(FIXTURE_PATH.read_text())["pairs"]
+    omitted = deepcopy(pairs[0])
+    omitted.pop("pairCreatedAt")
+    pairs[0] = omitted
+    calls: list[tuple[str, str]] = []
+
+    result = bridge.inspect_token_with_temporal(
+        "chain-A",
+        "token-A",
+        transport=mocked_transport(calls, pairs),
+        evaluation_clock=lambda: EVALUATION_TIME,
+    )
+
+    assert calls == [("chain-A", "token-A")]
+    assert len(result["report"]["payload"]["pairs"]) == 3
+    assert "pairCreatedAt" not in result["report"]["payload"]["pairs"][0]
+    assert len(result["temporal_evidence"]["records"]) == 3
+    assert [
+        record["pair_created_at_source_value"]
+        for record in result["temporal_evidence"]["records"]
+    ] == [None, "1710000000000", None]
 
 
 def test_empty_report_keeps_converter_empty_and_receipt_evaluation_distinct() -> None:

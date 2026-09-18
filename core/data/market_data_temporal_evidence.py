@@ -386,7 +386,6 @@ def convert_inspection_report(
             "liquidity",
             "volume",
             "txns",
-            "pairCreatedAt",
         ):
             if field_name not in pair:
                 raise TemporalEvidenceError(
@@ -404,9 +403,9 @@ def convert_inspection_report(
         )
         volume = _mapping(pair["volume"], f"payload.pairs[{index}].volume")
         source_label = "h24" if "h24" in volume else None
-        pair_created = pair["pairCreatedAt"]
+        pair_created = pair.get("pairCreatedAt")
         if pair_created is not None:
-            pair_created = _canonical_text(
+            pair_created = _pair_created_at_text(
                 pair_created,
                 f"payload.pairs[{index}].pairCreatedAt",
             )
@@ -492,6 +491,17 @@ def _unavailable_reason(
                 raise TemporalEvidenceError(f"contradictory unavailable reason for {field}")
             return reason
     raise TemporalEvidenceError(f"missing unavailable evidence for {field}")
+
+
+def _pair_created_at_text(value: Any, path: str) -> str:
+    normalized = _canonical_text(value, path)
+    try:
+        parsed = Decimal(normalized)
+    except InvalidOperation as exc:
+        raise TemporalEvidenceError(f"{path} must be numeric text") from exc
+    if not parsed.is_finite():
+        raise TemporalEvidenceError(f"{path} must be finite numeric text")
+    return normalized
 
 
 def _occurrence_id(
