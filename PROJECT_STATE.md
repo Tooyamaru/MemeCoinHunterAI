@@ -183,6 +183,17 @@ wallet, signing, broadcast, RPC, DEX, provider, network, persistence,
 external-authority reconciliation, economic metric, model, or P09
 functionality was introduced. P08-T03 remains evidence-state-only.
 
+The candidate-listing integration checkpoint is verified on 2026-09-18. The
+read-only inspection artifact now supports an explicit, bounded provider-list
+request, preserves provider order plus duplicate, invalid, and missing-identity
+entries, and keeps canonical discovery admission `NOT_ADMITTED`. Selecting a
+candidate only fills the inspection form; inspection remains explicit. Latest
+token profiles are not comprehensive discovery, a newly-created-token feed, or
+approved opportunities. Verification uses mocked provider responses and does
+not establish live provider correctness; source freshness remains `UNKNOWN` and
+P08 acceptance remains `NOT_ATTEMPTED`. No live market requests, analytics,
+watchlist, or downstream admission behavior was added.
+
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
 exists.
