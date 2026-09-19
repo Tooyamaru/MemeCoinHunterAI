@@ -194,6 +194,18 @@ not establish live provider correctness; source freshness remains `UNKNOWN` and
 P08 acceptance remains `NOT_ATTEMPTED`. No live market requests, analytics,
 watchlist, or downstream admission behavior was added.
 
+The token-safety integration checkpoint is verified on 2026-09-19 on branch
+`wip/token-safety-integration`. The inspection UI now exposes an explicit
+“Check token safety” action only after a successful inspection. The bounded
+server-side GoPlus adapter supports the configured EVM chain set, validates and
+binds the exact chain/token identity, applies response-size and timeout limits,
+and composes returned fields through the existing P03 evaluation and eligibility
+contracts. Risk flags fail closed; favorable, missing, unsupported, or
+undocumented evidence remains `UNKNOWN`/unavailable rather than becoming
+positive evidence. Stale UI responses are rejected after input identity changes.
+Verification uses mocked provider responses; no live GoPlus request, wallet,
+trading, ranking, analytics, commit, push, or merge was performed.
+
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
 exists.
@@ -367,6 +379,8 @@ require separate specifications and approval.
 
 No secret values are stored here. Future integrations must use environment
 secrets; names will be added only when a later task requires them.
+The token-safety adapter optionally reads `GOPLUS_ACCESS_TOKEN` server-side when
+the provider requires authentication; no value is present in this workspace.
 
 ## V1.1 architecture revision
 

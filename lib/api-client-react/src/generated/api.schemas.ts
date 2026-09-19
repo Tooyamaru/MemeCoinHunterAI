@@ -448,3 +448,162 @@ export interface InspectionWithTemporalEvidence {
   temporal_evidence: TemporalEvidenceReport;
   evaluation_time: string;
 }
+
+export interface TokenSafetyInput {
+  /**
+     * @minLength 1
+     * @maxLength 64
+     * @pattern ^[A-Za-z0-9._~-]+$
+     */
+  chainId: string;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     * @pattern ^[A-Za-z0-9._~-]+$
+     */
+  tokenAddress: string;
+}
+
+export interface SafetyAssessmentIdentity {
+  chain_id: string;
+  token_address: string;
+}
+
+export type SafetyAssessmentSourceSourceId = typeof SafetyAssessmentSourceSourceId[keyof typeof SafetyAssessmentSourceSourceId];
+
+
+export const SafetyAssessmentSourceSourceId = {
+  GoPlus: 'GoPlus',
+} as const;
+
+export type SafetyAssessmentSourceSourceFreshness = typeof SafetyAssessmentSourceSourceFreshness[keyof typeof SafetyAssessmentSourceSourceFreshness];
+
+
+export const SafetyAssessmentSourceSourceFreshness = {
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export interface SafetyAssessmentSource {
+  source_id: SafetyAssessmentSourceSourceId;
+  endpoint: string;
+  /**
+     * @minimum 200
+     * @maximum 599
+     */
+  http_status: number;
+  /**
+     * @minimum 0
+     * @maximum 1048576
+     */
+  response_bytes: number;
+  received_at: string;
+  /** @nullable */
+  source_observed_at: null;
+  source_freshness: SafetyAssessmentSourceSourceFreshness;
+}
+
+export type SafetyEvidenceItemDomain = typeof SafetyEvidenceItemDomain[keyof typeof SafetyEvidenceItemDomain];
+
+
+export const SafetyEvidenceItemDomain = {
+  MINT_FREEZE_AUTHORITY: 'MINT_FREEZE_AUTHORITY',
+  LP_STATUS_CONCENTRATION: 'LP_STATUS_CONCENTRATION',
+  LIQUIDITY_QUALITY: 'LIQUIDITY_QUALITY',
+  METADATA_MUTABILITY: 'METADATA_MUTABILITY',
+  TOP_HOLDER_CONCENTRATION: 'TOP_HOLDER_CONCENTRATION',
+  FUNDING_WALLET_RELATIONSHIPS: 'FUNDING_WALLET_RELATIONSHIPS',
+  PROXY_CONTROL_PATTERNS: 'PROXY_CONTROL_PATTERNS',
+  SUSPICIOUS_MUTABLE_BEHAVIOR: 'SUSPICIOUS_MUTABLE_BEHAVIOR',
+  TRADABILITY_SELLABILITY: 'TRADABILITY_SELLABILITY',
+  STALE_UNAVAILABLE_EVIDENCE: 'STALE_UNAVAILABLE_EVIDENCE',
+} as const;
+
+export type SafetyEvidenceItemStatus = typeof SafetyEvidenceItemStatus[keyof typeof SafetyEvidenceItemStatus];
+
+
+export const SafetyEvidenceItemStatus = {
+  PASS: 'PASS',
+  FAIL: 'FAIL',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type SafetyEvidenceItemQuality = typeof SafetyEvidenceItemQuality[keyof typeof SafetyEvidenceItemQuality];
+
+
+export const SafetyEvidenceItemQuality = {
+  VALID: 'VALID',
+  INVALID: 'INVALID',
+  INCOMPLETE: 'INCOMPLETE',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type SafetyEvidenceItemFreshnessStatus = typeof SafetyEvidenceItemFreshnessStatus[keyof typeof SafetyEvidenceItemFreshnessStatus];
+
+
+export const SafetyEvidenceItemFreshnessStatus = {
+  VALID: 'VALID',
+  INVALID: 'INVALID',
+  INCOMPLETE: 'INCOMPLETE',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type SafetyEvidenceItemEvidenceContext = { [key: string]: unknown };
+
+export interface SafetyEvidenceItem {
+  domain: SafetyEvidenceItemDomain;
+  status: SafetyEvidenceItemStatus;
+  quality: SafetyEvidenceItemQuality;
+  freshness_status: SafetyEvidenceItemFreshnessStatus;
+  observed_at: string;
+  source_id: string;
+  method: string;
+  evidence_reference: string;
+  evidence_context: SafetyEvidenceItemEvidenceContext;
+  /** @maxItems 12 */
+  reason_codes: string[];
+}
+
+export interface SafetyMissingEvidence {
+  domain: string;
+  requirement: string;
+  reason: string;
+}
+
+export type SafetyEvaluationStatus = typeof SafetyEvaluationStatus[keyof typeof SafetyEvaluationStatus];
+
+
+export const SafetyEvaluationStatus = {
+  ELIGIBLE: 'ELIGIBLE',
+  INELIGIBLE: 'INELIGIBLE',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type SafetyEvaluationDomainResults = {[key: string]: 'PASS' | 'FAIL' | 'UNKNOWN'};
+
+export interface SafetyEvaluation {
+  status: SafetyEvaluationStatus;
+  is_authoritative: false;
+  evaluator_id: string;
+  contract_version: string;
+  evaluation_timestamp: string;
+  /** @pattern ^[0-9a-f]{64}$ */
+  input_evidence_digest: string;
+  domain_results: SafetyEvaluationDomainResults;
+  /** @maxItems 32 */
+  evidence_references: string[];
+  /** @maxItems 128 */
+  reason_codes: string[];
+}
+
+export interface TokenSafetyAssessment {
+  assessment_version: string;
+  identity: SafetyAssessmentIdentity;
+  source: SafetyAssessmentSource;
+  evaluation: SafetyEvaluation;
+  /** @maxItems 32 */
+  evidence: SafetyEvidenceItem[];
+  /** @maxItems 32 */
+  missing_evidence: SafetyMissingEvidence[];
+  /** @maxItems 12 */
+  limitations: string[];
+}

@@ -288,3 +288,90 @@ export const ListCandidateTokensResponse = zod.object({
   "invalid_count": zod.number().int().min(listCandidateTokensResponseInvalidCountMin).max(listCandidateTokensResponseInvalidCountMax),
   "duplicate_count": zod.number().int().min(listCandidateTokensResponseDuplicateCountMin).max(listCandidateTokensResponseDuplicateCountMax)
 })
+
+
+/**
+ * Performs one explicit, read-only request to the bounded GoPlus Token Security API and composes the response through the existing P03 evaluator and eligibility contracts. This is non-authoritative evidence, not a safety guarantee, trading approval, or P08 acceptance.
+ * @summary Assess one token with bounded GoPlus safety evidence
+ */
+export const assessTokenSafetyBodyChainIdMax = 64;
+
+
+export const assessTokenSafetyBodyChainIdRegExp = new RegExp('^[A-Za-z0-9._~-]+$');
+export const assessTokenSafetyBodyTokenAddressMax = 128;
+
+
+export const assessTokenSafetyBodyTokenAddressRegExp = new RegExp('^[A-Za-z0-9._~-]+$');
+
+
+export const AssessTokenSafetyBody = zod.object({
+  "chainId": zod.string().min(1).max(assessTokenSafetyBodyChainIdMax).regex(assessTokenSafetyBodyChainIdRegExp),
+  "tokenAddress": zod.string().min(1).max(assessTokenSafetyBodyTokenAddressMax).regex(assessTokenSafetyBodyTokenAddressRegExp)
+})
+
+export const assessTokenSafetyResponseSourceHttpStatusMin = 200;
+export const assessTokenSafetyResponseSourceHttpStatusMax = 599;
+
+export const assessTokenSafetyResponseSourceResponseBytesMin = 0;
+export const assessTokenSafetyResponseSourceResponseBytesMax = 1048576;
+
+export const assessTokenSafetyResponseEvaluationInputEvidenceDigestRegExp = new RegExp('^[0-9a-f]{64}$');
+export const assessTokenSafetyResponseEvaluationEvidenceReferencesMax = 32;
+
+export const assessTokenSafetyResponseEvaluationReasonCodesMax = 128;
+
+export const assessTokenSafetyResponseEvidenceItemReasonCodesMax = 12;
+
+export const assessTokenSafetyResponseEvidenceMax = 32;
+
+export const assessTokenSafetyResponseMissingEvidenceMax = 32;
+
+export const assessTokenSafetyResponseLimitationsMax = 12;
+
+
+
+export const AssessTokenSafetyResponse = zod.object({
+  "assessment_version": zod.string(),
+  "identity": zod.object({
+  "chain_id": zod.string(),
+  "token_address": zod.string()
+}),
+  "source": zod.object({
+  "source_id": zod.enum(['GoPlus']),
+  "endpoint": zod.string().url(),
+  "http_status": zod.number().int().min(assessTokenSafetyResponseSourceHttpStatusMin).max(assessTokenSafetyResponseSourceHttpStatusMax),
+  "response_bytes": zod.number().int().min(assessTokenSafetyResponseSourceResponseBytesMin).max(assessTokenSafetyResponseSourceResponseBytesMax),
+  "received_at": zod.coerce.date(),
+  "source_observed_at": zod.null(),
+  "source_freshness": zod.enum(['UNKNOWN'])
+}),
+  "evaluation": zod.object({
+  "status": zod.enum(['ELIGIBLE', 'INELIGIBLE', 'UNKNOWN']),
+  "is_authoritative": zod.literal(false),
+  "evaluator_id": zod.string(),
+  "contract_version": zod.string(),
+  "evaluation_timestamp": zod.coerce.date(),
+  "input_evidence_digest": zod.string().regex(assessTokenSafetyResponseEvaluationInputEvidenceDigestRegExp),
+  "domain_results": zod.record(zod.string(), zod.enum(['PASS', 'FAIL', 'UNKNOWN'])),
+  "evidence_references": zod.array(zod.string()).max(assessTokenSafetyResponseEvaluationEvidenceReferencesMax),
+  "reason_codes": zod.array(zod.string()).max(assessTokenSafetyResponseEvaluationReasonCodesMax)
+}),
+  "evidence": zod.array(zod.object({
+  "domain": zod.enum(['MINT_FREEZE_AUTHORITY', 'LP_STATUS_CONCENTRATION', 'LIQUIDITY_QUALITY', 'METADATA_MUTABILITY', 'TOP_HOLDER_CONCENTRATION', 'FUNDING_WALLET_RELATIONSHIPS', 'PROXY_CONTROL_PATTERNS', 'SUSPICIOUS_MUTABLE_BEHAVIOR', 'TRADABILITY_SELLABILITY', 'STALE_UNAVAILABLE_EVIDENCE']),
+  "status": zod.enum(['PASS', 'FAIL', 'UNKNOWN']),
+  "quality": zod.enum(['VALID', 'INVALID', 'INCOMPLETE', 'UNKNOWN']),
+  "freshness_status": zod.enum(['VALID', 'INVALID', 'INCOMPLETE', 'UNKNOWN']),
+  "observed_at": zod.coerce.date(),
+  "source_id": zod.string(),
+  "method": zod.string(),
+  "evidence_reference": zod.string(),
+  "evidence_context": zod.record(zod.string(), zod.unknown()),
+  "reason_codes": zod.array(zod.string()).max(assessTokenSafetyResponseEvidenceItemReasonCodesMax)
+})).max(assessTokenSafetyResponseEvidenceMax),
+  "missing_evidence": zod.array(zod.object({
+  "domain": zod.string(),
+  "requirement": zod.string(),
+  "reason": zod.string()
+})).max(assessTokenSafetyResponseMissingEvidenceMax),
+  "limitations": zod.array(zod.string()).max(assessTokenSafetyResponseLimitationsMax)
+})

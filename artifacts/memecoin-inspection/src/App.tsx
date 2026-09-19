@@ -2,6 +2,7 @@ import { FormEvent, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
   listCandidateTokens,
+  useAssessTokenSafety,
   useInspectToken,
 } from "@workspace/api-client-react";
 import type {
@@ -9,6 +10,8 @@ import type {
   CandidateListingResponse,
   InspectionPair,
   InspectionWithTemporalEvidence,
+  SafetyEvidenceItem,
+  TokenSafetyAssessment,
   TemporalEvidenceRecord,
   WindowValues,
 } from "@workspace/api-client-react";
@@ -82,6 +85,159 @@ function analysisStatusText(status: AnalysisMetric["status"]) {
   if (status === "available") return "Available";
   if (status === "invalid") return "Invalid";
   return "Unavailable";
+}
+
+function safetyStatusClass(status: SafetyEvidenceItem["status"]) {
+  if (status === "FAIL") {
+    return "border-rose-200 bg-rose-50 text-rose-900";
+  }
+  if (status === "PASS") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  }
+  return "border-amber-200 bg-amber-50 text-amber-950";
+}
+
+function safetyStatusLabel(status: SafetyEvidenceItem["status"]) {
+  if (status === "FAIL") return "Risk flag";
+  if (status === "PASS") return "Pass";
+  return "Unknown";
+}
+
+function SafetyAssessmentPanel({ result }: { result: TokenSafetyAssessment }) {
+  const evaluationLabel =
+    result.evaluation.status === "INELIGIBLE"
+      ? "Fail-closed: risk evidence present"
+      : result.evaluation.status === "ELIGIBLE"
+        ? "Non-authoritative represented-domain result"
+        : "Unknown: evidence is incomplete";
+  const evaluationClass =
+    result.evaluation.status === "INELIGIBLE"
+      ? "border-rose-200 bg-rose-50 text-rose-950"
+      : "border-amber-200 bg-amber-50 text-amber-950";
+
+  return (
+    <Card className="border-slate-200 shadow-sm">
+      <CardHeader className="border-b border-slate-100 pb-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">
+              Token safety assessment
+            </div>
+            <CardTitle className="mt-1 text-xl">Source-backed findings</CardTitle>
+            <CardDescription className="mt-1">
+              {result.identity.chain_id} · {result.identity.token_address}
+            </CardDescription>
+          </div>
+          <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${evaluationClass}`}>
+            {evaluationLabel}
+          </span>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-5 bg-white pt-5">
+        <div className="rounded-lg border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm leading-6 text-amber-950">
+          <div className="font-semibold">Not a safety guarantee</div>
+          <div>
+            GoPlus evidence is evaluated through the existing P03 contracts. This result is
+            non-authoritative: it does not approve trading, authorize capital, or establish P08
+            acceptance.
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+            <div className="text-[11px] font-medium text-slate-500">Provider</div>
+            <div className="mt-1 font-medium text-slate-900">{result.source.source_id}</div>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+            <div className="text-[11px] font-medium text-slate-500">Source observation</div>
+            <div className="mt-1 font-medium text-slate-900">Unavailable</div>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+            <div className="text-[11px] font-medium text-slate-500">Source freshness</div>
+            <div className="mt-1 font-medium text-slate-900">{result.source.source_freshness}</div>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2">
+            <div className="text-[11px] font-medium text-slate-500">Evidence records</div>
+            <div className="mt-1 font-medium text-slate-900">{result.evidence.length}</div>
+          </div>
+        </div>
+
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Evaluated domain results
+          </div>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(result.evaluation.domain_results).map(([domain, status]) => (
+              <div key={domain} className={`rounded-lg border px-3 py-2 ${safetyStatusClass(status)}`}>
+                <div className="text-[11px] font-semibold tracking-[0.08em]">{domain}</div>
+                <div className="mt-1 text-sm font-semibold">{safetyStatusLabel(status)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Provider findings
+          </div>
+          <div className="mt-2 space-y-2">
+            {result.evidence.map((item) => {
+              const providerField = item.evidence_context.provider_field;
+              const providerValue = item.evidence_context.provider_value;
+              return (
+                <div
+                  key={item.evidence_reference}
+                  className={`rounded-lg border px-3 py-3 ${safetyStatusClass(item.status)}`}
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <div className="text-sm font-semibold">
+                        {typeof providerField === "string" && providerField
+                          ? providerField
+                          : item.domain}
+                      </div>
+                      <div className="mt-1 text-xs opacity-80">{item.domain}</div>
+                    </div>
+                    <span className="rounded-full bg-white/70 px-2 py-1 text-[11px] font-semibold">
+                      {safetyStatusLabel(item.status)}
+                    </span>
+                  </div>
+                  <div className="mt-2 text-xs leading-5">
+                    Provider value: <span className="font-mono">{displayValue(providerValue)}</span>
+                    {" · "}
+                    {item.reason_codes.join(" · ")}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <details className="rounded-lg border border-slate-200 bg-slate-50/50">
+          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-slate-700">
+            Evidence limitations ({result.missing_evidence.length})
+          </summary>
+          <div className="space-y-3 border-t border-slate-200 px-4 py-4 text-sm">
+            <ul className="space-y-2 text-slate-700">
+              {result.missing_evidence.map((item, index) => (
+                <li key={`${item.domain}-${item.reason}-${index}`}>
+                  <span className="font-semibold">{item.domain}</span>
+                  <span className="text-slate-500"> · {item.reason}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="border-t border-slate-200 pt-3 text-xs leading-5 text-slate-600">
+              {result.limitations.join(" ")}
+            </div>
+            <div className="border-t border-slate-200 pt-3 text-xs text-slate-500">
+              Received {formatReceivedAt(result.source.received_at)} · evaluated{" "}
+              {formatReceivedAt(result.evaluation.evaluation_timestamp)}
+            </div>
+          </div>
+        </details>
+      </CardContent>
+    </Card>
+  );
 }
 
 function CurrentLiquidity({ values }: { values: InspectionPair["liquidity"] }) {
@@ -430,28 +586,38 @@ function InspectionPage() {
   const [chainId, setChainId] = useState("ethereum");
   const [tokenAddress, setTokenAddress] = useState("");
   const [result, setResult] = useState<InspectionWithTemporalEvidence | null>(null);
+  const [safetyResult, setSafetyResult] = useState<TokenSafetyAssessment | null>(null);
   const [activeRequestKey, setActiveRequestKey] = useState<string | null>(null);
+  const [activeSafetyRequestKey, setActiveSafetyRequestKey] = useState<string | null>(null);
   const inputKeyRef = useRef("");
   const requestSequenceRef = useRef(0);
+  const safetyRequestSequenceRef = useRef(0);
   const inputKey = `${chainId.trim()}\u0000${tokenAddress.trim()}`;
   inputKeyRef.current = inputKey;
   const inspection = useInspectToken();
+  const safety = useAssessTokenSafety();
   const candidateListing = useMutation({
     mutationFn: () => listCandidateTokens(),
   });
 
   function updateChainId(value: string) {
     requestSequenceRef.current += 1;
+    safetyRequestSequenceRef.current += 1;
     setChainId(value);
     setResult(null);
+    setSafetyResult(null);
     setActiveRequestKey(null);
+    setActiveSafetyRequestKey(null);
   }
 
   function updateTokenAddress(value: string) {
     requestSequenceRef.current += 1;
+    safetyRequestSequenceRef.current += 1;
     setTokenAddress(value);
     setResult(null);
+    setSafetyResult(null);
     setActiveRequestKey(null);
+    setActiveSafetyRequestKey(null);
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -461,8 +627,11 @@ function InspectionPage() {
     const nextTokenAddress = tokenAddress.trim();
     const requestKey = `${nextChainId}\u0000${nextTokenAddress}`;
     const requestSequence = ++requestSequenceRef.current;
+    safetyRequestSequenceRef.current += 1;
     setResult(null);
+    setSafetyResult(null);
     setActiveRequestKey(requestKey);
+    setActiveSafetyRequestKey(null);
     inspection.mutate(
       { data: { chainId: nextChainId, tokenAddress: nextTokenAddress } },
       {
@@ -478,19 +647,51 @@ function InspectionPage() {
     );
   }
 
+  function checkTokenSafety() {
+    if (safety.isPending || !report) return;
+    const nextChainId = chainId.trim();
+    const nextTokenAddress = tokenAddress.trim();
+    const requestKey = `${nextChainId}\u0000${nextTokenAddress}`;
+    const requestSequence = ++safetyRequestSequenceRef.current;
+    setSafetyResult(null);
+    setActiveSafetyRequestKey(requestKey);
+    safety.mutate(
+      { data: { chainId: nextChainId, tokenAddress: nextTokenAddress } },
+      {
+        onSuccess: (nextResult) => {
+          if (
+            safetyRequestSequenceRef.current === requestSequence &&
+            inputKeyRef.current === requestKey &&
+            nextResult.identity.chain_id === nextChainId &&
+            nextResult.identity.token_address === nextTokenAddress
+          ) {
+            setSafetyResult(nextResult);
+          }
+        },
+      },
+    );
+  }
+
   function selectCandidate(candidate: CandidateListingEntry) {
     if (!candidate.chainId || !candidate.tokenAddress) return;
     requestSequenceRef.current += 1;
+    safetyRequestSequenceRef.current += 1;
     setChainId(candidate.chainId);
     setTokenAddress(candidate.tokenAddress);
     setResult(null);
+    setSafetyResult(null);
     setActiveRequestKey(null);
+    setActiveSafetyRequestKey(null);
   }
 
   const errorMessage =
     inspection.error instanceof Error
       ? inspection.error.message
       : "The inspection could not be completed. Check the inputs and try again.";
+  const safetyErrorMessage =
+    safety.error instanceof Error
+      ? safety.error.message
+      : "The token safety assessment could not be completed. Check the provider and try again.";
   const report = result?.report;
   const temporalEvidence = result?.temporal_evidence;
 
@@ -540,17 +741,37 @@ function InspectionPage() {
             <form onSubmit={submit} className="grid gap-4 lg:grid-cols-[180px_1fr_auto] lg:items-end">
               <label className="space-y-2">
                 <span className="text-sm font-medium text-slate-700">Chain</span>
-                <Input value={chainId} onChange={(event) => setChainId(event.target.value)} required maxLength={64} pattern="[A-Za-z0-9._~-]+" placeholder="ethereum" />
+                <Input value={chainId} onChange={(event) => updateChainId(event.target.value)} required maxLength={64} pattern="[A-Za-z0-9._~-]+" placeholder="ethereum" />
               </label>
               <label className="space-y-2">
                 <span className="text-sm font-medium text-slate-700">Token address</span>
-                <Input value={tokenAddress} onChange={(event) => setTokenAddress(event.target.value)} required maxLength={128} pattern="[A-Za-z0-9._~-]+" placeholder="0x..." />
+                <Input value={tokenAddress} onChange={(event) => updateTokenAddress(event.target.value)} required maxLength={128} pattern="[A-Za-z0-9._~-]+" placeholder="0x..." />
               </label>
               <Button type="submit" disabled={inspection.isPending || !chainId.trim() || !tokenAddress.trim()} className="min-h-10 px-8 bg-[#0f766e] hover:bg-[#0d665f]">
                 {inspection.isPending ? <LoaderCircle className="animate-spin" /> : <Search />}
                 {inspection.isPending ? "Inspecting…" : "Inspect token"}
               </Button>
             </form>
+            {report && (
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/60 px-4 py-3">
+                <div>
+                  <div className="text-sm font-semibold text-amber-950">Safety is always explicit</div>
+                  <div className="mt-1 text-xs leading-5 text-amber-900/80">
+                    Request bounded GoPlus evidence for this inspected token. No safety request runs automatically.
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={checkTokenSafety}
+                  disabled={safety.isPending}
+                  className="min-h-10 border-amber-300 bg-white text-amber-900 hover:bg-amber-100"
+                >
+                  {safety.isPending ? <LoaderCircle className="animate-spin" /> : <Search />}
+                  {safety.isPending ? "Checking safety…" : "Check token safety"}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -570,6 +791,27 @@ function InspectionPage() {
               <div>
                 <div className="font-semibold">Inspection unavailable</div>
                 <div className="mt-1 text-sm text-rose-800">{errorMessage}</div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {safety.isPending && activeSafetyRequestKey === inputKey && (
+          <Card className="border-amber-200 bg-amber-50/70">
+            <CardContent className="flex items-center gap-3 py-5 text-sm text-amber-950">
+              <LoaderCircle className="h-5 w-5 animate-spin" />
+              Fetching bounded safety evidence and applying the P03 evaluator…
+            </CardContent>
+          </Card>
+        )}
+
+        {safety.isError && !safety.isPending && activeSafetyRequestKey === inputKey && (
+          <Card className="border-rose-200 bg-rose-50">
+            <CardContent className="flex items-start gap-3 py-5 text-rose-950">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+              <div>
+                <div className="font-semibold">Token safety unavailable</div>
+                <div className="mt-1 text-sm text-rose-800">{safetyErrorMessage}</div>
               </div>
             </CardContent>
           </Card>
@@ -614,6 +856,9 @@ function InspectionPage() {
                  <div className="text-amber-900/80">A recent receipt confirms when this response arrived, not when the source last observed the market. Rolling volume labels remain source windows, not exact UTC boundaries.</div>
                </CardContent>
              </Card>
+             {safetyResult && !safety.isPending && (
+               <SafetyAssessmentPanel result={safetyResult} />
+             )}
             {report.payload.pairs.length === 0 ? (
                <Card className="border-dashed border-slate-300 bg-white/60"><CardContent className="py-12 text-center text-sm text-slate-500"><div className="font-medium text-slate-700">No pairs returned</div><div className="mt-2">The source returned no pair-level temporal records for this token.</div></CardContent></Card>
             ) : (

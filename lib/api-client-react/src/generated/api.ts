@@ -24,7 +24,9 @@ import type {
   ErrorResponse,
   HealthStatus,
   InspectionWithTemporalEvidence,
-  TokenInspectionInput
+  TokenInspectionInput,
+  TokenSafetyAssessment,
+  TokenSafetyInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -275,3 +277,81 @@ export function useListCandidateTokens<TData = Awaited<ReturnType<typeof listCan
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export const getAssessTokenSafetyUrl = () => {
+
+
+
+
+  return `/api/token-safety`
+}
+
+/**
+ * Performs one explicit, read-only request to the bounded GoPlus Token Security API and composes the response through the existing P03 evaluator and eligibility contracts. This is non-authoritative evidence, not a safety guarantee, trading approval, or P08 acceptance.
+ * @summary Assess one token with bounded GoPlus safety evidence
+ */
+export const assessTokenSafety = async (tokenSafetyInput: TokenSafetyInput, options?: Parameters<typeof customFetch>[1]): Promise<TokenSafetyAssessment> => {
+
+  return customFetch<TokenSafetyAssessment>(getAssessTokenSafetyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(tokenSafetyInput)
+  }
+);}
+
+
+
+
+
+export const getAssessTokenSafetyMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assessTokenSafety>>, TError,{data: BodyType<TokenSafetyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof assessTokenSafety>>, TError,{data: BodyType<TokenSafetyInput>}, TContext> => {
+
+const mutationKey = ['assessTokenSafety'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assessTokenSafety>>, {data: BodyType<TokenSafetyInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  assessTokenSafety(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssessTokenSafetyMutationResult = NonNullable<Awaited<ReturnType<typeof assessTokenSafety>>>
+    export type AssessTokenSafetyMutationBody = BodyType<TokenSafetyInput>
+    export type AssessTokenSafetyMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Assess one token with bounded GoPlus safety evidence
+ */
+export const useAssessTokenSafety = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assessTokenSafety>>, TError,{data: BodyType<TokenSafetyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof assessTokenSafety>>,
+        TError,
+        {data: BodyType<TokenSafetyInput>},
+        TContext
+      > => {
+      return useMutation(getAssessTokenSafetyMutationOptions(options));
+    }

@@ -93,6 +93,57 @@ function makeReport(pairs, receivedAt = successReceivedAt) {
   };
 }
 
+function makeSafetyAssessment(tokenAddress = "0xsuccess") {
+  return {
+    assessment_version: "p03-safety-assessment-v1",
+    identity: { chain_id: "ethereum", token_address: tokenAddress },
+    source: {
+      source_id: "GoPlus",
+      endpoint: "https://api.gopluslabs.io/api/v1/token_security/1?contract_addresses=0xsuccess",
+      http_status: 200,
+      response_bytes: 512,
+      received_at: successReceivedAt,
+      source_observed_at: null,
+      source_freshness: "UNKNOWN",
+    },
+    evaluation: {
+      status: "UNKNOWN",
+      is_authoritative: false,
+      evaluator_id: "p03-t03-eligibility-derivation",
+      contract_version: "p03-t02-v1",
+      evaluation_timestamp: successReceivedAt,
+      input_evidence_digest: "a".repeat(64),
+      domain_results: { MINT_FREEZE_AUTHORITY: "UNKNOWN" },
+      evidence_references: [],
+      reason_codes: ["UNKNOWN_DOMAIN"],
+    },
+    evidence: [
+      {
+        domain: "MINT_FREEZE_AUTHORITY",
+        status: "UNKNOWN",
+        quality: "INCOMPLETE",
+        freshness_status: "INCOMPLETE",
+        observed_at: successReceivedAt,
+        source_id: "GoPlus",
+        method: "token-security-api",
+        evidence_reference: "GoPlus:ethereum:0xsuccess:is_mintable",
+        evidence_context: { provider_field: "is_mintable", provider_value: "0" },
+        reason_codes: ["SOURCE_OBSERVATION_TIME_UNAVAILABLE"],
+      },
+    ],
+    missing_evidence: [
+      {
+        domain: "MINT_FREEZE_AUTHORITY",
+        requirement: "A documented provider safety field with a source observation timestamp.",
+        reason: "The provider did not document a source observation timestamp.",
+      },
+    ],
+    limitations: [
+      "This is non-authoritative safety evidence evaluation, not a safety guarantee.",
+    ],
+  };
+}
+
 const successPair = {
   pairAddress: "0xpair",
   chainId: "ethereum",
@@ -390,9 +441,12 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   const { page } = browser;
   const requests = [];
   const candidateRequests = [];
+  const safetyRequests = [];
   const pausedRequests = [];
+  const pausedSafetyRequests = [];
   const queuedResponses = [];
   const requestWaiters = [];
+  const safetyRequestWaiters = [];
 
   page.on("Fetch.requestPaused", async (request) => {
     if (request.request.url.endsWith("/api/candidate-listings")) {
@@ -431,6 +485,12 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
       });
       return;
     }
+    if (request.request.url.endsWith("/api/token-safety")) {
+      safetyRequests.push(request);
+      for (const resolve of safetyRequestWaiters.splice(0)) resolve(request);
+      pausedSafetyRequests.push(request);
+      return;
+    }
     if (!request.request.url.endsWith("/api/inspections")) {
       await page.send("Fetch.continueRequest", { requestId: request.requestId });
       return;
@@ -456,6 +516,7 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   await new Promise((resolve) => setTimeout(resolve, 300));
   assert.equal(requests.length, 0, "the app must not inspect automatically on page load");
   assert.equal(candidateRequests.length, 0, "the app must not load candidates automatically on page load");
+  assert.equal(safetyRequests.length, 0, "the app must not check safety automatically on page load");
 
   const bodyText = () => evaluate(page, "document.body.innerText");
   await evaluate(
@@ -556,6 +617,43 @@ test("the rendered inspection flow uses one mocked request and rejects stale UI 
   assert.match(successText, /Receipt age at evaluation/i);
   assert.match(successText, /12 seconds/);
   assert.match(successText, /Evaluation timestamp/);
+
+  await evaluate(
+    page,
+    `Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Check token safety")).click()`,
+  );
+  const nextSafetyRequest = (expectedCount) =>
+    safetyRequests.length >= expectedCount
+      ? Promise.resolve(safetyRequests[expectedCount - 1])
+      : new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error("Timed out waiting for safety request")), 5000);
+          safetyRequestWaiters.push((request) => {
+            clearTimeout(timer);
+            resolve(request);
+          });
+        });
+  const firstSafetyRequest = await nextSafetyRequest(1);
+  assert.deepEqual(JSON.parse(firstSafetyRequest.request.postData), {
+    chainId: "ethereum",
+    tokenAddress: "0xsuccess",
+  });
+  await fulfill(page, firstSafetyRequest, 200, makeSafetyAssessment());
+  await waitFor(async () => (await bodyText()).toLowerCase().includes("token safety assessment"));
+  assert.match(await bodyText(), /Source-backed findings/);
+  assert.match(await bodyText(), /Unknown: evidence is incomplete/);
+  assert.match(await bodyText(), /not a safety guarantee/i);
+
+  await evaluate(
+    page,
+    `Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Check token safety")).click()`,
+  );
+  const staleSafetyRequest = await nextSafetyRequest(2);
+  await setToken("0xchanged-before-safety-result");
+  await fulfill(page, staleSafetyRequest, 200, makeSafetyAssessment());
+  assert.ok(
+    !(await bodyText()).toLowerCase().includes("token safety assessment"),
+    "a safety response for the previous token must not render",
+  );
 
   await setToken("0xstale");
   await submit();

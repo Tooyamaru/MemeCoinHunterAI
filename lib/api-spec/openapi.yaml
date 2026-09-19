@@ -14,6 +14,8 @@ tags:
     description: Read-only market inspection operations
   - name: candidate-discovery
     description: Bounded provider candidate listings without canonical admission
+  - name: token-safety
+    description: Explicit bounded token-safety evidence assessment
 paths:
   /healthz:
     get:
@@ -90,6 +92,59 @@ paths:
                 $ref: "#/components/schemas/CandidateListingResponse"
         "429":
           description: Candidate listing concurrency limit reached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Provider or response validation failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "504":
+          description: Provider request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /token-safety:
+    post:
+      operationId: assessTokenSafety
+      tags: [token-safety]
+      summary: Assess one token with bounded GoPlus safety evidence
+      description: >
+        Performs one explicit, read-only request to the bounded GoPlus Token
+        Security API and composes the response through the existing P03
+        evaluator and eligibility contracts. This is non-authoritative evidence,
+        not a safety guarantee, trading approval, or P08 acceptance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenSafetyInput"
+      responses:
+        "200":
+          description: Non-authoritative safety evidence assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenSafetyAssessment"
+        "400":
+          description: Invalid chain or token input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Chain is outside the bounded integration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Safety assessment concurrency limit reached
           content:
             application/json:
               schema:
@@ -671,4 +726,169 @@ components:
         evaluation_time:
           type: string
       required: [report, temporal_evidence, evaluation_time]
+    TokenSafetyInput:
+      type: object
+      additionalProperties: false
+      properties:
+        chainId:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^[A-Za-z0-9._~-]+$"
+        tokenAddress:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: "^[A-Za-z0-9._~-]+$"
+      required: [chainId, tokenAddress]
+    SafetyAssessmentIdentity:
+      type: object
+      additionalProperties: false
+      properties:
+        chain_id:
+          type: string
+        token_address:
+          type: string
+      required: [chain_id, token_address]
+    SafetyAssessmentSource:
+      type: object
+      additionalProperties: false
+      properties:
+        source_id:
+          type: string
+          enum: [GoPlus]
+        endpoint:
+          type: string
+          format: uri
+        http_status:
+          type: integer
+          minimum: 200
+          maximum: 599
+        response_bytes:
+          type: integer
+          minimum: 0
+          maximum: 1048576
+        received_at:
+          type: string
+          format: date-time
+        source_observed_at:
+          type: "null"
+        source_freshness:
+          type: string
+          enum: [UNKNOWN]
+      required:
+        [source_id, endpoint, http_status, response_bytes, received_at, source_observed_at, source_freshness]
+    SafetyEvidenceItem:
+      type: object
+      additionalProperties: false
+      properties:
+        domain:
+          type: string
+          enum:
+            [MINT_FREEZE_AUTHORITY, LP_STATUS_CONCENTRATION, LIQUIDITY_QUALITY, METADATA_MUTABILITY, TOP_HOLDER_CONCENTRATION, FUNDING_WALLET_RELATIONSHIPS, PROXY_CONTROL_PATTERNS, SUSPICIOUS_MUTABLE_BEHAVIOR, TRADABILITY_SELLABILITY, STALE_UNAVAILABLE_EVIDENCE]
+        status:
+          type: string
+          enum: [PASS, FAIL, UNKNOWN]
+        quality:
+          type: string
+          enum: [VALID, INVALID, INCOMPLETE, UNKNOWN]
+        freshness_status:
+          type: string
+          enum: [VALID, INVALID, INCOMPLETE, UNKNOWN]
+        observed_at:
+          type: string
+          format: date-time
+        source_id:
+          type: string
+        method:
+          type: string
+        evidence_reference:
+          type: string
+        evidence_context:
+          type: object
+          additionalProperties: true
+        reason_codes:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+      required:
+        [domain, status, quality, freshness_status, observed_at, source_id, method, evidence_reference, evidence_context, reason_codes]
+    SafetyMissingEvidence:
+      type: object
+      additionalProperties: false
+      properties:
+        domain:
+          type: string
+        requirement:
+          type: string
+        reason:
+          type: string
+      required: [domain, requirement, reason]
+    SafetyEvaluation:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [ELIGIBLE, INELIGIBLE, UNKNOWN]
+        is_authoritative:
+          type: boolean
+          enum: [false]
+        evaluator_id:
+          type: string
+        contract_version:
+          type: string
+        evaluation_timestamp:
+          type: string
+          format: date-time
+        input_evidence_digest:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+        domain_results:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [PASS, FAIL, UNKNOWN]
+        evidence_references:
+          type: array
+          maxItems: 32
+          items:
+            type: string
+        reason_codes:
+          type: array
+          maxItems: 128
+          items:
+            type: string
+      required:
+        [status, is_authoritative, evaluator_id, contract_version, evaluation_timestamp, input_evidence_digest, domain_results, evidence_references, reason_codes]
+    TokenSafetyAssessment:
+      type: object
+      additionalProperties: false
+      properties:
+        assessment_version:
+          type: string
+        identity:
+          $ref: "#/components/schemas/SafetyAssessmentIdentity"
+        source:
+          $ref: "#/components/schemas/SafetyAssessmentSource"
+        evaluation:
+          $ref: "#/components/schemas/SafetyEvaluation"
+        evidence:
+          type: array
+          maxItems: 32
+          items:
+            $ref: "#/components/schemas/SafetyEvidenceItem"
+        missing_evidence:
+          type: array
+          maxItems: 32
+          items:
+            $ref: "#/components/schemas/SafetyMissingEvidence"
+        limitations:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+      required:
+        [assessment_version, identity, source, evaluation, evidence, missing_evidence, limitations]
 
