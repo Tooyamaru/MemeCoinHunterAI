@@ -56,7 +56,6 @@ EVM_FIELD_DOMAINS: tuple[tuple[SafetyDomain, str], ...] = (
     (SafetyDomain.SUSPICIOUS_MUTABLE_BEHAVIOR, "is_open_source"),
     (SafetyDomain.PROXY_CONTROL_PATTERNS, "is_proxy"),
     (SafetyDomain.MINT_FREEZE_AUTHORITY, "is_mintable"),
-    (SafetyDomain.MINT_FREEZE_AUTHORITY, "is_freezable"),
     (SafetyDomain.TRADABILITY_SELLABILITY, "is_honeypot"),
     (SafetyDomain.TRADABILITY_SELLABILITY, "cannot_sell_all"),
     (SafetyDomain.TRADABILITY_SELLABILITY, "is_blacklisted"),
@@ -455,6 +454,7 @@ def compose_safety_assessment(
     limitations = [
         "This is non-authoritative safety evidence evaluation, not a safety guarantee.",
         "The GoPlus response does not document a source observation timestamp; receipt or assessment time is not substituted for source time.",
+        "The documented response does not expose a mapped freeze-authority field; freeze-related evidence remains incomplete.",
         "Unknown or unavailable evidence remains non-positive and can never become favorable assessment evidence.",
         "This result does not approve trading, authorize capital, or establish P08 acceptance.",
         "The first integration supports only the bounded EVM chain set exposed by this adapter.",

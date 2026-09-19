@@ -104,6 +104,26 @@ def test_incomplete_response_preserves_unknown_evidence():
     )
 
 
+def test_undocumented_fields_are_not_promoted_to_safety_evidence():
+    result = compose_safety_assessment(
+        chain_id="ethereum",
+        token_address="0xabc",
+        provider=_provider(
+            _payload({"is_mintable": "0", "is_freezable": "1"})
+        ),
+        assessment_time=ASSESSMENT_TIME,
+    )
+
+    provider_fields = {
+        item["evidence_context"].get("provider_field")
+        for item in result["evidence"]
+    }
+    assert "is_freezable" not in provider_fields
+    assert any(
+        "freeze-authority field" in limitation for limitation in result["limitations"]
+    )
+
+
 def test_malformed_and_contradictory_identity_responses_fail_closed():
     with pytest.raises(GoPlusSafetyError, match="invalid token-security result"):
         compose_safety_assessment(

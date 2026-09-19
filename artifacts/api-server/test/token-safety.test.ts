@@ -219,6 +219,31 @@ test("unsupported chain is surfaced as a bounded integration limitation", async 
   }
 });
 
+test("provider authentication failure is explicit and never exposed as a credential request to the client", async () => {
+  const { server, url } = await startTestServer(async () => {
+    throw providerFailure("PROVIDER_AUTH_REQUIRED", "authorization required");
+  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        chainId: "ethereum",
+        tokenAddress: "0xabc",
+      }),
+    });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), {
+      error: "The token safety provider requires server-side authentication.",
+      code: "SAFETY_PROVIDER_AUTH_REQUIRED",
+      detail:
+        "Configure the GOPLUS_ACCESS_TOKEN secret for the API server; never send provider credentials from the browser.",
+    });
+  } finally {
+    await closeTestServer(server);
+  }
+});
+
 test("invalid input is rejected before the safety runner is invoked", async () => {
   let calls = 0;
   const { server, url } = await startTestServer(async () => {

@@ -199,12 +199,18 @@ The token-safety integration checkpoint is verified on 2026-09-19 on branch
 “Check token safety” action only after a successful inspection. The bounded
 server-side GoPlus adapter supports the configured EVM chain set, validates and
 binds the exact chain/token identity, applies response-size and timeout limits,
-and composes returned fields through the existing P03 evaluation and eligibility
-contracts. Risk flags fail closed; favorable, missing, unsupported, or
-undocumented evidence remains `UNKNOWN`/unavailable rather than becoming
-positive evidence. Stale UI responses are rejected after input identity changes.
-Verification uses mocked provider responses; no live GoPlus request, wallet,
-trading, ranking, analytics, commit, push, or merge was performed.
+and composes documented returned fields through the existing P03 evaluation and
+eligibility contracts. The generated API clients and validators are synchronized
+with the OpenAPI contract. Risk flags fail closed; favorable, missing,
+unsupported, and undocumented evidence remains `UNKNOWN`/unavailable rather
+than becoming positive evidence. Undocumented `is_freezable` is ignored, and
+the UI states that freeze-authority evidence remains incomplete. Stale UI
+responses are rejected after input identity changes. Focused verification
+passes 57 Python safety/contract tests, 38 API tests, and the Chromium-backed
+mocked frontend interaction test, plus API/frontend typechecks and builds with
+the required workflow environment. Verification uses mocked provider responses;
+no live GoPlus request, wallet, trading, ranking, analytics, commit, push, or
+merge was performed.
 
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
