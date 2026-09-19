@@ -222,10 +222,16 @@ whose token is not represented on either side, preserves receipt versus source
 observation timestamps, and reports explicit missing P04/P05 canonical-input
 blockers. Its bounded safety diagnostic bridge invokes the existing Python
 P03 evaluation and eligibility functions; the qualifying fixture path reaches
-those evaluators in focused tests. The live API remains intentionally blocked
-as an admission diagnostic because its request contract does not carry the
-canonical P04 signal and feature snapshots required by P05. The generated API
-clients are synchronized with OpenAPI. Verification passes 43 API tests, the
+those evaluators in focused tests and in the built API verification. The
+default bridge was exercised through the running `POST
+/api/opportunity-evaluations` endpoint with a generated-schema-valid offline
+fixture, using the repository root as the Python working directory. It
+returned HTTP 200 with a structured `BLOCKED` admission diagnostic,
+`P03_ELIGIBILITY_UNKNOWN`, unavailable P04/P05 blockers, and zero provider
+requests. The live API remains intentionally blocked as an admission
+diagnostic because its request contract does not carry the canonical P04
+signal and feature snapshots required by P05. The generated API clients are
+synchronized with OpenAPI. Verification passes 43 API tests, the
 Chromium-backed mocked frontend interaction test, API/frontend typechecks and
 builds with the required workflow environment, and 130 focused Python safety
 and opportunity tests. The frontend build retains only the existing
