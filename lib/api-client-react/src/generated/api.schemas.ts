@@ -502,6 +502,32 @@ export interface SafetyAssessmentSource {
   source_freshness: SafetyAssessmentSourceSourceFreshness;
 }
 
+export type SafetyEvaluationStatus = typeof SafetyEvaluationStatus[keyof typeof SafetyEvaluationStatus];
+
+
+export const SafetyEvaluationStatus = {
+  ELIGIBLE: 'ELIGIBLE',
+  INELIGIBLE: 'INELIGIBLE',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type SafetyEvaluationDomainResults = {[key: string]: 'PASS' | 'FAIL' | 'UNKNOWN'};
+
+export interface SafetyEvaluation {
+  status: SafetyEvaluationStatus;
+  is_authoritative: false;
+  evaluator_id: string;
+  contract_version: string;
+  evaluation_timestamp: string;
+  /** @pattern ^[0-9a-f]{64}$ */
+  input_evidence_digest: string;
+  domain_results: SafetyEvaluationDomainResults;
+  /** @maxItems 32 */
+  evidence_references: string[];
+  /** @maxItems 128 */
+  reason_codes: string[];
+}
+
 export type SafetyEvidenceItemDomain = typeof SafetyEvidenceItemDomain[keyof typeof SafetyEvidenceItemDomain];
 
 
@@ -569,32 +595,6 @@ export interface SafetyMissingEvidence {
   reason: string;
 }
 
-export type SafetyEvaluationStatus = typeof SafetyEvaluationStatus[keyof typeof SafetyEvaluationStatus];
-
-
-export const SafetyEvaluationStatus = {
-  ELIGIBLE: 'ELIGIBLE',
-  INELIGIBLE: 'INELIGIBLE',
-  UNKNOWN: 'UNKNOWN',
-} as const;
-
-export type SafetyEvaluationDomainResults = {[key: string]: 'PASS' | 'FAIL' | 'UNKNOWN'};
-
-export interface SafetyEvaluation {
-  status: SafetyEvaluationStatus;
-  is_authoritative: false;
-  evaluator_id: string;
-  contract_version: string;
-  evaluation_timestamp: string;
-  /** @pattern ^[0-9a-f]{64}$ */
-  input_evidence_digest: string;
-  domain_results: SafetyEvaluationDomainResults;
-  /** @maxItems 32 */
-  evidence_references: string[];
-  /** @maxItems 128 */
-  reason_codes: string[];
-}
-
 export interface TokenSafetyAssessment {
   assessment_version: string;
   identity: SafetyAssessmentIdentity;
@@ -606,4 +606,128 @@ export interface TokenSafetyAssessment {
   missing_evidence: SafetyMissingEvidence[];
   /** @maxItems 12 */
   limitations: string[];
+}
+
+export interface OpportunityEvaluationInput {
+  /**
+     * @minLength 1
+     * @maxLength 64
+     * @pattern ^[A-Za-z0-9._~-]+$
+     */
+  chainId: string;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     * @pattern ^[A-Za-z0-9._~-]+$
+     */
+  tokenAddress: string;
+  /**
+     * @minimum 0
+     * @maximum 127
+     */
+  pairIndex: number;
+  inspection: InspectionWithTemporalEvidence;
+  safety: TokenSafetyAssessment;
+}
+
+export interface OpportunityEvaluationIdentity {
+  chain_id: string;
+  token_identity: string;
+  pair_address: string;
+  pair_index: number;
+  market_subject_id: string;
+}
+
+export interface OpportunityEvaluationBlocker {
+  code: string;
+  detail: string;
+}
+
+export type OpportunityEvaluationSafetyClaimedStatus = typeof OpportunityEvaluationSafetyClaimedStatus[keyof typeof OpportunityEvaluationSafetyClaimedStatus];
+
+
+export const OpportunityEvaluationSafetyClaimedStatus = {
+  ELIGIBLE: 'ELIGIBLE',
+  INELIGIBLE: 'INELIGIBLE',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type OpportunityEvaluationSafetyRecomputedStatus = typeof OpportunityEvaluationSafetyRecomputedStatus[keyof typeof OpportunityEvaluationSafetyRecomputedStatus];
+
+
+export const OpportunityEvaluationSafetyRecomputedStatus = {
+  ELIGIBLE: 'ELIGIBLE',
+  INELIGIBLE: 'INELIGIBLE',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export interface OpportunityEvaluationSafety {
+  claimed_status: OpportunityEvaluationSafetyClaimedStatus;
+  recomputed_status: OpportunityEvaluationSafetyRecomputedStatus;
+  evidence_references: string[];
+  /** @nullable */
+  source_observed_at: null;
+}
+
+export type OpportunityEvaluationStatus = typeof OpportunityEvaluationStatus[keyof typeof OpportunityEvaluationStatus];
+
+
+export const OpportunityEvaluationStatus = {
+  QUALIFIED: 'QUALIFIED',
+  BLOCKED: 'BLOCKED',
+} as const;
+
+export type OpportunityEvaluationP04Status = typeof OpportunityEvaluationP04Status[keyof typeof OpportunityEvaluationP04Status];
+
+
+export const OpportunityEvaluationP04Status = {
+  AVAILABLE: 'AVAILABLE',
+  UNAVAILABLE: 'UNAVAILABLE',
+} as const;
+
+export type OpportunityEvaluationP05Status = typeof OpportunityEvaluationP05Status[keyof typeof OpportunityEvaluationP05Status];
+
+
+export const OpportunityEvaluationP05Status = {
+  QUALIFIED: 'QUALIFIED',
+  BLOCKED: 'BLOCKED',
+} as const;
+
+export type OpportunityEvaluationProviderRequests = typeof OpportunityEvaluationProviderRequests[keyof typeof OpportunityEvaluationProviderRequests];
+
+
+export const OpportunityEvaluationProviderRequests = {
+  NUMBER_0: 0,
+} as const;
+
+export type OpportunityEvaluationCanonicalDiscovery = typeof OpportunityEvaluationCanonicalDiscovery[keyof typeof OpportunityEvaluationCanonicalDiscovery];
+
+
+export const OpportunityEvaluationCanonicalDiscovery = {
+  NOT_ADMITTED: 'NOT_ADMITTED',
+} as const;
+
+export type OpportunityEvaluationP08Acceptance = typeof OpportunityEvaluationP08Acceptance[keyof typeof OpportunityEvaluationP08Acceptance];
+
+
+export const OpportunityEvaluationP08Acceptance = {
+  NOT_ATTEMPTED: 'NOT_ATTEMPTED',
+} as const;
+
+export interface OpportunityEvaluation {
+  evaluation_version: string;
+  status: OpportunityEvaluationStatus;
+  identity: OpportunityEvaluationIdentity;
+  safety: OpportunityEvaluationSafety;
+  /** @maxItems 16 */
+  blockers: OpportunityEvaluationBlocker[];
+  p04_status: OpportunityEvaluationP04Status;
+  p05_status: OpportunityEvaluationP05Status;
+  provider_requests: OpportunityEvaluationProviderRequests;
+  canonical_discovery: OpportunityEvaluationCanonicalDiscovery;
+  p08_acceptance: OpportunityEvaluationP08Acceptance;
+  inspection_received_at: string;
+  safety_received_at: string;
+  /** @nullable */
+  source_observed_at: null;
 }

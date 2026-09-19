@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   listCandidateTokens,
   useAssessTokenSafety,
+  useEvaluateOpportunity,
   useInspectToken,
 } from "@workspace/api-client-react";
 import type {
@@ -10,6 +11,7 @@ import type {
   CandidateListingResponse,
   InspectionPair,
   InspectionWithTemporalEvidence,
+  OpportunityEvaluation,
   SafetyEvidenceItem,
   TokenSafetyAssessment,
   TemporalEvidenceRecord,
@@ -240,6 +242,57 @@ function SafetyAssessmentPanel({ result }: { result: TokenSafetyAssessment }) {
   );
 }
 
+function OpportunityEvaluationPanel({ result }: { result: OpportunityEvaluation }) {
+  return (
+    <Card className="border-indigo-200 bg-indigo-50/60">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg text-indigo-950">
+          Opportunity evaluation: {result.status === "BLOCKED" ? "Blocked" : "Qualified"}
+        </CardTitle>
+        <CardDescription className="text-indigo-900/75">
+          Pair {result.identity.pair_index + 1} · {result.identity.pair_address} · no provider request was made.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 pt-0 text-sm text-indigo-950">
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="rounded-lg border border-indigo-200 bg-white/70 px-3 py-2">
+            <div className="text-xs text-indigo-700">Safety eligibility used</div>
+            <div className="mt-1 font-semibold">{result.safety.recomputed_status}</div>
+            <div className="mt-1 text-xs text-indigo-800/70">
+              Client claim: {result.safety.claimed_status}
+            </div>
+          </div>
+          <div className="rounded-lg border border-indigo-200 bg-white/70 px-3 py-2">
+            <div className="text-xs text-indigo-700">P04 / P05 readiness</div>
+            <div className="mt-1 font-semibold">
+              {result.p04_status} / {result.p05_status}
+            </div>
+            <div className="mt-1 text-xs text-indigo-800/70">
+              Canonical discovery: {result.canonical_discovery} · P08: {result.p08_acceptance}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-800">
+            Why this is blocked
+          </div>
+          <ul className="mt-2 space-y-2">
+            {result.blockers.map((blocker) => (
+              <li key={blocker.code} className="rounded-lg border border-indigo-200 bg-white/60 px-3 py-2">
+                <span className="font-semibold">{blocker.code}</span>
+                <span className="ml-2 text-indigo-900/75">{blocker.detail}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="text-xs leading-5 text-indigo-900/75">
+          This action does not rank pairs, create an opportunity score, admit the token, or authorize trading.
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function CurrentLiquidity({ values }: { values: InspectionPair["liquidity"] }) {
   return (
     <div className="space-y-2">
@@ -323,10 +376,16 @@ function PairCard({
   pair,
   index,
   temporalRecord,
+  onEvaluate,
+  canEvaluate,
+  isEvaluating,
 }: {
   pair: InspectionPair;
   index: number;
   temporalRecord: TemporalEvidenceRecord | undefined;
+  onEvaluate: (index: number) => void;
+  canEvaluate: boolean;
+  isEvaluating: boolean;
 }) {
   const base = pair.baseToken?.symbol || pair.baseToken?.name || "Unknown base";
   const quote = pair.quoteToken?.symbol || pair.quoteToken?.name || "Unknown quote";
@@ -354,6 +413,16 @@ function PairCard({
               {findingCount} finding{findingCount === 1 ? "" : "s"}
             </span>
           )}
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canEvaluate || isEvaluating}
+            onClick={() => onEvaluate(index)}
+            className="border-indigo-300 bg-white text-indigo-900 hover:bg-indigo-50"
+          >
+            {isEvaluating ? <LoaderCircle className="animate-spin" /> : null}
+            {isEvaluating ? "Evaluating…" : "Evaluate this pair"}
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-6 bg-white pt-5">
@@ -587,15 +656,19 @@ function InspectionPage() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [result, setResult] = useState<InspectionWithTemporalEvidence | null>(null);
   const [safetyResult, setSafetyResult] = useState<TokenSafetyAssessment | null>(null);
+  const [opportunityResult, setOpportunityResult] = useState<OpportunityEvaluation | null>(null);
   const [activeRequestKey, setActiveRequestKey] = useState<string | null>(null);
   const [activeSafetyRequestKey, setActiveSafetyRequestKey] = useState<string | null>(null);
+  const [activeEvaluationKey, setActiveEvaluationKey] = useState<string | null>(null);
   const inputKeyRef = useRef("");
   const requestSequenceRef = useRef(0);
   const safetyRequestSequenceRef = useRef(0);
+  const evaluationRequestSequenceRef = useRef(0);
   const inputKey = `${chainId.trim()}\u0000${tokenAddress.trim()}`;
   inputKeyRef.current = inputKey;
   const inspection = useInspectToken();
   const safety = useAssessTokenSafety();
+  const opportunity = useEvaluateOpportunity();
   const candidateListing = useMutation({
     mutationFn: () => listCandidateTokens(),
   });
@@ -603,21 +676,27 @@ function InspectionPage() {
   function updateChainId(value: string) {
     requestSequenceRef.current += 1;
     safetyRequestSequenceRef.current += 1;
+    evaluationRequestSequenceRef.current += 1;
     setChainId(value);
     setResult(null);
     setSafetyResult(null);
+    setOpportunityResult(null);
     setActiveRequestKey(null);
     setActiveSafetyRequestKey(null);
+    setActiveEvaluationKey(null);
   }
 
   function updateTokenAddress(value: string) {
     requestSequenceRef.current += 1;
     safetyRequestSequenceRef.current += 1;
+    evaluationRequestSequenceRef.current += 1;
     setTokenAddress(value);
     setResult(null);
     setSafetyResult(null);
+    setOpportunityResult(null);
     setActiveRequestKey(null);
     setActiveSafetyRequestKey(null);
+    setActiveEvaluationKey(null);
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -628,10 +707,13 @@ function InspectionPage() {
     const requestKey = `${nextChainId}\u0000${nextTokenAddress}`;
     const requestSequence = ++requestSequenceRef.current;
     safetyRequestSequenceRef.current += 1;
+    evaluationRequestSequenceRef.current += 1;
     setResult(null);
     setSafetyResult(null);
+    setOpportunityResult(null);
     setActiveRequestKey(requestKey);
     setActiveSafetyRequestKey(null);
+    setActiveEvaluationKey(null);
     inspection.mutate(
       { data: { chainId: nextChainId, tokenAddress: nextTokenAddress } },
       {
@@ -653,8 +735,11 @@ function InspectionPage() {
     const nextTokenAddress = tokenAddress.trim();
     const requestKey = `${nextChainId}\u0000${nextTokenAddress}`;
     const requestSequence = ++safetyRequestSequenceRef.current;
+    evaluationRequestSequenceRef.current += 1;
     setSafetyResult(null);
+    setOpportunityResult(null);
     setActiveSafetyRequestKey(requestKey);
+    setActiveEvaluationKey(null);
     safety.mutate(
       { data: { chainId: nextChainId, tokenAddress: nextTokenAddress } },
       {
@@ -672,16 +757,53 @@ function InspectionPage() {
     );
   }
 
+  function evaluatePair(pairIndex: number) {
+    if (!report || !safetyResult || opportunity.isPending) return;
+    const nextChainId = chainId.trim();
+    const nextTokenAddress = tokenAddress.trim();
+    const requestKey = `${nextChainId}\u0000${nextTokenAddress}\u0000${pairIndex}`;
+    const requestSequence = ++evaluationRequestSequenceRef.current;
+    setOpportunityResult(null);
+    setActiveEvaluationKey(requestKey);
+    opportunity.mutate(
+      {
+        data: {
+          chainId: nextChainId,
+          tokenAddress: nextTokenAddress,
+          pairIndex,
+          inspection: result,
+          safety: safetyResult,
+        },
+      },
+      {
+        onSuccess: (nextResult) => {
+          if (
+            evaluationRequestSequenceRef.current === requestSequence &&
+            inputKeyRef.current === `${nextChainId}\u0000${nextTokenAddress}` &&
+            nextResult.identity.pair_index === pairIndex &&
+            nextResult.identity.chain_id === nextChainId &&
+            nextResult.identity.token_identity === nextTokenAddress
+          ) {
+            setOpportunityResult(nextResult);
+          }
+        },
+      },
+    );
+  }
+
   function selectCandidate(candidate: CandidateListingEntry) {
     if (!candidate.chainId || !candidate.tokenAddress) return;
     requestSequenceRef.current += 1;
     safetyRequestSequenceRef.current += 1;
+    evaluationRequestSequenceRef.current += 1;
     setChainId(candidate.chainId);
     setTokenAddress(candidate.tokenAddress);
     setResult(null);
     setSafetyResult(null);
+    setOpportunityResult(null);
     setActiveRequestKey(null);
     setActiveSafetyRequestKey(null);
+    setActiveEvaluationKey(null);
   }
 
   const errorMessage =
@@ -692,6 +814,10 @@ function InspectionPage() {
     safety.error instanceof Error
       ? safety.error.message
       : "The token safety assessment could not be completed. Check the provider and try again.";
+  const opportunityErrorMessage =
+    opportunity.error instanceof Error
+      ? opportunity.error.message
+      : "The selected pair could not be evaluated. The reports may no longer match.";
   const report = result?.report;
   const temporalEvidence = result?.temporal_evidence;
 
@@ -859,10 +985,34 @@ function InspectionPage() {
              {safetyResult && !safety.isPending && (
                <SafetyAssessmentPanel result={safetyResult} />
              )}
+             {opportunity.isError && !opportunity.isPending && (
+               <Card className="border-rose-200 bg-rose-50">
+                 <CardContent className="py-4 text-sm text-rose-900">
+                   <div className="font-semibold">Opportunity evaluation unavailable</div>
+                   <div className="mt-1">{opportunityErrorMessage}</div>
+                 </CardContent>
+               </Card>
+             )}
+             {opportunityResult && !opportunity.isPending && (
+               <OpportunityEvaluationPanel result={opportunityResult} />
+             )}
             {report.payload.pairs.length === 0 ? (
                <Card className="border-dashed border-slate-300 bg-white/60"><CardContent className="py-12 text-center text-sm text-slate-500"><div className="font-medium text-slate-700">No pairs returned</div><div className="mt-2">The source returned no pair-level temporal records for this token.</div></CardContent></Card>
             ) : (
-               report.payload.pairs.map((pair: InspectionPair, index: number) => <PairCard key={`${pair.pairAddress ?? "pair"}-${index}`} pair={pair} index={index} temporalRecord={temporalEvidence?.records[index]} />)
+               report.payload.pairs.map((pair: InspectionPair, index: number) => (
+                 <PairCard
+                   key={`${pair.pairAddress ?? "pair"}-${index}`}
+                   pair={pair}
+                   index={index}
+                   temporalRecord={temporalEvidence?.records[index]}
+                   onEvaluate={evaluatePair}
+                   canEvaluate={Boolean(safetyResult) && !safety.isPending}
+                   isEvaluating={
+                     opportunity.isPending &&
+                     activeEvaluationKey === `${inputKey}\u0000${index}`
+                   }
+                 />
+               ))
             )}
             <details className="rounded-xl border border-slate-200 bg-white">
               <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-slate-700">Report provenance</summary>

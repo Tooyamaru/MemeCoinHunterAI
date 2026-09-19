@@ -375,3 +375,304 @@ export const AssessTokenSafetyResponse = zod.object({
 })).max(assessTokenSafetyResponseMissingEvidenceMax),
   "limitations": zod.array(zod.string()).max(assessTokenSafetyResponseLimitationsMax)
 })
+
+
+/**
+ * Validates and composes one inspection report and one token-safety assessment already held by the client. This action makes no provider request. It never ranks pairs or treats receipt time as source observation time. The current live report contract returns an explicit blocked result when canonical P04 signal/feature snapshots are absent.
+ * @summary Evaluate one explicitly selected pair from already-held reports
+ */
+export const evaluateOpportunityBodyChainIdMax = 64;
+
+
+export const evaluateOpportunityBodyChainIdRegExp = new RegExp('^[A-Za-z0-9._~-]+$');
+export const evaluateOpportunityBodyTokenAddressMax = 128;
+
+
+export const evaluateOpportunityBodyTokenAddressRegExp = new RegExp('^[A-Za-z0-9._~-]+$');
+export const evaluateOpportunityBodyPairIndexMin = 0;
+export const evaluateOpportunityBodyPairIndexMax = 127;
+
+export const evaluateOpportunityBodyInspectionReportRequestAttemptsMax = 2;
+
+export const evaluateOpportunityBodyInspectionReportRequestRetryCountMin = 0;
+export const evaluateOpportunityBodyInspectionReportRequestRetryCountMax = 1;
+
+export const evaluateOpportunityBodyInspectionReportRequestAttemptLogItemAttemptMax = 2;
+
+export const evaluateOpportunityBodyInspectionReportRequestAttemptLogItemStatusCodeMin = 100;
+export const evaluateOpportunityBodyInspectionReportRequestAttemptLogItemStatusCodeMax = 599;
+
+export const evaluateOpportunityBodyInspectionReportRequestAttemptLogItemResponseBytesMin = 0;
+export const evaluateOpportunityBodyInspectionReportRequestAttemptLogItemResponseBytesMax = 1048576;
+
+export const evaluateOpportunityBodyInspectionReportReceiptHttpStatusMin = 100;
+export const evaluateOpportunityBodyInspectionReportReceiptHttpStatusMax = 599;
+
+export const evaluateOpportunityBodyInspectionReportReceiptResponseBytesMin = 0;
+export const evaluateOpportunityBodyInspectionReportReceiptResponseBytesMax = 1048576;
+
+export const evaluateOpportunityBodyInspectionReportPayloadPairCountMin = 0;
+export const evaluateOpportunityBodyInspectionReportPayloadPairCountMax = 128;
+
+export const evaluateOpportunityBodyInspectionTemporalEvidenceRawPayloadDigestRegExp = new RegExp('^[0-9a-f]{64}$');
+export const evaluateOpportunityBodyInspectionTemporalEvidenceRecordsItemOccurrenceIdRegExp = new RegExp('^[0-9a-f]{64}$');
+export const evaluateOpportunityBodyInspectionTemporalEvidenceRecordsItemRawPayloadDigestRegExp = new RegExp('^[0-9a-f]{64}$');
+export const evaluateOpportunityBodyInspectionTemporalEvidenceRecordsMax = 128;
+
+export const evaluateOpportunityBodySafetySourceHttpStatusMin = 200;
+export const evaluateOpportunityBodySafetySourceHttpStatusMax = 599;
+
+export const evaluateOpportunityBodySafetySourceResponseBytesMin = 0;
+export const evaluateOpportunityBodySafetySourceResponseBytesMax = 1048576;
+
+export const evaluateOpportunityBodySafetyEvaluationInputEvidenceDigestRegExp = new RegExp('^[0-9a-f]{64}$');
+export const evaluateOpportunityBodySafetyEvaluationEvidenceReferencesMax = 32;
+
+export const evaluateOpportunityBodySafetyEvaluationReasonCodesMax = 128;
+
+export const evaluateOpportunityBodySafetyEvidenceItemReasonCodesMax = 12;
+
+export const evaluateOpportunityBodySafetyEvidenceMax = 32;
+
+export const evaluateOpportunityBodySafetyMissingEvidenceMax = 32;
+
+export const evaluateOpportunityBodySafetyLimitationsMax = 12;
+
+
+
+export const EvaluateOpportunityBody = zod.object({
+  "chainId": zod.string().min(1).max(evaluateOpportunityBodyChainIdMax).regex(evaluateOpportunityBodyChainIdRegExp),
+  "tokenAddress": zod.string().min(1).max(evaluateOpportunityBodyTokenAddressMax).regex(evaluateOpportunityBodyTokenAddressRegExp),
+  "pairIndex": zod.number().int().min(evaluateOpportunityBodyPairIndexMin).max(evaluateOpportunityBodyPairIndexMax),
+  "inspection": zod.object({
+  "report": zod.object({
+  "tool_version": zod.string(),
+  "source": zod.string(),
+  "request": zod.object({
+  "endpoint": zod.string(),
+  "chain_id": zod.string(),
+  "token_address": zod.string(),
+  "attempts": zod.number().int().min(1).max(evaluateOpportunityBodyInspectionReportRequestAttemptsMax),
+  "retry_count": zod.number().int().min(evaluateOpportunityBodyInspectionReportRequestRetryCountMin).max(evaluateOpportunityBodyInspectionReportRequestRetryCountMax),
+  "attempt_log": zod.array(zod.object({
+  "attempt": zod.number().int().min(1).max(evaluateOpportunityBodyInspectionReportRequestAttemptLogItemAttemptMax),
+  "status_code": zod.number().int().min(evaluateOpportunityBodyInspectionReportRequestAttemptLogItemStatusCodeMin).max(evaluateOpportunityBodyInspectionReportRequestAttemptLogItemStatusCodeMax).nullable(),
+  "response_bytes": zod.number().int().min(evaluateOpportunityBodyInspectionReportRequestAttemptLogItemResponseBytesMin).max(evaluateOpportunityBodyInspectionReportRequestAttemptLogItemResponseBytesMax),
+  "received_at": zod.string().nullable(),
+  "error": zod.string().nullish()
+}))
+}),
+  "receipt": zod.object({
+  "received_at": zod.string().nullable(),
+  "http_status": zod.number().int().min(evaluateOpportunityBodyInspectionReportReceiptHttpStatusMin).max(evaluateOpportunityBodyInspectionReportReceiptHttpStatusMax).nullable(),
+  "response_bytes": zod.number().int().min(evaluateOpportunityBodyInspectionReportReceiptResponseBytesMin).max(evaluateOpportunityBodyInspectionReportReceiptResponseBytesMax)
+}),
+  "payload": zod.object({
+  "raw_payload_sha256": zod.string().nullable(),
+  "pair_count": zod.number().int().min(evaluateOpportunityBodyInspectionReportPayloadPairCountMin).max(evaluateOpportunityBodyInspectionReportPayloadPairCountMax),
+  "pairs": zod.array(zod.object({
+  "pairAddress": zod.string().nullish(),
+  "chainId": zod.string().nullish(),
+  "dexId": zod.string().nullish(),
+  "url": zod.string().nullish(),
+  "baseToken": zod.union([zod.object({
+  "address": zod.string().nullish(),
+  "name": zod.string().nullish(),
+  "symbol": zod.string().nullish()
+}),zod.null()]).optional(),
+  "quoteToken": zod.union([zod.object({
+  "address": zod.string().nullish(),
+  "name": zod.string().nullish(),
+  "symbol": zod.string().nullish()
+}),zod.null()]).optional(),
+  "priceNative": zod.string().nullish(),
+  "priceUsd": zod.string().nullish(),
+  "fdv": zod.string().nullish(),
+  "marketCap": zod.string().nullish(),
+  "liquidity": zod.union([zod.object({
+  "m5": zod.string().nullish(),
+  "h1": zod.string().nullish(),
+  "h6": zod.string().nullish(),
+  "h24": zod.string().nullish()
+}).and(zod.object({
+  "usd": zod.string().nullish(),
+  "base": zod.string().nullish(),
+  "quote": zod.string().nullish()
+})),zod.null()]).optional(),
+  "volume": zod.union([zod.object({
+  "m5": zod.string().nullish(),
+  "h1": zod.string().nullish(),
+  "h6": zod.string().nullish(),
+  "h24": zod.string().nullish()
+}),zod.null()]).optional(),
+  "priceChange": zod.union([zod.object({
+  "m5": zod.string().nullish(),
+  "h1": zod.string().nullish(),
+  "h6": zod.string().nullish(),
+  "h24": zod.string().nullish()
+}),zod.null()]).optional(),
+  "txns": zod.union([zod.object({
+  "m5": zod.union([zod.object({
+  "buys": zod.string().nullish(),
+  "sells": zod.string().nullish()
+}),zod.null()]).optional(),
+  "h1": zod.union([zod.object({
+  "buys": zod.string().nullish(),
+  "sells": zod.string().nullish()
+}),zod.null()]).optional(),
+  "h6": zod.union([zod.object({
+  "buys": zod.string().nullish(),
+  "sells": zod.string().nullish()
+}),zod.null()]).optional(),
+  "h24": zod.union([zod.object({
+  "buys": zod.string().nullish(),
+  "sells": zod.string().nullish()
+}),zod.null()]).optional()
+}),zod.null()]).optional(),
+  "pairCreatedAt": zod.string().nullish(),
+  "inspection": zod.object({
+  "source_pair_created_at": zod.string().nullish(),
+  "field_provenance": zod.record(zod.string(), zod.unknown()),
+  "findings": zod.array(zod.object({
+  "code": zod.string(),
+  "source_field": zod.string().nullish(),
+  "value": zod.unknown().optional()
+}))
+})
+}))
+}),
+  "evidence": zod.object({
+  "p08_acceptance": zod.string(),
+  "p08_observed_at": zod.string().nullable(),
+  "asset_age": zod.record(zod.string(), zod.unknown()),
+  "unavailable_fields": zod.array(zod.object({
+  "field": zod.string(),
+  "reason": zod.string()
+}))
+}),
+  "error": zod.record(zod.string(), zod.unknown()).nullish()
+}),
+  "temporal_evidence": zod.object({
+  "contract_version": zod.string(),
+  "source_id": zod.string(),
+  "token_identity": zod.string(),
+  "chain_id": zod.string(),
+  "raw_payload_digest": zod.string().regex(evaluateOpportunityBodyInspectionTemporalEvidenceRawPayloadDigestRegExp),
+  "p08_acceptance": zod.enum(['NOT_ATTEMPTED']),
+  "records": zod.array(zod.object({
+  "contract_version": zod.string(),
+  "source_id": zod.string(),
+  "source_event_id": zod.null(),
+  "token_identity": zod.string(),
+  "chain_id": zod.string(),
+  "market_subject_id": zod.string(),
+  "occurrence_id": zod.string().regex(evaluateOpportunityBodyInspectionTemporalEvidenceRecordsItemOccurrenceIdRegExp),
+  "source_observed_at": zod.null(),
+  "received_at": zod.string(),
+  "source_freshness": zod.object({
+  "status": zod.enum(['UNKNOWN']),
+  "reason": zod.string()
+}),
+  "receipt_recency": zod.object({
+  "reference_time": zod.string(),
+  "age_seconds": zod.string()
+}),
+  "volume_window": zod.object({
+  "source_label": zod.string().nullable(),
+  "exact_window": zod.null()
+}),
+  "asset_age": zod.object({
+  "status": zod.enum(['UNAVAILABLE']),
+  "amount": zod.null(),
+  "unit": zod.null(),
+  "reference_semantics": zod.null(),
+  "source_field": zod.null(),
+  "reason": zod.string()
+}),
+  "pair_created_at_source_value": zod.string().nullable(),
+  "raw_payload_digest": zod.string().regex(evaluateOpportunityBodyInspectionTemporalEvidenceRecordsItemRawPayloadDigestRegExp),
+  "p08_acceptance": zod.enum(['NOT_ATTEMPTED'])
+})).max(evaluateOpportunityBodyInspectionTemporalEvidenceRecordsMax)
+}),
+  "evaluation_time": zod.string()
+}),
+  "safety": zod.object({
+  "assessment_version": zod.string(),
+  "identity": zod.object({
+  "chain_id": zod.string(),
+  "token_address": zod.string()
+}),
+  "source": zod.object({
+  "source_id": zod.enum(['GoPlus']),
+  "endpoint": zod.string().url(),
+  "http_status": zod.number().int().min(evaluateOpportunityBodySafetySourceHttpStatusMin).max(evaluateOpportunityBodySafetySourceHttpStatusMax),
+  "response_bytes": zod.number().int().min(evaluateOpportunityBodySafetySourceResponseBytesMin).max(evaluateOpportunityBodySafetySourceResponseBytesMax),
+  "received_at": zod.coerce.date(),
+  "source_observed_at": zod.null(),
+  "source_freshness": zod.enum(['UNKNOWN'])
+}),
+  "evaluation": zod.object({
+  "status": zod.enum(['ELIGIBLE', 'INELIGIBLE', 'UNKNOWN']),
+  "is_authoritative": zod.literal(false),
+  "evaluator_id": zod.string(),
+  "contract_version": zod.string(),
+  "evaluation_timestamp": zod.coerce.date(),
+  "input_evidence_digest": zod.string().regex(evaluateOpportunityBodySafetyEvaluationInputEvidenceDigestRegExp),
+  "domain_results": zod.record(zod.string(), zod.enum(['PASS', 'FAIL', 'UNKNOWN'])),
+  "evidence_references": zod.array(zod.string()).max(evaluateOpportunityBodySafetyEvaluationEvidenceReferencesMax),
+  "reason_codes": zod.array(zod.string()).max(evaluateOpportunityBodySafetyEvaluationReasonCodesMax)
+}),
+  "evidence": zod.array(zod.object({
+  "domain": zod.enum(['MINT_FREEZE_AUTHORITY', 'LP_STATUS_CONCENTRATION', 'LIQUIDITY_QUALITY', 'METADATA_MUTABILITY', 'TOP_HOLDER_CONCENTRATION', 'FUNDING_WALLET_RELATIONSHIPS', 'PROXY_CONTROL_PATTERNS', 'SUSPICIOUS_MUTABLE_BEHAVIOR', 'TRADABILITY_SELLABILITY', 'STALE_UNAVAILABLE_EVIDENCE']),
+  "status": zod.enum(['PASS', 'FAIL', 'UNKNOWN']),
+  "quality": zod.enum(['VALID', 'INVALID', 'INCOMPLETE', 'UNKNOWN']),
+  "freshness_status": zod.enum(['VALID', 'INVALID', 'INCOMPLETE', 'UNKNOWN']),
+  "observed_at": zod.coerce.date(),
+  "source_id": zod.string(),
+  "method": zod.string(),
+  "evidence_reference": zod.string(),
+  "evidence_context": zod.record(zod.string(), zod.unknown()),
+  "reason_codes": zod.array(zod.string()).max(evaluateOpportunityBodySafetyEvidenceItemReasonCodesMax)
+})).max(evaluateOpportunityBodySafetyEvidenceMax),
+  "missing_evidence": zod.array(zod.object({
+  "domain": zod.string(),
+  "requirement": zod.string(),
+  "reason": zod.string()
+})).max(evaluateOpportunityBodySafetyMissingEvidenceMax),
+  "limitations": zod.array(zod.string()).max(evaluateOpportunityBodySafetyLimitationsMax)
+})
+})
+
+export const evaluateOpportunityResponseBlockersMax = 16;
+
+
+
+export const EvaluateOpportunityResponse = zod.object({
+  "evaluation_version": zod.string(),
+  "status": zod.enum(['QUALIFIED', 'BLOCKED']),
+  "identity": zod.object({
+  "chain_id": zod.string(),
+  "token_identity": zod.string(),
+  "pair_address": zod.string(),
+  "pair_index": zod.number().int(),
+  "market_subject_id": zod.string()
+}),
+  "safety": zod.object({
+  "claimed_status": zod.enum(['ELIGIBLE', 'INELIGIBLE', 'UNKNOWN']),
+  "recomputed_status": zod.enum(['ELIGIBLE', 'INELIGIBLE', 'UNKNOWN']),
+  "evidence_references": zod.array(zod.string()),
+  "source_observed_at": zod.null()
+}),
+  "blockers": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string()
+})).max(evaluateOpportunityResponseBlockersMax),
+  "p04_status": zod.enum(['AVAILABLE', 'UNAVAILABLE']),
+  "p05_status": zod.enum(['QUALIFIED', 'BLOCKED']),
+  "provider_requests": zod.literal(0),
+  "canonical_discovery": zod.enum(['NOT_ADMITTED']),
+  "p08_acceptance": zod.enum(['NOT_ATTEMPTED']),
+  "inspection_received_at": zod.coerce.date(),
+  "safety_received_at": zod.coerce.date(),
+  "source_observed_at": zod.null()
+})
