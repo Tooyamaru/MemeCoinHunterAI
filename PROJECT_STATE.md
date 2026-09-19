@@ -238,6 +238,26 @@ and opportunity tests. The frontend build retains only the existing
 `tooltip.tsx` sourcemap warning. No live provider request, wallet, trading,
 ranking, analytics, commit, push, or merge was performed.
 
+The canonical P04-to-P05 composition checkpoint is implemented as a
+provider-neutral, deterministic assembly boundary. It constructs P04-T06
+signal and P04-T10 feature snapshots from already-validated upstream results,
+then invokes the existing P05-T01 candidate, P05-T02 normalization, P05-T03
+hard-risk, P05-T04 feature-evaluation, and P05-T05 score functions. The
+qualifying test-only fixture reaches `ELIGIBLE` and produces the existing
+P05-T05 score `80.55555555555555555555555556` while preserving candidate
+identity, upstream representation digests, snapshot provenance, and the
+reference timestamp. Missing evidence, UNKNOWN/INELIGIBLE safety, identity
+mismatch, invalid time ordering, malformed numbers, and altered digests fail
+closed through the existing contracts.
+
+The application endpoint remains diagnostic-only and does not accept
+browser-supplied eligibility, self-computed digests, or test fixtures. It
+continues to report blocked P04/P05 canonical-input blockers when those
+inputs are absent. Remaining live-data blockers are unchanged: the backend
+does not yet receive trusted canonical P04 signal/feature inputs from an
+authorized upstream producer, and G2 realization/settlement remains blocked
+pending the authoritative provider/source owner decision.
+
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
 exists.

@@ -69,6 +69,11 @@ from core.opportunity.opportunity_context import (
     create_opportunity_context,
     materialize_opportunity_context,
 )
+from core.opportunity.p04_p05_composition import (
+    CanonicalP04ToP05Composition,
+    compose_canonical_p04_to_p05,
+    compose_p04_to_p05,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -124,4 +129,7 @@ __all__ = [
     "P05_T08_EVALUATOR_VERSION",
     "create_opportunity_context",
     "materialize_opportunity_context",
+    "CanonicalP04ToP05Composition",
+    "compose_canonical_p04_to_p05",
+    "compose_p04_to_p05",
 ]
