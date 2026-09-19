@@ -10,7 +10,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current task:** P08 — G2 Realization / Settlement Endpoint Boundary Discovery
 - **Current task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Last updated:** 2026-09-16
+- **Last updated:** 2026-09-19
 
 ## Master progress
 
@@ -211,6 +211,26 @@ mocked frontend interaction test, plus API/frontend typechecks and builds with
 the required workflow environment. Verification uses mocked provider responses;
 no live GoPlus request, wallet, trading, ranking, analytics, commit, push, or
 merge was performed.
+
+The opportunity-evaluation integration checkpoint is verified on 2026-09-19 on
+branch `wip/opportunity-evaluation-integration`. The inspection UI now exposes
+an explicit per-pair admission-diagnostic action only after both held reports
+are available; it does not evaluate automatically, request another provider
+report, rank pairs, create a score, admit a token, or authorize trading. The
+API preserves exact chain/token/pair/market-subject identity, rejects a pair
+whose token is not represented on either side, preserves receipt versus source
+observation timestamps, and reports explicit missing P04/P05 canonical-input
+blockers. Its bounded safety diagnostic bridge invokes the existing Python
+P03 evaluation and eligibility functions; the qualifying fixture path reaches
+those evaluators in focused tests. The live API remains intentionally blocked
+as an admission diagnostic because its request contract does not carry the
+canonical P04 signal and feature snapshots required by P05. The generated API
+clients are synchronized with OpenAPI. Verification passes 43 API tests, the
+Chromium-backed mocked frontend interaction test, API/frontend typechecks and
+builds with the required workflow environment, and 130 focused Python safety
+and opportunity tests. The frontend build retains only the existing
+`tooltip.tsx` sourcemap warning. No live provider request, wallet, trading,
+ranking, analytics, commit, push, or merge was performed.
 
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task

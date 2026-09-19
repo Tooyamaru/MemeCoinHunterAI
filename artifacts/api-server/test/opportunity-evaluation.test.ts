@@ -18,7 +18,14 @@ const input = (overrides: Record<string, unknown> = {}) =>
         request: { chain_id: "ethereum", token_address: "0xabc" },
         receipt: { received_at: "2026-09-18T03:00:00.000Z" },
         payload: {
-          pairs: [{ pairAddress: "0xpair", chainId: "ethereum" }],
+          pairs: [
+            {
+              pairAddress: "0xpair",
+              chainId: "ethereum",
+              baseToken: { address: "0xabc" },
+              quoteToken: { address: "0xusd" },
+            },
+          ],
         },
       },
       temporal_evidence: {
@@ -59,6 +66,7 @@ test("composes a precise blocked result without requesting another provider repo
   assert.deepEqual(
     result.blockers.map((blocker) => blocker.code),
     [
+      "SAFETY_EVIDENCE_NOT_AUTHENTICATED",
       "SAFETY_SOURCE_OBSERVATION_TIME_UNAVAILABLE",
       "MARKET_SOURCE_OBSERVATION_TIME_UNAVAILABLE",
       "P03_ELIGIBILITY_UNKNOWN",
@@ -108,6 +116,47 @@ test("rejects contradictory report identity before producing an evaluation", () 
     error: "REPORT_IDENTITY_MISMATCH",
     detail:
       "Chain and token identity must match across the request, inspection, temporal, and safety reports.",
+  });
+});
+
+test("rejects a pair whose token identity is not represented by either token side", () => {
+  const result = composeOpportunityEvaluation(
+    input({
+      inspection: {
+        report: {
+          request: { chain_id: "ethereum", token_address: "0xabc" },
+          receipt: { received_at: "2026-09-18T03:00:00.000Z" },
+          payload: {
+            pairs: [
+              {
+                pairAddress: "0xpair",
+                chainId: "ethereum",
+                baseToken: { address: "0xother" },
+                quoteToken: { address: "0xusd" },
+              },
+            ],
+          },
+        },
+        temporal_evidence: {
+          chain_id: "ethereum",
+          token_identity: "0xabc",
+          records: [
+            {
+              chain_id: "ethereum",
+              token_identity: "0xabc",
+              market_subject_id: "ethereum:0xpair",
+              source_observed_at: null,
+            },
+          ],
+        },
+      },
+    }),
+  );
+
+  assert.deepEqual(result, {
+    error: "PAIR_IDENTITY_MISMATCH",
+    detail:
+      "The selected pair must preserve its exact chain, pair, token, and market-subject identity.",
   });
 });
 

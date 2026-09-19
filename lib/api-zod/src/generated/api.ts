@@ -378,8 +378,8 @@ export const AssessTokenSafetyResponse = zod.object({
 
 
 /**
- * Validates and composes one inspection report and one token-safety assessment already held by the client. This action makes no provider request. It never ranks pairs or treats receipt time as source observation time. The current live report contract returns an explicit blocked result when canonical P04 signal/feature snapshots are absent.
- * @summary Evaluate one explicitly selected pair from already-held reports
+ * Validates and composes one inspection report and one token-safety assessment already held by the client. This action makes no provider request. It never ranks pairs, authenticates client-held evidence, or treats receipt time as source observation time. Because this request contract does not carry canonical P04 signal and feature snapshots, the current live result is an admission diagnostic rather than a completed P04/P05 evaluation.
+ * @summary Produce an admission diagnostic for one explicitly selected pair
  */
 export const evaluateOpportunityBodyChainIdMax = 64;
 

@@ -247,10 +247,11 @@ function OpportunityEvaluationPanel({ result }: { result: OpportunityEvaluation 
     <Card className="border-indigo-200 bg-indigo-50/60">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg text-indigo-950">
-          Opportunity evaluation: {result.status === "BLOCKED" ? "Blocked" : "Qualified"}
+          Opportunity admission diagnostic: {result.status === "BLOCKED" ? "Blocked" : "Qualified"}
         </CardTitle>
         <CardDescription className="text-indigo-900/75">
           Pair {result.identity.pair_index + 1} · {result.identity.pair_address} · no provider request was made.
+          This is not a completed P04/P05 evaluation or an authenticated safety decision.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 pt-0 text-sm text-indigo-950">
@@ -287,6 +288,8 @@ function OpportunityEvaluationPanel({ result }: { result: OpportunityEvaluation 
         </div>
         <div className="text-xs leading-5 text-indigo-900/75">
           This action does not rank pairs, create an opportunity score, admit the token, or authorize trading.
+          Canonical P04 signal and feature snapshots are still required before the existing Python P05
+          evaluator can produce an opportunity score.
         </div>
       </CardContent>
     </Card>
@@ -985,7 +988,9 @@ function InspectionPage() {
              {safetyResult && !safety.isPending && (
                <SafetyAssessmentPanel result={safetyResult} />
              )}
-             {opportunity.isError && !opportunity.isPending && (
+              {opportunity.isError &&
+                !opportunity.isPending &&
+                activeEvaluationKey?.startsWith(`${inputKey}\u0000`) && (
                <Card className="border-rose-200 bg-rose-50">
                  <CardContent className="py-4 text-sm text-rose-900">
                    <div className="font-semibold">Opportunity evaluation unavailable</div>
