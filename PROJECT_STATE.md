@@ -258,6 +258,26 @@ does not yet receive trusted canonical P04 signal/feature inputs from an
 authorized upstream producer, and G2 realization/settlement remains blocked
 pending the authoritative provider/source owner decision.
 
+The canonical evidence producer is now implemented on branch
+`wip/canonical-evidence-producer`. It consumes already-admitted P02-T09
+market-intelligence observations and P04-T01 signal evidence, invokes the
+existing P04-T02 normalization, P04-T03 quality, P04-T04 evaluation,
+P04-T05 aggregation, and P04-T09 price-feature functions, then passes their
+outputs into the existing P04-T06/P04-T10 and P05-T01 through P05-T05 chain.
+The qualifying offline path uses three explicitly historical price
+observations, preserves observation versus receipt timestamps and P02 state
+digests, and reaches the existing score of
+`80.55555555555555555555555556`.
+
+The producer does not derive signal types or statuses from market data because
+the repository has no approved market-to-signal policy or source-authentication
+mapping for that decision. Its live application connection therefore remains
+blocked: DexScreener inspection is source-shaped/read-only and GoPlus safety
+is not market evidence; neither supplies the complete authenticated historical
+price, signal-policy, and source-time linkage required for P04. The next
+concrete requirement is an authoritative producer that supplies those fields
+and an approved mapping from them to P04-T01 signal evidence.
+
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
 exists.

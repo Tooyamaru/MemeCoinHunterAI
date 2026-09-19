@@ -74,6 +74,11 @@ from core.opportunity.p04_p05_composition import (
     compose_canonical_p04_to_p05,
     compose_p04_to_p05,
 )
+from core.opportunity.canonical_evidence_producer import (
+    CanonicalP04ToP05EvidenceInputs,
+    produce_canonical_p04_to_p05,
+    produce_canonical_p04_to_p05_inputs,
+)
 
 __all__ = [
     "OpportunityCandidate",
@@ -132,4 +137,7 @@ __all__ = [
     "CanonicalP04ToP05Composition",
     "compose_canonical_p04_to_p05",
     "compose_p04_to_p05",
+    "CanonicalP04ToP05EvidenceInputs",
+    "produce_canonical_p04_to_p05",
+    "produce_canonical_p04_to_p05_inputs",
 ]
