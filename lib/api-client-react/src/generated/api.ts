@@ -24,6 +24,8 @@ import type {
   ErrorResponse,
   HealthStatus,
   InspectionWithTemporalEvidence,
+  OpportunityEvaluation,
+  OpportunityEvaluationInput,
   TokenInspectionInput,
   TokenSafetyAssessment,
   TokenSafetyInput
@@ -354,4 +356,76 @@ export const useAssessTokenSafety = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getAssessTokenSafetyMutationOptions(options));
+    }
+
+export const getEvaluateOpportunityUrl = () => {
+
+
+
+
+  return `/api/opportunity-evaluations`
+}
+
+/**
+ * Validates and composes one inspection report and one token-safety assessment already held by the client. This action makes no provider request. It never ranks pairs, authenticates client-held evidence, or treats receipt time as source observation time. Because this request contract does not carry canonical P04 signal and feature snapshots, the current live result is an admission diagnostic rather than a completed P04/P05 evaluation.
+ * @summary Produce an admission diagnostic for one explicitly selected pair
+ */
+export const evaluateOpportunity = async (opportunityEvaluationInput: OpportunityEvaluationInput, options?: Parameters<typeof customFetch>[1]): Promise<OpportunityEvaluation> => {
+
+  return customFetch<OpportunityEvaluation>(getEvaluateOpportunityUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(opportunityEvaluationInput)
+  }
+);}
+
+
+
+
+
+export const getEvaluateOpportunityMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof evaluateOpportunity>>, TError,{data: BodyType<OpportunityEvaluationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof evaluateOpportunity>>, TError,{data: BodyType<OpportunityEvaluationInput>}, TContext> => {
+
+const mutationKey = ['evaluateOpportunity'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof evaluateOpportunity>>, {data: BodyType<OpportunityEvaluationInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  evaluateOpportunity(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EvaluateOpportunityMutationResult = NonNullable<Awaited<ReturnType<typeof evaluateOpportunity>>>
+    export type EvaluateOpportunityMutationBody = BodyType<OpportunityEvaluationInput>
+    export type EvaluateOpportunityMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Produce an admission diagnostic for one explicitly selected pair
+ */
+export const useEvaluateOpportunity = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof evaluateOpportunity>>, TError,{data: BodyType<OpportunityEvaluationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof evaluateOpportunity>>,
+        TError,
+        {data: BodyType<OpportunityEvaluationInput>},
+        TContext
+      > => {
+      return useMutation(getEvaluateOpportunityMutationOptions(options));
     }

@@ -16,6 +16,8 @@ tags:
     description: Bounded provider candidate listings without canonical admission
   - name: token-safety
     description: Explicit bounded token-safety evidence assessment
+  - name: opportunity-evaluation
+    description: Explicit local admission diagnostics over already-held inspection and safety reports
 paths:
   /healthz:
     get:
@@ -157,6 +159,38 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "504":
           description: Provider request timed out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /opportunity-evaluations:
+    post:
+      operationId: evaluateOpportunity
+      tags: [opportunity-evaluation]
+      summary: Produce an admission diagnostic for one explicitly selected pair
+      description: >
+        Validates and composes one inspection report and one token-safety
+        assessment already held by the client. This action makes no provider
+        request. It never ranks pairs, authenticates client-held evidence, or
+        treats receipt time as source observation time. Because this request
+        contract does not carry canonical P04 signal and feature snapshots, the
+        current live result is an admission diagnostic rather than a completed
+        P04/P05 evaluation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpportunityEvaluationInput"
+      responses:
+        "200":
+          description: Explicit local admission diagnostic result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpportunityEvaluation"
+        "400":
+          description: Invalid reports or contradictory identity
           content:
             application/json:
               schema:
@@ -741,6 +775,127 @@ components:
           maxLength: 128
           pattern: "^[A-Za-z0-9._~-]+$"
       required: [chainId, tokenAddress]
+    OpportunityEvaluationInput:
+      type: object
+      additionalProperties: false
+      properties:
+        chainId:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^[A-Za-z0-9._~-]+$"
+        tokenAddress:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: "^[A-Za-z0-9._~-]+$"
+        pairIndex:
+          type: integer
+          minimum: 0
+          maximum: 127
+        inspection:
+          $ref: "#/components/schemas/InspectionWithTemporalEvidence"
+        safety:
+          $ref: "#/components/schemas/TokenSafetyAssessment"
+      required: [chainId, tokenAddress, pairIndex, inspection, safety]
+    OpportunityEvaluationIdentity:
+      type: object
+      additionalProperties: false
+      properties:
+        chain_id:
+          type: string
+        token_identity:
+          type: string
+        pair_address:
+          type: string
+        pair_index:
+          type: integer
+        market_subject_id:
+          type: string
+      required: [chain_id, token_identity, pair_address, pair_index, market_subject_id]
+    OpportunityEvaluationBlocker:
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        detail:
+          type: string
+      required: [code, detail]
+    OpportunityEvaluationSafety:
+      type: object
+      additionalProperties: false
+      properties:
+        claimed_status:
+          type: string
+          enum: [ELIGIBLE, INELIGIBLE, UNKNOWN]
+        recomputed_status:
+          type: string
+          enum: [ELIGIBLE, INELIGIBLE, UNKNOWN]
+        evidence_references:
+          type: array
+          items:
+            type: string
+        source_observed_at:
+          type: "null"
+      required: [claimed_status, recomputed_status, evidence_references, source_observed_at]
+    OpportunityEvaluation:
+      type: object
+      additionalProperties: false
+      properties:
+        evaluation_version:
+          type: string
+        status:
+          type: string
+          enum: [QUALIFIED, BLOCKED]
+        identity:
+          $ref: "#/components/schemas/OpportunityEvaluationIdentity"
+        safety:
+          $ref: "#/components/schemas/OpportunityEvaluationSafety"
+        blockers:
+          type: array
+          maxItems: 16
+          items:
+            $ref: "#/components/schemas/OpportunityEvaluationBlocker"
+        p04_status:
+          type: string
+          enum: [AVAILABLE, UNAVAILABLE]
+        p05_status:
+          type: string
+          enum: [QUALIFIED, BLOCKED]
+        provider_requests:
+          type: integer
+          enum: [0]
+        canonical_discovery:
+          type: string
+          enum: [NOT_ADMITTED]
+        p08_acceptance:
+          type: string
+          enum: [NOT_ATTEMPTED]
+        inspection_received_at:
+          type: string
+          format: date-time
+        safety_received_at:
+          type: string
+          format: date-time
+        source_observed_at:
+          type: "null"
+      required:
+        [
+          evaluation_version,
+          status,
+          identity,
+          safety,
+          blockers,
+          p04_status,
+          p05_status,
+          provider_requests,
+          canonical_discovery,
+          p08_acceptance,
+          inspection_received_at,
+          safety_received_at,
+          source_observed_at,
+        ]
     SafetyAssessmentIdentity:
       type: object
       additionalProperties: false
