@@ -11,6 +11,8 @@
   Actions run #7 for implementation PR #3. Whitespace check passed locally.
 - **BOUNDARY:** No network calls, HTTP transport, environment-secret reads,
   new dependency, application wiring, wallet, execution, G2, or P09 behavior.
+- **MERGE:** Implementation PR #3 passed its final CI run and was squash-merged
+  to `main` at `155b50a`.
 
 ## 2026-09-21 — P04-LME-01 Source and Signal Policy Specification
 
