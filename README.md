@@ -32,12 +32,18 @@ The Risk Governor has authority over the Decision Engine. Any future execution m
 
 ## Development workflow
 
+GitHub is the source of truth. Development uses short-lived branches and pull
+requests; Replit is the runtime/preview environment rather than an independent
+copy of the project. See `docs/HYBRID_DEVELOPMENT_WORKFLOW.md` for the complete
+change, test, review, and merge path.
+
 1. Read `REPLIT_RULES.md` and `PROJECT_STATE.md`.
-2. Inspect only the current task's relevant files.
-3. Make the smallest scoped change.
-4. Run targeted verification.
-5. Update documentation and `PROJECT_STATE.md`.
-6. Commit/push through the single GitHub repository when ready.
+2. Create a scoped branch from the latest `main`.
+3. Inspect only the current task's relevant files.
+4. Make the smallest authorized change and add applicable tests.
+5. Run targeted checks, then the applicable full checks.
+6. Update documentation and `PROJECT_STATE.md`.
+7. Open a pull request and require CI to pass before merge.
 
 ### Run the P01 foundation
 
