@@ -82,7 +82,7 @@ current P02-T06 token candidate and one exact caller-directed pool
 target to the existing one-shot diagnostic, while validating admission before
 credential lookup or network access. It does not discover, rank, or select a
 token or pool and adds no polling or application wiring. The limited
-implementation and offline verification are complete; locked CI is pending.
+implementation, offline verification, and locked CI are complete.
 
 ## Hard safety evidence
 

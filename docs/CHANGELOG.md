@@ -10,7 +10,8 @@
   one-shot orchestration without changing P04-LME-02 outcome ownership.
 - **VERIFICATION:** 45 focused tests and 284 combined P02/P04
   targeted/regression tests passed locally. Relevant module compilation and
-  whitespace checks passed; locked CI remains pending.
+  whitespace checks passed. The locked Python 3.13 suite, CI whitespace gate,
+  and TypeScript checks/builds passed in GitHub Actions run #19.
 - **BOUNDARY:** Only one orchestration module, one focused test module, minimal
   exports/documentation, and PR/CI/merge are authorized. Token/pool selection,
   polling, retry, persistence, application wiring, paper automation, wallet,

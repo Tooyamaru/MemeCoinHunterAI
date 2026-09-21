@@ -12,8 +12,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P04-LME-03 controlled read-only diagnostic
   orchestration specification
-- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL
-  CHECKS PASS / CI PENDING
+- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / REVIEWED /
+  CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-21
@@ -43,8 +43,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** P04-LME-03 implementation review and CI verification; no
-  scheduler, application wiring, wallet, or trading runtime is authorized
+- **In progress:** No further P04-LME-03 implementation is authorized; no
+  scheduler, application wiring, wallet, or trading runtime is active
 - **Blocked:** G2 realization/settlement endpoint and authoritative provider/source owner decision unresolved
 - **On hold:** None
 - **Not started:** P06 runtime; later P08 tasks; P09–P12
@@ -144,11 +144,11 @@ requires its own specification and explicit approval.
 ## Last verified checkpoint
 
 The owner accepted the recommended P04-LME-03 limited implementation after
-P04-LME-02 merged. P04-LME-03 is a controlled one-shot composition from one current P02-T06
-candidate and one exact caller-directed pool target into the existing
-P04-LME-02 diagnostic. The draft explicitly preserves caller-owned target
-provenance, validates current candidate membership before secret lookup or
-network access, and performs no token/pool selection, polling, retry,
+P04-LME-02 merged. P04-LME-03 is a controlled one-shot composition from one
+current P02-T06 candidate and one exact caller-directed pool target into the
+existing P04-LME-02 diagnostic. The specification explicitly preserves
+caller-owned target provenance, validates current candidate membership before
+secret lookup or network access, and performs no token/pool selection, polling, retry,
 persistence, application wiring, paper automation, wallet, or execution.
 Authorization is limited to one orchestration module, one focused test module,
 minimal exports/documentation, and the standard PR/CI/merge workflow.
@@ -160,7 +160,8 @@ never selects or rewrites a target, and preserves nested diagnostic outcomes
 without reinterpretation. Forty-five focused tests and 284 combined P02/P04
 targeted/regression tests passed on the available Python 3.12.14 runtime.
 Relevant module compilation and `git diff --check` passed. Locked Python 3.13
-and TypeScript CI remain pending.
+full-suite tests, whitespace checks, and TypeScript checks/builds passed in
+GitHub Actions run #19.
 
 The owner authorized the recommended P04-LME-02 transport and diagnostic step
 on 2026-09-21. The approved scope is one server-side read-only request,
@@ -492,8 +493,8 @@ functionality was introduced.
 
 ## Next action
 
-Review P04-LME-03 and complete the locked Python 3.13 and TypeScript CI gates.
-Keep live provider verification recorded as `NOT RUN`.
+P04-LME-03 limited implementation and CI verification are complete. Keep live
+provider verification recorded as `NOT RUN`.
 
 ## Next task
 
