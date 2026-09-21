@@ -10,10 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P04-LME-01 live market evidence source and
-  deterministic market-to-signal policy
-- **Integration priority status:** OWNER ACCEPTED / LIMITED OFFLINE IMPLEMENTATION
-  COMPLETE / REVIEWED / CI PASS
+- **Current integration priority:** P04-LME-02 server-side OHLCV transport and
+  one-shot diagnostic
+- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL
+  CHECKS PASS / CI PENDING / LIVE PROVIDER CHECK NOT RUN
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-21
@@ -43,8 +43,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** No P04-LME-01 runtime integration is active; any transport or
-  live-provider diagnostic requires a separate authorization
+- **In progress:** P04-LME-02 implementation review and CI verification; no
+  scheduler, application wiring, wallet, or trading runtime is active
 - **Blocked:** G2 realization/settlement endpoint and authoritative provider/source owner decision unresolved
 - **On hold:** None
 - **Not started:** P06 runtime; later P08 tasks; P09–P12
@@ -142,6 +142,24 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+The owner authorized the recommended P04-LME-02 transport and diagnostic step
+on 2026-09-21. The approved scope is one server-side read-only request,
+environment-secret handling, a one-shot diagnostic composition, mocked/offline
+tests, and the timing separation required by a real request. Continuous polling,
+application wiring, persistence, wallet, execution, G2, and P09 remain outside
+this authorization. Live provider verification has not run because no provider
+credential or exact real diagnostic target has been supplied to this task.
+
+The bounded one-attempt transport, environment-secret diagnostic boundary, and
+post-receipt evaluation-time correction are implemented. The implementation
+uses no new dependency, disables redirects, streams within the caller's size
+limit, discards HTTP error bodies, closes responses, and maps expected failures
+into existing P04-LME-01 outcomes. Thirty-two new focused tests passed; 133
+combined LME tests and 223 targeted/regression tests passed on the available
+Python 3.12.14 runtime. Module compilation and `git diff --check` passed. The
+locked Python 3.13 full suite remains pending in GitHub Actions. Live provider
+verification is `NOT RUN`; no credential value or real target was available.
 
 The owner explicitly approved P04-LME-01 and its limited implementation on
 2026-09-21. Authorization covers the two modules, offline fixture, focused
@@ -361,7 +379,10 @@ functionality was introduced.
 - `.github/workflows/ci.yml`
 - `docs/HYBRID_DEVELOPMENT_WORKFLOW.md`
 - `docs/P04-LME-01-LIVE-MARKET-EVIDENCE-SPECIFICATION.md`
+- `docs/P04-LME-02-TRANSPORT-DIAGNOSTIC-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
+- `core/data/coingecko_onchain_transport.py`
+- `core/data/coingecko_onchain_diagnostic.py`
 - `core/signals/price_direction_policy.py`
 - `core/data/market_observations.py`
 - `core/data/market_state.py`
@@ -369,6 +390,8 @@ functionality was introduced.
 - `core/opportunity/canonical_evidence_producer.py`
 - `tests/test_coingecko_onchain_ohlcv.py`
 - `tests/test_price_direction_policy.py`
+- `tests/test_coingecko_onchain_transport.py`
+- `tests/test_coingecko_onchain_diagnostic.py`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -446,17 +469,17 @@ functionality was introduced.
 
 ## Next action
 
-P04-LME-01 limited offline implementation is complete and merged. Any next
-transport, live-provider diagnostic, or application-wiring task requires its
-own specification and explicit authorization.
+Review P04-LME-02 and complete the locked Python 3.13 CI gate. Keep live
+provider verification recorded as `NOT RUN` unless a server-side API key and
+exact real Solana diagnostic target are available.
 
 ## Next task
 
-After implementation review, any transport/live-provider diagnostic boundary
-requires separate scope and authorization. This revision contains only pure
-mapping, request preparation, P02 admission, and observational signal evidence.
-G2 remains a separate blocked owner decision. No P09 behavior has been started
-or authorized.
+The next implementation task is not yet authorized. After P04-LME-02 review,
+the proposed next boundary is controlled runtime orchestration from an admitted
+candidate/pool through the read-only diagnostic path. Continuous polling,
+application wiring, and paper automation require a later specification and
+authorization. G2 remains blocked; P09 remains unauthorized.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

@@ -283,6 +283,7 @@ def _parse(body: bytes, request: OhlcvRequest) -> tuple[str | None, str, str, tu
 def map_pool_ohlcv(
     *, request: OhlcvRequest, response: OhlcvResponse,
     predecessor: P02T07PredecessorContext, freshness_policy: FreshnessPolicy,
+    evaluation_time: datetime | None = None,
 ) -> OhlcvResult:
     """Admit exactly three closed candles through T07 -> T08 -> T09.
 
@@ -295,11 +296,12 @@ def map_pool_ohlcv(
             raise ValueError("request and response required")
         if response.request != request:
             _reject(OhlcvOutcome.IDENTITY_MISMATCH, "REQUEST_BINDING_MISMATCH")
+        evaluation = _utc(evaluation_time or request.reference_time)
         try:
             start, received = _utc(response.started_at), _utc(response.received_at)
         except ValueError:
             _reject(OhlcvOutcome.TEMPORAL_INVALID, "INVALID_RECEIPT_TIMESTAMP")
-        if not start <= received <= request.reference_time:
+        if not start <= received <= evaluation:
             _reject(OhlcvOutcome.TEMPORAL_INVALID, "INVALID_RECEIPT_TIMELINE")
         if type(response.body) is not bytes:
             raise ValueError("bytes required")
@@ -359,7 +361,11 @@ def map_pool_ohlcv(
                 source_metadata=source_metadata,
                 observation_metadata={"pool_address": request.pool_address, "interval": "60s"},
             )
-            admitted = admission.process(candidate, processing_time=received, reference_time=request.reference_time)
+            admitted = admission.process(
+                candidate,
+                processing_time=received,
+                reference_time=evaluation,
+            )
             if not admitted.accepted or admitted.evidence is None:
                 _reject(OhlcvOutcome.UPSTREAM_ADMISSION_REJECTED, "P02_T07_" + admitted.outcome.value)
             state = materializer.process(admitted.evidence)
@@ -370,8 +376,8 @@ def map_pool_ohlcv(
                 token_identity=request.token_mint, market_subject_id=request.pool_address,
                 intelligence_category=MarketIntelligenceCategory.PRICE,
                 value=format(close, "f"), observation_time=observed,
-                received_time=received, reference_time=request.reference_time,
-                data_age=request.reference_time - observed,
+                received_time=received, reference_time=evaluation,
+                data_age=evaluation - observed,
                 upstream=MarketIntelligenceStateReference(
                     state.entry, state.local_state_version, state.local_state_digest,
                 ), source_event_id=source_event_id, sequence=stamp,
