@@ -1,3 +1,14 @@
+## 2026-09-21 — P04-LME-03 Controlled Orchestration Specification Draft
+
+- **REQUEST:** Owner requested continuation after P04-LME-02 merged.
+- **SPECIFICATION:** Proposed one caller-directed, one-shot composition from a
+  current P02-T06 candidate and exact pool target into P04-LME-02.
+- **FAIL-CLOSED ORDER:** Candidate membership and target identity must validate
+  before credential lookup, network access, or diagnostic invocation.
+- **BOUNDARY:** No implementation, token/pool selection, polling, retry,
+  persistence, application wiring, paper automation, wallet, execution, G2,
+  or P09 behavior is authorized by this draft.
+
 ## 2026-09-21 — P04-LME-02 Read-Only Transport and Diagnostic
 
 - **AUTHORIZATION:** Owner authorized the recommended server-side OHLCV
