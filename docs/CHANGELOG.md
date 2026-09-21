@@ -7,7 +7,8 @@
   post-receipt evaluation time for the existing pure mapper and signal policy.
 - **VERIFICATION:** 32 new focused tests, 133 combined LME tests, and 223
   targeted/regression tests passed locally. Module compilation and whitespace
-  checks passed. Locked Python 3.13 CI remains pending.
+  checks passed. The locked Python 3.13 suite, CI whitespace gate, and
+  TypeScript checks/builds passed in GitHub Actions run #14.
 - **LIVE CHECK:** `NOT RUN`; no credential value or exact real Solana diagnostic
   target was supplied. No success is inferred from mocked responses.
 - **BOUNDARY:** No retry, scheduler, persistence, application wiring, paper

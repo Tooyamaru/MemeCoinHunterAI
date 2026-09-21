@@ -1,6 +1,6 @@
 # P04-LME-02 — Server-Side OHLCV Transport and Diagnostic Specification
 
-**Status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL CHECKS PASS / CI PENDING
+**Status:** LIMITED IMPLEMENTATION COMPLETE / REVIEWED / CI PASS
 
 **Phase:** P04 — Market & Signal Intelligence
 
