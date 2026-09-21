@@ -1,6 +1,6 @@
 # P04-LME-01 — Live Market Evidence and Signal Policy Specification
 
-**Status:** SPECIFICATION COMPLETE / IMPLEMENTATION NOT AUTHORIZED  
+**Status:** OWNER ACCEPTED / LIMITED OFFLINE IMPLEMENTATION COMPLETE / CI PASS
 **Phase:** P04 — Market & Signal Intelligence  
 **Scope:** source decision, canonical mapping, and deterministic signal policy  
 **Updated:** 2026-09-21
@@ -285,8 +285,8 @@ permanent.
 
 ## 13. Proposed implementation scope
 
-No implementation is authorized by this specification. A later explicit
-authorization may create only:
+The owner explicitly accepted this specification and authorized limited
+implementation on 2026-09-21. The authorization permits only:
 
 - `core/data/coingecko_onchain_ohlcv.py` — bounded source envelope and pure
   response mapping;
@@ -310,6 +310,46 @@ The specification gate passes only when the owner accepts:
 4. `PRICE_DIRECTION_1M` as observational evidence only.
 5. The proposed limited implementation file scope.
 
-Until explicit implementation authorization is recorded, the existing live
-application path remains blocked and offline fixtures remain the only allowed
-canonical-producer input.
+Owner acceptance and limited implementation authorization were recorded on
+2026-09-21. The live application path remains blocked. This authorization
+covers offline mapping and tests, not live-provider verification or application
+wiring.
+
+## 15. Limited implementation notes
+
+- `map_pool_ohlcv` consumes a credential-free `OhlcvRequest`, a source response
+  envelope, an actual caller-supplied `P02T07PredecessorContext`, and an explicit
+  `FreshnessPolicy` with a finite `stale_after`. It does not invent admission or
+  silently relax freshness to fit three minutes of history.
+- Each candle passes through fresh local T07 admission, T08 materialization,
+  and T09 representation processors. A failed candle discards the entire local
+  result; no partial accepted history escapes and caller state is unchanged.
+- Strictly ascending and strictly descending provider order are supported;
+  mixed ordering is rejected before canonical ascending ordering. Duplicate
+  timestamps with different rows are contradictory; identical repeats are
+  temporally invalid. Neither produces a signal.
+- Candle timestamps retain their interval-start semantics. The complete
+  interval must have ended by receipt, and receipt must not exceed evaluation
+  time. The three-candle freshness threshold remains an explicit caller policy.
+- The documented response does not echo pool/network identity. Binding is
+  therefore to the exact trusted request envelope plus returned base/quote
+  composition, not a claim of independently proven pool identity. No browser
+  or arbitrary caller can establish source authority with a self-labeled payload.
+- Defensive limits: at most 1 MiB of response bytes, 128 decimal digits,
+  absolute decimal exponent at most 100, numeric text at most 160 characters,
+  and request IDs at most 128 safe characters. Duplicate JSON keys, unexpected
+  structures, invalid UTF-8, non-finite numbers, and numeric strings fail closed.
+- `prepare_authenticated_request` only prepares a header from the caller's
+  server-side `COINGECKO_DEMO_API_KEY` value. Missing/invalid credentials raise a
+  generic `AUTHENTICATION_FAILED`; credentials never enter mapper inputs, URLs,
+  normal object representations, or canonical evidence. No environment lookup,
+  HTTP client, redirect handling, or streaming transport is implemented. Future
+  transport must enforce timeout/size bounds while reading and disable redirects.
+- `derive_price_direction` always invokes the mapper on original inputs, so a
+  caller-constructed accepted observation cannot shortcut validation. Comparing
+  the two exact Decimals implements the sign of delta without ambient rounding.
+  Signal references bind policy version, response digest, accepted observation
+  IDs/fingerprints, and T08 state digests.
+- The fixture is synthetic offline data with syntactically valid addresses. It
+  is not evidence that those addresses form a real pool or that live historical
+  data is available. No real credential is needed for any test.
