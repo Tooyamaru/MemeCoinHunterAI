@@ -77,11 +77,12 @@ time to the pure mapper. Continuous polling, live provider verification,
 application wiring, and paper automation remain outside the completed local
 verification. The transport does not select a token or pool.
 
-P04-LME-03 is a proposed, not-yet-authorized orchestration boundary. It would
-bind one current P02-T06 token candidate and one exact caller-directed pool
+P04-LME-03 is an owner-accepted limited orchestration boundary. It binds one
+current P02-T06 token candidate and one exact caller-directed pool
 target to the existing one-shot diagnostic, while validating admission before
-credential lookup or network access. It would not discover, rank, or select a
-token or pool and would add no polling or application wiring.
+credential lookup or network access. It does not discover, rank, or select a
+token or pool and adds no polling or application wiring. The limited
+implementation and offline verification are complete; locked CI is pending.
 
 ## Hard safety evidence
 

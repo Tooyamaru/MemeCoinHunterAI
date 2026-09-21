@@ -12,8 +12,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P04-LME-03 controlled read-only diagnostic
   orchestration specification
-- **Integration priority status:** SPECIFICATION DRAFT COMPLETE / REVIEW
-  PENDING / IMPLEMENTATION NOT AUTHORIZED
+- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL
+  CHECKS PASS / CI PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-21
@@ -43,7 +43,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** P04-LME-03 specification review; no implementation,
+- **In progress:** P04-LME-03 implementation review and CI verification; no
   scheduler, application wiring, wallet, or trading runtime is authorized
 - **Blocked:** G2 realization/settlement endpoint and authoritative provider/source owner decision unresolved
 - **On hold:** None
@@ -143,14 +143,24 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-The owner requested continuation after P04-LME-02 merged. P04-LME-03 is now
-defined as a proposed controlled one-shot composition from one current P02-T06
+The owner accepted the recommended P04-LME-03 limited implementation after
+P04-LME-02 merged. P04-LME-03 is a controlled one-shot composition from one current P02-T06
 candidate and one exact caller-directed pool target into the existing
 P04-LME-02 diagnostic. The draft explicitly preserves caller-owned target
 provenance, validates current candidate membership before secret lookup or
 network access, and performs no token/pool selection, polling, retry,
 persistence, application wiring, paper automation, wallet, or execution.
-Implementation remains held for explicit owner acceptance of the specification.
+Authorization is limited to one orchestration module, one focused test module,
+minimal exports/documentation, and the standard PR/CI/merge workflow.
+
+The approved orchestration is implemented. It validates exact target-reference
+fields and the existing `OhlcvRequest`, requires current candidate membership,
+and only then delegates once to P04-LME-02. It never reads the secret itself,
+never selects or rewrites a target, and preserves nested diagnostic outcomes
+without reinterpretation. Forty-five focused tests and 284 combined P02/P04
+targeted/regression tests passed on the available Python 3.12.14 runtime.
+Relevant module compilation and `git diff --check` passed. Locked Python 3.13
+and TypeScript CI remain pending.
 
 The owner authorized the recommended P04-LME-02 transport and diagnostic step
 on 2026-09-21. The approved scope is one server-side read-only request,
@@ -394,6 +404,7 @@ functionality was introduced.
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
+- `core/data/coingecko_onchain_orchestration.py`
 - `core/signals/price_direction_policy.py`
 - `core/data/market_observations.py`
 - `core/data/market_state.py`
@@ -403,6 +414,7 @@ functionality was introduced.
 - `tests/test_price_direction_policy.py`
 - `tests/test_coingecko_onchain_transport.py`
 - `tests/test_coingecko_onchain_diagnostic.py`
+- `tests/test_coingecko_onchain_orchestration.py`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -480,17 +492,15 @@ functionality was introduced.
 
 ## Next action
 
-Review and explicitly accept or revise the P04-LME-03 field-level contract.
-Runtime code must not begin before that approval. Keep live provider
-verification recorded as `NOT RUN`.
+Review P04-LME-03 and complete the locked Python 3.13 and TypeScript CI gates.
+Keep live provider verification recorded as `NOT RUN`.
 
 ## Next task
 
-After approval, the next limited implementation may add only the controlled
-one-shot orchestration module, its mocked/offline tests, minimal exports, and
-documentation synchronization. Continuous polling, application wiring, and
-paper automation require later specifications and authorization. G2 remains
-blocked; P09 remains unauthorized.
+The next implementation task is not authorized. Continuous polling,
+application wiring, persistence, dashboard publication, and paper automation
+require later specifications and authorization. G2 remains blocked; P09
+remains unauthorized.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

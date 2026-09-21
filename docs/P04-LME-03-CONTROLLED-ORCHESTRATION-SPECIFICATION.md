@@ -1,6 +1,6 @@
 # P04-LME-03 — Controlled Read-Only Diagnostic Orchestration Specification
 
-**Status:** SPECIFICATION DRAFT COMPLETE / REVIEW PENDING / IMPLEMENTATION NOT AUTHORIZED
+**Status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL CHECKS PASS / CI PENDING
 
 **Phase:** P04 — Market & Signal Intelligence
 
@@ -10,10 +10,10 @@
 
 ## 1. Authorization and purpose
 
-The owner requested continuation after P04-LME-02 was merged. Under the
-repository's gated workflow, that request authorizes preparation of this next
-reviewable specification. Runtime implementation remains held until the owner
-explicitly accepts this field-level boundary and authorizes the limited code.
+The owner requested continuation after P04-LME-02 was merged, then accepted the
+recommended limited scope on 2026-09-21. This authorizes the field-level
+contract, one orchestration module, one focused test module, minimal exports and
+documentation, and the standard PR/CI/merge workflow.
 
 P04-LME-03 defines the smallest useful orchestration above P04-LME-02. It binds
 one current P02-T06 token-universe candidate to one exact pool target supplied
@@ -40,18 +40,20 @@ tradable.
 P04-LME-03 must compose these owners rather than duplicate their validation or
 manufacture accepted P02/P04 evidence.
 
-## 3. Proposed immutable input
+## 3. Immutable input
 
-The implementation may introduce an immutable `ExactPoolDiagnosticTarget`
+The implementation introduces an immutable `ExactPoolDiagnosticTarget`
 containing only:
 
 1. `chain_id`, fixed to canonical `solana`;
 2. exact candidate `token_mint`;
 3. exact `pool_address`;
 4. exact `base_mint` and `quote_mint` in source order;
-5. non-empty `target_reference_id` owned by the caller;
+5. `target_reference_id` owned by the caller, matching
+   `[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}`;
 6. lowercase SHA-256 `target_reference_digest`; and
-7. non-empty `target_contract_version`.
+7. `target_contract_version`, matching
+   `[A-Za-z0-9][A-Za-z0-9._-]{0,63}`.
 
 The orchestration call must also receive explicitly:
 
@@ -73,10 +75,10 @@ or network call:
 
 1. require exact supported input types;
 2. validate the target reference fields and SHA-256 digest shape;
-3. require that the predecessor snapshot contains the exact
-   `(chain_id, token_mint)` candidate;
-4. construct `OhlcvRequest`, thereby applying the existing Solana address,
+3. construct `OhlcvRequest`, thereby applying the existing Solana address,
    pool-composition, time, timeout, and size validation; and
+4. require that the predecessor snapshot contains the exact
+   `(chain_id, token_mint)` candidate; and
 5. only then invoke P04-LME-02 once with the original predecessor and freshness
    policy.
 
@@ -90,9 +92,9 @@ The orchestration must not:
 - read the API key when target admission fails; or
 - retry a diagnostic result.
 
-## 5. Proposed result contract
+## 5. Result contract
 
-The implementation may introduce immutable `ControlledDiagnosticResult` and
+The implementation introduces immutable `ControlledDiagnosticResult` and
 `ControlledDiagnosticOutcome` values with exactly these orchestration states:
 
 - `DIAGNOSTIC_COMPLETED`: the existing diagnostic was invoked once; its own
@@ -133,9 +135,9 @@ The target reference digest is not a credential and must not be treated as
 proof of external truth. Browser-supplied data cannot become authoritative
 merely by hashing it.
 
-## 8. Proposed implementation files
+## 8. Implementation files
 
-After explicit approval, the limited implementation may add only:
+The approved limited implementation may add only:
 
 - `core/data/coingecko_onchain_orchestration.py`;
 - `tests/test_coingecko_onchain_orchestration.py`; and
@@ -169,9 +171,11 @@ CI remains offline and credential-free.
 
 ## 10. Exit and following gate
 
-This specification is ready for owner review, not implementation. Approval of
-P04-LME-03 would authorize only the two proposed Python/test files and minimal
-exports/documentation above.
+The two approved Python/test files and documentation are implemented. Forty-five
+focused tests and 284 combined P02/P04 targeted/regression tests pass locally;
+module compilation and `git diff --check` also pass. P04-LME-03 exits only after
+review and the locked CI gates pass. Owner acceptance does not authorize any
+following runtime boundary.
 
 Continuous polling, application/API wiring, persistence, dashboard publication,
 paper automation, live provider verification, pool selection, wallet access,
