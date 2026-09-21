@@ -53,6 +53,21 @@ Decision journal / outcome
 - Detect duplicates, preserve sequence integrity where available, and track
   source health, failure, retry, recovery, and resynchronization.
 
+## Planned P04-LME-01 analytical source boundary
+
+The proposed V1 historical price-evidence source is the CoinGecko Demo
+Onchain pool-OHLCV endpoint. It is limited to exact-pool, exact-token,
+closed one-minute candles mapped through the existing P02 admission boundary.
+Missing intervals are not interpolated, and invalid identity, temporal, or
+content evidence fails closed.
+
+The proposed `PRICE_DIRECTION_1M` policy classifies only whether the latest
+validated close rose, fell, or remained flat relative to the previous close.
+It is observational evidence, not a prediction or trading instruction. The
+complete decision, mapping, test requirements, and excluded scope are recorded
+in `docs/P04-LME-01-LIVE-MARKET-EVIDENCE-SPECIFICATION.md`. Implementation is
+not authorized until the specification receives explicit owner acceptance.
+
 ## Hard safety evidence
 
 The future hard-risk contract must expose explicit PASS, FAIL, or UNKNOWN
