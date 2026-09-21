@@ -8,9 +8,15 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 - **Project name:** Meme Coin Hunter AI
 - **Current phase:** P08 — Outcome Learning
-- **Current task:** P08 — G2 Realization / Settlement Endpoint Boundary Discovery
-- **Current task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Last updated:** 2026-09-19
+- **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
+- **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
+- **Current integration priority:** authoritative live market evidence source and
+  deterministic market-to-signal policy specification
+- **Integration priority status:** SPECIFICATION REQUIRED / NOT AUTHORIZED
+- **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
+  implemented and locally verified on `chore/hybrid-workflow-hardening`;
+  pending pull-request review and GitHub Actions verification
+- **Last updated:** 2026-09-21
 
 ## Master progress
 
@@ -19,7 +25,15 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P02: T01 done; T02 done; T03 done; T04 done; T05 done; T06 done; T07 done; T08 done; T09 done
 - P03: T01 implemented, audited, and technically complete; T02 implemented, corrective fix completed, audited / verified, and formally closed; T03 implemented, audited, verified, and formally closed; P03 overall remains not complete
 - P04: T01 complete; T02 complete; T03 complete; T04 complete; T05 complete / closed; T06 complete / closed / audited PASS; T07 complete / closed / audited PASS; T08 environment/tooling stabilization complete / closed; P04 overall remains not complete
-- P05: T01 COMPLETE; T02 COMPLETE; T03 COMPLETE / CLOSED / AUDITED PASS; T04 COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; T05 COMPLETE / CLOSED / AUDITED PASS; T06 COMPLETE / CLOSED / AUDITED PASS; T07 COMPLETE / CLOSED / AUDITED PASS; T08 COMPLETE / CLOSED / AUDITED PASS; P06 ARCHITECTURE / SPECIFICATION GATE COMPLETE / CLOSED / APPROVED; P06-T01 COMPLETE / CLOSED / AUDITED PASS; P06-T02 COMPLETE / CLOSED / AUDITED PASS; P06-T03 COMPLETE / CLOSED; P07 ARCHITECTURE GATE PASSED; P07-T01 through P07-T07 COMPLETE / CLOSED / AUDITED PASS; P07 COMPLETE / CLOSED / AUDITED PASS; P08-T01 COMPLETE / CLOSED / AUDITED PASS; P08-T02 COMPLETE / CLOSED / AUDITED PASS; P08-T03 COMPLETE / CLOSED / AUDITED PASS; P08-T04 COMPLETE / CLOSED / AUDITED PASS; P08-T05 COMPLETE / CLOSED / AUDITED PASS; P08-T06 IMPLEMENTED / AUDITED PASS / READY TO CLOSE; P08-T07 COMPLETE / CLOSED / AUDITED PASS; G1 LIMITED IMPLEMENTATION COMPLETE / CLOSED / AUDITED PASS; AUTHORITY B COMPLETE / CLOSED / AUDITED PASS; G2 REALIZATION / SETTLEMENT ENDPOINT DISCOVERY COMPLETE / BLOCKED / UNRESOLVED; PROVIDER/ENDPOINT OWNER DECISION REQUIRED; G2, G3, G4, and P09 NOT AUTHORIZED; later P08 tasks not started; P06 runtime and P09–P12 not started
+- P05: T01–T08 COMPLETE; T03–T08 CLOSED / AUDITED PASS (T04 with
+  non-blocking observations)
+- P06: architecture/specification gate COMPLETE / CLOSED / APPROVED; T01–T02
+  COMPLETE / CLOSED / AUDITED PASS; T03 COMPLETE / CLOSED; runtime not started
+- P07: architecture gate PASSED; T01–T07 COMPLETE / CLOSED / AUDITED PASS;
+  phase COMPLETE / CLOSED / AUDITED PASS
+- P08: T01–T07 COMPLETE / CLOSED / AUDITED PASS; G1 limited implementation and
+  Authority B COMPLETE / CLOSED / AUDITED PASS; G2 discovery COMPLETE but
+  BLOCKED / UNRESOLVED; G2, G3, G4, and P09 NOT AUTHORIZED
 - Risk/Capital Authority limited implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - P07 Risk/Capital admission contract specification is COMPLETE / CLOSED / AUDITED PASS; a separate P07 v2 implementation authorization is required before code may be created. G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - P07 v2 Risk/Capital admission implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
@@ -29,7 +43,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** None
+- **In progress:** Hybrid development workflow hardening is implemented and
+  under pull-request review; no trading/runtime phase implementation is active
 - **Blocked:** G2 realization/settlement endpoint and authoritative provider/source owner decision unresolved
 - **On hold:** None
 - **Not started:** P06 runtime; later P08 tasks; P09–P12
@@ -127,6 +142,12 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+Hybrid workflow hardening was locally verified on 2026-09-21. The full Python
+3.13 suite passed with 1,191 tests and one non-blocking dependency warning.
+The pnpm 10.28.0 frozen installation, workspace TypeScript typechecks, package
+builds with the required non-secret build environment, and `git diff --check`
+passed. GitHub Actions verification remains pending until the branch is pushed.
 
 Limited G1 implementation and real P06 → P07 → P08 fixture-chain verification
 were completed on 2026-09-09 against main commit `546ef24`.
@@ -258,8 +279,8 @@ does not yet receive trusted canonical P04 signal/feature inputs from an
 authorized upstream producer, and G2 realization/settlement remains blocked
 pending the authoritative provider/source owner decision.
 
-The canonical evidence producer is now implemented on branch
-`wip/canonical-evidence-producer`. It consumes already-admitted P02-T09
+The canonical evidence producer is implemented on `main` at commit `2d32397`.
+It consumes already-admitted P02-T09
 market-intelligence observations and P04-T01 signal evidence, invokes the
 existing P04-T02 normalization, P04-T03 quality, P04-T04 evaluation,
 P04-T05 aggregation, and P04-T09 price-feature functions, then passes their
@@ -313,6 +334,8 @@ functionality was introduced.
 - `REPLIT_RULES.md`
 - `PROJECT_STATE.md`
 - `README.md`
+- `.github/workflows/ci.yml`
+- `docs/HYBRID_DEVELOPMENT_WORKFLOW.md`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -390,24 +413,19 @@ functionality was introduced.
 
 ## Next action
 
-P07-T01 through P07-T07 implementation and verification are COMPLETE / CLOSED /
-AUDITED PASS. P07 remains simulation-only and has no live execution authority.
-No P07-T08 exists or is required.
-
-P08-T04 through P08-T06 implementation and verification are COMPLETE / CLOSED /
-AUDITED PASS. P08-T07 is COMPLETE / CLOSED / AUDITED PASS. No later P08 task is
-authorized or started by this checkpoint.
+Complete review and merge of the hybrid workflow CI baseline. After CI is green,
+prepare a separate documentation/specification task for the authoritative
+historical market-evidence source and the deterministic, versioned
+market-to-signal policy. Do not connect the producer to live application data
+until that specification is approved.
 
 ## Next task
 
-P08-T04 is COMPLETE / CLOSED / AUDITED PASS as a single-observation
-evidence-integrity evaluation over one validated P08-T03 result and its linked
-P08-T02 snapshot. P08-T05 is COMPLETE / CLOSED / AUDITED PASS as the
-deterministic, immutable collection snapshot over the complete T04 result set.
-P08-T06 is COMPLETE / CLOSED / AUDITED PASS as the structural, non-economic
-readiness predicate over one validated T05 snapshot. P08-T07 is COMPLETE /
-CLOSED / AUDITED PASS as the deterministic economic outcome interpretation/assembly
-boundary. No P09 behavior has been started or authorized.
+The next implementation task is not yet authorized. The next proposed task is a
+specification-only live market evidence boundary covering provider/source
+ownership, authentication, historical observations, timestamps, provenance,
+freshness, failure semantics, and the market-to-signal mapping. G2 remains a
+separate blocked owner decision. No P09 behavior has been started or authorized.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:
