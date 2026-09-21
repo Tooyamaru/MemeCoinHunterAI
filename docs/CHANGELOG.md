@@ -1,3 +1,22 @@
+## 2026-09-21 — P04-LME-03 Controlled Orchestration
+
+- **AUTHORIZATION:** Owner accepted the recommended limited implementation and
+  standard PR/CI/merge scope after P04-LME-02 merged.
+- **SPECIFICATION:** Proposed one caller-directed, one-shot composition from a
+  current P02-T06 candidate and exact pool target into P04-LME-02.
+- **FAIL-CLOSED ORDER:** Candidate membership and target identity must validate
+  before credential lookup, network access, or diagnostic invocation.
+- **IMPLEMENTATION:** Added the immutable exact-target/result contract and
+  one-shot orchestration without changing P04-LME-02 outcome ownership.
+- **VERIFICATION:** 45 focused tests and 284 combined P02/P04
+  targeted/regression tests passed locally. Relevant module compilation and
+  whitespace checks passed. The locked Python 3.13 suite, CI whitespace gate,
+  and TypeScript checks/builds passed in GitHub Actions run #19.
+- **BOUNDARY:** Only one orchestration module, one focused test module, minimal
+  exports/documentation, and PR/CI/merge are authorized. Token/pool selection,
+  polling, retry, persistence, application wiring, paper automation, wallet,
+  execution, G2, and P09 remain excluded.
+
 ## 2026-09-21 — P04-LME-02 Read-Only Transport and Diagnostic
 
 - **AUTHORIZATION:** Owner authorized the recommended server-side OHLCV

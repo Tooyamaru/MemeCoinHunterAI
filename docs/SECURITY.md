@@ -18,6 +18,11 @@ header. The URL, transport result, exception text, logs, provenance, fixtures,
 and canonical digests remain credential-free. Redirects are disabled and HTTP
 error bodies are discarded.
 
+P04-LME-03 does not read or inspect that credential. It validates the exact
+target, request bounds, and current candidate membership before passing the
+environment mapping unchanged to P04-LME-02. Rejected orchestration inputs
+therefore cannot trigger credential lookup or network access.
+
 ## V1.1 security boundaries
 
 Capital protection is the highest-priority invariant. When uncertainty exists,
