@@ -155,7 +155,8 @@ Python 3.13 suite, workspace TypeScript checks/builds, and repository hygiene
 passed in GitHub Actions run #7 for implementation PR #3. `git diff --check`
 also passed locally. No live request, new dependency, runtime wiring, wallet,
 execution, or G2/P09 functionality was introduced. PR #2 specification was
-approved by the owner and merged at `891d2a0`.
+approved by the owner and merged at `891d2a0`. Implementation PR #3 passed its
+final GitHub Actions run and was squash-merged to `main` at `155b50a`.
 
 P04-LME-01 specification completed on 2026-09-21. It selects the CoinGecko
 Demo Onchain pool-OHLCV endpoint as the V1 analytical source owner, defines
@@ -445,9 +446,9 @@ functionality was introduced.
 
 ## Next action
 
-Merge the reviewed limited P04-LME-01 implementation after the final CI run.
-Live application wiring, provider verification, and transport implementation
-remain outside this authorization.
+P04-LME-01 limited offline implementation is complete and merged. Any next
+transport, live-provider diagnostic, or application-wiring task requires its
+own specification and explicit authorization.
 
 ## Next task
 
