@@ -1,6 +1,6 @@
 # P04-LME-01 — Live Market Evidence and Signal Policy Specification
 
-**Status:** OWNER ACCEPTED / LIMITED OFFLINE IMPLEMENTATION AUTHORIZED
+**Status:** OWNER ACCEPTED / LIMITED OFFLINE IMPLEMENTATION COMPLETE / CI PASS
 **Phase:** P04 — Market & Signal Intelligence  
 **Scope:** source decision, canonical mapping, and deterministic signal policy  
 **Updated:** 2026-09-21
