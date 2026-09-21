@@ -1,3 +1,16 @@
+## 2026-09-21 — P04-LME-01 Source and Signal Policy Specification
+
+- **PHASE:** P04 — Market & Signal Intelligence
+- **TASK:** P04-LME-01 — Live Market Evidence and Signal Policy
+- **DECISION:** Proposed CoinGecko Demo Onchain pool OHLCV as the V1
+  analytical source owner, with exact-pool/exact-token closed-candle semantics.
+- **POLICY:** Defined deterministic `PRICE_DIRECTION_1M` observational evidence
+  with `RISING`, `FALLING`, and `FLAT` outcomes; it is not predictive or an
+  execution instruction.
+- **BOUNDARY:** No provider call, secret, dependency, wallet, execution, G2, or
+  P09 behavior was added. Runtime implementation remains unauthorized pending
+  explicit owner acceptance.
+
 ## 2026-08-31 — P08-T06 Implementation and Documentation Synchronization
 
 - **PHASE:** P08 — Outcome Learning
