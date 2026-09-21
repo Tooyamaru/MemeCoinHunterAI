@@ -12,6 +12,12 @@ Never commit:
 
 Use environment secrets. Documentation may contain secret variable names only, never values.
 
+P04-LME-02 recognizes `COINGECKO_DEMO_API_KEY` only at its one-shot diagnostic
+boundary. The value is placed only in the `x-cg-demo-api-key` server-side
+header. The URL, transport result, exception text, logs, provenance, fixtures,
+and canonical digests remain credential-free. Redirects are disabled and HTTP
+error bodies are discarded.
+
 ## V1.1 security boundaries
 
 Capital protection is the highest-priority invariant. When uncertainty exists,
@@ -48,5 +54,6 @@ Win rate or a fixed trade count cannot authorize live trading. If durable
 risk-adjusted edge is not demonstrated after controlled testing, governance
 may STOP, PAUSE, or change market.
 
-This V1.1 revision creates no integrations, wallet, secret configuration, or
-fund-access code.
+The current read-only market transports have no wallet or fund access. Secret
+variable names may be configured through the environment; values remain outside
+source control and canonical evidence.

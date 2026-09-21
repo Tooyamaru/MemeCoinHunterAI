@@ -67,8 +67,15 @@ It is observational evidence, not a prediction or trading instruction. The
 complete decision, mapping, test requirements, and excluded scope are recorded
 in `docs/P04-LME-01-LIVE-MARKET-EVIDENCE-SPECIFICATION.md`. The pure mapper and
 policy are implemented and tested through the existing P02/P04/P05 chain using
-synthetic fixtures. HTTP transport, live verification, and application wiring
-remain outside this authorization.
+synthetic fixtures.
+
+P04-LME-02 adds one bounded server-side HTTP GET and one-shot diagnostic
+composition. It reads the API credential from the exact environment name,
+disables redirects, performs no retry, enforces the request-owned timeout and
+streaming response-size limit, and supplies a distinct post-receipt evaluation
+time to the pure mapper. Continuous polling, live provider verification,
+application wiring, and paper automation remain outside the completed local
+verification. The transport does not select a token or pool.
 
 ## Hard safety evidence
 

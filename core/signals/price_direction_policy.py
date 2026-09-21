@@ -1,6 +1,7 @@
 """Versioned observational price direction, never a trading instruction."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 import hashlib
 import json
@@ -31,6 +32,7 @@ class PriceDirectionResult:
 def derive_price_direction(
     *, request: OhlcvRequest, response: OhlcvResponse,
     predecessor: P02T07PredecessorContext, freshness_policy: FreshnessPolicy,
+    evaluation_time: datetime | None = None,
 ) -> PriceDirectionResult:
     """Validate original inputs before producing P04-T01 evidence.
 
@@ -39,7 +41,7 @@ def derive_price_direction(
     """
     market = map_pool_ohlcv(
         request=request, response=response, predecessor=predecessor,
-        freshness_policy=freshness_policy,
+        freshness_policy=freshness_policy, evaluation_time=evaluation_time,
     )
     if market.outcome is not OhlcvOutcome.PRODUCED:
         return PriceDirectionResult(market)
