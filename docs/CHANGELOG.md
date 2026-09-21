@@ -1,3 +1,17 @@
+## 2026-09-21 — P04-LME-01 Limited Offline Implementation
+
+- **AUTHORIZATION:** Owner accepted P04-LME-01 and explicitly authorized the
+  limited implementation; specification PR #2 merged at `891d2a0`.
+- **IMPLEMENTATION:** Added bounded OHLCV response mapping through existing
+  P02-T07/T08/T09 processors, credential-isolated request preparation, and
+  deterministic `PRICE_DIRECTION_1M` evidence. No existing evaluator changed.
+- **VERIFICATION:** 101 new offline tests; 191 combined focused/regression tests
+  passed locally under Python 3.12.14. Required Python 3.13 full-suite verification
+  runs in GitHub Actions; results are attached to the implementation PR. The
+  local 3.13 interpreter is unavailable. Whitespace check passed.
+- **BOUNDARY:** No network calls, HTTP transport, environment-secret reads,
+  new dependency, application wiring, wallet, execution, G2, or P09 behavior.
+
 ## 2026-09-21 — P04-LME-01 Source and Signal Policy Specification
 
 - **PHASE:** P04 — Market & Signal Intelligence

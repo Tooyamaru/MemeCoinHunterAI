@@ -12,8 +12,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P04-LME-01 live market evidence source and
   deterministic market-to-signal policy
-- **Integration priority status:** SPECIFICATION COMPLETE / IMPLEMENTATION NOT
-  AUTHORIZED / OWNER ACCEPTANCE REQUIRED
+- **Integration priority status:** OWNER ACCEPTED / LIMITED OFFLINE IMPLEMENTATION
+  COMPLETE / LOCAL CHECKS PASS / IMPLEMENTATION REVIEW REQUIRED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-21
@@ -43,8 +43,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** P04-LME-01 source/policy specification is under pull-request
-  review; no trading/runtime phase implementation is active
+- **In progress:** P04-LME-01 implementation review and CI verification;
+  no live integration or trading/runtime phase implementation is active
 - **Blocked:** G2 realization/settlement endpoint and authoritative provider/source owner decision unresolved
 - **On hold:** None
 - **Not started:** P06 runtime; later P08 tasks; P09–P12
@@ -143,12 +143,28 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
+The owner explicitly approved P04-LME-01 and its limited implementation on
+2026-09-21. Authorization covers the two modules, offline fixture, focused
+tests, and minimal documentation in section 13. Live provider verification,
+application wiring, wallet, execution, G2, and P09 remain unauthorized.
+
+The limited mapper, deterministic price-direction policy, synthetic fixture,
+and 101 new offline tests are implemented. Combined targeted/regression checks
+passed: 191 tests on the available Python 3.12.14 runtime. The local Python 3.13
+interpreter is unavailable and its automatic download failed; the required
+locked Python 3.13 full-suite verification is delegated to GitHub Actions and
+its results are tracked on the implementation pull request.
+`git diff --check` passed. No live request, new dependency, runtime wiring,
+wallet, execution, or G2/P09 functionality was introduced. PR #2 specification
+was approved by the owner and merged at `891d2a0`.
+
 P04-LME-01 specification completed on 2026-09-21. It selects the CoinGecko
 Demo Onchain pool-OHLCV endpoint as the V1 analytical source owner, defines
 exact-pool/exact-token closed-candle mapping into P02-T09, and defines the
 non-predictive `PRICE_DIRECTION_1M` signal policy. The specification adds no
 provider call, dependency, secret, runtime, wallet, execution, G2, or P09
-behavior. Implementation remains NOT AUTHORIZED pending owner acceptance.
+behavior. Its original implementation hold was superseded by the explicit
+limited authorization recorded above; live integration remains blocked.
 
 Hybrid workflow hardening was locally verified on 2026-09-21. The full Python
 3.13 suite passed with 1,191 tests and one non-blocking dependency warning.
@@ -345,6 +361,14 @@ functionality was introduced.
 - `.github/workflows/ci.yml`
 - `docs/HYBRID_DEVELOPMENT_WORKFLOW.md`
 - `docs/P04-LME-01-LIVE-MARKET-EVIDENCE-SPECIFICATION.md`
+- `core/data/coingecko_onchain_ohlcv.py`
+- `core/signals/price_direction_policy.py`
+- `core/data/market_observations.py`
+- `core/data/market_state.py`
+- `core/data/market_intelligence.py`
+- `core/opportunity/canonical_evidence_producer.py`
+- `tests/test_coingecko_onchain_ohlcv.py`
+- `tests/test_price_direction_policy.py`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -422,18 +446,18 @@ functionality was introduced.
 
 ## Next action
 
-Review and accept or reject the P04-LME-01 source/policy decision. If accepted,
-issue a separate limited implementation authorization for only the files and
-tests listed in the specification. Do not connect the producer to live
-application data until the limited implementation passes its own audit.
+Review the limited P04-LME-01 implementation and its CI results. Source/policy
+acceptance and limited implementation are authorized; live application wiring,
+provider verification, and transport implementation are not. Do not connect the
+producer to live application data under this authorization.
 
 ## Next task
 
-The next implementation task is not yet authorized. The proposed next task is
-the limited P04-LME-01 implementation of the CoinGecko OHLCV response mapper
-and deterministic price-direction policy, with offline fixtures and focused
-tests only. G2 remains a separate blocked owner decision. No P09 behavior has
-been started or authorized.
+After implementation review, any transport/live-provider diagnostic boundary
+requires separate scope and authorization. This revision contains only pure
+mapping, request preparation, P02 admission, and observational signal evidence.
+G2 remains a separate blocked owner decision. No P09 behavior has been started
+or authorized.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:
