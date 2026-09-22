@@ -1,6 +1,6 @@
 # P01-RTI-04 — Caller-Triggered Persisted Paper Run
 
-**Status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING
+**Status:** COMPLETE / CLOSED / CI PASS
 
 **Phase:** P01 runtime integration over completed P01-RTI-01, P01-RTI-02, and
 P01-RTI-03 boundaries
@@ -234,7 +234,8 @@ P01-RTI-01 through P01-RTI-04 regression suite passes 38 tests, and the full
 Python 3.13 suite passes 1,409 tests with one pre-existing Starlette warning.
 Module compilation, whitespace checks, TypeScript typechecks, and all workspace
 builds pass; the known frontend `tooltip.tsx` sourcemap warning remains
-non-blocking. GitHub CI and merge are pending.
+non-blocking. GitHub Actions run #41 passed both required jobs, and PR #13 was
+squash-merged to `main` at `6fdcd72`.
 
 Any later API/manual trigger, read-only result query, dashboard/Hunter Room
 publication, upstream market-to-opportunity runtime composition, scheduler, or

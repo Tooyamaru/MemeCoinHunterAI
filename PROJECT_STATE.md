@@ -10,10 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-04 caller-triggered persisted paper
-  run application-service boundary
-- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
-  PENDING
+- **Current integration priority:** Post-P01-RTI-04 next-gate selection
+- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
+  AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -48,8 +47,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01-RTI-03 controlled paper persistence is COMPLETE / CLOSED / CI PASS and
   was squash-merged through PR #11 at `43ab170`. G2, G3, G4, and P09 remain
   NOT AUTHORIZED.
-- P01-RTI-04 caller-triggered persisted paper run is IMPLEMENTED with local
-  verification PASS; GitHub PR/CI/merge is pending.
+- P01-RTI-04 caller-triggered persisted paper run is COMPLETE / CLOSED / CI
+  PASS and was squash-merged through PR #13 at `6fdcd72`.
 
 ## Phase status
 
@@ -161,10 +160,11 @@ results and digests, persists rejection and reconciliation-mismatch audit
 chains, and relies on P01-RTI-03 for idempotency and conflict handling. Ten
 focused tests, 38 combined P01-RTI-01 through P01-RTI-04 regressions, and the
 full 1,409-test Python 3.13 suite pass. Module compilation, whitespace checks,
-TypeScript typechecks, and all workspace builds pass. One pre-existing
-Starlette warning and the known frontend sourcemap warning remain non-blocking.
-GitHub PR/CI/merge is pending. No API, worker, scheduler, provider, automatic
-selection, dashboard, wallet, or live execution surface is authorized.
+TypeScript typechecks, and all workspace builds pass. GitHub Actions run #41
+passed both required jobs, and PR #13 was squash-merged to `main` at `6fdcd72`.
+One pre-existing Starlette warning and the known frontend sourcemap warning
+remain non-blocking. No API, worker, scheduler, provider, automatic selection,
+dashboard, wallet, or live execution surface is authorized.
 
 P01-RTI-03 is implemented as an append-only, atomic persistence boundary over
 one already-created P01-RTI-02 result. It uses one root run row plus
@@ -558,17 +558,19 @@ functionality was introduced.
 
 ## Next action
 
-Push the verified P01-RTI-04 branch, open its pull request, require both GitHub
-Actions jobs to pass, and merge. No API, worker, scheduler, provider loop,
-dashboard publication, wallet access, or live execution is authorized.
+Select and separately specify the next bounded integration gate. The leading
+options are a manual one-shot API boundary, a read-only persisted-result query,
+or upstream market-to-opportunity runtime composition. No option is authorized
+yet. Scheduler, provider loop, dashboard publication, wallet access, and live
+execution remain unauthorized.
 
 ## Next task
 
-P01-RTI-04 merge and closure is the current task under its approved one-request
-application-service composition. Automatic token/pool selection, continuous
-polling, automatic retry, API publication, dashboard publication, wallet
-access, signing, broadcast, live execution, G2, G3, G4, and P09 remain
-unauthorized.
+P01-RTI-04 is complete, merged, and CI-verified. The next task is an explicit
+owner selection and specification review for one bounded post-RTI-04 gate.
+Automatic token/pool selection, continuous polling, automatic retry, API
+publication, dashboard publication, wallet access, signing, broadcast, live
+execution, G2, G3, G4, and P09 remain unauthorized.
 
 The implementation is present in
 `core/runtime/controlled_paper_run_admission.py` with focused verification in
