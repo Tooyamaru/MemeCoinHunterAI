@@ -5,7 +5,7 @@ from hashlib import sha256
 import json
 from typing import Any
 
-from core.execution.paper_fill_outcome import PaperFillOutcome
+from core.execution.paper_fill_outcome import FillOutcomeStatus, PaperFillOutcome
 from core.execution.paper_ledger import PaperLedgerEntry
 from core.execution.paper_position_exposure_state import PaperStateTransitionResult
 from core.execution.paper_reconciliation import PaperReconciliationResult
@@ -94,7 +94,11 @@ class PaperSimulationResult:
             transition_digest=transition.transition_digest,
             ledger_digest=ledger_values[0].entry_digest,
             reconciliation_digest=reconciliation.result_digest,
-            status=fill_outcome.status.value,
+            status=(
+                "PARTIAL"
+                if fill_outcome.status is FillOutcomeStatus.PARTIALLY_FILLED
+                else fill_outcome.status.value
+            ),
             filled_quantity=str(fill_outcome.filled_quantity),
             unfilled_quantity=str(fill_outcome.remaining_quantity),
             position_state_digest=(

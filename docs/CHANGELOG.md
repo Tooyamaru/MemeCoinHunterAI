@@ -1,3 +1,25 @@
+## 2026-09-22 — P01-RTI-02 Controlled Paper Lifecycle Gate
+
+- **AUTHORIZATION:** The owner requested continued construction after
+  P01-RTI-01 merged through PR #7.
+- **SPECIFICATION:** Bounded one explicit paper-only lifecycle from an approved
+  P07-T01 input through P07-T02–T07 and one P08-T01 observation.
+- **RECONCILIATION:** Requires an independently supplied expectation; the
+  runtime cannot manufacture an expectation from its own ledger output.
+- **CORRECTIVE SCOPE:** Authorizes only the exact P07-T02
+  `PARTIALLY_FILLED` → P07-T06 `PARTIAL` representation mapping.
+- **IMPLEMENTATION:** Added the immutable, one-shot P07-T02–T07 and P08-T01
+  composition. It preserves full, partial, failed, and unavailable fill
+  outcomes; stops before result/history/observation when reconciliation does
+  not match; and fails closed on invalid or tampered evidence.
+- **LOCAL VERIFICATION:** 16 focused tests, 349 relevant P01/P07/P08/G1
+  regressions, and the full 1,388-test Python 3.13 suite pass. Module
+  compilation, `git diff --check`, TypeScript typechecks, and all workspace
+  builds pass. One pre-existing Starlette deprecation warning and the known
+  frontend sourcemap warning remain non-blocking.
+- **EXCLUSIONS:** No persistence, API, scheduler, dashboard, provider, wallet,
+  live execution, G2, G3, G4, or P09 behavior.
+
 ## 2026-09-22 — Current-State Synchronization and Runtime Integration Gate
 
 - **STATUS:** Documentation synchronization started from merged `main` after
