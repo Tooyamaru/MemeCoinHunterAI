@@ -22,6 +22,8 @@
   pass. Workspace TypeScript typechecks and builds pass. One pre-existing
   Starlette deprecation warning and the known frontend sourcemap warning remain
   non-blocking.
+- **CI:** GitHub Actions run #24 passed the locked Python 3.13 suite,
+  whitespace gate, TypeScript typechecks, and workspace builds for PR #7.
 
 ## 2026-09-21 — P04-LME-03 Controlled Orchestration
 

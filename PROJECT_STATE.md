@@ -12,8 +12,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-RTI-01 controlled paper runtime
   integration gate
-- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL
-  VERIFICATION PASS / CI PENDING
+- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / REVIEWED /
+  CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -39,8 +39,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P07 v2 Risk/Capital admission implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - Read-only Market Data Adapter specification is COMPLETE / CLOSED / AUDITED PASS; limited implementation is AUTHORIZED; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - Read-only Market Data Adapter implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
-- P01-RTI-01 controlled paper-run admission composition is IMPLEMENTED / LOCAL
-  VERIFICATION PASS / CI PENDING. It composes one existing P05-T08 context
+- P01-RTI-01 controlled paper-run admission composition is IMPLEMENTED /
+  REVIEWED / CI PASS. It composes one existing P05-T08 context
   through P06-T02, paper Risk/Capital Authority, and P07-T01 only.
 
 ## Phase status
@@ -499,9 +499,8 @@ functionality was introduced.
 
 ## Next action
 
-Commit and push the locally verified P01-RTI-01 implementation, open a pull
-request, require the locked Python 3.13 and TypeScript CI gates to pass, then
-merge to `main`.
+Merge PR #7 after the documentation-only closure commit repeats the locked
+Python 3.13 and TypeScript CI gates successfully.
 
 ## Next task
 
@@ -522,6 +521,8 @@ reconciliation, P08 runtime, provider, persistence, API, scheduler, dashboard,
 wallet, signing, broadcast, or live execution behavior was introduced.
 Workspace TypeScript typechecks and builds pass locally with the pre-existing
 non-blocking frontend `tooltip.tsx` sourcemap warning.
+GitHub Actions run #24 passed the locked Python 3.13 suite, whitespace gate,
+TypeScript typechecks, and workspace builds for the implementation commit.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

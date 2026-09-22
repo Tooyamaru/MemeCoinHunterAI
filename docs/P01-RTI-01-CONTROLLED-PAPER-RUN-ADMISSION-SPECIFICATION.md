@@ -1,6 +1,6 @@
 # P01-RTI-01 — Controlled Paper Run Admission Composition
 
-**Status:** LIMITED IMPLEMENTATION COMPLETE / LOCALLY VERIFIED
+**Status:** LIMITED IMPLEMENTATION COMPLETE / REVIEWED / CI PASS
 
 **Phase:** P01 runtime integration over existing P05, P06, Risk/Capital, and P07 owners
 
@@ -137,8 +137,9 @@ Focused tests, relevant P05/P06/Risk/P07 regressions, module compilation,
 The authorized composition and focused tests are implemented. Eight focused
 tests, 87 relevant P05/P06/Risk/P07 tests, and the full 1,377-test Python 3.13
 suite pass locally. Module compilation and `git diff --check` pass. GitHub CI
-verification remains required before merge. Workspace TypeScript typechecks and
-builds also pass locally with the known non-blocking frontend sourcemap warning.
+verification passed in GitHub Actions run #24. Workspace TypeScript typechecks
+and builds also pass locally and in CI with the known non-blocking frontend
+sourcemap warning.
 
 Completion of P01-RTI-01 authorizes neither a complete paper cycle nor an API
 runtime. A later P01-RTI-02 specification may compose an explicitly supplied
