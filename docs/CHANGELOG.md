@@ -1,3 +1,33 @@
+## 2026-09-22 — P01-RTI-07 Read-Only Lifecycle Digest Catalog
+
+- **STATUS:** Implemented / local verification pass / CI pending.
+- **RECOMMENDATION:** P01-RTI-07, a bounded, read-only, HTTP-independent catalog
+  of canonical persisted `lifecycle_result_digest` identities.
+- **RATIONALE:** It is the smallest repository-supported successor to RTI-05/06
+  and can remain deterministic, identity-only, and read-only. Manual-trigger
+  transport would open mutation/paper execution, while upstream composition is
+  blocked by unresolved source and market-to-signal policy ownership.
+- **BOUNDARY:** Proposed digest-ordered keyset continuation only; no secondary
+  identity, timestamps, filtering, search, latest/history semantics, result
+  detail projection, HTTP route, model, migration, provider, worker, scheduler,
+  dashboard, wallet, execution, live trading, G2, G3, G4, or P09.
+- **CONTRACT:** Default limit `50`, hard maximum `100`, ascending digest order,
+  exclusive `after_digest` keyset continuation, successful empty `PAGE`, and
+  bounded `STORAGE_UNAVAILABLE`. Every immutable result has a canonical SHA-256
+  `result_digest`.
+- **IMPLEMENTATION:** Added one HTTP-independent application catalog, one
+  digest-only method on the existing repository, and a public delegation point
+  for the unchanged authoritative RTI-03 digest validation semantics. No
+  artifacts or complete bundles are read.
+- **LOCAL VERIFICATION:** 21 focused tests, 37 relevant RTI-03/05/06
+  regressions, 86 combined P01-RTI-01 through RTI-07 regressions, and the full
+  1,456-test Python 3.13 suite pass. Module compilation, whitespace checks,
+  TypeScript typechecks, and workspace builds pass.
+- **GOVERNANCE:** No HTTP, route, dashboard, model, migration, dependency,
+  provider, worker, scheduler, execution, wallet, live trading, economic
+  authority, G2, G3, G4, or P09 behavior was added. RTI-03/04/05/06 behavior is
+  unchanged.
+
 ## 2026-09-22 — P01-RTI-06 Read-Only Result API Specification Gate
 
 - **STATUS:** Complete / closed / CI pass.

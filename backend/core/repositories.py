@@ -58,6 +58,25 @@ class PaperLifecycleRepository:
         )
         return tuple(result.scalars())
 
+    async def list_run_digests(
+        self,
+        session: AsyncSession,
+        *,
+        limit: int,
+        after_digest: str | None,
+    ) -> tuple[str, ...]:
+        statement = select(PaperLifecycleRun.lifecycle_result_digest)
+        if after_digest is not None:
+            statement = statement.where(
+                PaperLifecycleRun.lifecycle_result_digest > after_digest
+            )
+        result = await session.execute(
+            statement.order_by(PaperLifecycleRun.lifecycle_result_digest.asc()).limit(
+                limit
+            )
+        )
+        return tuple(result.scalars())
+
     async def insert_bundle(
         self,
         session: AsyncSession,

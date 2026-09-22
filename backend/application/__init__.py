@@ -16,12 +16,20 @@ from backend.application.paper_lifecycle_persistence import (
     PaperLifecycleReadOutcome,
     PaperLifecycleReadResult,
     PaperLifecycleRunSnapshot,
+    validate_lifecycle_result_digest,
+)
+from backend.application.paper_lifecycle_digest_catalog import (
+    P01_RTI_07_CONTRACT_VERSION,
+    PaperLifecycleDigestCatalogOutcome,
+    PaperLifecycleDigestCatalogResult,
+    PaperLifecycleDigestCatalogService,
 )
 from backend.application.paper_lifecycle_query import PaperLifecycleQueryService
 
 __all__ = [
     "P01_RTI_04_CONTRACT_VERSION",
     "P01_RTI_03_CONTRACT_VERSION",
+    "P01_RTI_07_CONTRACT_VERSION",
     "ControlledPaperRunOutcome",
     "ControlledPaperRunRequest",
     "ControlledPaperRunResult",
@@ -35,4 +43,8 @@ __all__ = [
     "PaperLifecycleReadResult",
     "PaperLifecycleRunSnapshot",
     "PaperLifecycleQueryService",
+    "PaperLifecycleDigestCatalogOutcome",
+    "PaperLifecycleDigestCatalogResult",
+    "PaperLifecycleDigestCatalogService",
+    "validate_lifecycle_result_digest",
 ]
