@@ -1,6 +1,6 @@
 ## 2026-09-22 — P01-RTI-04 Application-Service Specification Gate
 
-- **STATUS:** Implemented with local verification pass; CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **AUTHORIZATION:** The owner explicitly approved the limited P01-RTI-04
   implementation on 2026-09-22.
 - **PROPOSAL:** Compose exactly one explicit caller request through the existing
@@ -18,6 +18,8 @@
   compilation, whitespace checks, TypeScript typechecks, and all workspace
   builds pass. One pre-existing Starlette warning and the known frontend
   sourcemap warning remain non-blocking.
+- **MERGE:** GitHub Actions run #41 passed both required jobs and PR #13 was
+  squash-merged to `main` at `6fdcd72`.
 
 ## 2026-09-22 — P01-RTI-03 Controlled Paper Persistence Gate
 

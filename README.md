@@ -27,10 +27,11 @@ pool selection, application runtime wiring, wallet, live trading, AI/ML, or P09
 execution functionality has been implemented.
 
 The controlled paper path now has one-shot admission (P01-RTI-01), lifecycle
-(P01-RTI-02), and append-only persistence (P01-RTI-03), all merged and CI
-verified. P01-RTI-04 is the next specification gate for one explicit
-caller-triggered application-service invocation; implementation is not yet
-authorized.
+(P01-RTI-02), append-only persistence (P01-RTI-03), and one explicit
+caller-triggered application-service invocation (P01-RTI-04), all merged and CI
+verified. P01-RTI-04 is complete through PR #13. A later API, result-query,
+upstream runtime-composition, scheduler, or dashboard gate requires separate
+approval.
 
 ## Architecture summary
 
