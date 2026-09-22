@@ -10,13 +10,13 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P04-LME-03 controlled read-only diagnostic
-  orchestration specification
+- **Current integration priority:** P01-RTI-01 controlled paper runtime
+  integration gate
 - **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / REVIEWED /
   CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
-- **Last updated:** 2026-09-21
+- **Last updated:** 2026-09-22
 
 ## Master progress
 
@@ -39,6 +39,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P07 v2 Risk/Capital admission implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - Read-only Market Data Adapter specification is COMPLETE / CLOSED / AUDITED PASS; limited implementation is AUTHORIZED; G2, G3, G4, and P09 remain NOT AUTHORIZED.
 - Read-only Market Data Adapter implementation is COMPLETE / CLOSED / AUDITED PASS; G2, G3, G4, and P09 remain NOT AUTHORIZED.
+- P01-RTI-01 controlled paper-run admission composition is IMPLEMENTED /
+  REVIEWED / CI PASS. It composes one existing P05-T08 context
+  through P06-T02, paper Risk/Capital Authority, and P07-T01 only.
 
 ## Phase status
 
@@ -402,6 +405,7 @@ functionality was introduced.
 - `docs/P04-LME-01-LIVE-MARKET-EVIDENCE-SPECIFICATION.md`
 - `docs/P04-LME-02-TRANSPORT-DIAGNOSTIC-SPECIFICATION.md`
 - `docs/P04-LME-03-CONTROLLED-ORCHESTRATION-SPECIFICATION.md`
+- `docs/P01-RTI-01-CONTROLLED-PAPER-RUN-ADMISSION-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -411,11 +415,13 @@ functionality was introduced.
 - `core/data/market_state.py`
 - `core/data/market_intelligence.py`
 - `core/opportunity/canonical_evidence_producer.py`
+- `core/runtime/controlled_paper_run_admission.py`
 - `tests/test_coingecko_onchain_ohlcv.py`
 - `tests/test_price_direction_policy.py`
 - `tests/test_coingecko_onchain_transport.py`
 - `tests/test_coingecko_onchain_diagnostic.py`
 - `tests/test_coingecko_onchain_orchestration.py`
+- `tests/test_controlled_paper_run_admission.py`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -493,15 +499,30 @@ functionality was introduced.
 
 ## Next action
 
-P04-LME-03 limited implementation and CI verification are complete. Keep live
-provider verification recorded as `NOT RUN`.
+Merge PR #7 after the documentation-only closure commit repeats the locked
+Python 3.13 and TypeScript CI gates successfully.
 
 ## Next task
 
-The next implementation task is not authorized. Continuous polling,
-application wiring, persistence, dashboard publication, and paper automation
-require later specifications and authorization. G2 remains blocked; P09
-remains unauthorized.
+P01-RTI-01 specification and limited implementation are authorized by the owner
+on 2026-09-22. The task must remain one-shot, explicitly supplied,
+deterministic, offline-testable, and paper-only. It may compose existing domain
+owners but must not add automatic token/pool selection, continuous polling,
+retry, persistence, dashboard publication, wallet access, signing, broadcast,
+live execution, G2, G3, G4, or P09 behavior.
+
+The implementation is present in
+`core/runtime/controlled_paper_run_admission.py` with focused verification in
+`tests/test_controlled_paper_run_admission.py`. Eight focused tests, 87 relevant
+P05/P06/Risk/P07 tests, and the full 1,377-test Python 3.13 suite pass locally
+with one pre-existing non-blocking Starlette deprecation warning. Module
+compilation and `git diff --check` pass. No fill, position, ledger,
+reconciliation, P08 runtime, provider, persistence, API, scheduler, dashboard,
+wallet, signing, broadcast, or live execution behavior was introduced.
+Workspace TypeScript typechecks and builds pass locally with the pre-existing
+non-blocking frontend `tooltip.tsx` sourcemap warning.
+GitHub Actions run #24 passed the locked Python 3.13 suite, whitespace gate,
+TypeScript typechecks, and workspace builds for the implementation commit.
 
  Only the implementation
 files explicitly approved by the P07-T01 specification were created:

@@ -1,3 +1,30 @@
+## 2026-09-22 — Current-State Synchronization and Runtime Integration Gate
+
+- **STATUS:** Documentation synchronization started from merged `main` after
+  P04-LME-03.
+- **CORRECTION:** README, master blueprint, architecture, and project state now
+  distinguish the completed bounded read-only provider diagnostic from an
+  operational application/runtime loop and record P04-T08 through P04-T10,
+  P06-T01 through P06-T03, and P08-T07 accurately.
+- **NEXT GATE:** The owner authorized a separately specified P01-RTI-01
+  controlled, one-shot, paper-only runtime composition. Automatic selection,
+  polling, persistence, dashboard publication, wallet, live execution,
+  G2/G3/G4, and P09 remain outside scope.
+- **SPECIFICATION:** P01-RTI-01 is bounded to one P05-T08 → P06-T02 →
+  Risk/Capital → P07-T01 admission attempt. It stops before fill, state, ledger,
+  reconciliation, P08, persistence, API wiring, or scheduling.
+- **IMPLEMENTATION:** Added an immutable one-shot composition result and
+  fail-closed admission function. It preserves P06 output, canonical
+  Risk/Capital approval or rejection, and creates P07-T01 v2 only through the
+  official authorization-reference adapter.
+- **LOCAL VERIFICATION:** 8 focused tests, 87 relevant regressions, and 1,377
+  full-suite Python 3.13 tests pass; module compilation and `git diff --check`
+  pass. Workspace TypeScript typechecks and builds pass. One pre-existing
+  Starlette deprecation warning and the known frontend sourcemap warning remain
+  non-blocking.
+- **CI:** GitHub Actions run #24 passed the locked Python 3.13 suite,
+  whitespace gate, TypeScript typechecks, and workspace builds for PR #7.
+
 ## 2026-09-21 — P04-LME-03 Controlled Orchestration
 
 - **AUTHORIZATION:** Owner accepted the recommended limited implementation and
