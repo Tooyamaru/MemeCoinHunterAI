@@ -1,6 +1,17 @@
+## 2026-09-22 — P01-RTI-04 Application-Service Specification Gate
+
+- **STATUS:** Specification draft; implementation not authorized.
+- **PROPOSAL:** Compose exactly one explicit caller request through the existing
+  P01-RTI-01 admission, P01-RTI-02 lifecycle, and P01-RTI-03 persistence
+  boundaries without recreating their rules.
+- **RESULT:** Preserve the canonical nested admission, lifecycle, and
+  persistence results and expose only deterministic orchestration outcomes.
+- **BOUNDARY:** No API, worker, scheduler, automatic selection, provider call,
+  dashboard, wallet, live execution, G2, G3, G4, or P09 behavior.
+
 ## 2026-09-22 — P01-RTI-03 Controlled Paper Persistence Gate
 
-- **STATUS:** Implemented with local verification pass; CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **PROPOSAL:** Atomically retain one canonical P01-RTI-02 result and every
   artifact actually present through one append-only run row plus ordered
   canonical artifact snapshots.
@@ -25,6 +36,8 @@
   TypeScript typechecks, and all workspace builds pass. One pre-existing
   Starlette deprecation warning and the known frontend sourcemap warning remain
   non-blocking.
+- **MERGE:** GitHub Actions run #36 passed both required jobs and PR #11 was
+  squash-merged to `main` at `43ab170`.
 
 ## 2026-09-22 — P01-RTI-02 Controlled Paper Lifecycle Gate
 

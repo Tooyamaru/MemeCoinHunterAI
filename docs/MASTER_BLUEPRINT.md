@@ -41,6 +41,13 @@ closed at their governed deterministic/optional-analysis boundaries, but no
 operational decision loop is active. Trading, execution, and wallet behavior
 remain future boundaries.
 
+P01-RTI-01 and P01-RTI-02 provide the bounded one-shot paper admission and
+lifecycle compositions. P01-RTI-03 append-only persistence is COMPLETE /
+CLOSED / CI PASS through PR #11 at `43ab170`. P01-RTI-04 is the next
+specification-only gate for one caller-triggered persisted paper run; its
+implementation, API publication, workers, scheduling, dashboard wiring, and
+live behavior remain unauthorized.
+
 ## V1.1 architectural baseline
 
 V1.1 defines the intended system as a selective, explainable, risk-first crypto

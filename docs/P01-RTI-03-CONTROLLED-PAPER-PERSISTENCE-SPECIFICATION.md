@@ -1,6 +1,6 @@
 # P01-RTI-03 — Controlled Paper Persistence
 
-**Status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING
+**Status:** COMPLETE / CLOSED / CI PASS
 
 **Phase:** P01 runtime integration over the existing P01-T03 persistence
 foundation and completed P01-RTI-02 paper lifecycle
@@ -331,11 +331,12 @@ merge.
 
 ## 14. Exit and following gate
 
-Completion of P01-RTI-03 would provide durable paper-lifecycle audit records
-only. It would not create an operational runtime.
+P01-RTI-03 provides durable paper-lifecycle audit records only. GitHub Actions
+run #36 passed both required jobs, and PR #11 was squash-merged to `main` at
+`43ab170`. It does not create an operational runtime.
 
-The next possible gate after implementation and closure would be a separately
-specified P01-RTI-04 application-service boundary for one caller-triggered
-persisted paper run. That gate is not authorized by this document. Scheduler,
+The next gate is the separately specified P01-RTI-04 application-service
+boundary for one caller-triggered persisted paper run. Its implementation is
+not authorized by this document. Scheduler,
 continuous market selection, dashboard publication, Hunter Room integration,
 wallet access, live execution, G2, G3, G4, and P09 remain future work.
