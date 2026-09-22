@@ -36,6 +36,31 @@ Provider credentials are not required by CI. Tests that represent provider
 behavior must remain deterministic and mocked unless a later specification
 explicitly authorizes a separate protected integration workflow.
 
+## Work-usage efficiency and continuation
+
+Development uses one primary agent by default. Additional agents are justified
+only when independent parallel work has a measured benefit; they are not the
+default for routine inspection, implementation, testing, or documentation.
+
+To reduce repeated context and tool usage:
+
+1. work on one governed gate at a time;
+2. inspect only the current task's listed files;
+3. batch related read-only checks when safe;
+4. run focused tests during iteration and the full required suite once before
+   code merge;
+5. do not rerun the full suite for documentation-only changes unless CI or the
+   changed workflow requires it;
+6. update `PROJECT_STATE.md` as soon as a milestone changes; and
+7. commit and publish a narrow checkpoint before available work usage becomes
+   insufficient.
+
+If a session stops, the next session resumes from GitHub `main`,
+`PROJECT_STATE.md`, and the latest open pull request rather than repeating a
+repository-wide audit. A checkpoint must state the completed work, remaining
+work, verification already performed, current branch/commit, and explicit
+scope exclusions.
+
 ## Branch and merge policy
 
 - `main` represents the stable, reviewable baseline.

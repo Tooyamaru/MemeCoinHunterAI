@@ -10,9 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-03 controlled paper persistence
-- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
-  PENDING
+- **Current integration priority:** P01-RTI-04 caller-triggered persisted paper
+  run application-service boundary
+- **Integration priority status:** SPECIFICATION DRAFT / IMPLEMENTATION NOT
+  AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -44,9 +45,11 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01-RTI-02 controlled paper lifecycle is COMPLETE / CLOSED / CI PASS and was
   squash-merged through PR #8 at `74e6b39`. G2, G3, G4, and P09 remain NOT
   AUTHORIZED.
-- P01-RTI-03 controlled paper persistence is IMPLEMENTED with local
-  verification PASS; GitHub PR/CI/merge is pending. G2, G3, G4, and P09 remain
+- P01-RTI-03 controlled paper persistence is COMPLETE / CLOSED / CI PASS and
+  was squash-merged through PR #11 at `43ab170`. G2, G3, G4, and P09 remain
   NOT AUTHORIZED.
+- P01-RTI-04 caller-triggered persisted paper run is the next specification
+  gate. Its implementation is not authorized.
 
 ## Phase status
 
@@ -152,8 +155,7 @@ requires its own specification and explicit approval.
 ## Last verified checkpoint
 
 P01-RTI-03 is implemented as an append-only, atomic persistence boundary over
-one
-already-created P01-RTI-02 result. The proposal uses one root run row plus
+one already-created P01-RTI-02 result. It uses one root run row plus
 ordered canonical artifact rows, preserves every owner digest and contract
 version, distinguishes exact retries from conflicts through complete bundle
 comparison, and requires rollback of partial writes. Persistence remains a
@@ -162,9 +164,9 @@ learning authority. The two models, repository boundary, migration, application
 persistence service, and focused offline tests are implemented. Eleven focused
 tests, 375 relevant regressions, and the full 1,399-test Python 3.13 suite pass;
 migration upgrade/downgrade, module compilation, whitespace checks, TypeScript
-typechecks, and workspace builds also pass. GitHub PR/CI/merge is pending. No
-API, worker, scheduler, dashboard, wallet, or live execution surface is
-authorized.
+typechecks, and workspace builds also pass. GitHub Actions run #36 passed both
+required jobs, and PR #11 was squash-merged to `main` at `43ab170`. No API,
+worker, scheduler, dashboard, wallet, or live execution surface is authorized.
 
 P01-RTI-02 now composes one approved P01-RTI-01 admission through canonical
 P07-T02 fill, P07-T03 state transition, P07-T04 ledger, independently supplied
@@ -441,6 +443,7 @@ functionality was introduced.
 - `docs/P01-RTI-01-CONTROLLED-PAPER-RUN-ADMISSION-SPECIFICATION.md`
 - `docs/P01-RTI-02-CONTROLLED-PAPER-LIFECYCLE-SPECIFICATION.md`
 - `docs/P01-RTI-03-CONTROLLED-PAPER-PERSISTENCE-SPECIFICATION.md`
+- `docs/P01-RTI-04-CALLER-TRIGGERED-PERSISTED-PAPER-RUN-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -541,17 +544,18 @@ functionality was introduced.
 
 ## Next action
 
-Push the verified P01-RTI-03 branch, open its pull request, require both GitHub
-Actions jobs to pass, and merge. No API runtime, scheduler, provider loop,
+Review and explicitly approve or revise the P01-RTI-04 application-service
+specification. No RTI-04 runtime code, API, worker, scheduler, provider loop,
 dashboard publication, wallet access, or live execution is authorized.
 
 ## Next task
 
-P01-RTI-03 merge and closure is the current task under the approved exact
-append-only schema, atomicity, idempotency, conflict, readback, and failure
-semantics. Automatic token/pool selection, continuous polling, automatic retry,
-dashboard publication, wallet access, signing, broadcast, live execution, G2,
-G3, G4, and P09 remain unauthorized.
+P01-RTI-04 specification review is the current task. It proposes one explicit
+caller-triggered application-service composition across P01-RTI-01 admission,
+P01-RTI-02 paper lifecycle, and P01-RTI-03 persistence while preserving every
+owner result. Automatic token/pool selection, continuous polling, automatic
+retry, API publication, dashboard publication, wallet access, signing,
+broadcast, live execution, G2, G3, G4, and P09 remain unauthorized.
 
 The implementation is present in
 `core/runtime/controlled_paper_run_admission.py` with focused verification in
