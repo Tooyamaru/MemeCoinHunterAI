@@ -10,9 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-02 controlled paper lifecycle
-  composition
-- **Integration priority status:** COMPLETE / CLOSED / CI PASS
+- **Current integration priority:** P01-RTI-03 controlled paper persistence
+- **Integration priority status:** SPECIFICATION DRAFT / IMPLEMENTATION NOT
+  AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -44,6 +44,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01-RTI-02 controlled paper lifecycle is COMPLETE / CLOSED / CI PASS and was
   squash-merged through PR #8 at `74e6b39`. G2, G3, G4, and P09 remain NOT
   AUTHORIZED.
+- P01-RTI-03 controlled paper persistence specification is drafted for owner
+  review. No persistence implementation is authorized. G2, G3, G4, and P09
+  remain NOT AUTHORIZED.
 
 ## Phase status
 
@@ -147,6 +150,16 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+P01-RTI-03 is specified as an append-only, atomic persistence boundary over one
+already-created P01-RTI-02 result. The proposal uses one root run row plus
+ordered canonical artifact rows, preserves every owner digest and contract
+version, distinguishes exact retries from conflicts through complete bundle
+comparison, and requires rollback of partial writes. Persistence remains a
+recorder without decision, risk, reconciliation, execution, settlement, or
+learning authority. The specification is ready for owner review; models,
+repositories, migrations, runtime persistence code, and tests have not been
+implemented or authorized.
 
 P01-RTI-02 now composes one approved P01-RTI-01 admission through canonical
 P07-T02 fill, P07-T03 state transition, P07-T04 ledger, independently supplied
@@ -422,6 +435,7 @@ functionality was introduced.
 - `docs/P04-LME-03-CONTROLLED-ORCHESTRATION-SPECIFICATION.md`
 - `docs/P01-RTI-01-CONTROLLED-PAPER-RUN-ADMISSION-SPECIFICATION.md`
 - `docs/P01-RTI-02-CONTROLLED-PAPER-LIFECYCLE-SPECIFICATION.md`
+- `docs/P01-RTI-03-CONTROLLED-PAPER-PERSISTENCE-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -517,18 +531,20 @@ functionality was introduced.
 
 ## Next action
 
-Prepare a separate P01-RTI-03 controlled-persistence specification for owner
-review. No persistence implementation, API runtime, scheduler, provider loop,
-dashboard publication, wallet access, or live execution is authorized yet.
+Review and explicitly approve or revise the P01-RTI-03 controlled-persistence
+specification. Only after approval may its limited models, repository,
+migration, runtime persistence boundary, and offline tests be implemented. No
+API runtime, scheduler, provider loop, dashboard publication, wallet access, or
+live execution is authorized.
 
 ## Next task
 
-P01-RTI-02 is complete, merged, and CI-verified within its one-shot,
-explicitly supplied, deterministic, offline-testable, paper-only scope. The
-next proposed task is P01-RTI-03 specification work only, after P01-RTI-02 is
-merged. Automatic token/pool selection, continuous polling, retry, persistence
-implementation, dashboard publication, wallet access, signing, broadcast,
-live execution, G2, G3, G4, and P09 remain unauthorized.
+P01-RTI-03 specification review is the current task. Its implementation remains
+unauthorized until the owner accepts the exact append-only schema, atomicity,
+idempotency, conflict, readback, and failure semantics. Automatic token/pool
+selection, continuous polling, automatic retry, dashboard publication, wallet
+access, signing, broadcast, live execution, G2, G3, G4, and P09 remain
+unauthorized.
 
 The implementation is present in
 `core/runtime/controlled_paper_run_admission.py` with focused verification in

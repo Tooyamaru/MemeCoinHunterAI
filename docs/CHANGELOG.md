@@ -1,3 +1,18 @@
+## 2026-09-22 — P01-RTI-03 Controlled Paper Persistence Gate
+
+- **STATUS:** Specification draft complete; implementation not authorized.
+- **PROPOSAL:** Atomically retain one canonical P01-RTI-02 result and every
+  artifact actually present through one append-only run row plus ordered
+  canonical artifact snapshots.
+- **IDEMPOTENCY:** Exact retries return `ALREADY_STORED`; same-digest storage
+  disagreements return `CONFLICT` without rewriting existing data.
+- **TRANSACTION:** Root and artifact inserts form one unit of work and roll back
+  together. A losing concurrent writer may use a fresh bounded read transaction
+  only to distinguish an exact stored bundle from a conflict.
+- **BOUNDARY:** Persistence records but does not recreate, repair, evaluate, or
+  reinterpret domain artifacts. No API, worker, scheduler, provider, dashboard,
+  wallet, live execution, G2, G3, G4, or P09 behavior is proposed.
+
 ## 2026-09-22 — P01-RTI-02 Controlled Paper Lifecycle Gate
 
 - **AUTHORIZATION:** The owner requested continued construction after
