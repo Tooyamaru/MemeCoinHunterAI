@@ -1,6 +1,6 @@
 # P01-RTI-04 — Caller-Triggered Persisted Paper Run
 
-**Status:** SPECIFICATION DRAFT / IMPLEMENTATION NOT AUTHORIZED
+**Status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING
 
 **Phase:** P01 runtime integration over completed P01-RTI-01, P01-RTI-02, and
 P01-RTI-03 boundaries
@@ -23,8 +23,7 @@ The service is a coordinator, not a new domain owner. It must not copy,
 reinterpret, repair, or replace decision, Risk/Capital, simulation,
 reconciliation, observation, or persistence rules.
 
-This specification does not authorize implementation. A separate owner
-approval is required before application code or tests are changed.
+The owner explicitly authorized the limited implementation on 2026-09-22.
 
 ## 2. Existing owners remain authoritative
 
@@ -184,9 +183,9 @@ P01-RTI-04 adds no:
 - strategy/model update, multi-agent runtime, or P09 behavior; or
 - G2, G3, or G4 implementation.
 
-## 10. Proposed implementation surface
+## 10. Authorized implementation surface
 
-If separately authorized, implementation is limited to:
+Implementation is limited to:
 
 - `backend/application/controlled_paper_run_service.py` for the immutable
   request/result and coordinator;
@@ -225,9 +224,17 @@ and standard GitHub CI must pass before implementation merge.
 
 ## 12. Exit and following gate
 
-Completion of P01-RTI-04 would provide one manually invoked, persisted paper
-application-service call. It would not make the system continuously operational
-and would not create a public API or dashboard feed.
+P01-RTI-04 now provides one locally verified, manually invoked, persisted paper
+application-service call. It does not make the system continuously operational
+and does not create a public API or dashboard feed.
+
+The authorized service, immutable request/result contracts, exports, and ten
+focused tests are implemented. The focused suite passes 10 tests, the combined
+P01-RTI-01 through P01-RTI-04 regression suite passes 38 tests, and the full
+Python 3.13 suite passes 1,409 tests with one pre-existing Starlette warning.
+Module compilation, whitespace checks, TypeScript typechecks, and all workspace
+builds pass; the known frontend `tooltip.tsx` sourcemap warning remains
+non-blocking. GitHub CI and merge are pending.
 
 Any later API/manual trigger, read-only result query, dashboard/Hunter Room
 publication, upstream market-to-opportunity runtime composition, scheduler, or
