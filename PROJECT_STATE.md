@@ -12,8 +12,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-RTI-02 controlled paper lifecycle
   composition
-- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
-  PENDING
+- **Integration priority status:** COMPLETE / CLOSED / CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -42,8 +41,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01-RTI-01 controlled paper-run admission composition is IMPLEMENTED /
   REVIEWED / CI PASS. It composes one existing P05-T08 context
   through P06-T02, paper Risk/Capital Authority, and P07-T01 only.
-- P01-RTI-02 controlled paper lifecycle is IMPLEMENTED with local verification
-  PASS; GitHub PR/CI/merge is pending. G2, G3, G4, and P09 remain NOT
+- P01-RTI-02 controlled paper lifecycle is COMPLETE / CLOSED / CI PASS and was
+  squash-merged through PR #8 at `74e6b39`. G2, G3, G4, and P09 remain NOT
   AUTHORIZED.
 
 ## Phase status
@@ -159,7 +158,8 @@ narrow P07-T02 `PARTIALLY_FILLED` to P07-T06 `PARTIAL` compatibility mapping is
 implemented without altering the T02 artifact. Sixteen focused tests, 349
 relevant regressions, and the full 1,388-test Python 3.13 suite pass locally;
 module compilation, whitespace checks, TypeScript typechecks, and workspace
-builds also pass. GitHub CI and merge are pending.
+builds also pass. GitHub Actions run #29 passed both required jobs, and PR #8
+was squash-merged to `main` at `74e6b39`.
 
 The owner accepted the recommended P04-LME-03 limited implementation after
 P04-LME-02 merged. P04-LME-03 is a controlled one-shot composition from one
@@ -517,14 +517,13 @@ functionality was introduced.
 
 ## Next action
 
-Push the verified P01-RTI-02 branch, open its pull request, require both GitHub
-Actions jobs to pass, and merge. After merge, the next proposed gate is a
-separate P01-RTI-03 controlled-persistence specification and review; no
-persistence implementation is authorized yet.
+Prepare a separate P01-RTI-03 controlled-persistence specification for owner
+review. No persistence implementation, API runtime, scheduler, provider loop,
+dashboard publication, wallet access, or live execution is authorized yet.
 
 ## Next task
 
-P01-RTI-02 is implemented and locally verified within its one-shot,
+P01-RTI-02 is complete, merged, and CI-verified within its one-shot,
 explicitly supplied, deterministic, offline-testable, paper-only scope. The
 next proposed task is P01-RTI-03 specification work only, after P01-RTI-02 is
 merged. Automatic token/pool selection, continuous polling, retry, persistence

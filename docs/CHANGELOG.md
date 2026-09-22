@@ -17,6 +17,8 @@
   compilation, `git diff --check`, TypeScript typechecks, and all workspace
   builds pass. One pre-existing Starlette deprecation warning and the known
   frontend sourcemap warning remain non-blocking.
+- **MERGE:** GitHub Actions run #29 passed both required jobs and PR #8 was
+  squash-merged to `main` at `74e6b39`.
 - **EXCLUSIONS:** No persistence, API, scheduler, dashboard, provider, wallet,
   live execution, G2, G3, G4, or P09 behavior.
 
