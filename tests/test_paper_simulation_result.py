@@ -1,9 +1,16 @@
+from decimal import Decimal
+
 import pytest
 
+from core.execution.paper_fill_outcome import FillOutcomeStatus
 from core.execution.paper_simulation_result import (
     P07_T06_CONTRACT_VERSION,
     PaperSimulationResult,
 )
+from core.execution.paper_reconciliation import reconcile_paper_ledger
+from tests.test_paper_fill_outcome import _evaluate
+from tests.test_paper_ledger import _bundle
+from tests.test_paper_reconciliation import _expectation
 
 
 def make_result(**overrides):
@@ -44,3 +51,20 @@ def test_unknown_reconciliation_preserved():
 
 def test_digest_is_deterministic():
     assert make_result().digest == make_result().digest
+
+
+def test_partial_fill_maps_to_owned_t06_status_without_mutating_t02():
+    outcome = _evaluate(executable_liquidity=Decimal("1"))
+    simulation_input, outcome, transition, ledger = _bundle(outcome=outcome)
+    reconciliation = reconcile_paper_ledger((ledger,), _expectation(ledger))
+
+    result = PaperSimulationResult.from_predecessors(
+        simulation_input=simulation_input,
+        fill_outcome=outcome,
+        transition=transition,
+        ledger_entries=(ledger,),
+        reconciliation=reconciliation,
+    )
+
+    assert outcome.status is FillOutcomeStatus.PARTIALLY_FILLED
+    assert result.status == "PARTIAL"

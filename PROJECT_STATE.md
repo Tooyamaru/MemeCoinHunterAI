@@ -10,10 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-01 controlled paper runtime
-  integration gate
-- **Integration priority status:** LIMITED IMPLEMENTATION COMPLETE / REVIEWED /
-  CI PASS
+- **Current integration priority:** P01-RTI-02 controlled paper lifecycle
+  composition
+- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
+  PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -42,6 +42,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01-RTI-01 controlled paper-run admission composition is IMPLEMENTED /
   REVIEWED / CI PASS. It composes one existing P05-T08 context
   through P06-T02, paper Risk/Capital Authority, and P07-T01 only.
+- P01-RTI-02 controlled paper lifecycle is IMPLEMENTED with local verification
+  PASS; GitHub PR/CI/merge is pending. G2, G3, G4, and P09 remain NOT
+  AUTHORIZED.
 
 ## Phase status
 
@@ -145,6 +148,18 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+P01-RTI-02 now composes one approved P01-RTI-01 admission through canonical
+P07-T02 fill, P07-T03 state transition, P07-T04 ledger, independently supplied
+P07-T05 reconciliation, P07-T06 result, P07-T07 local history, and one P08-T01
+observation. It stops before T06 when reconciliation is not `MATCH`, preserves
+failed and unavailable outcomes as non-economic observations, and contains no
+persistence, API, scheduler, provider, wallet, or live execution behavior. The
+narrow P07-T02 `PARTIALLY_FILLED` to P07-T06 `PARTIAL` compatibility mapping is
+implemented without altering the T02 artifact. Sixteen focused tests, 349
+relevant regressions, and the full 1,388-test Python 3.13 suite pass locally;
+module compilation, whitespace checks, TypeScript typechecks, and workspace
+builds also pass. GitHub CI and merge are pending.
 
 The owner accepted the recommended P04-LME-03 limited implementation after
 P04-LME-02 merged. P04-LME-03 is a controlled one-shot composition from one
@@ -406,6 +421,7 @@ functionality was introduced.
 - `docs/P04-LME-02-TRANSPORT-DIAGNOSTIC-SPECIFICATION.md`
 - `docs/P04-LME-03-CONTROLLED-ORCHESTRATION-SPECIFICATION.md`
 - `docs/P01-RTI-01-CONTROLLED-PAPER-RUN-ADMISSION-SPECIFICATION.md`
+- `docs/P01-RTI-02-CONTROLLED-PAPER-LIFECYCLE-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -416,12 +432,14 @@ functionality was introduced.
 - `core/data/market_intelligence.py`
 - `core/opportunity/canonical_evidence_producer.py`
 - `core/runtime/controlled_paper_run_admission.py`
+- `core/runtime/controlled_paper_lifecycle.py`
 - `tests/test_coingecko_onchain_ohlcv.py`
 - `tests/test_price_direction_policy.py`
 - `tests/test_coingecko_onchain_transport.py`
 - `tests/test_coingecko_onchain_diagnostic.py`
 - `tests/test_coingecko_onchain_orchestration.py`
 - `tests/test_controlled_paper_run_admission.py`
+- `tests/test_controlled_paper_lifecycle.py`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -499,17 +517,19 @@ functionality was introduced.
 
 ## Next action
 
-Merge PR #7 after the documentation-only closure commit repeats the locked
-Python 3.13 and TypeScript CI gates successfully.
+Push the verified P01-RTI-02 branch, open its pull request, require both GitHub
+Actions jobs to pass, and merge. After merge, the next proposed gate is a
+separate P01-RTI-03 controlled-persistence specification and review; no
+persistence implementation is authorized yet.
 
 ## Next task
 
-P01-RTI-01 specification and limited implementation are authorized by the owner
-on 2026-09-22. The task must remain one-shot, explicitly supplied,
-deterministic, offline-testable, and paper-only. It may compose existing domain
-owners but must not add automatic token/pool selection, continuous polling,
-retry, persistence, dashboard publication, wallet access, signing, broadcast,
-live execution, G2, G3, G4, or P09 behavior.
+P01-RTI-02 is implemented and locally verified within its one-shot,
+explicitly supplied, deterministic, offline-testable, paper-only scope. The
+next proposed task is P01-RTI-03 specification work only, after P01-RTI-02 is
+merged. Automatic token/pool selection, continuous polling, retry, persistence
+implementation, dashboard publication, wallet access, signing, broadcast,
+live execution, G2, G3, G4, and P09 remain unauthorized.
 
 The implementation is present in
 `core/runtime/controlled_paper_run_admission.py` with focused verification in
