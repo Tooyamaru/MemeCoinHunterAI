@@ -16,11 +16,15 @@ Meme Coin Hunter AI is a future selective, deterministic, explainable, risk-firs
 ## Current status
 
 The project is currently at P08 — Outcome Learning. P07-T01 through P07-T07
-and P08-T01 through P08-T07 are complete, closed, and audited PASS. The G2
+and P08-T01 through P08-T07 are complete, closed, and audited PASS. P04-LME-01
+through P04-LME-03 also provide a bounded CoinGecko pool-OHLCV mapper,
+single-attempt server-side read-only transport, diagnostic, and caller-directed
+one-shot orchestration. Live provider verification has not run. The G2
 realization/settlement endpoint boundary discovery is complete but remains
 documentation-only, blocked, unresolved, and unauthorized pending an
-owner-approved realization/settlement source. No provider connectivity, wallet,
-live trading, AI/ML, or P09 execution functionality has been implemented.
+owner-approved realization/settlement source. No continuous polling, automatic
+pool selection, application runtime wiring, wallet, live trading, AI/ML, or P09
+execution functionality has been implemented.
 
 ## Architecture summary
 

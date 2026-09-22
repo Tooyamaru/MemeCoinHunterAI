@@ -4,7 +4,8 @@ This document maps the system. It does not implement future phases.
 
 ## Current implementation status
 
-The project has completed the P06 architecture/specification gate and P06-T01.
+The project has completed the P06 architecture/specification gate and P06-T01
+through P06-T03.
 P05-T01
 through P05-T08 are
 complete. P05-T03 is COMPLETE / CLOSED / AUDITED PASS. P05-T04 is COMPLETE /
@@ -30,13 +31,15 @@ Evidence Normalization, Signal Evidence Quality, and Signal Evidence
 Evaluation. P04-T05 — Signal Evidence Aggregation is DONE / CLOSED. P04-T06 —
 Signal Evidence Snapshot Contract is DONE / CLOSED / AUDITED PASS. P04-T07 is
 COMPLETE / CLOSED / AUDITED PASS, with an architectural audit verdict of PASS
-WITH NON-BLOCKING OBSERVATIONS. No later P04 task has started. P04-T08 is not
-explicitly defined in the current architecture; any next P04 task requires a
-separate specification and approval.
-No provider, network, persistence, AI, wallet, trading, or execution integration
-was introduced. P06 runtime implementation remains unauthorized after the
-completed architecture/specification gate and P06-T01 contract. Trading,
-execution, and any wallet behavior remain future boundaries.
+WITH NON-BLOCKING OBSERVATIONS. P04-T08 environment stabilization, P04-T09
+feature calculation, and P04-T10 feature history are complete. P04-LME-01
+through P04-LME-03 add a bounded exact-pool OHLCV mapping, single-attempt
+read-only transport/diagnostic, and caller-directed one-shot orchestration.
+They do not add automatic discovery, polling, persistence, application wiring,
+paper automation, or execution. P06-T01 through P06-T03 are implemented and
+closed at their governed deterministic/optional-analysis boundaries, but no
+operational decision loop is active. Trading, execution, and wallet behavior
+remain future boundaries.
 
 ## V1.1 architectural baseline
 
@@ -221,7 +224,13 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **P04-T05:** Signal Evidence Aggregation — DONE / CLOSED
 - **P04-T06:** Signal Evidence Snapshot Contract — DONE / CLOSED / AUDITED PASS
 - **P04-T07:** Signal Evidence Snapshot History Boundary — DONE / CLOSED / AUDITED PASS
-- **P04 next task:** P04-T08 is not explicitly defined in the current architecture; any next P04 task requires a separate specification and approval
+- **P04-T08:** Python Environment Stabilization — DONE / CLOSED
+- **P04-T09:** Feature Calculation Snapshot Boundary — DONE / CLOSED
+- **P04-T10:** Feature Snapshot History Boundary — DONE / CLOSED / AUDITED PASS
+- **P04-LME-01:** Exact-pool OHLCV mapping and deterministic price-direction policy — LIMITED IMPLEMENTATION COMPLETE / CI PASS
+- **P04-LME-02:** Bounded server-side read-only transport and one-shot diagnostic — LIMITED IMPLEMENTATION COMPLETE / CI PASS
+- **P04-LME-03:** Caller-directed controlled diagnostic orchestration — LIMITED IMPLEMENTATION COMPLETE / CI PASS
+- **P04 next gate:** Application/runtime composition requires a separate bounded specification and authorization; automatic pool selection and continuous polling remain unauthorized
 
 ### P05 — OPPORTUNITY ENGINE
 - **Objective:** Fuse signals and rank candidate opportunities.
@@ -232,7 +241,7 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **Major risks:** Overweighting one signal, score gaming, unstable rankings.
 - **Deliverables:** Opportunity records, phase states, ranking evaluation.
 
-### P06 — AI DECISION ENGINE — ARCHITECTURE GATE COMPLETE / P06-T01 CLOSED
+### P06 — AI DECISION ENGINE — T01–T03 COMPLETE / CLOSED
 - **Objective:** Produce bounded, evidence-backed trade intents with deterministic hot-path decisions.
 - **Major components:** Deterministic rules, optional statistical/classical or bounded ML analysis, BUY, WATCH, HOLD, TAKE PROFIT, REDUCE, EXIT, AVOID, confidence, evidence, risk, invalidation, expected edge, uncertainty, entry quality, phase, NO TRADE, and point-in-time feature snapshots.
 - **Dependencies:** P03, P05.
@@ -240,8 +249,9 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **Exit criteria:** Decisions preserve time-of-decision evidence, separate intent from authorization and entry, and do not depend on an LLM.
 - **Major risks:** Overconfidence, data leakage, hallucinated evidence, treating confidence as profit probability, and analysis latency.
 - **Deliverables:** Approved P06 specification, versioned decision-record
-  contract, and evaluation criteria. Runtime implementation requires a later
-  explicit authorization.
+  contract, deterministic evaluation, and optional bounded non-authoritative
+  analysis record. Operational runtime composition requires a later explicit
+  authorization.
 
 ### P07 — PAPER TRADING ENGINE — COMPLETE / CLOSED / AUDITED PASS
 - **Objective:** Test decisions with realistic simulated execution.
@@ -260,7 +270,7 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **Objective:** Preserve and evaluate decision/outcome evidence without
   uncontrolled strategy changes; any economic interpretation is a separately
   governed future boundary.
-- **Major components:** Current P08-T01 through P08-T06 provide
+- **Major components:** Current P08-T01 through P08-T07 provide
   non-economic observation, dataset, interpretation, evidence evaluation,
   immutable snapshots, and readiness. A later separately authorized boundary
   may analyze wins/losses, missed opportunities, avoided losses, expectancy,
@@ -274,13 +284,11 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **Deliverables:** Non-economic outcome dataset and evidence reports;
   economic reports and controlled model versioning require separate
   specification and authorization.
-- **Current boundary:** P08-T06 — Outcome Evidence Analysis Readiness Boundary —
-  IMPLEMENTED / AUDITED PASS / READY TO CLOSE. P08-T01 through P08-T05 are
-  COMPLETE / CLOSED / AUDITED PASS. T06 consumes one validated T05 snapshot,
-  preserves T04/T02 provenance and cutoff, and emits only a structural,
-  non-economic readiness predicate without economic outcome classification,
-  aggregation, ranking, decision, authorization, execution, or model/strategy
-  modification.
+- **Current boundary:** P08-T07 — Economic Outcome Interpretation Assembly —
+  COMPLETE / CLOSED / AUDITED PASS. It validates and assembles separately
+  materialized G2/G3/G4 results without recomputing settlement, accounting, or
+  performance classification. G2 remains blocked, unresolved, and
+  unauthorized, so the economic chain is not operational.
 
 #### P08 implementation sequence
 
@@ -293,10 +301,13 @@ edge, governance must allow the project to STOP, PAUSE, or change market.
 - **P08-T04:** Outcome Evidence Evaluation — COMPLETE / CLOSED / AUDITED PASS
 - **P08-T05:** Outcome Evidence Evaluation Snapshot — COMPLETE / CLOSED /
   AUDITED PASS
-- **P08-T06:** Outcome Evidence Analysis Readiness — IMPLEMENTED / AUDITED PASS /
-  READY TO CLOSE
-- **P08-T07 and later:** NOT STARTED; separate specification and authorization
-  required.
+- **P08-T06:** Outcome Evidence Analysis Readiness — COMPLETE / CLOSED /
+  AUDITED PASS
+- **P08-T07:** Economic Outcome Interpretation Assembly — COMPLETE / CLOSED /
+  AUDITED PASS
+- **P08 G2/G3/G4 and later:** G2 discovery complete but BLOCKED / UNRESOLVED /
+  NOT AUTHORIZED; G3, G4, P09, and later runtime behavior require separate
+  specification and authorization
 
 ### P09 — PROVIDER-NEUTRAL CONTROLLED EXECUTION
 - **Objective:** Add provider-agnostic controlled execution only after prior validation and explicit go-live approval.

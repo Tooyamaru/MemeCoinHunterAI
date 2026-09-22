@@ -142,7 +142,7 @@ these boundaries. Later services remain gated until explicitly authorized.
 
 ## Future portability
 
-The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastructure in `backend/core`. The initial Replit environment is for development and preview. GitHub is the source of truth. A future stable 24/7 runtime may use Railway, but Railway remains out of scope until its planned production phase.
+The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastructure in `backend/core`. The initial Replit environment is for development and preview. GitHub is the source of truth. P04-LME-01 through P04-LME-03 add only a bounded read-only CoinGecko diagnostic path; they are not an operational application loop. A future stable 24/7 runtime may use Railway, but Railway remains out of scope until its planned production phase.
 
 
 ## P05 Current Boundary
@@ -159,10 +159,10 @@ and fail-closed.
 ## P06 Architecture Gate — COMPLETE / CLOSED / APPROVED
 
 P05-T01 through P05-T08 are complete and closed. The P06 architecture/
-specification gate is COMPLETE / CLOSED / APPROVED; no P06 runtime is
-authorized yet. The approved P06 boundary consumes one validated P05-T08
-evidence-first opportunity context and produces one deterministic, versioned
-analytical decision intent.
+specification gate and P06-T01 through P06-T03 are COMPLETE / CLOSED. The
+approved deterministic evaluator consumes one validated P05-T08 evidence-first
+opportunity context and produces one versioned analytical decision intent.
+There is still no scheduled or application-wired P06 decision loop.
 
 Optional bounded deep analysis, including statistical, classical, bounded ML,
 or narrative/LLM analysis, is non-authoritative and separately versioned. It
@@ -209,8 +209,10 @@ live authority.
 
 ## P08 Outcome Learning Current Boundary
 
-P08-T01 through P08-T05 are complete, closed, and audited PASS. The current
-P08-T06 boundary is implemented, audited PASS, and ready to close.
+P08-T01 through P08-T07 are complete, closed, and audited PASS. P08-T06 is the
+non-economic readiness boundary. P08-T07 is a validation/assembly boundary over
+separately materialized G2, G3, and G4 results; it does not supply those
+authorities itself.
 
 The governed provenance chain is:
 
@@ -223,6 +225,8 @@ P06 DecisionIntent
 → P08-T04 evidence evaluation
 → P08-T05 validated outcome record
 → P08-T06 readiness
+→ separately governed G2 / G3 / G4 results
+→ P08-T07 economic outcome assembly
 ```
 
 P08-T06 consumes exactly one validated P08-T05 snapshot and produces only the
@@ -234,6 +238,8 @@ T02 dataset digest and cutoff, and T04/T05 contract identities.
 T06 is immutable, deterministic, provider-neutral, read-only, and non-economic.
 It does not classify WIN/LOSS, calculate profit or performance metrics, rank or
 compare candidates, modify models or strategies, authorize risk or capital,
-execute trades, replace P07/P08 ownership, or activate P08-T07/P09 behavior.
-Any later analysis or economic outcome boundary requires separate governance,
-specification, and authorization.
+execute trades, replace P07/P08 ownership, or create G2/G3/G4 authority.
+P08-T07 is complete but cannot become operational until those separately
+governed inputs exist. G2 remains blocked pending an owner-selected
+realization/settlement source and semantics; G3, G4, P09, and later behavior
+remain unauthorized.
