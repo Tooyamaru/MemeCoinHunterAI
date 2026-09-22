@@ -17,6 +17,7 @@ from backend.application.paper_lifecycle_persistence import (
     PaperLifecycleReadResult,
     PaperLifecycleRunSnapshot,
 )
+from backend.application.paper_lifecycle_query import PaperLifecycleQueryService
 
 __all__ = [
     "P01_RTI_04_CONTRACT_VERSION",
@@ -33,4 +34,5 @@ __all__ = [
     "PaperLifecycleReadOutcome",
     "PaperLifecycleReadResult",
     "PaperLifecycleRunSnapshot",
+    "PaperLifecycleQueryService",
 ]

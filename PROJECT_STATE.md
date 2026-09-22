@@ -10,9 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-04 next-gate selection
-- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
-  AUTHORIZED
+- **Current integration priority:** P01-RTI-05 read-only persisted paper
+  lifecycle result query
+- **Integration priority status:** AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT
+  PASS / CI PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -49,6 +50,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   NOT AUTHORIZED.
 - P01-RTI-04 caller-triggered persisted paper run is COMPLETE / CLOSED / CI
   PASS and was squash-merged through PR #13 at `6fdcd72`.
+- P01-RTI-05 read-only persisted paper lifecycle result query is AUTHORIZED and
+  IMPLEMENTED LOCALLY; checkpoint verification and delivery are in progress.
+  It delegates only to the existing P01-RTI-03 read owner and adds no API,
+  provider, scheduler, worker, execution, or economic behavior.
 
 ## Phase status
 
@@ -152,6 +157,16 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+P01-RTI-05 is implemented as one thin, HTTP-independent application
+query over the P01-RTI-03 read owner. It accepts only an explicit canonical
+`lifecycle_result_digest`, returns the existing `PaperLifecycleReadResult`
+unchanged, preserves RTI-03 malformed-input `ValueError` semantics, and performs
+no persistence mutation or repair. Twelve focused tests, 51 combined P01-RTI-01
+through P01-RTI-05 regressions, and the full 1,421-test Python 3.13 suite pass.
+Module compilation, whitespace checks, TypeScript typechecks, and all workspace
+builds pass. GitHub CI and merge are pending; P01-RTI-04 remains closed and
+unchanged.
 
 P01-RTI-04 is implemented as one HTTP-independent application-service
 composition across P01-RTI-01 admission, P01-RTI-02 lifecycle, and P01-RTI-03
@@ -456,6 +471,7 @@ functionality was introduced.
 - `docs/P01-RTI-02-CONTROLLED-PAPER-LIFECYCLE-SPECIFICATION.md`
 - `docs/P01-RTI-03-CONTROLLED-PAPER-PERSISTENCE-SPECIFICATION.md`
 - `docs/P01-RTI-04-CALLER-TRIGGERED-PERSISTED-PAPER-RUN-SPECIFICATION.md`
+- `docs/P01-RTI-05-READ-ONLY-PERSISTED-PAPER-LIFECYCLE-RESULT-QUERY-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -469,6 +485,7 @@ functionality was introduced.
 - `core/runtime/controlled_paper_lifecycle.py`
 - `backend/application/paper_lifecycle_persistence.py`
 - `backend/application/controlled_paper_run_service.py`
+- `backend/application/paper_lifecycle_query.py`
 - `backend/core/models.py`
 - `backend/core/repositories.py`
 - `migrations/versions/0002_create_paper_lifecycle_persistence.py`
@@ -478,6 +495,7 @@ functionality was introduced.
 - `tests/test_coingecko_onchain_diagnostic.py`
 - `tests/test_coingecko_onchain_orchestration.py`
 - `tests/test_controlled_paper_run_admission.py`
+- `tests/test_paper_lifecycle_query.py`
 - `tests/test_controlled_paper_lifecycle.py`
 - `tests/test_controlled_paper_persistence.py`
 - `tests/test_controlled_paper_run_service.py`
@@ -558,16 +576,15 @@ functionality was introduced.
 
 ## Next action
 
-Select and separately specify the next bounded integration gate. The leading
-options are a manual one-shot API boundary, a read-only persisted-result query,
-or upstream market-to-opportunity runtime composition. No option is authorized
-yet. Scheduler, provider loop, dashboard publication, wallet access, and live
-execution remain unauthorized.
+Complete P01-RTI-05 checkpoint verification, CI, and merge. Selection of any
+subsequent gate must occur separately. Scheduler, provider loop, API/dashboard
+publication, wallet access, and live execution remain unauthorized.
 
 ## Next task
 
-P01-RTI-04 is complete, merged, and CI-verified. The next task is an explicit
-owner selection and specification review for one bounded post-RTI-04 gate.
+P01-RTI-04 is complete, merged, and CI-verified. P01-RTI-05 is the explicitly
+authorized bounded post-RTI-04 gate and has passed local checkpoint
+verification pending GitHub delivery.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.
