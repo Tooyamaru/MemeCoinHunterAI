@@ -2,7 +2,7 @@
 
 ## Status
 
-AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT PASS / CI PENDING
+COMPLETE / CLOSED / CI PASS
 
 ## Boundary
 
@@ -71,4 +71,5 @@ Twelve focused RTI-05 tests, 51 combined P01-RTI-01 through P01-RTI-05
 regressions, and the full 1,421-test Python 3.13 suite pass. Module compilation,
 whitespace checks, TypeScript typechecks, and all workspace builds pass. One
 pre-existing Starlette warning and the known frontend sourcemap warning remain
-non-blocking. GitHub CI and merge are pending.
+non-blocking. GitHub Actions run #46 passed both required jobs, and PR #15 was
+squash-merged to `main` at `669c678`.

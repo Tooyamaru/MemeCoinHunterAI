@@ -1,6 +1,6 @@
 ## 2026-09-22 — P01-RTI-05 Read-Only Persisted Result Query Gate
 
-- **STATUS:** Authorized / implemented / local checkpoint pass / CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **AUTHORIZATION:** The owner explicitly approved the limited P01-RTI-05
   implementation on 2026-09-22.
 - **IMPLEMENTATION:** Added one thin HTTP-independent application query that
@@ -18,7 +18,9 @@
   P01-RTI-05 regressions, and the full 1,421-test Python 3.13 suite pass. Module
   compilation, whitespace checks, TypeScript typechecks, and all workspace
   builds pass. One pre-existing Starlette warning and the known frontend
-  sourcemap warning remain non-blocking. GitHub CI and merge are pending.
+  sourcemap warning remain non-blocking.
+- **MERGE:** GitHub Actions run #46 passed both required jobs and PR #15 was
+  squash-merged to `main` at `669c678`.
 
 ## 2026-09-22 — P01-RTI-04 Application-Service Specification Gate
 
