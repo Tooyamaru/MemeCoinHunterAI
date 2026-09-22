@@ -1,6 +1,8 @@
 ## 2026-09-22 — P01-RTI-04 Application-Service Specification Gate
 
-- **STATUS:** Specification draft; implementation not authorized.
+- **STATUS:** Implemented with local verification pass; CI pending.
+- **AUTHORIZATION:** The owner explicitly approved the limited P01-RTI-04
+  implementation on 2026-09-22.
 - **PROPOSAL:** Compose exactly one explicit caller request through the existing
   P01-RTI-01 admission, P01-RTI-02 lifecycle, and P01-RTI-03 persistence
   boundaries without recreating their rules.
@@ -8,6 +10,14 @@
   persistence results and expose only deterministic orchestration outcomes.
 - **BOUNDARY:** No API, worker, scheduler, automatic selection, provider call,
   dashboard, wallet, live execution, G2, G3, G4, or P09 behavior.
+- **IMPLEMENTATION:** Added an immutable request/result contract and one
+  HTTP-independent service that invokes admission, lifecycle, and persistence
+  at most once each while preserving exact nested outcomes and digests.
+- **LOCAL VERIFICATION:** 10 focused tests, 38 combined P01-RTI-01 through
+  P01-RTI-04 regressions, and the full 1,409-test Python 3.13 suite pass. Module
+  compilation, whitespace checks, TypeScript typechecks, and all workspace
+  builds pass. One pre-existing Starlette warning and the known frontend
+  sourcemap warning remain non-blocking.
 
 ## 2026-09-22 — P01-RTI-03 Controlled Paper Persistence Gate
 

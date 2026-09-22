@@ -12,8 +12,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-RTI-04 caller-triggered persisted paper
   run application-service boundary
-- **Integration priority status:** SPECIFICATION DRAFT / IMPLEMENTATION NOT
-  AUTHORIZED
+- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
+  PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -48,8 +48,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - P01-RTI-03 controlled paper persistence is COMPLETE / CLOSED / CI PASS and
   was squash-merged through PR #11 at `43ab170`. G2, G3, G4, and P09 remain
   NOT AUTHORIZED.
-- P01-RTI-04 caller-triggered persisted paper run is the next specification
-  gate. Its implementation is not authorized.
+- P01-RTI-04 caller-triggered persisted paper run is IMPLEMENTED with local
+  verification PASS; GitHub PR/CI/merge is pending.
 
 ## Phase status
 
@@ -153,6 +153,18 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+P01-RTI-04 is implemented as one HTTP-independent application-service
+composition across P01-RTI-01 admission, P01-RTI-02 lifecycle, and P01-RTI-03
+persistence. It invokes each owner at most once, preserves canonical nested
+results and digests, persists rejection and reconciliation-mismatch audit
+chains, and relies on P01-RTI-03 for idempotency and conflict handling. Ten
+focused tests, 38 combined P01-RTI-01 through P01-RTI-04 regressions, and the
+full 1,409-test Python 3.13 suite pass. Module compilation, whitespace checks,
+TypeScript typechecks, and all workspace builds pass. One pre-existing
+Starlette warning and the known frontend sourcemap warning remain non-blocking.
+GitHub PR/CI/merge is pending. No API, worker, scheduler, provider, automatic
+selection, dashboard, wallet, or live execution surface is authorized.
 
 P01-RTI-03 is implemented as an append-only, atomic persistence boundary over
 one already-created P01-RTI-02 result. It uses one root run row plus
@@ -456,6 +468,7 @@ functionality was introduced.
 - `core/runtime/controlled_paper_run_admission.py`
 - `core/runtime/controlled_paper_lifecycle.py`
 - `backend/application/paper_lifecycle_persistence.py`
+- `backend/application/controlled_paper_run_service.py`
 - `backend/core/models.py`
 - `backend/core/repositories.py`
 - `migrations/versions/0002_create_paper_lifecycle_persistence.py`
@@ -467,6 +480,7 @@ functionality was introduced.
 - `tests/test_controlled_paper_run_admission.py`
 - `tests/test_controlled_paper_lifecycle.py`
 - `tests/test_controlled_paper_persistence.py`
+- `tests/test_controlled_paper_run_service.py`
 - `docs/MASTER_BLUEPRINT.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DATA_PIPELINE.md`
@@ -544,18 +558,17 @@ functionality was introduced.
 
 ## Next action
 
-Review and explicitly approve or revise the P01-RTI-04 application-service
-specification. No RTI-04 runtime code, API, worker, scheduler, provider loop,
+Push the verified P01-RTI-04 branch, open its pull request, require both GitHub
+Actions jobs to pass, and merge. No API, worker, scheduler, provider loop,
 dashboard publication, wallet access, or live execution is authorized.
 
 ## Next task
 
-P01-RTI-04 specification review is the current task. It proposes one explicit
-caller-triggered application-service composition across P01-RTI-01 admission,
-P01-RTI-02 paper lifecycle, and P01-RTI-03 persistence while preserving every
-owner result. Automatic token/pool selection, continuous polling, automatic
-retry, API publication, dashboard publication, wallet access, signing,
-broadcast, live execution, G2, G3, G4, and P09 remain unauthorized.
+P01-RTI-04 merge and closure is the current task under its approved one-request
+application-service composition. Automatic token/pool selection, continuous
+polling, automatic retry, API publication, dashboard publication, wallet
+access, signing, broadcast, live execution, G2, G3, G4, and P09 remain
+unauthorized.
 
 The implementation is present in
 `core/runtime/controlled_paper_run_admission.py` with focused verification in
