@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING
+COMPLETE / CLOSED / CI PASS
 
 The owner approved the P01-RTI-07 specification direction and authorized final
 reconciliation plus limited implementation on 2026-09-22. This specification
@@ -193,6 +193,8 @@ The implementation checkpoint passes 21 focused tests, 37 relevant
 RTI-03/05/06 regressions, 86 combined P01-RTI-01 through RTI-07 regressions,
 and the full 1,456-test Python 3.13 suite. Module compilation, whitespace
 checks, TypeScript typechecks, and all workspace builds also pass locally.
+GitHub Actions run #57 passed both required jobs, and PR #20 was squash-merged
+to `main` at `14fc24f`.
 
 ## 12. Following gate
 

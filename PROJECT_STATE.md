@@ -10,10 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-07 bounded read-only persisted
-  lifecycle digest catalog
-- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
-  PENDING
+- **Current integration priority:** Post-P01-RTI-07 next-gate selection
+- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
+  AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -59,9 +58,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   delegates only to P01-RTI-05 and preserves the RTI-03/05 result vocabulary
   and validation ownership.
 - P01-RTI-07 bounded read-only persisted lifecycle digest catalog is
-  IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING. It reads only canonical
-  root digest identities with deterministic exclusive keyset continuation and
-  adds no HTTP, artifact read, full-bundle validation, model, or migration.
+  COMPLETE / CLOSED / CI PASS and was squash-merged through PR #20 at
+  `14fc24f`. It reads only canonical root digest identities with deterministic
+  exclusive keyset continuation and adds no HTTP, artifact read, full-bundle
+  validation, model, or migration.
 
 ## Phase status
 
@@ -176,10 +176,10 @@ claim complete-bundle integrity; detail lookup remains owned by RTI-05/RTI-03.
 Twenty-one focused tests, 37 relevant RTI-03/05/06 regressions, 86 combined
 P01-RTI-01 through RTI-07 regressions, and the full 1,456-test Python 3.13 suite
 pass. Module compilation, whitespace checks, TypeScript typechecks, and all
-workspace builds pass locally. GitHub CI and merge remain pending. P01-RTI-03
-through P01-RTI-06 behavior remains unchanged; G2 remains blocked, and G3, G4,
-P09, provider runtime, wallet, live trading, worker, scheduler, and dashboard
-remain unopened.
+workspace builds pass. GitHub Actions run #57 passed both required jobs, and PR
+#20 was squash-merged to `main` at `14fc24f`. P01-RTI-03 through P01-RTI-06
+behavior remains unchanged; G2 remains blocked, and G3, G4, P09, provider
+runtime, wallet, live trading, worker, scheduler, and dashboard remain unopened.
 
 P01-RTI-06 is implemented as a single-route, read-only HTTP transport over
 P01-RTI-05. It uses one exact
@@ -625,10 +625,8 @@ unauthorized.
 
 ## Next task
 
-P01-RTI-04 is complete, merged, and CI-verified. P01-RTI-05 is the explicitly
-authorized bounded post-RTI-04 gate and is complete, closed, merged, and
-CI-verified. P01-RTI-06 is complete, closed, merged, and CI-verified. No
-subsequent gate is authorized.
+P01-RTI-04 through P01-RTI-07 are complete, closed, merged, and CI-verified. No
+subsequent gate is selected or authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.
