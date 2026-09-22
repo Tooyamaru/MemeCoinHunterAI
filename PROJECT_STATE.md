@@ -10,9 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-06 next-gate selection
-- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
-  AUTHORIZED
+- **Current integration priority:** P01-RTI-07 bounded read-only persisted
+  lifecycle digest catalog
+- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
+  PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -57,6 +58,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   CI PASS and was squash-merged through PR #18 at `3ffe9f9`. The transport
   delegates only to P01-RTI-05 and preserves the RTI-03/05 result vocabulary
   and validation ownership.
+- P01-RTI-07 bounded read-only persisted lifecycle digest catalog is
+  IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING. It reads only canonical
+  root digest identities with deterministic exclusive keyset continuation and
+  adds no HTTP, artifact read, full-bundle validation, model, or migration.
 
 ## Phase status
 
@@ -160,6 +165,21 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+P01-RTI-07 is implemented as one HTTP-independent, read-only application
+catalog over a bounded repository root-digest select. It uses default limit
+`50`, hard maximum `100`, lexicographic ascending digest order, and exclusive
+`after_digest` keyset continuation. Empty catalogs return a successful `PAGE`;
+storage failures return bounded `STORAGE_UNAVAILABLE`. The immutable result
+has a canonical SHA-256 result digest. RTI-07 reads no artifacts and does not
+claim complete-bundle integrity; detail lookup remains owned by RTI-05/RTI-03.
+Twenty-one focused tests, 37 relevant RTI-03/05/06 regressions, 86 combined
+P01-RTI-01 through RTI-07 regressions, and the full 1,456-test Python 3.13 suite
+pass. Module compilation, whitespace checks, TypeScript typechecks, and all
+workspace builds pass locally. GitHub CI and merge remain pending. P01-RTI-03
+through P01-RTI-06 behavior remains unchanged; G2 remains blocked, and G3, G4,
+P09, provider runtime, wallet, live trading, worker, scheduler, and dashboard
+remain unopened.
 
 P01-RTI-06 is implemented as a single-route, read-only HTTP transport over
 P01-RTI-05. It uses one exact
@@ -489,6 +509,8 @@ functionality was introduced.
 - `docs/P01-RTI-04-CALLER-TRIGGERED-PERSISTED-PAPER-RUN-SPECIFICATION.md`
 - `docs/P01-RTI-05-READ-ONLY-PERSISTED-PAPER-LIFECYCLE-RESULT-QUERY-SPECIFICATION.md`
 - `docs/P01-RTI-06-BOUNDED-READ-ONLY-PAPER-LIFECYCLE-RESULT-API-SPECIFICATION.md`
+- `docs/P01-RTI-07-BOUNDED-READ-ONLY-PERSISTED-LIFECYCLE-DIGEST-CATALOG-SPECIFICATION.md`
+- `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -503,9 +525,11 @@ functionality was introduced.
 - `backend/application/paper_lifecycle_persistence.py`
 - `backend/application/controlled_paper_run_service.py`
 - `backend/application/paper_lifecycle_query.py`
+- `backend/application/paper_lifecycle_digest_catalog.py`
 - `backend/core/models.py`
 - `backend/core/repositories.py`
 - `migrations/versions/0002_create_paper_lifecycle_persistence.py`
+- `tests/test_paper_lifecycle_digest_catalog.py`
 - `tests/test_coingecko_onchain_ohlcv.py`
 - `tests/test_price_direction_policy.py`
 - `tests/test_coingecko_onchain_transport.py`

@@ -374,9 +374,8 @@ class ControlledPaperPersistenceService:
 
     async def read(self, lifecycle_result_digest: str) -> PaperLifecycleReadResult:
         try:
-            digest = _digest_text(
+            digest = validate_lifecycle_result_digest(
                 lifecycle_result_digest,
-                "lifecycle_result_digest",
             )
         except ValueError:
             raise ValueError("lifecycle_result_digest must be a digest") from None
@@ -955,6 +954,12 @@ def _digest_text(value: Any, name: str) -> str:
     return value
 
 
+def validate_lifecycle_result_digest(value: Any) -> str:
+    """Validate the canonical RTI lifecycle identity for read boundaries."""
+
+    return _digest_text(value, "lifecycle_result_digest")
+
+
 def _reason_codes(value: Any) -> tuple[str, ...]:
     if not isinstance(value, tuple):
         raise ValueError("reason_codes must be an immutable tuple")
@@ -1022,4 +1027,5 @@ __all__ = [
     "PaperLifecycleReadOutcome",
     "PaperLifecycleReadResult",
     "PaperLifecycleRunSnapshot",
+    "validate_lifecycle_result_digest",
 ]
