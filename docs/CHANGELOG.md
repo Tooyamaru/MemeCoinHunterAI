@@ -1,6 +1,6 @@
 ## 2026-09-22 — P01-RTI-07 Read-Only Lifecycle Digest Catalog
 
-- **STATUS:** Implemented / local verification pass / CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **RECOMMENDATION:** P01-RTI-07, a bounded, read-only, HTTP-independent catalog
   of canonical persisted `lifecycle_result_digest` identities.
 - **RATIONALE:** It is the smallest repository-supported successor to RTI-05/06
@@ -23,6 +23,8 @@
   regressions, 86 combined P01-RTI-01 through RTI-07 regressions, and the full
   1,456-test Python 3.13 suite pass. Module compilation, whitespace checks,
   TypeScript typechecks, and workspace builds pass.
+- **MERGE:** GitHub Actions run #57 passed both required jobs and PR #20 was
+  squash-merged to `main` at `14fc24f`.
 - **GOVERNANCE:** No HTTP, route, dashboard, model, migration, dependency,
   provider, worker, scheduler, execution, wallet, live trading, economic
   authority, G2, G3, G4, or P09 behavior was added. RTI-03/04/05/06 behavior is
