@@ -6,6 +6,7 @@ from typing import AsyncIterator
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from backend.api.paper_lifecycle_results import router as paper_lifecycle_router
 from backend.application.service import ApplicationService
 from backend.core.config import get_settings
 from backend.core.database import DatabaseRuntime
@@ -68,20 +69,27 @@ def create_app(app_settings=None) -> FastAPI:
 
     @application.exception_handler(Exception)
     async def internal_error(request: Request, exc: Exception) -> JSONResponse:
+        request_id = getattr(request.state, "request_id", get_request_id())
         logger.exception(
             "unhandled_exception",
             extra={"method": request.method, "path": request.url.path},
         )
         return JSONResponse(
             status_code=500,
+            headers={
+                "Cache-Control": "no-store",
+                "X-Request-ID": request_id,
+            },
             content={
                 "error": {
                     "code": "internal_server_error",
                     "message": "Internal server error",
-                    "request_id": get_request_id(),
+                    "request_id": request_id,
                 }
             },
         )
+
+    application.include_router(paper_lifecycle_router)
 
     @application.get("/health", tags=["runtime"])
     def health() -> dict[str, str]:
