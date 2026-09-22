@@ -2,11 +2,11 @@
 
 ## 1. Status
 
-AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT PASS / CI PENDING
+COMPLETE / CLOSED / CI PASS
 
 The owner explicitly authorized this limited implementation against the merged
-specification. The bounded transport is implemented and locally verified;
-GitHub CI and merge are pending.
+specification. The bounded transport is implemented, verified, merged, and
+closed.
 
 ## 2. Purpose
 
@@ -319,6 +319,7 @@ document. Fourteen focused transport tests, 12 RTI-05 regressions, 65 combined
 P01-RTI-01 through P01-RTI-06 regressions, and the full 1,435-test Python 3.13
 suite pass. Module compilation, whitespace checks, TypeScript typechecks, and
 all workspace builds pass. One pre-existing Starlette warning and the known
-frontend sourcemap warning remain non-blocking. GitHub CI and merge are pending.
+frontend sourcemap warning remain non-blocking. GitHub Actions run #53 passed
+both required jobs, and PR #18 was squash-merged to `main` at `3ffe9f9`.
 
 No gate after P01-RTI-06 is selected or authorized by this specification.
