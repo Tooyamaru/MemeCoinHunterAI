@@ -10,10 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-05 read-only persisted paper
-  lifecycle result query
-- **Integration priority status:** AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT
-  PASS / CI PENDING
+- **Current integration priority:** Post-P01-RTI-05 next-gate selection
+- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
+  AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -50,9 +49,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   NOT AUTHORIZED.
 - P01-RTI-04 caller-triggered persisted paper run is COMPLETE / CLOSED / CI
   PASS and was squash-merged through PR #13 at `6fdcd72`.
-- P01-RTI-05 read-only persisted paper lifecycle result query is AUTHORIZED and
-  IMPLEMENTED LOCALLY; checkpoint verification and delivery are in progress.
-  It delegates only to the existing P01-RTI-03 read owner and adds no API,
+- P01-RTI-05 read-only persisted paper lifecycle result query is COMPLETE /
+  CLOSED / CI PASS and was squash-merged through PR #15 at `669c678`. It
+  delegates only to the existing P01-RTI-03 read owner and adds no API,
   provider, scheduler, worker, execution, or economic behavior.
 
 ## Phase status
@@ -165,8 +164,8 @@ unchanged, preserves RTI-03 malformed-input `ValueError` semantics, and performs
 no persistence mutation or repair. Twelve focused tests, 51 combined P01-RTI-01
 through P01-RTI-05 regressions, and the full 1,421-test Python 3.13 suite pass.
 Module compilation, whitespace checks, TypeScript typechecks, and all workspace
-builds pass. GitHub CI and merge are pending; P01-RTI-04 remains closed and
-unchanged.
+builds pass. GitHub Actions run #46 passed both required jobs, and PR #15 was
+squash-merged to `main` at `669c678`. P01-RTI-04 remains closed and unchanged.
 
 P01-RTI-04 is implemented as one HTTP-independent application-service
 composition across P01-RTI-01 admission, P01-RTI-02 lifecycle, and P01-RTI-03
@@ -576,15 +575,15 @@ functionality was introduced.
 
 ## Next action
 
-Complete P01-RTI-05 checkpoint verification, CI, and merge. Selection of any
-subsequent gate must occur separately. Scheduler, provider loop, API/dashboard
-publication, wallet access, and live execution remain unauthorized.
+Select and separately authorize the next bounded integration gate. Scheduler,
+provider loop, API/dashboard publication, wallet access, and live execution
+remain unauthorized.
 
 ## Next task
 
 P01-RTI-04 is complete, merged, and CI-verified. P01-RTI-05 is the explicitly
-authorized bounded post-RTI-04 gate and has passed local checkpoint
-verification pending GitHub delivery.
+authorized bounded post-RTI-04 gate and is complete, closed, merged, and
+CI-verified. No subsequent gate is authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.
