@@ -1,6 +1,6 @@
 ## 2026-09-22 — P01-RTI-06 Read-Only Result API Specification Gate
 
-- **STATUS:** Authorized / implemented / local checkpoint pass / CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **AUTHORIZATION:** The owner explicitly approved the limited P01-RTI-06
   implementation on 2026-09-22.
 - **BOUNDARY:** Defines one prospective versioned `GET` route over the existing
@@ -24,8 +24,9 @@
   combined P01-RTI-01 through P01-RTI-06 regressions, and the full 1,435-test
   Python 3.13 suite pass. Module compilation, whitespace checks, TypeScript
   typechecks, and all workspace builds pass. One pre-existing Starlette warning
-  and the known frontend sourcemap warning remain non-blocking. GitHub CI and
-  merge are pending.
+  and the known frontend sourcemap warning remain non-blocking.
+- **MERGE:** GitHub Actions run #53 passed both required jobs and PR #18 was
+  squash-merged to `main` at `3ffe9f9`.
 
 ## 2026-09-22 — P01-RTI-05 Read-Only Persisted Result Query Gate
 

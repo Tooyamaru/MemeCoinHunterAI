@@ -10,10 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-06 bounded read-only paper
-  lifecycle result API
-- **Integration priority status:** AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT
-  PASS / CI PENDING
+- **Current integration priority:** Post-P01-RTI-06 next-gate selection
+- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
+  AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -54,10 +53,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   CLOSED / CI PASS and was squash-merged through PR #15 at `669c678`. It
   delegates only to the existing P01-RTI-03 read owner and adds no API,
   provider, scheduler, worker, execution, or economic behavior.
-- P01-RTI-06 bounded read-only paper lifecycle result API is AUTHORIZED and
-  IMPLEMENTED with local checkpoint PASS; GitHub CI and merge are pending. The
-  transport delegates only to P01-RTI-05 and preserves the RTI-03/05 result
-  vocabulary and validation ownership.
+- P01-RTI-06 bounded read-only paper lifecycle result API is COMPLETE / CLOSED /
+  CI PASS and was squash-merged through PR #18 at `3ffe9f9`. The transport
+  delegates only to P01-RTI-05 and preserves the RTI-03/05 result vocabulary
+  and validation ownership.
 
 ## Phase status
 
@@ -172,7 +171,8 @@ regressions, 65 combined P01-RTI-01 through P01-RTI-06 regressions, and the full
 1,435-test Python 3.13 suite pass. Module compilation, whitespace checks,
 TypeScript typechecks, and all workspace builds pass. No migration, dependency,
 provider, worker, scheduler, wallet, live-trading, G2, G3, G4, or P09 behavior
-was added. GitHub CI and merge are pending.
+was added. GitHub Actions run #53 passed both required jobs, and PR #18 was
+squash-merged to `main` at `3ffe9f9`.
 
 P01-RTI-05 is implemented as one thin, HTTP-independent application
 query over the P01-RTI-03 read owner. It accepts only an explicit canonical
@@ -595,15 +595,16 @@ functionality was introduced.
 
 ## Next action
 
-Complete P01-RTI-06 GitHub CI and merge. Scheduler, provider loop, dashboard
-publication, wallet access, and live execution remain unauthorized.
+Select and separately authorize the next bounded integration gate. Scheduler,
+provider loop, dashboard publication, wallet access, and live execution remain
+unauthorized.
 
 ## Next task
 
 P01-RTI-04 is complete, merged, and CI-verified. P01-RTI-05 is the explicitly
 authorized bounded post-RTI-04 gate and is complete, closed, merged, and
-CI-verified. P01-RTI-06 is implemented and locally verified pending GitHub CI
-and merge. No subsequent gate is authorized.
+CI-verified. P01-RTI-06 is complete, closed, merged, and CI-verified. No
+subsequent gate is authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.
