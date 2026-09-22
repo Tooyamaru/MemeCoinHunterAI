@@ -1,3 +1,20 @@
+## 2026-09-22 — P01-RTI-06 Read-Only Result API Specification Gate
+
+- **STATUS:** Specification complete / implementation not authorized.
+- **BOUNDARY:** Defines one prospective versioned `GET` route over the existing
+  P01-RTI-05 query by exact `lifecycle_result_digest` only.
+- **OWNERSHIP:** P01-RTI-05 remains the application query owner and P01-RTI-03
+  remains the persistence, digest-validation, integrity, snapshot, and ordering
+  owner. The transport may only serialize and map existing results.
+- **HTTP CONTRACT:** Specifies deterministic `200 FOUND`, `404 NOT_FOUND`,
+  `409 CORRUPT`, `503 STORAGE_UNAVAILABLE`, and safe `422` malformed-input
+  responses without collapsing distinct states.
+- **READ-ONLY:** No insert, update, delete, repair, migration, reconstruction,
+  lifecycle execution, or RTI-04 invocation is permitted.
+- **EXCLUSIONS:** No implementation code, API route, public deployment,
+  dashboard, provider, worker, scheduler, queue, wallet, signing, broadcast,
+  live trading, realization, settlement, G2, G3, G4, or P09 behavior was added.
+
 ## 2026-09-22 — P01-RTI-05 Read-Only Persisted Result Query Gate
 
 - **STATUS:** Complete / closed / CI pass.

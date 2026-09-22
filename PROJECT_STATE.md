@@ -10,8 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-05 next-gate selection
-- **Integration priority status:** AWAITING OWNER SELECTION / IMPLEMENTATION NOT
+- **Current integration priority:** P01-RTI-06 bounded read-only paper
+  lifecycle result API
+- **Integration priority status:** SPECIFICATION COMPLETE / IMPLEMENTATION NOT
   AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
@@ -53,6 +54,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   CLOSED / CI PASS and was squash-merged through PR #15 at `669c678`. It
   delegates only to the existing P01-RTI-03 read owner and adds no API,
   provider, scheduler, worker, execution, or economic behavior.
+- P01-RTI-06 bounded read-only paper lifecycle result API specification is
+  COMPLETE. Implementation is NOT AUTHORIZED. The proposed transport delegates
+  only to P01-RTI-05 and preserves the RTI-03/05 result vocabulary and
+  validation ownership.
 
 ## Phase status
 
@@ -156,6 +161,16 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+P01-RTI-06 is specification-complete as a prospective single-route,
+read-only HTTP transport over P01-RTI-05. The specification fixes one exact
+digest path, deterministic `FOUND` / `NOT_FOUND` / `CORRUPT` /
+`STORAGE_UNAVAILABLE` HTTP mappings, RTI-03-owned malformed-input semantics,
+safe error envelopes, immutable snapshot serialization, and strict no-mutation
+and no-execution constraints. No implementation code, route, schema, migration,
+dependency, provider, worker, scheduler, wallet, live-trading, G2, G3, G4, or
+P09 behavior has been added. Implementation requires separate explicit owner
+authorization.
 
 P01-RTI-05 is implemented as one thin, HTTP-independent application
 query over the P01-RTI-03 read owner. It accepts only an explicit canonical
@@ -471,6 +486,7 @@ functionality was introduced.
 - `docs/P01-RTI-03-CONTROLLED-PAPER-PERSISTENCE-SPECIFICATION.md`
 - `docs/P01-RTI-04-CALLER-TRIGGERED-PERSISTED-PAPER-RUN-SPECIFICATION.md`
 - `docs/P01-RTI-05-READ-ONLY-PERSISTED-PAPER-LIFECYCLE-RESULT-QUERY-SPECIFICATION.md`
+- `docs/P01-RTI-06-BOUNDED-READ-ONLY-PAPER-LIFECYCLE-RESULT-API-SPECIFICATION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
 - `core/data/coingecko_onchain_transport.py`
 - `core/data/coingecko_onchain_diagnostic.py`
@@ -575,15 +591,17 @@ functionality was introduced.
 
 ## Next action
 
-Select and separately authorize the next bounded integration gate. Scheduler,
-provider loop, API/dashboard publication, wallet access, and live execution
-remain unauthorized.
+Review and explicitly approve or reject the limited P01-RTI-06 implementation
+against its completed specification. No implementation is authorized yet.
+Scheduler, provider loop, dashboard publication, wallet access, and live
+execution remain unauthorized.
 
 ## Next task
 
 P01-RTI-04 is complete, merged, and CI-verified. P01-RTI-05 is the explicitly
 authorized bounded post-RTI-04 gate and is complete, closed, merged, and
-CI-verified. No subsequent gate is authorized.
+CI-verified. P01-RTI-06 is specification-complete; its implementation is not
+authorized. No subsequent gate is authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.
