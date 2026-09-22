@@ -12,8 +12,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-RTI-06 bounded read-only paper
   lifecycle result API
-- **Integration priority status:** SPECIFICATION COMPLETE / IMPLEMENTATION NOT
-  AUTHORIZED
+- **Integration priority status:** AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT
+  PASS / CI PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-22
@@ -54,10 +54,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   CLOSED / CI PASS and was squash-merged through PR #15 at `669c678`. It
   delegates only to the existing P01-RTI-03 read owner and adds no API,
   provider, scheduler, worker, execution, or economic behavior.
-- P01-RTI-06 bounded read-only paper lifecycle result API specification is
-  COMPLETE. Implementation is NOT AUTHORIZED. The proposed transport delegates
-  only to P01-RTI-05 and preserves the RTI-03/05 result vocabulary and
-  validation ownership.
+- P01-RTI-06 bounded read-only paper lifecycle result API is AUTHORIZED and
+  IMPLEMENTED with local checkpoint PASS; GitHub CI and merge are pending. The
+  transport delegates only to P01-RTI-05 and preserves the RTI-03/05 result
+  vocabulary and validation ownership.
 
 ## Phase status
 
@@ -162,15 +162,17 @@ requires its own specification and explicit approval.
 
 ## Last verified checkpoint
 
-P01-RTI-06 is specification-complete as a prospective single-route,
-read-only HTTP transport over P01-RTI-05. The specification fixes one exact
+P01-RTI-06 is implemented as a single-route, read-only HTTP transport over
+P01-RTI-05. It uses one exact
 digest path, deterministic `FOUND` / `NOT_FOUND` / `CORRUPT` /
 `STORAGE_UNAVAILABLE` HTTP mappings, RTI-03-owned malformed-input semantics,
 safe error envelopes, immutable snapshot serialization, and strict no-mutation
-and no-execution constraints. No implementation code, route, schema, migration,
-dependency, provider, worker, scheduler, wallet, live-trading, G2, G3, G4, or
-P09 behavior has been added. Implementation requires separate explicit owner
-authorization.
+and no-execution constraints. Fourteen focused transport tests, 12 RTI-05
+regressions, 65 combined P01-RTI-01 through P01-RTI-06 regressions, and the full
+1,435-test Python 3.13 suite pass. Module compilation, whitespace checks,
+TypeScript typechecks, and all workspace builds pass. No migration, dependency,
+provider, worker, scheduler, wallet, live-trading, G2, G3, G4, or P09 behavior
+was added. GitHub CI and merge are pending.
 
 P01-RTI-05 is implemented as one thin, HTTP-independent application
 query over the P01-RTI-03 read owner. It accepts only an explicit canonical
@@ -534,6 +536,7 @@ functionality was introduced.
 - `pyproject.toml`
 - `uv.lock`
 - `backend/api/main.py`
+- `backend/api/paper_lifecycle_results.py`
 - `backend/core/config.py`
 - `backend/core/logging.py`
 - `backend/core/database.py`
@@ -552,6 +555,7 @@ functionality was introduced.
 - `migrations/env.py`
 - `migrations/versions/0001_create_system_metadata.py`
 - `tests/test_foundation.py`
+- `tests/test_paper_lifecycle_results_api.py`
 - `.env.example`
 
 ## Optional files
@@ -591,17 +595,15 @@ functionality was introduced.
 
 ## Next action
 
-Review and explicitly approve or reject the limited P01-RTI-06 implementation
-against its completed specification. No implementation is authorized yet.
-Scheduler, provider loop, dashboard publication, wallet access, and live
-execution remain unauthorized.
+Complete P01-RTI-06 GitHub CI and merge. Scheduler, provider loop, dashboard
+publication, wallet access, and live execution remain unauthorized.
 
 ## Next task
 
 P01-RTI-04 is complete, merged, and CI-verified. P01-RTI-05 is the explicitly
 authorized bounded post-RTI-04 gate and is complete, closed, merged, and
-CI-verified. P01-RTI-06 is specification-complete; its implementation is not
-authorized. No subsequent gate is authorized.
+CI-verified. P01-RTI-06 is implemented and locally verified pending GitHub CI
+and merge. No subsequent gate is authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.

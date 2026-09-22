@@ -1,6 +1,8 @@
 ## 2026-09-22 — P01-RTI-06 Read-Only Result API Specification Gate
 
-- **STATUS:** Specification complete / implementation not authorized.
+- **STATUS:** Authorized / implemented / local checkpoint pass / CI pending.
+- **AUTHORIZATION:** The owner explicitly approved the limited P01-RTI-06
+  implementation on 2026-09-22.
 - **BOUNDARY:** Defines one prospective versioned `GET` route over the existing
   P01-RTI-05 query by exact `lifecycle_result_digest` only.
 - **OWNERSHIP:** P01-RTI-05 remains the application query owner and P01-RTI-03
@@ -11,9 +13,19 @@
   responses without collapsing distinct states.
 - **READ-ONLY:** No insert, update, delete, repair, migration, reconstruction,
   lifecycle execution, or RTI-04 invocation is permitted.
-- **EXCLUSIONS:** No implementation code, API route, public deployment,
-  dashboard, provider, worker, scheduler, queue, wallet, signing, broadcast,
-  live trading, realization, settlement, G2, G3, G4, or P09 behavior was added.
+- **EXCLUSIONS:** No public deployment, additional API route, dashboard,
+  provider, worker, scheduler, queue, wallet, signing, broadcast, live trading,
+  realization, settlement, G2, G3, G4, or P09 behavior was added.
+- **IMPLEMENTATION:** Added one transport module with explicit response schemas,
+  dependency wiring to P01-RTI-05, deterministic outcome mapping, safe
+  malformed-input handling, `Cache-Control: no-store`, and existing request-ID
+  correlation. Registered only the specified versioned `GET` route.
+- **LOCAL VERIFICATION:** 14 focused transport tests, 12 RTI-05 regressions, 65
+  combined P01-RTI-01 through P01-RTI-06 regressions, and the full 1,435-test
+  Python 3.13 suite pass. Module compilation, whitespace checks, TypeScript
+  typechecks, and all workspace builds pass. One pre-existing Starlette warning
+  and the known frontend sourcemap warning remain non-blocking. GitHub CI and
+  merge are pending.
 
 ## 2026-09-22 — P01-RTI-05 Read-Only Persisted Result Query Gate
 

@@ -2,10 +2,11 @@
 
 ## 1. Status
 
-SPECIFICATION COMPLETE / IMPLEMENTATION NOT AUTHORIZED
+AUTHORIZED / IMPLEMENTED / LOCAL CHECKPOINT PASS / CI PENDING
 
-This document defines a prospective HTTP transport over the completed
-P01-RTI-05 application query. It does not authorize runtime implementation.
+The owner explicitly authorized this limited implementation against the merged
+specification. The bounded transport is implemented and locally verified;
+GitHub CI and merge are pending.
 
 ## 2. Purpose
 
@@ -28,7 +29,7 @@ directly. P01-RTI-05 remains the application query owner, and P01-RTI-03
 remains the persistence, digest-validation, integrity, snapshot, and ordering
 owner.
 
-## 3. Authorized boundary if implementation is separately approved
+## 3. Authorized implementation boundary
 
 The bounded implementation may add only:
 
@@ -251,7 +252,7 @@ not mutate runtime readiness.
 
 ## 13. Focused implementation test requirements
 
-If implementation is later authorized, focused offline tests must prove:
+Focused offline tests must prove:
 
 1. one exact valid persisted digest returns `200` and delegates once to RTI-05;
 2. `FOUND` preserves lifecycle identity, contract versions, result digest,
@@ -278,12 +279,17 @@ If implementation is later authorized, focused offline tests must prove:
 The transport tests must not duplicate RTI-03's deep corruption suite or
 RTI-05's application-delegation suite beyond representative boundary cases.
 
-## 14. Expected future implementation shape
+## 14. Implemented shape
 
-A separately authorized implementation should be limited to the smallest
-reasonable API route/schema module, minimal app registration or dependency
-wiring, one focused transport test module, and governance updates. Exact names
-must follow repository conventions at implementation time.
+The implementation is limited to:
+
+- `backend/api/paper_lifecycle_results.py` for explicit response schemas,
+  dependency wiring, serialization, and outcome mapping;
+- minimal router registration and safe-error response headers in
+  `backend/api/main.py`;
+- `tests/test_paper_lifecycle_results_api.py` for focused offline transport
+  verification; and
+- governance updates.
 
 No database migration, model, repository, third-party dependency, frontend,
 dashboard, or generated client is required by this specification.
@@ -306,11 +312,13 @@ P01-RTI-06 does not authorize:
 P08-G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED. G3, G4, and P09 remain
 NOT AUTHORIZED.
 
-## 16. Implementation authorization gate
+## 16. Implementation checkpoint
 
-This specification is complete, but implementation remains unauthorized. A
-future approval must explicitly authorize the limited P01-RTI-06 implementation
-against this document. Until then, no route, schema, dependency wiring, test
-code, or runtime behavior described here may be added.
+The owner authorized the limited P01-RTI-06 implementation against this
+document. Fourteen focused transport tests, 12 RTI-05 regressions, 65 combined
+P01-RTI-01 through P01-RTI-06 regressions, and the full 1,435-test Python 3.13
+suite pass. Module compilation, whitespace checks, TypeScript typechecks, and
+all workspace builds pass. One pre-existing Starlette warning and the known
+frontend sourcemap warning remain non-blocking. GitHub CI and merge are pending.
 
 No gate after P01-RTI-06 is selected or authorized by this specification.
