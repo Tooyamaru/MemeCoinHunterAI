@@ -1,6 +1,6 @@
 # P01-RTI-03 — Controlled Paper Persistence
 
-**Status:** SPECIFICATION DRAFT / IMPLEMENTATION NOT AUTHORIZED
+**Status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING
 
 **Phase:** P01 runtime integration over the existing P01-T03 persistence
 foundation and completed P01-RTI-02 paper lifecycle
@@ -23,9 +23,7 @@ back stored records. It must not create or repair a lifecycle artifact, rerun a
 decision, reinterpret an outcome, manufacture reconciliation evidence, or
 authorize any trade.
 
-This specification does not authorize implementation. A separate owner
-approval is required before models, repositories, migrations, or tests are
-changed.
+The owner explicitly authorized the limited implementation on 2026-09-22.
 
 ## 2. Existing owners remain authoritative
 
@@ -112,6 +110,7 @@ One row retains one artifact snapshot belonging to the run:
 - `run_id`: foreign key to `paper_lifecycle_runs.id` with delete restricted;
 - `artifact_kind`: closed P01-RTI-03 vocabulary;
 - `artifact_digest`;
+- `payload_digest`: SHA-256 of the exact canonical payload bytes;
 - `owner_contract_version`;
 - `canonical_payload`: UTF-8 canonical JSON text;
 - `ordinal`: deterministic order within the run; and
@@ -150,6 +149,9 @@ existing canonical representations as follows:
 - mappings use lexicographically sorted string keys;
 - tuples become JSON arrays without reordering;
 - `Decimal` values use the owning contract's canonical decimal text;
+- finite legacy float values already present in owner canonical forms retain
+  Python's deterministic JSON number representation; NaN and infinity fail
+  closed;
 - timezone-aware datetimes use normalized UTC ISO-8601 text;
 - enums use their contract values;
 - booleans, integers, strings, and `null` retain their JSON meanings; and
@@ -163,6 +165,9 @@ For contracts whose owner digest covers their canonical payload, the stored
 payload must re-hash to that digest. For aggregate/projection records such as
 the P07-T07 insertion result, P01-RTI-03 stores the exact explicit fields and
 the owner-provided `history_digest`; it does not invent a new P07 digest.
+Every artifact also stores a separate `payload_digest` over its exact UTF-8
+canonical JSON bytes so corruption can be detected even when an owner identity
+digest intentionally covers a different projection.
 
 ## 6. Atomicity and transaction boundary
 
@@ -189,8 +194,9 @@ It has exactly these outcomes:
 
 - `STORED`: the complete bundle was inserted once;
 - `ALREADY_STORED`: a row with the same lifecycle result digest exists and its
-  full stored root fields, artifact kinds, artifact digests, ordinals, contract
-  versions, and canonical payload bytes exactly match the candidate bundle;
+  full stored root fields, artifact kinds, artifact and payload digests,
+  ordinals, contract versions, and canonical payload bytes exactly match the
+  candidate bundle;
 - `CONFLICT`: the same lifecycle result digest exists but any stored value or
   artifact differs;
 - `INVALID_INPUT`: owner validation, linkage, digest, serialization, or closed
@@ -275,7 +281,7 @@ This task adds no:
 
 ## 12. Proposed implementation surface
 
-If separately authorized, implementation is limited to:
+The authorized implementation is limited to:
 
 - `backend/core/models.py` for the two append-only SQLAlchemy models;
 - `backend/core/repositories.py` for bounded write/read operations;

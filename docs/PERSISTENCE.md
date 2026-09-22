@@ -25,9 +25,26 @@ API and future workers use `DatabaseRuntime.session_scope()` as the unit-of-work
 
 The current repository example is `SystemMetadataRepository`, backed only by the infrastructure-level `system_metadata` table. Trading, market, wallet, position, signal, decision, and learning tables are intentionally deferred.
 
+P01-RTI-03 adds a narrowly bounded exception for completed paper-runtime
+integration records. `paper_lifecycle_runs` stores one immutable P01-RTI-02
+root identity, and `paper_lifecycle_artifacts` stores its ordered canonical
+artifact snapshots. The application persistence service validates and builds
+the full bundle before opening one write transaction. Exact retries are
+idempotent, storage disagreements fail closed, and partial writes roll back.
+The repository exposes no update or delete operation.
+
+This storage is an audit snapshot, not a live position, wallet, settlement,
+economic-result, dashboard, or complete replay-input store. Database timestamps
+are operational metadata only and never become domain or learning facts.
+
 ## Migrations
 
-Alembic configuration lives in `alembic.ini`, `migrations/env.py`, and `migrations/versions/`. Migration metadata is imported from `backend.core.models.Base.metadata`. The initial revision creates only `system_metadata`. Migration commands use `DATABASE_URL`; no credentials are stored in source.
+Alembic configuration lives in `alembic.ini`, `migrations/env.py`, and
+`migrations/versions/`. Migration metadata is imported from
+`backend.core.models.Base.metadata`. The initial revision creates only
+`system_metadata`; revision `0002_paper_lifecycle` creates only the two
+controlled paper-lifecycle tables and their identity/order constraints.
+Migration commands use `DATABASE_URL`; no credentials are stored in source.
 
 ## Test database
 
