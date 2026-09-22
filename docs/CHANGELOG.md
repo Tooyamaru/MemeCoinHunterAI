@@ -1,6 +1,6 @@
 ## 2026-09-22 — P01-RTI-03 Controlled Paper Persistence Gate
 
-- **STATUS:** Specification draft complete; implementation not authorized.
+- **STATUS:** Implemented with local verification pass; CI pending.
 - **PROPOSAL:** Atomically retain one canonical P01-RTI-02 result and every
   artifact actually present through one append-only run row plus ordered
   canonical artifact snapshots.
@@ -12,6 +12,19 @@
 - **BOUNDARY:** Persistence records but does not recreate, repair, evaluate, or
   reinterpret domain artifacts. No API, worker, scheduler, provider, dashboard,
   wallet, live execution, G2, G3, G4, or P09 behavior is proposed.
+- **IMPLEMENTATION:** Added two append-only SQLAlchemy models, migration
+  `0002_paper_lifecycle`, bounded repository operations, and an application
+  persistence service with canonical serialization and read/write outcomes.
+- **CORRECTIVE DETAIL:** Artifact rows include a payload SHA-256 in addition to
+  the owner digest, allowing exact byte-corruption detection. Existing finite
+  legacy floats in owner canonical forms are retained deterministically;
+  NaN/infinity fail closed.
+- **LOCAL VERIFICATION:** 11 focused persistence tests, 375 relevant database
+  and P01/P07/P08/G1 regressions, and the full 1,399-test Python 3.13 suite
+  pass. Migration upgrade/downgrade, module compilation, whitespace checks,
+  TypeScript typechecks, and all workspace builds pass. One pre-existing
+  Starlette deprecation warning and the known frontend sourcemap warning remain
+  non-blocking.
 
 ## 2026-09-22 — P01-RTI-02 Controlled Paper Lifecycle Gate
 
