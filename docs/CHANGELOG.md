@@ -1,3 +1,25 @@
+## 2026-09-22 — P01-RTI-05 Read-Only Persisted Result Query Gate
+
+- **STATUS:** Authorized / implemented / local checkpoint pass / CI pending.
+- **AUTHORIZATION:** The owner explicitly approved the limited P01-RTI-05
+  implementation on 2026-09-22.
+- **IMPLEMENTATION:** Added one thin HTTP-independent application query that
+  delegates an explicit `lifecycle_result_digest` to the existing P01-RTI-03
+  `ControlledPaperPersistenceService.read(...)` owner and returns its existing
+  `PaperLifecycleReadResult` unchanged.
+- **VALIDATION:** P01-RTI-03 remains the sole digest validator. Malformed input
+  preserves its `ValueError` contract and is never converted into `NOT_FOUND`.
+- **READ-ONLY:** No insert, update, delete, repair, reconstruction, model,
+  migration, or second repository was added.
+- **BOUNDARY:** No RTI-04 invocation or modification; no API, provider, worker,
+  scheduler, wallet, live execution, realization, settlement, G2, G3, G4, or
+  P09 behavior.
+- **LOCAL VERIFICATION:** 12 focused tests, 51 combined P01-RTI-01 through
+  P01-RTI-05 regressions, and the full 1,421-test Python 3.13 suite pass. Module
+  compilation, whitespace checks, TypeScript typechecks, and all workspace
+  builds pass. One pre-existing Starlette warning and the known frontend
+  sourcemap warning remain non-blocking. GitHub CI and merge are pending.
+
 ## 2026-09-22 — P01-RTI-04 Application-Service Specification Gate
 
 - **STATUS:** Complete / closed / CI pass.
