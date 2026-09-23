@@ -5,7 +5,7 @@
 - **Gate:** P01-RTI-12
 - **Title:** Deterministic P05 Opportunity-Context Continuation
 - **Specification status:** COMPLETE / APPROVED
-- **Implementation status:** AUTHORIZED FOR LIMITED IMPLEMENTATION / NOT STARTED
+- **Implementation status:** COMPLETE / CLOSED / CI PASS
 - **Runtime status:** NO RUNTIME CALLER AUTHORIZED
 - **Contract version:** `p01-rti-12-v1`
 
@@ -14,9 +14,9 @@ continuation from one canonical `P01Rti11CompositionResult` through the
 existing P05-T06, P05-T07, and P05-T08 owners. The terminal output is the
 existing P05-T08 `OpportunityContext`.
 
-This specification does **not** authorize implementation in this documentation
-checkpoint. Limited implementation has been separately authorized by the
-controller and must be delivered in a later implementation gate.
+The controller separately authorized limited implementation. That implementation
+has now been delivered and closed without opening any runtime caller or
+downstream authority boundary.
 
 ## 1. Purpose
 
@@ -473,3 +473,34 @@ and governance state. It does not implement RTI-12 and does not start any
 runtime behavior.
 
 No gate after P01-RTI-12 is authorized or started by this document.
+
+
+## 21. Closure record
+
+P01-RTI-12 limited implementation is complete and closed.
+
+- Application module:
+  `backend/application/p05_opportunity_context_continuation.py`
+- Focused tests:
+  `tests/test_p05_opportunity_context_continuation.py`
+- Minimal export:
+  `backend/application/__init__.py`
+- Implementation PR: #31
+- Implementation merge commit:
+  `1287316872fe95d21f321ce6b2a501a0808792a9`
+- GitHub Actions run: #90
+- Python 3.13 tests / whitespace: PASS
+- TypeScript typecheck / build: PASS
+
+The implementation preserves the exact three-outcome RTI-12 vocabulary,
+once-only P05-T06/P05-T07/P05-T08 delegation, fresh invocation-local history,
+safe validation/failure semantics, exact version binding, provenance continuity,
+and deterministic canonical result digest.
+
+No concrete runtime caller, provider/network runtime, persistence/publication,
+API/WebSocket, P06, Risk/Capital, P07/paper lifecycle, retry/polling,
+worker/scheduler/queue, dashboard/Hunter Room, wallet/signing/RPC/DEX,
+economic realization, execution/live trading, G2, G3, G4, or P09 boundary was
+opened.
+
+No post-P01-RTI-12 gate is authorized by this closure.
