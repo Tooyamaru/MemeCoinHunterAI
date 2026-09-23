@@ -1,6 +1,6 @@
 ## 2026-09-23 — P01-RTI-08 Read-Only Digest Catalog API
 
-- **STATUS:** Implemented / local verification pass / CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **AUTHORIZATION:** The owner approved final specification reconciliation and
   limited implementation on 2026-09-23.
 - **ENDPOINT:** Added only `GET /api/v1/paper-lifecycle-results` with optional
@@ -18,6 +18,8 @@
   104 combined P01-RTI-01 through RTI-08 regressions, and the full 1,474-test
   Python 3.13 suite pass. Module compilation, whitespace checks, TypeScript
   typechecks, and workspace builds pass.
+- **MERGE:** GitHub Actions run #63 passed both required jobs and PR #22 was
+  squash-merged to `main` at `7a56077`.
 - **GOVERNANCE:** RTI-03/04/05/06/07 behavior is unchanged. No direct
   repository/session/model access, artifact read, model, migration, dependency,
   provider, worker, scheduler, queue, dashboard, wallet, execution, live

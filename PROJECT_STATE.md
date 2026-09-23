@@ -10,10 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-08 bounded read-only persisted
-  lifecycle digest catalog API
-- **Integration priority status:** IMPLEMENTED / LOCAL VERIFICATION PASS / CI
-  PENDING
+- **Current integration priority:** Post-P01-RTI-08 next-gate selection
+- **Integration priority status:** P01-RTI-08 COMPLETE / CLOSED / CI PASS;
+  NEXT GATE NOT SELECTED / NOT AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -64,9 +63,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   exclusive keyset continuation and adds no HTTP, artifact read, full-bundle
   validation, model, or migration.
 - P01-RTI-08 bounded read-only persisted lifecycle digest catalog API is
-  IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING. It adds one collection
-  `GET` that delegates only to P01-RTI-07, preserves the exact eight-field
-  catalog result, and adds no direct persistence access or new authority.
+  COMPLETE / CLOSED / CI PASS and was squash-merged through PR #22 at
+  `7a56077`. It adds one collection `GET` that delegates only to P01-RTI-07,
+  preserves the exact eight-field catalog result, and adds no direct
+  persistence access or new authority.
 
 ## Phase status
 
@@ -182,11 +182,12 @@ existing safe `500`; every supported response class uses `Cache-Control:
 no-store` and the existing `X-Request-ID`. Eighteen focused tests, 35 relevant
 RTI-06/07 regressions, 104 combined P01-RTI-01 through RTI-08 regressions, and
 the full 1,474-test Python 3.13 suite pass. Module compilation, whitespace
-checks, TypeScript typechecks, and workspace builds pass. GitHub CI and merge
-are pending. P01-RTI-03 through P01-RTI-07 remain closed and unchanged; G2
+checks, TypeScript typechecks, and workspace builds pass. GitHub Actions run
+#63 passed both required jobs, and PR #22 was squash-merged to `main` at
+`7a56077`. P01-RTI-03 through P01-RTI-07 remain closed and unchanged; G2
 remains blocked; G3, G4, P09, provider runtime, worker, scheduler, queue,
 wallet, execution, live trading, dashboard, and economic authority remain
-unopened.
+unopened. No subsequent gate is selected or authorized.
 
 P01-RTI-07 is implemented as one HTTP-independent, read-only application
 catalog over a bounded repository root-digest select. It uses default limit
