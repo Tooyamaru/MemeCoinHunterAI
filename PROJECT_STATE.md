@@ -10,10 +10,12 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-14 successor selection
+- **Current integration priority:** P01-RTI-15 deterministic Risk/Capital-to-P07
+  paper admission continuation
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS
+  P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
+  P01-RTI-15 LIMITED IMPLEMENTATION COMPLETE / LOCAL REGRESSION PASS / PR PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -179,6 +181,20 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+Post-P01-RTI-14 dependency review selected P01-RTI-15 as the smallest missing
+composition: one canonical RTI-14 paper-only approval through the existing
+authorization-observation adapter and P07-T01 v2 owner, stopping at the exact
+`PaperSimulationInput`. The limited implementation is complete locally. It
+adds one thin application module, one focused test module, and a minimal
+application export. Focused tests pass 17/17; relevant RTI-13/14,
+Risk/Capital, and P07 tests pass 95/95; combined RTI regressions pass 217/217;
+and the full Python suite passes 1601 tests with one existing dependency
+warning. Python compilation, TypeScript typecheck/build (with required local
+`PORT` and `BASE_PATH` values), and whitespace checks pass. GitHub PR/CI and
+merge closure remain pending. No fill, paper lifecycle, persistence, provider
+runtime, P08 economic behavior, wallet, execution, G2, G3, G4, or P09 boundary
+was opened.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
