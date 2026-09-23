@@ -1,3 +1,26 @@
+## 2026-09-23 — P01-RTI-14 Limited Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS.
+- **IMPLEMENTATION:** Added one thin HTTP-independent continuation from the
+  canonical P01-RTI-13 decision result to the existing paper-only Risk/Capital
+  authority, terminating at the exact `PaperRiskCapitalAuthorizationResult`.
+- **DOMAIN STATUS:** Canonical `APPROVED` and `REJECTED` are both valid
+  materialized authority outputs; RTI-14 does not reinterpret owner rejection
+  as an application failure.
+- **FAILURES:** Owner validation remains standardized; unexpected owner failure
+  and invalid owner output remain bounded and non-leaking.
+- **TEST/CI:** GitHub Actions run #120 passed after two focused test assertions
+  were corrected to preserve the canonical P06/Risk-Capital owner result.
+  Production authority logic was not changed by that correction.
+- **MERGE:** PR #37 was merged to `main` at
+  `af44f00eaff2550baf8f9648d38b3ca8e87e86b6`.
+- **BOUNDARY:** Paper-simulation-lifecycle-entry-only. No P07,
+  persistence/publication, runtime caller, provider loop, worker/scheduler,
+  wallet/signing/RPC/DEX, economic realization, execution/live trading, G2,
+  G3, G4, or P09 was opened.
+- **NEXT:** No successor gate is authorized or started; successor selection
+  requires a bounded dependency/gap review.
+
 ## 2026-09-23 — P01-RTI-14 Formal Specification
 
 - **STATUS:** Specification COMPLETE / READY FOR CONTROLLER REVIEW;

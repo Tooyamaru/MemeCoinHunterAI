@@ -10,11 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-14 limited implementation review
+- **Current integration priority:** Post-P01-RTI-14 successor selection
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 SPECIFICATION COMPLETE /
-  READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
+  P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -779,16 +778,17 @@ and is COMPLETE / READY FOR CONTROLLER REVIEW. It locks the authority effect to
 REJECTED results as valid materialized authority outputs, and stops before P07.
 No implementation is authorized by this checkpoint.
 
-P01-RTI-14 limited implementation was explicitly authorized on 2026-09-23 and is
-implemented on the bounded feature branch. The implementation adds only the thin
-Decision-to-Risk/Capital application continuation, focused tests, minimal application
-exports, and this governance update. It stops at the exact paper-only
-PaperRiskCapitalAuthorizationResult and does not open P07, persistence, runtime caller,
-provider loop, wallet, execution, G2, G3, G4, or P09 authority.
+P01-RTI-14 deterministic Decision-to-Risk/Capital continuation is COMPLETE /
+CLOSED / CI PASS. The bounded implementation was merged through PR #37 at
+`af44f00eaff2550baf8f9648d38b3ca8e87e86b6` after GitHub Actions run #120
+passed. It stops at the exact paper-only `PaperRiskCapitalAuthorizationResult`;
+both canonical APPROVED and REJECTED remain valid authority materializations. It
+does not open P07, persistence/publication, runtime caller, provider loop, wallet,
+execution, G2, G3, G4, or P09 authority.
 
 ## Next action
 
-Controller review of P01-RTI-14 — Deterministic Decision-to-Risk/Capital
+Controller selection of the next bounded post-P01-RTI-14 integration gap
 Continuation. The formal specification accepts one canonical RTI-13 result and
 one explicit canonical PaperRiskCapitalPolicySnapshot; it may call the existing
 paper-only Risk/Capital Authority exactly once only for DECISION_MATERIALIZED
