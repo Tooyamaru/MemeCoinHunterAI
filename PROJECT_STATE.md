@@ -10,10 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-10 cross-surface governance and
-  upstream readiness reconciliation
-- **Integration priority status:** P01-RTI-10 DOCUMENTATION COMPLETE / READY
-  FOR GOVERNANCE REVIEW; MERGE AND CLOSURE PENDING
+- **Current integration priority:** Post-P01-RTI-10 controller review
+- **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
+  P01-RTI-11 RECOMMENDED / NOT AUTHORIZED / NOT STARTED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -73,6 +72,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   `986f298`. One focused test module proves the combined RTI-06/08 route,
   OpenAPI, schema, status, safe-error, header, owner-isolation, and
   forbidden-operation contract. No production code change was required.
+- P01-RTI-10 cross-surface governance and upstream readiness reconciliation is
+  COMPLETE / CLOSED / CI PASS and was squash-merged through PR #26 at
+  `b8e24c8`. It is documentation/governance-only and opens no runtime boundary.
 
 ## Phase status
 
@@ -193,9 +195,14 @@ current-governance wording, distinguishes P04 analytical evidence from blocked
 G2 realization/settlement authority, and states the exact remaining
 application-composition gap. The formal result is recorded in
 `docs/P01-RTI-10-CROSS-SURFACE-GOVERNANCE-UPSTREAM-READINESS-RECONCILIATION.md`.
-It adds no code or runtime behavior; merge and closure remain pending.
+It adds no code or runtime behavior. GitHub Actions run #75 passed both required
+jobs, and PR #26 was squash-merged to `main` at `b8e24c8`.
 
-RTI-03 through RTI-09 remain closed. G2 remains blocked; G3, G4, P09, provider
+P01-RTI-10 is COMPLETE / CLOSED / CI PASS. Its recommended successor is
+P01-RTI-11, a specification-only bounded caller-directed market-to-opportunity
+application composition gate. P01-RTI-11 is not authorized and has not started.
+
+RTI-03 through RTI-10 remain closed. G2 remains blocked; G3, G4, P09, provider
 runtime, worker, scheduler, queue, wallet, execution, live trading, dashboard,
 and public deployment remain unopened.
 
