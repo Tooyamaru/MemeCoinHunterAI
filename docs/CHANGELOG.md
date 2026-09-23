@@ -1245,3 +1245,21 @@
   does not open fill/state/ledger continuation, paper lifecycle, persistence,
   provider runtime, wallet, execution, economic realization, G2, G3, G4, or
   P09.
+
+## 2026-09-23 — P01-RTI-16 specification checkpoint
+
+- Verified `main` / `origin/main` at
+  `0828d0acac7af751953eba3c6b80770fdb4eb7c8` with P01-RTI-14 and
+  P01-RTI-15 COMPLETE / CLOSED / CI PASS.
+- Completed the bounded post-RTI-15 dependency review and selected P01-RTI-16
+  as the compatibility continuation from exact RTI-15 admission artifacts to
+  the existing RTI-02 lifecycle owner.
+- Added the formal specification for one exact RTI-01-compatible envelope
+  materialization and one exact `run_controlled_paper_lifecycle` delegation,
+  stopping at the exact `ControlledPaperLifecycleResult`.
+- Corrected the stale RTI-15 checkpoint text that still described GitHub
+  closure as pending.
+- This checkpoint is documentation/governance-only. RTI-16 implementation is
+  NOT AUTHORIZED; no source, runtime, tests, persistence, API, provider,
+  worker/scheduler/queue, wallet/execution, economic realization, G2/G3/G4, or
+  P09 boundary was opened.
