@@ -1,3 +1,27 @@
+## 2026-09-23 — Post-P01-RTI-08 Next-Gate Selection
+
+- **STATUS:** Implemented / local verification pass / CI pending.
+- **RECOMMENDATION:** P01-RTI-09, a bounded read-only API contract-conformance
+  gate across the closed RTI-06 detail and RTI-08 collection routes.
+- **RATIONALE:** It uses only closed dependencies, adds no runtime capability,
+  and locks the combined route, OpenAPI, response, safe-error, request-ID, and
+  no-store contract before any separate security or deployment decision.
+- **BOUNDARY:** Verification/specification only by default; no new endpoint,
+  application service, repository access, model, migration, dependency,
+  authentication, deployment, provider, worker, scheduler, queue, dashboard,
+  wallet, execution, live trading, G2, G3, G4, or P09.
+- **AUTHORIZATION:** The owner approved P01-RTI-09 as a verification-only
+  conformance gate and authorized focused tests plus checkpoint documentation.
+- **IMPLEMENTATION:** Added one focused contract-conformance test module. Exact
+  OpenAPI and runtime checks found no discrepancy, so production code remains
+  unchanged.
+- **LOCAL VERIFICATION:** 15 focused tests, 32 relevant RTI-06/08 regressions,
+  119 combined P01-RTI-01 through RTI-09 regressions, and the full 1,489-test
+  Python 3.13 suite pass. Module compilation, whitespace checks, TypeScript
+  typechecks, and workspace builds pass.
+- **GOVERNANCE:** RTI-03 through RTI-08 remain closed and unchanged. Production
+  code remains frozen unless focused tests prove an actual contract discrepancy.
+
 ## 2026-09-23 — P01-RTI-08 Read-Only Digest Catalog API
 
 - **STATUS:** Complete / closed / CI pass.
