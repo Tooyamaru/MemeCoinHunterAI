@@ -11,8 +11,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** Post-P01-RTI-08 next-gate selection
-- **Integration priority status:** P01-RTI-08 COMPLETE / CLOSED / CI PASS;
-  NEXT GATE NOT SELECTED / NOT AUTHORIZED
+- **Integration priority status:** P01-RTI-09 IMPLEMENTED / LOCAL VERIFICATION
+  PASS / CI PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -67,6 +67,11 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   `7a56077`. It adds one collection `GET` that delegates only to P01-RTI-07,
   preserves the exact eight-field catalog result, and adds no direct
   persistence access or new authority.
+- P01-RTI-09 bounded read-only lifecycle API contract conformance is
+  IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING. One focused test module
+  proves the combined RTI-06/08 route, OpenAPI, schema, status, safe-error,
+  header, owner-isolation, and forbidden-operation contract. No production
+  code change was required.
 
 ## Phase status
 
@@ -170,6 +175,34 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+Post-P01-RTI-08 candidate selection is documented in
+`docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`. All repository-deferred
+read-only, security/deployment, mutating, operational, presentation, and
+future-authority surfaces were compared for architecture readiness, dependency
+readiness, boundedness, determinism, testability, observability, governance
+risk, blast radius, and sequencing value. The recommended next gate is
+P01-RTI-09, a verification-only contract-conformance gate over the existing
+RTI-06 detail and RTI-08 collection `GET` routes. It proposes no new route,
+runtime behavior, result vocabulary, model, migration, dependency, or domain
+authority. The controller approved this direction and authorized limited
+implementation with production behavior frozen unless an actual discrepancy
+requires a documented minimal correction.
+RTI-03 through RTI-08 remain closed; G2 remains blocked; G3, G4, P09, provider
+runtime, worker, scheduler, queue, wallet, execution, live trading, dashboard,
+and public deployment remain unopened.
+
+P01-RTI-09 is implemented as one focused contract-conformance test boundary
+over the unchanged RTI-06 detail and RTI-08 collection transports. Generated
+OpenAPI exposes exactly the two governed `GET` paths, exact parameters,
+component schemas, and status mappings. Runtime checks preserve route
+separation, safe `422`/`500`, `Cache-Control: no-store`, existing
+`X-Request-ID`, owner isolation, method rejection, and absence of command-style
+nested routes. No discrepancy was found and no production code changed.
+Fifteen focused tests, 32 relevant RTI-06/08 regressions, 119 combined
+P01-RTI-01 through RTI-09 regressions, and the full 1,489-test Python 3.13 suite
+pass. Module compilation, whitespace checks, TypeScript typechecks, and
+workspace builds pass. GitHub CI and merge are pending.
 
 P01-RTI-08 is implemented as one collection-only, read-only HTTP transport
 over P01-RTI-07. `GET /api/v1/paper-lifecycle-results` accepts only optional
@@ -534,6 +567,8 @@ functionality was introduced.
 - `docs/P01-RTI-06-BOUNDED-READ-ONLY-PAPER-LIFECYCLE-RESULT-API-SPECIFICATION.md`
 - `docs/P01-RTI-07-BOUNDED-READ-ONLY-PERSISTED-LIFECYCLE-DIGEST-CATALOG-SPECIFICATION.md`
 - `docs/P01-RTI-08-BOUNDED-READ-ONLY-PERSISTED-LIFECYCLE-DIGEST-CATALOG-API-SPECIFICATION.md`
+- `docs/P01-RTI-09-BOUNDED-READ-ONLY-LIFECYCLE-API-CONTRACT-CONFORMANCE-SPECIFICATION.md`
+- `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`
 - `core/data/coingecko_onchain_ohlcv.py`
@@ -556,6 +591,7 @@ functionality was introduced.
 - `migrations/versions/0002_create_paper_lifecycle_persistence.py`
 - `tests/test_paper_lifecycle_digest_catalog.py`
 - `tests/test_paper_lifecycle_digest_catalog_api.py`
+- `tests/test_paper_lifecycle_api_contract_conformance.py`
 - `tests/test_coingecko_onchain_ohlcv.py`
 - `tests/test_price_direction_policy.py`
 - `tests/test_coingecko_onchain_transport.py`
