@@ -1,3 +1,33 @@
+## 2026-09-23 — P01-RTI-13 Formal Specification
+
+- **STATUS:** Specification COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation NOT AUTHORIZED.
+- **SELECTION:** Post-RTI-12 dependency audit selected a bounded
+  OpportunityContext-to-Decision continuation over existing P06-T02.
+- **INPUT:** Exactly one canonical P01-RTI-12 result, one explicit canonical
+  `DecisionEvaluationRuleset`, and one explicit timezone-aware
+  `decision_time`.
+- **FLOW:** Only RTI-12 `CONTEXT_MATERIALIZED` may continue. The exact
+  `OpportunityContext`, ruleset, and decision time are passed to
+  `evaluate_decision_intent(...)` exactly once. The gate stops at the exact
+  P06-T01 `DecisionIntent`.
+- **OUTCOMES:** Proposed wrapper vocabulary is `DECISION_MATERIALIZED`,
+  `UPSTREAM_NOT_MATERIALIZED`, and `DECISION_UNAVAILABLE`.
+- **VERSIONS:** Locks RTI-12 `p01-rti-12-v1`, P05-T08
+  `p05-t08-v1`/`p05-t08-context-v1`, P06-T01 `p06-t01-v1`,
+  P06-T02 ruleset `p06-t02-rules-v1`, and evaluator
+  `p06-t02-evaluator-v1`.
+- **DEFAULTS:** RTI-13 forbids implicit P06 module default ruleset and implicit
+  decision-time fallback; both facts remain caller-owned.
+- **SEMANTICS:** P06 output remains analytical only. BUY is not capital
+  authorization, an order, or execution permission.
+- **BOUNDARY:** No Risk/Capital, P07, RTI-01/paper path, persistence/publication,
+  API/WebSocket, runtime caller, provider/network loop, worker/scheduler/queue,
+  dashboard, wallet/signing/RPC/DEX, economic realization, execution/live
+  trading, G2, G3, G4, or P09 is opened.
+- **SCOPE:** Documentation/governance only; no source/runtime/test behavior is
+  created by this checkpoint.
+
 ## 2026-09-23 — P01-RTI-12 Limited Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS.
