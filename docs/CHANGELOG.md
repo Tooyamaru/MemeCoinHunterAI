@@ -1,3 +1,29 @@
+## 2026-09-23 — P01-RTI-13 Limited Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS.
+- **IMPLEMENTATION:** Added one thin HTTP-independent continuation from a
+  canonical P01-RTI-12 result to existing P06-T02, terminating at P06-T01
+  `DecisionIntent`.
+- **INPUTS:** Exact RTI-12 result, explicit canonical
+  `DecisionEvaluationRuleset`, explicit timezone-aware `decision_time`.
+- **CARDINALITY:** P06-T02 runs exactly once only for
+  `CONTEXT_MATERIALIZED`; all canonical non-materialized RTI-12 outcomes call
+  P06 zero times.
+- **FAILURES:** P06-T02 `ValueError` remains standardized safe validation;
+  unexpected/invalid owner results remain bounded and non-leaking.
+- **SEMANTICS:** Decision output remains analytical only; BUY is not
+  authorization, an order, or execution permission.
+- **TEST/CI:** GitHub Actions run #107 passed after one focused test assertion
+  was aligned with the existing standardized validation message. Production
+  logic was unchanged by the correction.
+- **MERGE:** PR #34 was squash-merged to `main` at
+  `b634d7cacea5a95c6466c8d46d696798dd67712d`.
+- **BOUNDARY:** No concrete runtime caller, Risk/Capital, P07,
+  RTI-01/paper lifecycle, persistence/publication, API/WebSocket, provider loop,
+  worker/scheduler/queue, dashboard, wallet/signing/RPC/DEX, economic
+  realization, execution/live trading, G2, G3, G4, or P09 was opened.
+- **NEXT:** No successor gate is authorized or started.
+
 ## 2026-09-23 — P01-RTI-13 Limited Implementation
 
 - **STATUS:** Controller-approved limited implementation / CI verification

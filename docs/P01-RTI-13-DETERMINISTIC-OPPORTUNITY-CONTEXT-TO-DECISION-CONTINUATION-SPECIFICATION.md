@@ -5,7 +5,7 @@
 - **Gate:** P01-RTI-13
 - **Title:** Deterministic OpportunityContext-to-Decision Continuation
 - **Specification status:** APPROVED
-- **Implementation status:** LIMITED IMPLEMENTATION AUTHORIZED / IN PROGRESS
+- **Implementation status:** COMPLETE / CLOSED / CI PASS
 - **Runtime status:** NO CONCRETE RUNTIME CALLER AUTHORIZED
 - **Proposed contract version:** `p01-rti-13-v1`
 
@@ -507,3 +507,39 @@ implementation confined to the exact scope above. No concrete runtime caller or
 downstream authority was authorized.
 
 `SPECIFICATION APPROVED / LIMITED IMPLEMENTATION AUTHORIZED`
+
+
+## 22. Closure record
+
+P01-RTI-13 limited implementation is complete and closed.
+
+- Application module:
+  `backend/application/opportunity_context_to_decision_continuation.py`
+- Focused tests:
+  `tests/test_opportunity_context_to_decision_continuation.py`
+- Minimal export:
+  `backend/application/__init__.py`
+- Implementation PR: #34
+- Implementation merge commit:
+  `b634d7cacea5a95c6466c8d46d696798dd67712d`
+- GitHub Actions run: #107
+- Python 3.13 tests: PASS
+- TypeScript typecheck/build: PASS
+
+The final CI correction affected only the focused test assertion for the
+standardized tampered-ruleset validation message. Production logic was not
+changed by that correction.
+
+The implementation preserves the exact three-input contract, explicit ruleset
+and decision-time ownership, three RTI-13 wrapper outcomes, zero delegation on
+non-materialized upstream results, exactly one P06-T02 delegation on success,
+exact context identity, P06 version binding, deterministic result digest, and
+analytical-only semantics.
+
+No concrete runtime caller, Risk/Capital, P07, RTI-01/paper lifecycle,
+persistence/publication, API/WebSocket, provider loop, retry/polling,
+worker/scheduler/queue, dashboard/Hunter Room, wallet/signing/RPC/DEX,
+economic realization, execution/live trading, G2, G3, G4, or P09 boundary was
+opened.
+
+No post-P01-RTI-13 gate is authorized by this closure.
