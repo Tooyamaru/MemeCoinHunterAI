@@ -1,6 +1,6 @@
 # P01-RTI-11 — Bounded Caller-Directed Market-to-Opportunity Composition
 
-**Status:** SPECIFICATION APPROVED / LIMITED IMPLEMENTATION COMPLETE LOCALLY / CI AND MERGE PENDING
+**Status:** COMPLETE / CLOSED / CI PASS
 
 **Gate type:** bounded application integration gate
 
