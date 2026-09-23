@@ -1220,3 +1220,16 @@
 - **CHANGE:** Added async SQLAlchemy persistence, truthful database runtime states, a system metadata model/repository, Alembic migration scaffolding, isolated SQLite test strategy, and database-aware readiness.
 - **VERIFICATION:** Targeted persistence tests, migration metadata checks, transaction commit/rollback, URL redaction, application health/readiness, dependency sync, setup repeatability, and secret-pattern checks passed.
 - **COMMIT:** Not created in this workspace.
+## 2026-09-23 — P01-RTI-15 selected and specified
+
+- Verified RTI-14 closure at `683ceeba231de8f439199e1836177efbb902267a`.
+- Selected the exact missing RTI-14 approval-to-P07-T01 v2 admission boundary.
+- Locked one authorization-observation adapter call, one P07 constructor call,
+  rejected/non-materialized stop behavior, deterministic digest/provenance,
+  and a hard stop at `PaperSimulationInput`.
+- No provider runtime, paper lifecycle, persistence, P08 economic path,
+  wallet, execution, G2/G3/G4, or P09 authority is opened.
+- Implemented the thin RTI-15 continuation, focused tests, and minimal
+  application export. Local verification: 17 focused, 95 relevant, 217
+  combined RTI, and 1601 full-suite tests pass; compilation, TypeScript
+  typecheck/build, and whitespace checks pass.
