@@ -1,3 +1,29 @@
+## 2026-09-23 — P01-RTI-12 Limited Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS.
+- **IMPLEMENTATION:** Added one thin HTTP-independent application continuation
+  from a canonical RTI-11 result through existing P05-T06, fresh local P05-T07
+  history, and P05-T08, terminating at `OpportunityContext`.
+- **OUTCOMES:** Preserves exactly `CONTEXT_MATERIALIZED`,
+  `UPSTREAM_NOT_COMPOSED`, and `MATERIALIZATION_UNAVAILABLE`.
+- **CARDINALITY:** P05-T06 once, one P05-T07 append into a fresh invocation-local
+  history, P05-T08 once. Valid non-`COMPOSED` results invoke none of them.
+- **FAILURES:** Validation failures remain safe raised `ValueError`; P05-T07
+  bounded failures remain distinguishable; unexpected owner failures use finite
+  stage-specific reasons without leaking exception detail.
+- **DETERMINISM:** Exact version/provenance binding and canonical lowercase
+  SHA-256 result digest are preserved without wall-clock/environment/shared
+  mutable state.
+- **TEST/CI:** GitHub Actions run #90 passed the Python 3.13
+  tests/whitespace job and TypeScript typecheck/build job.
+- **MERGE:** PR #31 was squash-merged to `main` at
+  `1287316872fe95d21f321ce6b2a501a0808792a9`.
+- **BOUNDARY:** No concrete runtime caller, provider/network runtime,
+  persistence/publication, API/WebSocket, P06, paper lifecycle,
+  worker/scheduler/queue, dashboard, wallet, economic realization,
+  execution/live trading, G2, G3, G4, or P09 was opened.
+- **NEXT:** No successor gate is authorized or started.
+
 ## 2026-09-23 — P01-RTI-12 Formal Specification Checkpoint
 
 - **STATUS:** Formal specification COMPLETE / APPROVED; limited implementation
