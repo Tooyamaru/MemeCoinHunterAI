@@ -82,12 +82,18 @@ of the project.
 ## Current development boundary
 
 The canonical evidence producer is present and tested with offline fixtures.
-Live application integration remains blocked until the project approves both:
+P04-LME-01 subsequently approved CoinGecko Demo Onchain pool OHLCV as the
+bounded V1 analytical historical-price source and `price-direction-v1` as the
+deterministic observational market-to-signal policy. P04-LME-02 and
+P04-LME-03 completed the bounded one-shot transport and caller-directed exact-
+pool diagnostic orchestration.
 
-1. an authoritative historical market-evidence source with identity,
-   timestamps, and provenance; and
-2. a deterministic, versioned market-to-signal policy that can produce the
-   canonical P04 signal evidence without browser-supplied authority.
+Application/runtime composition remains blocked pending a separately approved
+contract for the application caller, exact inputs, single-invocation boundary,
+failure propagation, policy-version binding, time/cutoff semantics, provenance,
+and output handoff. Source and policy approval alone does not authorize
+application wiring, automatic pool selection, retry, polling, worker,
+scheduler, queue, or persistence.
 
 G2 realization/settlement remains a separate blocked governance decision. This
 workflow change does not authorize G2, wallet integration, signing, broadcast,
