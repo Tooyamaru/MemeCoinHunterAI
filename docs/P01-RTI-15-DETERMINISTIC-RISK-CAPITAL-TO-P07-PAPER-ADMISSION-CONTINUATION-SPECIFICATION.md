@@ -1,6 +1,6 @@
 # P01-RTI-15 — Deterministic Risk/Capital-to-P07 Paper Admission Continuation
 
-**Status:** LIMITED IMPLEMENTATION COMPLETE / LOCAL REGRESSION PASS / PR PENDING
+**Status:** COMPLETE / CLOSED / CI PASS
 
 **Contract:** `p01-rti-15-v1`
 
