@@ -11,7 +11,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** Post-P01-RTI-16 bounded dependency/gap
-  review; no successor implementation is authorized
+  review complete — natural in-memory STOP; no RTI successor selected
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -217,6 +217,17 @@ regression passed 94/94. GitHub Actions run #132 passed both Python 3.13 and
 TypeScript jobs; PR #42 was squash-merged to `main` at `4530a6c`.
 P01-RTI-16 is COMPLETE / CLOSED / CI PASS. No operational caller,
 persistence/publication, economic or live authority has been authorized.
+
+The bounded post-P01-RTI-16 review in
+`docs/POST-P01-RTI-16-DEPENDENCY-GAP-REVIEW.md` finds no mandatory next
+composition gap. RTI-16 preserves an exact RTI-02 lifecycle result, already
+accepted directly by RTI-03 if a later, separately authorized storage use
+case requires it. RTI-04 is a separate P05-T08-starting persistence path and
+cannot consume RTI-16 without rerunning closed owners. RTI-03 does not retain
+the RTI-16 wrapper or original fill/evidence replay inputs; durable full-chain
+lineage would require its own explicit contract/ownership decision. The
+authorized caller-supplied in-memory paper chain has a natural STOP at RTI-16.
+No RTI-17 or implementation is selected or authorized.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
@@ -693,6 +704,7 @@ functionality was introduced.
 - `docs/P01-RTI-09-BOUNDED-READ-ONLY-LIFECYCLE-API-CONTRACT-CONFORMANCE-SPECIFICATION.md`
 - `docs/POST-P01-RTI-15-NEXT-GATE-SELECTION.md`
 - `docs/P01-RTI-16-DETERMINISTIC-RTI-15-TO-CONTROLLED-PAPER-LIFECYCLE-CONTINUATION-SPECIFICATION.md`
+- `docs/POST-P01-RTI-16-DEPENDENCY-GAP-REVIEW.md`
 - `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`
@@ -828,8 +840,10 @@ execution, G2, G3, G4, or P09 authority.
 
 ## Next action
 
-Conduct a separately authorized bounded post-P01-RTI-16 dependency/gap review
-before selecting any successor. RTI-16 itself is COMPLETE / CLOSED / CI PASS.
+Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
+selected. A specific controller decision about a future persistence,
+full-lineage retention, or caller/operational use case is required before
+specifying any new gate. RTI-16 is COMPLETE / CLOSED / CI PASS.
 Do not infer authorization for persistence/publication, provider loops,
 concrete callers, scheduler, worker, queue, API/dashboard publication, wallet
 access, economic realization, or live execution.
@@ -837,7 +851,8 @@ access, economic realization, or live execution.
 ## Next task
 
 P01-RTI-04 through P01-RTI-16 are complete, closed, merged, and CI-verified.
-No successor gate is selected or authorized.
+The bounded in-memory chain stops naturally at RTI-16; no RTI-17 or other
+successor implementation is selected or authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.

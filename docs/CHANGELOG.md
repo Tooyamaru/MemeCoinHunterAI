@@ -1,3 +1,19 @@
+## 2026-09-23 — Post-P01-RTI-16 Bounded Dependency Review
+
+- **BASE:** Verified GitHub `main` at `00904bd` after implementation PR #42
+  and closure PR #43; RTI-16 is COMPLETE / CLOSED / CI PASS.
+- **FINDING:** The exact nested RTI-02 `ControlledPaperLifecycleResult` already
+  matches RTI-03's accepted write type. RTI-04 is a separate P05-T08-starting
+  orchestration, not a safe adapter for RTI-16. Existing RTI-03 storage does
+  not retain the RTI-16 wrapper or original fill/evidence replay facts.
+- **DECISION:** The authorized in-memory paper chain has a natural STOP at
+  RTI-16. No RTI-17 or other successor is selected. A concrete storage,
+  full-lineage retention, or caller policy needs a separate controller
+  decision before specification.
+- **SCOPE:** Documentation/governance only. No runtime/source/tests, owner,
+  model/migration, provider, worker/scheduler, API/dashboard, wallet,
+  execution, economic realization, G2, G3, G4, or P09 change.
+
 ## 2026-09-23 — P01-RTI-16 Bounded Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS. Controller approved limited
