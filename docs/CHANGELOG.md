@@ -1,3 +1,34 @@
+## 2026-09-23 — P01-RTI-12 Formal Specification Checkpoint
+
+- **STATUS:** Formal specification COMPLETE / APPROVED; limited implementation
+  AUTHORIZED separately / NOT STARTED in this checkpoint.
+- **SEQUENCING:** RTI-11 stops at P05-T05, while P06-T02 and P01-RTI-01 consume
+  P05-T08 `OpportunityContext`. P05-T06/T07/T08 are already closed,
+  deterministic, local owners, so the bounded continuation is the next
+  dependency-correct step.
+- **INPUT:** Exactly one canonical `P01Rti11CompositionResult`.
+- **FLOW:** Only `COMPOSED` may continue: exact `composition.score` →
+  P05-T06 exactly once → fresh invocation-local P05-T07 history with one append
+  and required `STORED` → P05-T08 exactly once → exact
+  `OpportunityContext` → STOP.
+- **OUTCOMES:** Exact RTI-12 vocabulary is `CONTEXT_MATERIALIZED`,
+  `UPSTREAM_NOT_COMPOSED`, and `MATERIALIZATION_UNAVAILABLE`.
+- **FAILURES:** Malformed/tampered/identity/structural/version mismatches and
+  P05-T06/P05-T08 `ValueError` remain validation failures. P05-T07
+  `INVALID_INPUT`/`DUPLICATE` remain bounded owner failures under
+  `MATERIALIZATION_UNAVAILABLE`. No retry or raw exception leakage.
+- **DETERMINISM:** Locks exact version bindings, fresh-history isolation,
+  provenance continuity, and lowercase SHA-256 over canonical JSON with no
+  wall-clock/environment/callable/exception/object-address/shared-state
+  dependency.
+- **BOUNDARY:** No RTI-11 execution, concrete runtime caller, provider/network,
+  persistence/publication, API/WebSocket, P06, Risk/Capital, P07/paper
+  lifecycle, retry/polling, worker/scheduler/queue, dashboard, wallet,
+  economic realization, execution/live trading, G2, G3, G4, or P09 is opened.
+- **DELIVERY:** Documentation-only checkpoint. No production source, runtime,
+  test behavior, model, migration, dependency, route, config, secret, or
+  implementation file is created here.
+
 ## 2026-09-23 — P01-RTI-11 Formal Specification
 
 - **STATUS:** Specification complete / ready for controller review;
