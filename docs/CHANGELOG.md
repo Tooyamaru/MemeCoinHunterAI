@@ -1,3 +1,32 @@
+## 2026-09-23 — P01-RTI-14 Formal Specification
+
+- **STATUS:** Specification COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation NOT AUTHORIZED.
+- **SELECTION:** Post-RTI-13 dependency audit selected the bounded
+  Decision-to-Risk/Capital continuation over the existing paper-only authority.
+- **INPUTS:** Exactly one canonical P01-RTI-13 result and one explicit canonical
+  `PaperRiskCapitalPolicySnapshot`.
+- **FLOW:** Only RTI-13 `DECISION_MATERIALIZED` may continue. The exact
+  `DecisionIntent` and exact policy snapshot are passed once to
+  `evaluate_paper_risk_capital_authorization(...)`. The gate stops at the
+  exact `PaperRiskCapitalAuthorizationResult`.
+- **DOMAIN STATUS:** Both canonical `APPROVED` and `REJECTED` are valid
+  authority materializations. RTI-14 does not reinterpret rejection as an
+  application failure.
+- **VERSIONS:** Locks policy `p08-risk-capital-policy-v1`, authority
+  `p08-risk-capital-authority-v1`, evaluator
+  `p08-risk-capital-authority-evaluator-v1`, and effect
+  `PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY`.
+- **SEMANTICS:** Even APPROVED remains paper-simulation-lifecycle-entry-only;
+  it is not live capital, order, wallet, signing, broadcast, or execution
+  authority.
+- **BOUNDARY:** No P07, RTI-01/paper lifecycle, persistence/publication,
+  API/WebSocket, runtime caller, provider loop, worker/scheduler/queue,
+  dashboard, wallet/signing/RPC/DEX, economic realization, execution/live
+  trading, G2, G3, G4, or P09 is opened.
+- **SCOPE:** Documentation/governance only; no source/runtime/test behavior is
+  created by this checkpoint.
+
 ## 2026-09-23 — P01-RTI-13 Limited Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS.
