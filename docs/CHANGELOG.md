@@ -1233,3 +1233,15 @@
   application export. Local verification: 17 focused, 95 relevant, 217
   combined RTI, and 1601 full-suite tests pass; compilation, TypeScript
   typecheck/build, and whitespace checks pass.
+
+## 2026-09-23 — P01-RTI-15 implementation closure
+
+- Closed P01-RTI-15 as COMPLETE / CLOSED / CI PASS after GitHub Actions run
+  #124 passed the required Python 3.13 tests, whitespace checks, TypeScript
+  typechecks, and workspace builds.
+- Implementation PR #39 was merged to `main` at
+  `fdb7305f1c929c9b9bda28283e03e8b71c195541`.
+- The closed boundary stops at the exact P07-T01 v2 `PaperSimulationInput` and
+  does not open fill/state/ledger continuation, paper lifecycle, persistence,
+  provider runtime, wallet, execution, economic realization, G2, G3, G4, or
+  P09.
