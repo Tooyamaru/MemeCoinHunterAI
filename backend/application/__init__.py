@@ -10,6 +10,12 @@ from backend.application.opportunity_context_to_decision_continuation import (
     OpportunityContextToDecisionContinuationService,
     P01Rti13DecisionContinuationResult,
 )
+from backend.application.risk_capital_to_paper_admission_continuation import (
+    P01_RTI_15_CONTRACT_VERSION,
+    P01Rti15PaperAdmissionContinuationResult,
+    RiskCapitalToPaperAdmissionContinuationService,
+    RiskCapitalToPaperAdmissionOutcome,
+)
 """Application-service boundaries independent from HTTP transport."""
 from backend.application.controlled_paper_run_service import (
     P01_RTI_04_CONTRACT_VERSION,
@@ -52,6 +58,10 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_RTI_15_CONTRACT_VERSION",
+    "P01Rti15PaperAdmissionContinuationResult",
+    "RiskCapitalToPaperAdmissionContinuationService",
+    "RiskCapitalToPaperAdmissionOutcome",
     "P01_RTI_14_CONTRACT_VERSION",
     "DecisionToRiskCapitalContinuationService",
     "DecisionToRiskCapitalOutcome",
