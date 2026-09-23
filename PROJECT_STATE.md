@@ -10,9 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-12 next-gate selection
+- **Current integration priority:** P01-RTI-13 formal specification review
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS
+  P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
+  P01-RTI-13 SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -765,11 +766,14 @@ functionality was introduced.
 
 ## Next action
 
-Select and separately authorize the next bounded integration gate after
-P01-RTI-12. Do not create a concrete runtime caller or cross into P06, paper
-lifecycle, persistence/publication, provider loop, scheduler, worker, queue,
-dashboard publication, wallet access, economic realization, or live execution
-without a new explicit gate.
+Controller review of P01-RTI-13 — Deterministic OpportunityContext-to-Decision
+Continuation. The formal specification accepts one canonical RTI-12 result, one
+explicit canonical P06-T02 ruleset, and one explicit decision_time; it may call
+P06-T02 exactly once only for CONTEXT_MATERIALIZED and stops at P06-T01
+DecisionIntent. Implementation is NOT AUTHORIZED. Do not create a concrete
+runtime caller or cross into Risk/Capital, P07, paper lifecycle,
+persistence/publication, provider loop, scheduler, worker, queue, dashboard
+publication, wallet access, economic realization, or live execution.
 
 ## Next task
 
