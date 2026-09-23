@@ -1,3 +1,57 @@
+## 2026-09-23 — P01-RTI-11 Formal Specification
+
+- **STATUS:** Specification complete / ready for controller review;
+  implementation not authorized and not started.
+- **DECISION:** Locked P01-RTI-11 as a specification-only bounded application
+  composition terminating at existing P05-T05.
+- **PURPOSE:** Define one HTTP-independent, caller-directed, single-invocation
+  application composition from existing P04-LME-03 output into the existing
+  canonical P04/P05 producer.
+- **BOUNDARY:** Proposed output stops at the existing P05-T05
+  `CanonicalP04ToP05Composition`. P05-T06 record, P05-T07 history, P05-T08
+  context, P06, RTI/paper invocation, persistence, API, publication, and all
+  economic/execution authority remain excluded.
+- **RECONCILIATION:** `DerivedEligibilityOutput` has no chain/token identity;
+  the formal contract therefore requires its matching P03-T02
+  `SafetyEvaluationResult` as a canonical paired handoff and forbids RTI-11
+  from recomputing safety or eligibility.
+- **LOCKS:** Fixed the sole caller boundary, exact input/output and identity
+  linkage, nested success predicate, four-state non-economic result vocabulary,
+  raised validation failures, explicit time semantics, exact policy/version
+  bindings, provenance propagation, deterministic digest, and unreachability
+  proof/test requirements.
+- **GOVERNANCE:** No production code, tests, dependency, model, migration,
+  provider call, runtime wiring, worker, scheduler, queue, dashboard, wallet,
+  execution, live trading, G2, G3, G4, or P09 implementation was added.
+
+## 2026-09-23 — P01-RTI-11 Limited Implementation
+
+- **STATUS:** Implemented locally / checkpoint pass / GitHub CI and merge
+  pending.
+- **APPLICATION:** Added one thin `MarketToOpportunityCompositionService` with
+  immutable explicit request/result contracts and no concrete runtime caller.
+- **P03:** Requires the matching `SafetyEvaluationResult` and
+  `DerivedEligibilityOutput`; validates exact identity, evaluator, time,
+  evidence-reference, and version linkage without recomputation.
+- **COMPOSITION:** Delegates exactly once to P04-LME-03, proceeds only for the
+  exact `PRODUCED`/three-observation/`PRICE_DIRECTION_1M`/
+  `price-direction-v1` predicate, then delegates once to the existing canonical
+  P04/P05 producer and stops at P05-T05.
+- **OUTCOMES:** Locks `COMPOSED`, `TOKEN_NOT_CURRENT`,
+  `DIAGNOSTIC_NOT_PRODUCED`, and `COMPOSITION_UNAVAILABLE`; malformed caller
+  input remains a validation exception and raw internal failures do not leak.
+- **DETERMINISM:** Preserves explicit times, P02/P03/source/signal/P04/P05
+  provenance and exact version bindings, with canonical `p01-rti-11-v1`
+  `result_digest` independent of environment, callables, wall clock, and
+  exception details.
+- **TESTS:** Focused 32/32; relevant P03/P04/P05 228/228; combined RTI
+  119/119; full Python 1521 passed with one existing dependency warning;
+  TypeScript typecheck/build and `git diff --check` passed.
+- **BOUNDARY:** No concrete caller, route, provider runtime, retry/polling,
+  persistence/publication, P05-T06–T08, P06, paper lifecycle, worker,
+  scheduler, queue, dashboard, wallet, economic realization, execution, live
+  trading, G2, G3, G4, or P09 behavior was added.
+
 ## 2026-09-23 — Post-P01-RTI-09 Next-Gate Selection
 
 - **STATUS:** Direction accepted and superseded by the controlling P01-RTI-10
