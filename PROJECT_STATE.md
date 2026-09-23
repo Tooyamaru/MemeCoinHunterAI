@@ -10,9 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-11 controller next-gate selection
+- **Current integration priority:** P01-RTI-12 limited implementation
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-11 COMPLETE / CLOSED / CI PASS; NO SUCCESSOR AUTHORIZED
+  P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 FORMAL SPECIFICATION
+  COMPLETE / APPROVED; LIMITED IMPLEMENTATION AUTHORIZED / NOT STARTED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -219,7 +220,25 @@ regressions pass 228/228, combined RTI regressions pass 119/119, and the full
 Python suite passes 1521 tests with one existing dependency deprecation
 warning. TypeScript typecheck/build and whitespace checks pass. GitHub Actions
 run #80 passed both required jobs, and PR #28 was squash-merged to `main` at
-`5acc4dc`. P01-RTI-11 is COMPLETE / CLOSED / CI PASS. No successor gate is
+`5acc4dc`. P01-RTI-11 is COMPLETE / CLOSED / CI PASS.
+
+Post-P01-RTI-11 selection is recorded in
+`docs/POST-P01-RTI-11-NEXT-GATE-SELECTION.md`. The controller selected
+P01-RTI-12 — Deterministic P05 Opportunity-Context Continuation as the next
+bounded gate because RTI-11 terminates at P05-T05 while P06-T02 and P01-RTI-01
+consume the already-closed P05-T08 `OpportunityContext`. The formal
+specification is recorded in
+`docs/P01-RTI-12-DETERMINISTIC-P05-OPPORTUNITY-CONTEXT-CONTINUATION-SPECIFICATION.md`.
+
+P01-RTI-12 formal specification is COMPLETE / APPROVED. The controller
+separately AUTHORIZED LIMITED IMPLEMENTATION, but implementation is NOT STARTED
+in this documentation checkpoint. The authorized future implementation is one
+deterministic continuation from a canonical `P01Rti11CompositionResult` through
+P05-T06, a fresh invocation-local P05-T07 history, and P05-T08, terminating at
+the exact `OpportunityContext`. No concrete runtime caller, provider runtime,
+persistence/publication, API, P06, paper lifecycle, worker, scheduler, queue,
+dashboard, wallet, economic realization, execution/live trading, G2, G3, G4,
+or P09 is opened by this checkpoint. No successor after P01-RTI-12 is
 authorized or started.
 
 RTI-03 through RTI-10 remain closed. G2 remains blocked; G3, G4, P09, provider
@@ -740,9 +759,11 @@ functionality was introduced.
 
 ## Next action
 
-Select and separately authorize the next bounded integration gate. Scheduler,
-provider loop, dashboard publication, wallet access, and live execution remain
-unauthorized.
+Implement P01-RTI-12 only under the separately approved limited implementation
+authorization and exact formal specification. Do not create a concrete runtime
+caller and do not cross into P06, paper lifecycle, persistence/publication,
+provider loop, scheduler, worker, queue, dashboard publication, wallet access,
+economic realization, or live execution. No post-RTI-12 gate is authorized.
 
 ## Next task
 
