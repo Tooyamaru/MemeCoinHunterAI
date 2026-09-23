@@ -10,9 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-11 limited implementation delivery
+- **Current integration priority:** Post-P01-RTI-11 controller next-gate selection
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-11 IMPLEMENTED / LOCAL CHECKPOINT PASS / CI AND MERGE PENDING
+  P01-RTI-11 COMPLETE / CLOSED / CI PASS; NO SUCCESSOR AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -210,15 +210,17 @@ eligibility. The output stops at the existing P05-T05
 the gate. The formal specification is recorded in
 `docs/P01-RTI-11-BOUNDED-CALLER-DIRECTED-MARKET-TO-OPPORTUNITY-COMPOSITION-SPECIFICATION.md`.
 The controller approved the formal specification and authorized limited
-implementation. P01-RTI-11 is implemented locally as one thin application
+implementation. P01-RTI-11 is implemented as one thin application
 service with one focused test module and a minimal application export. It
 accepts only explicit caller-owned inputs, validates the canonical paired P03
 handoff, delegates once to P04-LME-03, applies the exact nested success
 predicate, and stops at P05-T05. Focused tests pass 32/32, relevant P03/P04/P05
 regressions pass 228/228, combined RTI regressions pass 119/119, and the full
 Python suite passes 1521 tests with one existing dependency deprecation
-warning. TypeScript typecheck/build and whitespace checks pass. GitHub CI and
-merge are pending.
+warning. TypeScript typecheck/build and whitespace checks pass. GitHub Actions
+run #80 passed both required jobs, and PR #28 was squash-merged to `main` at
+`5acc4dc`. P01-RTI-11 is COMPLETE / CLOSED / CI PASS. No successor gate is
+authorized or started.
 
 RTI-03 through RTI-10 remain closed. G2 remains blocked; G3, G4, P09, provider
 runtime, worker, scheduler, queue, wallet, execution, live trading, dashboard,

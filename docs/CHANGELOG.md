@@ -26,8 +26,7 @@
 
 ## 2026-09-23 — P01-RTI-11 Limited Implementation
 
-- **STATUS:** Implemented locally / checkpoint pass / GitHub CI and merge
-  pending.
+- **STATUS:** Complete / closed / CI pass.
 - **APPLICATION:** Added one thin `MarketToOpportunityCompositionService` with
   immutable explicit request/result contracts and no concrete runtime caller.
 - **P03:** Requires the matching `SafetyEvaluationResult` and
@@ -51,6 +50,11 @@
   persistence/publication, P05-T06–T08, P06, paper lifecycle, worker,
   scheduler, queue, dashboard, wallet, economic realization, execution, live
   trading, G2, G3, G4, or P09 behavior was added.
+- **MERGE:** GitHub Actions run #80 passed the Python 3.13 regression/whitespace
+  job and TypeScript typecheck/build job. PR #28 was squash-merged to `main` at
+  `5acc4dc`.
+- **CLOSURE:** P01-RTI-11 is closed. No successor gate is authorized or
+  started.
 
 ## 2026-09-23 — Post-P01-RTI-09 Next-Gate Selection
 
