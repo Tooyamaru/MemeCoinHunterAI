@@ -24,8 +24,7 @@
 
 ## 2026-09-23 — P01-RTI-10 Governance and Upstream Readiness Reconciliation
 
-- **STATUS:** Documentation complete / ready for governance review; merge and
-  closure pending.
+- **STATUS:** Complete / closed / CI pass.
 - **RECONCILIATION:** Confirmed CoinGecko Demo Onchain pool OHLCV as the current
   bounded V1 analytical source, `price-direction-v1` as the current
   deterministic observational signal policy, and P04-LME-01 through
@@ -48,6 +47,11 @@
   model, migration, API, provider call, runtime wiring, persistence, worker,
   scheduler, queue, dashboard, wallet, execution, live trading, G2, G3, G4,
   or P09 implementation.
+- **MERGE:** GitHub Actions run #75 passed the Python 3.13 regression/whitespace
+  job and the TypeScript typecheck/build job. PR #26 was squash-merged to
+  `main` at `b8e24c8`.
+- **CLOSURE:** P01-RTI-10 is closed. P01-RTI-11 remains recommendation-only,
+  not authorized, and not started.
 
 ## 2026-09-23 — P01-RTI-09 Lifecycle API Contract Conformance
 
