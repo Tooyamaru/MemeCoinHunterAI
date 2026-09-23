@@ -1,3 +1,28 @@
+## 2026-09-23 — P01-RTI-08 Read-Only Digest Catalog API
+
+- **STATUS:** Implemented / local verification pass / CI pending.
+- **AUTHORIZATION:** The owner approved final specification reconciliation and
+  limited implementation on 2026-09-23.
+- **ENDPOINT:** Added only `GET /api/v1/paper-lifecycle-results` with optional
+  `limit` and `after_digest`, delegating once to
+  `PaperLifecycleDigestCatalogService`.
+- **CONTRACT:** Preserves exactly the eight RTI-07 fields, lexicographic
+  ordering, exclusive continuation, and canonical `result_digest`; adds no
+  totals, links, timestamps, filters, search, artifacts, bundle detail, or
+  economic interpretation.
+- **HTTP:** Maps `PAGE` including an empty page to `200`,
+  `STORAGE_UNAVAILABLE` to `503`, invalid input to one fixed safe `422`
+  envelope, and unexpected failures to the existing safe `500`. Supported
+  responses use `Cache-Control: no-store` and existing `X-Request-ID`.
+- **LOCAL VERIFICATION:** 18 focused tests, 35 relevant RTI-06/07 regressions,
+  104 combined P01-RTI-01 through RTI-08 regressions, and the full 1,474-test
+  Python 3.13 suite pass. Module compilation, whitespace checks, TypeScript
+  typechecks, and workspace builds pass.
+- **GOVERNANCE:** RTI-03/04/05/06/07 behavior is unchanged. No direct
+  repository/session/model access, artifact read, model, migration, dependency,
+  provider, worker, scheduler, queue, dashboard, wallet, execution, live
+  trading, economic authority, G2, G3, G4, or P09 behavior was added.
+
 ## 2026-09-22 — P01-RTI-07 Read-Only Lifecycle Digest Catalog
 
 - **STATUS:** Complete / closed / CI pass.
