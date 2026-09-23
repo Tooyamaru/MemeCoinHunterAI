@@ -1,3 +1,54 @@
+## 2026-09-23 — Post-P01-RTI-09 Next-Gate Selection
+
+- **STATUS:** Direction accepted and superseded by the controlling P01-RTI-10
+  reconciliation document; this selection record authorized no implementation
+  by itself.
+- **ASSESSMENT:** RTI-05 through RTI-09 provide a sufficiently complete
+  read-only lifecycle surface for the current governed purpose. No immediate
+  filter, search, latest/history, projection, analytics, mutation, security, or
+  deployment extension has a repository-established consumer or policy.
+- **RECOMMENDATION:** P01-RTI-10 — Cross-Surface Governance and Upstream
+  Readiness Reconciliation.
+- **RATIONALE:** P04-LME-01 through P04-LME-03 now establish the bounded
+  historical price source, deterministic signal policy, one-shot transport,
+  and controlled orchestration, but older current-governance text still calls
+  the source and policy unresolved. A documentation-only reconciliation is the
+  safest prerequisite to any later application-composition proposal.
+- **BOUNDARY:** Documentation and authority/readiness mapping only. No code,
+  runtime, provider call, route, model, migration, dependency, worker,
+  scheduler, queue, dashboard, wallet, execution, live trading, G2, G3, G4,
+  or P09.
+- **GOVERNANCE:** G2 realization/settlement remains blocked and is explicitly
+  separate from P04 analytical market-evidence source authority. No subsequent
+  gate starts automatically.
+
+## 2026-09-23 — P01-RTI-10 Governance and Upstream Readiness Reconciliation
+
+- **STATUS:** Documentation complete / ready for governance review; merge and
+  closure pending.
+- **RECONCILIATION:** Confirmed CoinGecko Demo Onchain pool OHLCV as the current
+  bounded V1 analytical source, `price-direction-v1` as the current
+  deterministic observational signal policy, and P04-LME-01 through
+  P04-LME-03 as complete within their limited source, transport, and
+  orchestration scopes.
+- **CORRECTION:** Replaced current-governance wording that still described the
+  source and market-to-signal policy as unresolved. Historical selection
+  records remain unchanged and are explicitly classified as historical or
+  superseded where appropriate.
+- **MATRICES:** Added explicit authority and dependency/readiness matrices that
+  separate P04 analytical evidence, application composition, RTI persistence
+  and lifecycle reads, G2 realization/settlement, and live execution.
+- **RESIDUAL GAP:** Direct application composition still lacks an approved
+  caller/input/invocation/output contract, deterministic cross-boundary failure
+  semantics, policy binding, provenance propagation, and time/cutoff handoff.
+- **NEXT RECOMMENDATION:** P01-RTI-11, a specification-only bounded
+  caller-directed market-to-opportunity application composition gate. It is
+  not authorized or started.
+- **BOUNDARY:** Documentation/governance only. No source, test, dependency,
+  model, migration, API, provider call, runtime wiring, persistence, worker,
+  scheduler, queue, dashboard, wallet, execution, live trading, G2, G3, G4,
+  or P09 implementation.
+
 ## 2026-09-23 — P01-RTI-09 Lifecycle API Contract Conformance
 
 - **STATUS:** Complete / closed / CI pass.
