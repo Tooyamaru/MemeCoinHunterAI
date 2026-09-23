@@ -14,6 +14,11 @@ from backend.application.paper_lifecycle_persistence import (
     PaperLifecycleReadResult,
 )
 from backend.application.paper_lifecycle_query import PaperLifecycleQueryService
+from backend.application.paper_lifecycle_digest_catalog import (
+    PaperLifecycleDigestCatalogOutcome,
+    PaperLifecycleDigestCatalogResult,
+    PaperLifecycleDigestCatalogService,
+)
 from backend.core.request_id import get_request_id
 
 
@@ -83,6 +88,33 @@ class PaperLifecycleReadResponse(BaseModel):
         )
 
 
+class PaperLifecycleDigestCatalogResponse(BaseModel):
+    contract_version: str
+    outcome: str
+    reason_codes: list[str]
+    limit: int
+    after_digest: str | None
+    lifecycle_result_digests: list[str]
+    next_after_digest: str | None
+    result_digest: str
+
+    @classmethod
+    def from_result(
+        cls,
+        result: PaperLifecycleDigestCatalogResult,
+    ) -> PaperLifecycleDigestCatalogResponse:
+        return cls(
+            contract_version=result.contract_version,
+            outcome=result.outcome.value,
+            reason_codes=list(result.reason_codes),
+            limit=result.limit,
+            after_digest=result.after_digest,
+            lifecycle_result_digests=list(result.lifecycle_result_digests),
+            next_after_digest=result.next_after_digest,
+            result_digest=result.digest,
+        )
+
+
 class TransportErrorDetail(BaseModel):
     code: str
     message: str
@@ -100,7 +132,77 @@ def get_paper_lifecycle_query(request: Request) -> PaperLifecycleQueryService:
     return PaperLifecycleQueryService(persistence)
 
 
+def get_paper_lifecycle_digest_catalog(
+    request: Request,
+) -> PaperLifecycleDigestCatalogService:
+    """Build the RTI-07 catalog over the database runtime owned by this app."""
+
+    return PaperLifecycleDigestCatalogService(request.app.state.database)
+
+
 router = APIRouter(prefix="/api/v1", tags=["paper-lifecycle-results"])
+
+
+def _invalid_catalog_query_response() -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        headers=NO_STORE_HEADERS,
+        content={
+            "error": {
+                "code": "invalid_catalog_query",
+                "message": "limit or after_digest is invalid",
+                "request_id": get_request_id(),
+            }
+        },
+    )
+
+
+@router.get(
+    "/paper-lifecycle-results",
+    response_model=PaperLifecycleDigestCatalogResponse,
+    responses={
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": TransportErrorResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": TransportErrorResponse},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "model": PaperLifecycleDigestCatalogResponse
+        },
+    },
+)
+async def list_paper_lifecycle_results(
+    catalog: Annotated[
+        PaperLifecycleDigestCatalogService,
+        Depends(get_paper_lifecycle_digest_catalog),
+    ],
+    limit: str | None = None,
+    after_digest: str | None = None,
+) -> JSONResponse:
+    """Return one RTI-07 catalog page without reading lifecycle artifacts."""
+
+    query_arguments = {}
+    if limit is not None:
+        try:
+            query_arguments["limit"] = int(limit)
+        except (TypeError, ValueError):
+            return _invalid_catalog_query_response()
+    if after_digest is not None:
+        query_arguments["after_digest"] = after_digest
+    try:
+        result = await catalog.query(**query_arguments)
+    except ValueError:
+        return _invalid_catalog_query_response()
+
+    status_code = {
+        PaperLifecycleDigestCatalogOutcome.PAGE: status.HTTP_200_OK,
+        PaperLifecycleDigestCatalogOutcome.STORAGE_UNAVAILABLE: (
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        ),
+    }[result.outcome]
+    response = PaperLifecycleDigestCatalogResponse.from_result(result)
+    return JSONResponse(
+        status_code=status_code,
+        headers=NO_STORE_HEADERS,
+        content=response.model_dump(mode="json"),
+    )
 
 
 @router.get(
