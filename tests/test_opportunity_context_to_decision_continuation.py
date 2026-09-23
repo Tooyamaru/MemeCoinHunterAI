@@ -178,7 +178,7 @@ def test_tampered_ruleset_is_validation_failure_before_p06():
         calls += 1
         raise AssertionError("must not run")
 
-    with pytest.raises(ValueError, match="canonical"):
+    with pytest.raises(ValueError, match="invalid or unsupported"):
         OpportunityContextToDecisionContinuationService(
             decision_evaluator=evaluator,
         ).continue_to_decision(upstream, ruleset, upstream.context.reference_time)
