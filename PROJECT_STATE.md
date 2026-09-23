@@ -10,7 +10,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-14 formal specification review
+- **Current integration priority:** P01-RTI-14 limited implementation review
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 SPECIFICATION COMPLETE /
@@ -778,6 +778,13 @@ and is COMPLETE / READY FOR CONTROLLER REVIEW. It locks the authority effect to
 `PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY`, treats both canonical APPROVED and
 REJECTED results as valid materialized authority outputs, and stops before P07.
 No implementation is authorized by this checkpoint.
+
+P01-RTI-14 limited implementation was explicitly authorized on 2026-09-23 and is
+implemented on the bounded feature branch. The implementation adds only the thin
+Decision-to-Risk/Capital application continuation, focused tests, minimal application
+exports, and this governance update. It stops at the exact paper-only
+PaperRiskCapitalAuthorizationResult and does not open P07, persistence, runtime caller,
+provider loop, wallet, execution, G2, G3, G4, or P09 authority.
 
 ## Next action
 
