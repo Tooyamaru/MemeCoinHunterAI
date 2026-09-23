@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING
+COMPLETE / CLOSED / CI PASS
 
 The owner approved P01-RTI-08 and authorized final specification
 reconciliation plus limited implementation on 2026-09-23. This document is the
@@ -217,4 +217,5 @@ tests are implemented without changing RTI-03 through RTI-07 behavior.
 Eighteen focused tests, 35 relevant RTI-06/07 regressions, 104 combined
 P01-RTI-01 through RTI-08 regressions, and the full 1,474-test Python 3.13
 suite pass. Module compilation, whitespace checks, TypeScript typechecks, and
-workspace builds also pass. GitHub CI and merge remain pending.
+workspace builds also pass. GitHub Actions run #63 passed both required jobs,
+and PR #22 was squash-merged to `main` at `7a56077`.
