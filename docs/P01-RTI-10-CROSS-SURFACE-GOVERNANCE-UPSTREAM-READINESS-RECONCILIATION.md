@@ -1,6 +1,6 @@
 # P01-RTI-10 — Cross-Surface Governance and Upstream Readiness Reconciliation
 
-**Status:** COMPLETE / READY FOR GOVERNANCE REVIEW
+**Status:** COMPLETE / CLOSED / CI PASS
 
 **Gate type:** documentation and governance only
 
@@ -211,3 +211,8 @@ P01-RTI-10 is complete when:
 5. `git diff --check` passes; and
 6. the documentation PR passes required CI and merges before closure is
    recorded.
+
+All closure criteria are satisfied. GitHub Actions run #75 passed the Python
+3.13 regression/whitespace job and the TypeScript typecheck/build job. PR #26
+was squash-merged to `main` at `b8e24c8`. No subsequent gate is authorized or
+started by this closure.
