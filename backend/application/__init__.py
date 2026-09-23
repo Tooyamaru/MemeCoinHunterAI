@@ -25,11 +25,19 @@ from backend.application.paper_lifecycle_digest_catalog import (
     PaperLifecycleDigestCatalogService,
 )
 from backend.application.paper_lifecycle_query import PaperLifecycleQueryService
+from backend.application.market_to_opportunity_composition import (
+    P01_RTI_11_CONTRACT_VERSION,
+    MarketToOpportunityCompositionOutcome,
+    MarketToOpportunityCompositionService,
+    P01Rti11CompositionRequest,
+    P01Rti11CompositionResult,
+)
 
 __all__ = [
     "P01_RTI_04_CONTRACT_VERSION",
     "P01_RTI_03_CONTRACT_VERSION",
     "P01_RTI_07_CONTRACT_VERSION",
+    "P01_RTI_11_CONTRACT_VERSION",
     "ControlledPaperRunOutcome",
     "ControlledPaperRunRequest",
     "ControlledPaperRunResult",
@@ -47,4 +55,8 @@ __all__ = [
     "PaperLifecycleDigestCatalogResult",
     "PaperLifecycleDigestCatalogService",
     "validate_lifecycle_result_digest",
+    "MarketToOpportunityCompositionOutcome",
+    "MarketToOpportunityCompositionService",
+    "P01Rti11CompositionRequest",
+    "P01Rti11CompositionResult",
 ]
