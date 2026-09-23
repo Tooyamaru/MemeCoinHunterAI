@@ -10,9 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-08 next-gate selection
-- **Integration priority status:** P01-RTI-09 IMPLEMENTED / LOCAL VERIFICATION
-  PASS / CI PENDING
+- **Current integration priority:** Post-P01-RTI-09 next-gate selection
+- **Integration priority status:** P01-RTI-09 COMPLETE / CLOSED / CI PASS;
+  NEXT GATE NOT SELECTED / NOT AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -68,10 +68,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   preserves the exact eight-field catalog result, and adds no direct
   persistence access or new authority.
 - P01-RTI-09 bounded read-only lifecycle API contract conformance is
-  IMPLEMENTED / LOCAL VERIFICATION PASS / CI PENDING. One focused test module
-  proves the combined RTI-06/08 route, OpenAPI, schema, status, safe-error,
-  header, owner-isolation, and forbidden-operation contract. No production
-  code change was required.
+  COMPLETE / CLOSED / CI PASS and was squash-merged through PR #24 at
+  `986f298`. One focused test module proves the combined RTI-06/08 route,
+  OpenAPI, schema, status, safe-error, header, owner-isolation, and
+  forbidden-operation contract. No production code change was required.
 
 ## Phase status
 
@@ -202,7 +202,9 @@ nested routes. No discrepancy was found and no production code changed.
 Fifteen focused tests, 32 relevant RTI-06/08 regressions, 119 combined
 P01-RTI-01 through RTI-09 regressions, and the full 1,489-test Python 3.13 suite
 pass. Module compilation, whitespace checks, TypeScript typechecks, and
-workspace builds pass. GitHub CI and merge are pending.
+workspace builds pass. GitHub Actions run #69 passed both required jobs, and
+PR #24 was squash-merged to `main` at `986f298`. No subsequent gate is selected
+or authorized.
 
 P01-RTI-08 is implemented as one collection-only, read-only HTTP transport
 over P01-RTI-07. `GET /api/v1/paper-lifecycle-results` accepts only optional

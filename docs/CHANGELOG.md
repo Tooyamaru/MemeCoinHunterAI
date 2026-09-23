@@ -1,6 +1,6 @@
-## 2026-09-23 — Post-P01-RTI-08 Next-Gate Selection
+## 2026-09-23 — P01-RTI-09 Lifecycle API Contract Conformance
 
-- **STATUS:** Implemented / local verification pass / CI pending.
+- **STATUS:** Complete / closed / CI pass.
 - **RECOMMENDATION:** P01-RTI-09, a bounded read-only API contract-conformance
   gate across the closed RTI-06 detail and RTI-08 collection routes.
 - **RATIONALE:** It uses only closed dependencies, adds no runtime capability,
@@ -19,6 +19,8 @@
   119 combined P01-RTI-01 through RTI-09 regressions, and the full 1,489-test
   Python 3.13 suite pass. Module compilation, whitespace checks, TypeScript
   typechecks, and workspace builds pass.
+- **MERGE:** GitHub Actions run #69 passed both required jobs and PR #24 was
+  squash-merged to `main` at `986f298`.
 - **GOVERNANCE:** RTI-03 through RTI-08 remain closed and unchanged. Production
   code remains frozen unless focused tests prove an actual contract discrepancy.
 
