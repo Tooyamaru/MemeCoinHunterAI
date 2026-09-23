@@ -1,3 +1,15 @@
+## 2026-09-23 — P01-RTI-16 Bounded Implementation- **AUTHORIZATION:** Controller approved limited implementation of the merged
+  formal RTI-16 specification. CI and closure verification are pending.
+- **IMPLEMENTATION:** Added one application wrapper over canonical RTI-15,
+  explicit fill instruction and lifecycle evidence, an exact RTI-01-compatible
+  admission envelope, and one delegation to the existing RTI-02 owner.
+- **RESULT:** Preserves the exact owner result and deterministic digest, stops
+  before RTI-02 for non-admitted upstream outcomes, and distinguishes safe
+  validation failures from finite unavailable outcomes.
+- **BOUNDARY:** No upstream recomputation, persistence/publication, RTI-03/04,
+  provider/runtime caller, network, worker/scheduler, API/dashboard, wallet,
+  execution, economic realization, G2, G3, G4, or P09.
+
 ## 2026-09-23 — P01-RTI-14 Limited Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS.
