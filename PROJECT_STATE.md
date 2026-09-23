@@ -10,10 +10,11 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-13 next-gate selection
+- **Current integration priority:** P01-RTI-14 formal specification review
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-13 COMPLETE / CLOSED / CI PASS
+  P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 SPECIFICATION COMPLETE /
+  READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -764,14 +765,30 @@ functionality was introduced.
   validation, UNKNOWN-state preservation, and point-in-time provenance intact.
   No future task was started or invented.
 
+Post-P01-RTI-13 selection is recorded in
+`docs/POST-P01-RTI-13-NEXT-GATE-SELECTION.md`. Repository inspection confirms
+that the existing paper-only Risk/Capital Authority consumes exactly one
+P06-T01 `DecisionIntent` plus one immutable
+`PaperRiskCapitalPolicySnapshot`, then returns one canonical
+`PaperRiskCapitalAuthorizationResult`. The selected successor is P01-RTI-14 —
+Deterministic Decision-to-Risk/Capital Continuation. Its formal specification is
+recorded in
+`docs/P01-RTI-14-DETERMINISTIC-DECISION-TO-RISK-CAPITAL-CONTINUATION-SPECIFICATION.md`
+and is COMPLETE / READY FOR CONTROLLER REVIEW. It locks the authority effect to
+`PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY`, treats both canonical APPROVED and
+REJECTED results as valid materialized authority outputs, and stops before P07.
+No implementation is authorized by this checkpoint.
+
 ## Next action
 
-Select and separately authorize the next bounded integration gate after
-P01-RTI-13. P01-RTI-13 is complete and closed at the analytical
-OpportunityContext-to-Decision boundary. Do not create a concrete runtime caller
-or cross into Risk/Capital, P07, paper lifecycle, persistence/publication,
+Controller review of P01-RTI-14 — Deterministic Decision-to-Risk/Capital
+Continuation. The formal specification accepts one canonical RTI-13 result and
+one explicit canonical PaperRiskCapitalPolicySnapshot; it may call the existing
+paper-only Risk/Capital Authority exactly once only for DECISION_MATERIALIZED
+and stops at PaperRiskCapitalAuthorizationResult. Implementation is NOT
+AUTHORIZED. Do not cross into P07, paper lifecycle, persistence/publication,
 provider loop, scheduler, worker, queue, dashboard publication, wallet access,
-economic realization, or live execution without a new explicit gate.
+economic realization, or live execution.
 
 ## Next task
 
