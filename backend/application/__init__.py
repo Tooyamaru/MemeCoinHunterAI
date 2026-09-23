@@ -1,3 +1,9 @@
+from backend.application.decision_to_risk_capital_continuation import (
+    P01_RTI_14_CONTRACT_VERSION,
+    DecisionToRiskCapitalContinuationService,
+    DecisionToRiskCapitalOutcome,
+    P01Rti14RiskCapitalContinuationResult,
+)
 from backend.application.opportunity_context_to_decision_continuation import (
     P01_RTI_13_CONTRACT_VERSION,
     OpportunityContextToDecisionOutcome,
@@ -46,6 +52,10 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_RTI_14_CONTRACT_VERSION",
+    "DecisionToRiskCapitalContinuationService",
+    "DecisionToRiskCapitalOutcome",
+    "P01Rti14RiskCapitalContinuationResult",
     "P01_RTI_13_CONTRACT_VERSION",
     "OpportunityContextToDecisionOutcome",
     "OpportunityContextToDecisionContinuationService",
