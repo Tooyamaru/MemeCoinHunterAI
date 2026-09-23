@@ -1,3 +1,27 @@
+## 2026-09-23 — P01-RTI-13 Limited Implementation
+
+- **STATUS:** Controller-approved limited implementation / CI verification
+  pending.
+- **APPLICATION:** Added one thin HTTP-independent continuation from a canonical
+  P01-RTI-12 result to the existing P06-T02 deterministic evaluator.
+- **INPUTS:** Exact RTI-12 result, explicit canonical
+  `DecisionEvaluationRuleset`, and explicit timezone-aware
+  `decision_time`; no hidden default ruleset or clock/time fallback.
+- **FLOW:** Only `CONTEXT_MATERIALIZED` invokes P06-T02, exactly once, with
+  exact `OpportunityContext` identity. Terminal output is P06-T01
+  `DecisionIntent`.
+- **OUTCOMES:** `DECISION_MATERIALIZED`, `UPSTREAM_NOT_MATERIALIZED`, and
+  `DECISION_UNAVAILABLE`.
+- **FAILURES:** P06-T02 `ValueError` remains a standardized safe validation
+  failure. Unexpected owner failure and invalid owner result remain bounded,
+  finite, and non-leaking.
+- **DETERMINISM:** RTI-13 digest binds RTI-12 result, explicit ruleset digest,
+  explicit UTC decision time, and exact P06 version/digest material.
+- **BOUNDARY:** No Risk/Capital, P07, RTI-01/paper lifecycle,
+  persistence/publication, API/WebSocket, runtime caller, provider loop,
+  worker/scheduler/queue, dashboard, wallet/signing/RPC/DEX, economic
+  realization, execution/live trading, G2, G3, G4, or P09 is introduced.
+
 ## 2026-09-23 — P01-RTI-13 Formal Specification
 
 - **STATUS:** Specification COMPLETE / READY FOR CONTROLLER REVIEW;

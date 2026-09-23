@@ -4,8 +4,8 @@
 
 - **Gate:** P01-RTI-13
 - **Title:** Deterministic OpportunityContext-to-Decision Continuation
-- **Specification status:** COMPLETE / READY FOR CONTROLLER REVIEW
-- **Implementation status:** NOT AUTHORIZED
+- **Specification status:** APPROVED
+- **Implementation status:** LIMITED IMPLEMENTATION AUTHORIZED / IN PROGRESS
 - **Runtime status:** NO CONCRETE RUNTIME CALLER AUTHORIZED
 - **Proposed contract version:** `p01-rti-13-v1`
 
@@ -502,4 +502,8 @@ No concrete runtime caller, Risk/Capital call, paper path, persistence,
 publication, provider loop, API, dashboard, wallet, execution, G2, G3, G4, or
 P09 should be authorized by specification approval.
 
-`SPECIFICATION READY FOR CONTROLLER REVIEW`
+The controller subsequently approved this specification and authorized limited
+implementation confined to the exact scope above. No concrete runtime caller or
+downstream authority was authorized.
+
+`SPECIFICATION APPROVED / LIMITED IMPLEMENTATION AUTHORIZED`

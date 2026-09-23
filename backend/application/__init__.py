@@ -1,3 +1,9 @@
+from backend.application.opportunity_context_to_decision_continuation import (
+    P01_RTI_13_CONTRACT_VERSION,
+    OpportunityContextToDecisionOutcome,
+    OpportunityContextToDecisionContinuationService,
+    P01Rti13DecisionContinuationResult,
+)
 """Application-service boundaries independent from HTTP transport."""
 from backend.application.controlled_paper_run_service import (
     P01_RTI_04_CONTRACT_VERSION,
@@ -40,6 +46,10 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_RTI_13_CONTRACT_VERSION",
+    "OpportunityContextToDecisionOutcome",
+    "OpportunityContextToDecisionContinuationService",
+    "P01Rti13DecisionContinuationResult",
     "P01_RTI_04_CONTRACT_VERSION",
     "P01_RTI_03_CONTRACT_VERSION",
     "P01_RTI_07_CONTRACT_VERSION",
