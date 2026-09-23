@@ -10,11 +10,13 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-15 bounded dependency/gap review
+- **Current integration priority:** P01-RTI-16 deterministic RTI-15-to-controlled
+  paper lifecycle continuation specification
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-15 COMPLETE / CLOSED / CI PASS
+  P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 SPECIFICATION COMPLETE /
+  READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -194,6 +196,18 @@ Actions run #124 passed and implementation PR #39 was merged to `main` at
 `fdb7305f1c929c9b9bda28283e03e8b71c195541`. No fill, paper lifecycle,
 persistence, provider runtime, P08 economic behavior, wallet, execution, G2,
 G3, G4, or P09 boundary was opened.
+
+Post-P01-RTI-15 dependency review selected P01-RTI-16 as the smallest missing
+compatibility composition. RTI-15 terminates at an exact P07-T01
+`PaperSimulationInput`, while the existing RTI-02 lifecycle owner requires an
+RTI-01-compatible admission envelope. The RTI-16 specification permits only
+deterministic structural envelope materialization from exact RTI-15 artifacts
+and one exact RTI-02 delegation, stopping at the exact
+`ControlledPaperLifecycleResult`. The specification is ready for controller
+review; implementation is not authorized. Persistence/publication, RTI-03/04,
+provider runtime, concrete callers, workers/schedulers/queues, API/dashboard,
+wallet/execution, economic realization, G2, G3, G4, and P09 remain outside the
+gate.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
@@ -668,6 +682,8 @@ functionality was introduced.
 - `docs/P01-RTI-07-BOUNDED-READ-ONLY-PERSISTED-LIFECYCLE-DIGEST-CATALOG-SPECIFICATION.md`
 - `docs/P01-RTI-08-BOUNDED-READ-ONLY-PERSISTED-LIFECYCLE-DIGEST-CATALOG-API-SPECIFICATION.md`
 - `docs/P01-RTI-09-BOUNDED-READ-ONLY-LIFECYCLE-API-CONTRACT-CONFORMANCE-SPECIFICATION.md`
+- `docs/POST-P01-RTI-15-NEXT-GATE-SELECTION.md`
+- `docs/P01-RTI-16-DETERMINISTIC-RTI-15-TO-CONTROLLED-PAPER-LIFECYCLE-CONTINUATION-SPECIFICATION.md`
 - `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`
@@ -803,16 +819,17 @@ execution, G2, G3, G4, or P09 authority.
 
 ## Next action
 
-Controller selection of the next bounded post-P01-RTI-15 integration gap. No
-successor gate is selected or authorized. Do not infer authorization for P07
-fill/state/ledger continuation, paper lifecycle, persistence/publication,
-provider loops, scheduler, worker, queue, dashboard publication, wallet access,
+Controller review of the formal P01-RTI-16 specification. The specification is
+complete, but implementation is NOT AUTHORIZED. Do not infer authorization for
+source/runtime changes, persistence/publication, provider loops, concrete
+callers, scheduler, worker, queue, API/dashboard publication, wallet access,
 economic realization, or live execution.
 
 ## Next task
 
-P01-RTI-04 through P01-RTI-15 are complete, closed, merged, and CI-verified. No
-subsequent gate is selected or authorized.
+P01-RTI-04 through P01-RTI-15 are complete, closed, merged, and CI-verified.
+P01-RTI-16 is specification-only and awaits controller review; its limited
+implementation is not authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.

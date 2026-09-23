@@ -103,11 +103,13 @@ whitespace checks must pass.
 No model, migration, repository/session, dependency, route, config, secret, or
 runtime caller may be added.
 
-## Local implementation checkpoint
+## Implementation closure checkpoint
 
-The authorized module, focused tests, and minimal export are implemented.
+The authorized module, focused tests, and minimal export are implemented and
+closed.
 Focused tests pass 17/17; relevant RTI-13/14, Risk/Capital, and P07 tests pass
 95/95; combined RTI regression passes 217/217; full Python regression passes
 1601 tests with one existing dependency warning. Compilation, TypeScript
-typecheck/build, and whitespace checks pass. GitHub PR/CI and closure remain
-pending.
+typecheck/build, and whitespace checks pass. Implementation PR #39 was merged
+at `fdb7305f1c929c9b9bda28283e03e8b71c195541`; closure PR #40 was merged at
+`0828d0acac7af751953eba3c6b80770fdb4eb7c8`; final main CI #127 passed.
