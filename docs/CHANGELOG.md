@@ -1,11 +1,16 @@
-## 2026-09-23 — P01-RTI-16 Bounded Implementation- **AUTHORIZATION:** Controller approved limited implementation of the merged
-  formal RTI-16 specification. CI and closure verification are pending.
+## 2026-09-23 — P01-RTI-16 Bounded Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS. Controller approved limited
+  implementation of the merged formal RTI-16 specification.
 - **IMPLEMENTATION:** Added one application wrapper over canonical RTI-15,
   explicit fill instruction and lifecycle evidence, an exact RTI-01-compatible
   admission envelope, and one delegation to the existing RTI-02 owner.
 - **RESULT:** Preserves the exact owner result and deterministic digest, stops
   before RTI-02 for non-admitted upstream outcomes, and distinguishes safe
   validation failures from finite unavailable outcomes.
+- **VERIFICATION:** 16 focused tests and 94 relevant combined regressions
+  passed locally. GitHub Actions run #132 passed both Python 3.13 tests and
+  TypeScript checks/builds. PR #42 was squash-merged at `4530a6c`.
 - **BOUNDARY:** No upstream recomputation, persistence/publication, RTI-03/04,
   provider/runtime caller, network, worker/scheduler, API/dashboard, wallet,
   execution, economic realization, G2, G3, G4, or P09.

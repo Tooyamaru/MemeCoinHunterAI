@@ -10,13 +10,12 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-RTI-16 deterministic RTI-15-to-controlled
-  paper lifecycle continuation limited implementation
+- **Current integration priority:** Post-P01-RTI-16 bounded dependency/gap
+  review; no successor implementation is authorized
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 LIMITED IMPLEMENTATION
-  AUTHORIZED / LOCAL VERIFICATION IN PROGRESS / CI PENDING
+  P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 COMPLETE / CLOSED / CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -209,13 +208,15 @@ provider runtime, concrete callers, workers/schedulers/queues, API/dashboard,
 wallet/execution, economic realization, G2, G3, G4, and P09 remain outside the
 gate.
 
-The controller subsequently authorized the bounded RTI-16 implementation.
+The controller subsequently authorized and closed the bounded RTI-16 implementation.
 One HTTP-independent application wrapper accepts the canonical RTI-15 result
 and two explicit RTI-02 inputs. Only admitted results create the exact RTI-01
 compatibility envelope and delegate once to RTI-02; the wrapper preserves the
-exact lifecycle result and stops. Focused regression and CI verification are
-in progress. No operational caller, persistence/publication, economic or live
-authority has been authorized.
+exact lifecycle result and stops. Focused tests passed 16/16 and relevant
+regression passed 94/94. GitHub Actions run #132 passed both Python 3.13 and
+TypeScript jobs; PR #42 was squash-merged to `main` at `4530a6c`.
+P01-RTI-16 is COMPLETE / CLOSED / CI PASS. No operational caller,
+persistence/publication, economic or live authority has been authorized.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
@@ -827,17 +828,16 @@ execution, G2, G3, G4, or P09 authority.
 
 ## Next action
 
-Controller review of the formal P01-RTI-16 specification. The specification is
-complete, but implementation is NOT AUTHORIZED. Do not infer authorization for
-source/runtime changes, persistence/publication, provider loops, concrete
-callers, scheduler, worker, queue, API/dashboard publication, wallet access,
-economic realization, or live execution.
+Conduct a separately authorized bounded post-P01-RTI-16 dependency/gap review
+before selecting any successor. RTI-16 itself is COMPLETE / CLOSED / CI PASS.
+Do not infer authorization for persistence/publication, provider loops,
+concrete callers, scheduler, worker, queue, API/dashboard publication, wallet
+access, economic realization, or live execution.
 
 ## Next task
 
-P01-RTI-04 through P01-RTI-15 are complete, closed, merged, and CI-verified.
-P01-RTI-16 is specification-only and awaits controller review; its limited
-implementation is not authorized.
+P01-RTI-04 through P01-RTI-16 are complete, closed, merged, and CI-verified.
+No successor gate is selected or authorized.
 Automatic token/pool selection, continuous polling, automatic retry, API
 publication, dashboard publication, wallet access, signing, broadcast, live
 execution, G2, G3, G4, and P09 remain unauthorized.
