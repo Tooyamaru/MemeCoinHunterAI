@@ -16,6 +16,12 @@ from backend.application.risk_capital_to_paper_admission_continuation import (
     RiskCapitalToPaperAdmissionContinuationService,
     RiskCapitalToPaperAdmissionOutcome,
 )
+from backend.application.rti15_to_controlled_paper_lifecycle import (
+    P01_RTI_16_CONTRACT_VERSION,
+    P01Rti16ControlledPaperLifecycleContinuationResult,
+    Rti15ToControlledLifecycleOutcome,
+    Rti15ToControlledPaperLifecycleContinuationService,
+)
 """Application-service boundaries independent from HTTP transport."""
 from backend.application.controlled_paper_run_service import (
     P01_RTI_04_CONTRACT_VERSION,
@@ -58,6 +64,10 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_RTI_16_CONTRACT_VERSION",
+    "P01Rti16ControlledPaperLifecycleContinuationResult",
+    "Rti15ToControlledLifecycleOutcome",
+    "Rti15ToControlledPaperLifecycleContinuationService",
     "P01_RTI_15_CONTRACT_VERSION",
     "P01Rti15PaperAdmissionContinuationResult",
     "RiskCapitalToPaperAdmissionContinuationService",

@@ -11,12 +11,12 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-RTI-16 deterministic RTI-15-to-controlled
-  paper lifecycle continuation specification
+  paper lifecycle continuation limited implementation
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 SPECIFICATION COMPLETE /
-  READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
+  P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 LIMITED IMPLEMENTATION
+  AUTHORIZED / LOCAL VERIFICATION IN PROGRESS / CI PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -208,6 +208,14 @@ review; implementation is not authorized. Persistence/publication, RTI-03/04,
 provider runtime, concrete callers, workers/schedulers/queues, API/dashboard,
 wallet/execution, economic realization, G2, G3, G4, and P09 remain outside the
 gate.
+
+The controller subsequently authorized the bounded RTI-16 implementation.
+One HTTP-independent application wrapper accepts the canonical RTI-15 result
+and two explicit RTI-02 inputs. Only admitted results create the exact RTI-01
+compatibility envelope and delegate once to RTI-02; the wrapper preserves the
+exact lifecycle result and stops. Focused regression and CI verification are
+in progress. No operational caller, persistence/publication, economic or live
+authority has been authorized.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
