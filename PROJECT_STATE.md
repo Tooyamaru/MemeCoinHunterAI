@@ -10,9 +10,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-09 next-gate selection
-- **Integration priority status:** P01-RTI-09 COMPLETE / CLOSED / CI PASS;
-  NEXT GATE NOT SELECTED / NOT AUTHORIZED
+- **Current integration priority:** P01-RTI-10 cross-surface governance and
+  upstream readiness reconciliation
+- **Integration priority status:** P01-RTI-10 DOCUMENTATION COMPLETE / READY
+  FOR GOVERNANCE REVIEW; MERGE AND CLOSURE PENDING
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
 - **Last updated:** 2026-09-23
@@ -175,6 +176,28 @@ is closed and no subsequent P06 task is authorized yet; any next boundary
 requires its own specification and explicit approval.
 
 ## Last verified checkpoint
+
+Post-P01-RTI-09 candidate selection is documented in
+`docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
+read-only lifecycle surface is assessed as sufficiently complete for its
+current governed purpose. Additional filters, search, latest/history,
+projection, analytics, security/deployment, mutation, and operational surfaces
+remain deferred or ineligible.
+
+The controller approved P01-RTI-10 as a documentation-only cross-surface
+governance and upstream-readiness reconciliation. Repository evidence shows
+that accepted P04-LME-01 through P04-LME-03 decisions define the bounded
+historical price source, deterministic price-direction policy, one-shot
+transport, and controlled orchestration. P01-RTI-10 reconciles older
+current-governance wording, distinguishes P04 analytical evidence from blocked
+G2 realization/settlement authority, and states the exact remaining
+application-composition gap. The formal result is recorded in
+`docs/P01-RTI-10-CROSS-SURFACE-GOVERNANCE-UPSTREAM-READINESS-RECONCILIATION.md`.
+It adds no code or runtime behavior; merge and closure remain pending.
+
+RTI-03 through RTI-09 remain closed. G2 remains blocked; G3, G4, P09, provider
+runtime, worker, scheduler, queue, wallet, execution, live trading, dashboard,
+and public deployment remain unopened.
 
 Post-P01-RTI-08 candidate selection is documented in
 `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`. All repository-deferred
@@ -512,14 +535,21 @@ observations, preserves observation versus receipt timestamps and P02 state
 digests, and reaches the existing score of
 `80.55555555555555555555555556`.
 
-The producer does not derive signal types or statuses from market data because
-the repository has no approved market-to-signal policy or source-authentication
-mapping for that decision. Its live application connection therefore remains
-blocked: DexScreener inspection is source-shaped/read-only and GoPlus safety
-is not market evidence; neither supplies the complete authenticated historical
-price, signal-policy, and source-time linkage required for P04. The next
-concrete requirement is an authoritative producer that supplies those fields
-and an approved mapping from them to P04-T01 signal evidence.
+The canonical producer itself does not derive signal types or statuses from
+arbitrary market data. The later accepted P04-LME-01 boundary now owns the
+bounded CoinGecko Demo OHLCV source mapping and `price-direction-v1` policy;
+P04-LME-02 and P04-LME-03 own the one-shot transport and caller-directed
+diagnostic orchestration. This supersedes the former current-state blocker
+that no source or market-to-signal policy had been approved.
+
+Direct application composition remains blocked for a different reason: no
+application owner or contract yet joins the caller-owned exact pool target,
+P03 eligibility, P04-LME-03 diagnostic result, canonical P04/P05 producer,
+failure semantics, policy-version binding, provenance, and observation/cutoff
+semantics. No automatic pool selection, retry, polling, persistence, worker,
+scheduler, queue, or runtime loop is authorized. G2 realization/settlement
+remains separately blocked pending its own authoritative provider/source owner
+decision; P04 analytical source authority is not G2 economic authority.
 
 P07-T01 through P07-T07 are recorded as COMPLETE / CLOSED / AUDITED PASS.
 P07 is COMPLETE / CLOSED / AUDITED PASS. No P07-T08 specification or task
