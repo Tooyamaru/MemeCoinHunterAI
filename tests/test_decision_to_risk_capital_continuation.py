@@ -62,7 +62,14 @@ def test_approved_authorization_materializes_once_with_exact_identity():
     assert calls[0][1] is policy
     assert result.upstream_result is upstream
     assert result.policy_snapshot is policy
-    assert result.authorization_result.status is AuthorizationStatus.APPROVED
+    # RTI-14 must preserve the exact owner result. This canonical RTI-13 fixture
+    # currently yields a P06 action that Risk/Capital rejects; RTI-14 must not
+    # reinterpret that owner decision as an approval.
+    expected = evaluate_paper_risk_capital_authorization(
+        upstream.decision_intent, policy
+    )
+    assert result.authorization_result == expected
+    assert result.authorization_result.status is AuthorizationStatus.REJECTED
     assert result.authorization_result.authorization_effect == (
         "PAPER_SIMULATION_LIFECYCLE_ENTRY_ONLY"
     )
@@ -86,7 +93,11 @@ def test_rejected_authorization_is_still_materialized_and_preserves_reasons():
 
     assert result.outcome is DecisionToRiskCapitalOutcome.AUTHORIZATION_MATERIALIZED
     assert result.authorization_result.status is AuthorizationStatus.REJECTED
-    assert result.authorization_result.reason_codes == ("RISK_STATE_BLOCKED",)
+    assert "RISK_STATE_BLOCKED" in result.authorization_result.reason_codes
+    assert result.authorization_result.reason_codes == (
+        "P06_ACTION_NOT_ALLOWED",
+        "RISK_STATE_BLOCKED",
+    )
     assert result.reason_codes == ()
 
 
