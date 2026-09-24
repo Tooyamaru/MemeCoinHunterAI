@@ -1,3 +1,22 @@
+## 2026-09-24 — P01-PFX-01 Prevalidated Prefix Specification
+
+- **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation NOT AUTHORIZED.
+- **REVIEW:** Post-OSC-02 bounded review found the remaining gap is exact
+  decision-bound Risk/Capital prefix preparation, not the already-closed suffix.
+- **GATE:** P01-PFX-01 — Deterministic Prevalidated Decision/Risk-Capital Prefix
+  Preparation.
+- **FLOW:** exact RTI-11 → RTI-12 once → RTI-13 once → construct one exact
+  decision/context-bound `PaperRiskCapitalPolicySnapshot` from explicit seed
+  material → RTI-14 once → STOP.
+- **NEW INPUT BOUNDARY:** application-layer immutable policy seed carries only
+  explicit policy material that exists before RTI-13; decision/context digests
+  and P05/P06 lineage are bound only after the exact decision materializes.
+- **CARDINALITY:** RTI-12/13/14 <= 1; RTI-15/16, OSC-01/02, PFS, OSP = 0.
+- **BOUNDARY:** no persistence, provider/network loop, worker/scheduler/queue,
+  API/dashboard, wallet/signing/RPC/DEX, execution/live trading, economic
+  realization, G2/G3/G4/P09.
+
 ## 2026-09-24 — P01-OSC-02 Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS.
