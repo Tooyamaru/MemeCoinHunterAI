@@ -1,3 +1,10 @@
+## 2026-09-24 — P01-OSC-01 One-Shot Paper Caller Specification
+
+- **STATUS:** Specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT AUTHORIZED.
+- **SELECTION:** Controller selected bounded direction D after the post-RTI-16 natural-stop review. RTI-11's provider diagnostic and RTI-04's mandatory persistence make neither entry point suitable for a provider-free, nonpersistent call. The new application invocation policy starts with a caller-supplied canonical RTI-11 result and delegates to RTI-12–16 at most once each.
+- **BOUNDARY:** Exact in-memory RTI-16 result and nested RTI-02 lifecycle result; no RTI-03/04 write, provider loop, worker, scheduler, wallet, execution, economic realization, G2, G3, G4, or P09 authority.
+- **SCOPE:** Documentation/governance only; no runtime source or tests changed.
+
 ## 2026-09-23 — Post-P01-RTI-16 Bounded Dependency Review
 
 - **BASE:** Verified GitHub `main` at `00904bd` after implementation PR #42
