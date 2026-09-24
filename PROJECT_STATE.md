@@ -22,8 +22,11 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   input preparer from exact PFX/PFS results to one OSC-02 request.
   Its specification and bounded implementation are COMPLETE / CLOSED / CI PASS.
   Implementation PR #65 merged at `1916339`; CI #206 passed (1,691 Python
-  tests, whitespace, TypeScript typechecks, workspace builds). STOP before
-  OSC-02; no successor implementation authorized.
+  tests, whitespace, TypeScript typechecks, workspace builds). Post-CIP-01
+  bounded review selected P01-OCI-01: explicit prepared-case handoff to the
+  existing OSC-02 owner, at most once, preserving the exact OSC result.
+  P01-OCI-01 specification is COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation and invocation remain NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -788,6 +791,10 @@ functionality was introduced.
 - `docs/P01-RTI-09-BOUNDED-READ-ONLY-LIFECYCLE-API-CONTRACT-CONFORMANCE-SPECIFICATION.md`
 - `docs/POST-P01-RTI-15-NEXT-GATE-SELECTION.md`
 - `docs/P01-RTI-16-DETERMINISTIC-RTI-15-TO-CONTROLLED-PAPER-LIFECYCLE-CONTINUATION-SPECIFICATION.md`
+- `docs/POST-P01-CIP-01-DEPENDENCY-GAP-REVIEW.md`
+- `docs/P01-OCI-01-EXPLICIT-PREPARED-CASE-OSC-02-ONE-SHOT-INVOCATION-SPECIFICATION.md`
+- `backend/application/controlled_paper_experiment_input_preparation.py`
+- `backend/application/prevalidated_risk_capital_suffix_caller.py`
 - `docs/POST-P01-RTI-16-DEPENDENCY-GAP-REVIEW.md`
 - `docs/P01-OSC-01-EXPLICIT-INPUT-ONE-SHOT-PAPER-CALLER-SPECIFICATION.md`
 - `docs/POST-P01-OSC-01-PERSISTENCE-DEPENDENCY-REVIEW.md`
@@ -966,8 +973,13 @@ selected P01-CIP-01 as an in-memory, zero-delegation OSC-02 request
 preparation gate; its formal specification is recorded in
 `docs/P01-CIP-01-CONTROLLED-ONE-SHOT-PAPER-EXPERIMENT-INPUT-PREPARATION-SPECIFICATION.md`.
 Specification and bounded implementation are COMPLETE / CLOSED / CI PASS.
-Implementation PR #65 merged at `1916339` after CI #206 PASS; no further
-runtime gate is selected or authorized.
+Implementation PR #65 merged at `1916339` after CI #206 PASS. The bounded
+post-CIP review is recorded in `docs/POST-P01-CIP-01-DEPENDENCY-GAP-REVIEW.md`.
+It selected P01-OCI-01 as the smallest explicit handoff for exact CIP result
+lineage to one OSC-02 invocation; its specification is
+`docs/P01-OCI-01-EXPLICIT-PREPARED-CASE-OSC-02-ONE-SHOT-INVOCATION-SPECIFICATION.md`.
+This is documentation-only; OCI implementation and OSC-02 invocation are NOT
+AUTHORIZED by this checkpoint.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,
