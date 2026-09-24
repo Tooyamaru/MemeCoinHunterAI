@@ -1,3 +1,9 @@
+## 2026-09-24 — Post-PFS Controlled Input Path Dependency Review
+
+- **FINDING:** P07-PFS-01 closes simulation-only fill/lifecycle input sourcing, but an exact `PaperRiskCapitalPolicySnapshot` binds RTI-12 context and RTI-13 decision digests. OSC currently re-executes RTI-12–14 from RTI-11 and accepts no already-produced prefix; preparatory execution would duplicate owner work.
+- **EVIDENCE:** A canonical OSC request with an internally valid but wrong decision digest passes construction and later fails RTI-14 validation. Constructor-valid OSC input cannot attest a verified decision/Risk-Capital lineage or approval.
+- **DECISION:** No successor specification or implementation selected. Controller must choose a narrower structural-input-only case with deferred decision/risk validation, or explicitly govern a prefix-aware/staged OSC architecture. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED. No source/runtime changes or live/economic authority.
+
 ## 2026-09-24 — P07-PFS-01 Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS. Bounded implementation PR #54 merged at `a5a4dc9` after CI #162 PASS; fourteen focused tests and 78 relevant regression tests passed locally.

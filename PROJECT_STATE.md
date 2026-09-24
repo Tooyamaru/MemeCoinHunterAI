@@ -13,8 +13,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current integration priority:** P01-OSP-01 and P01-OSC-01 COMPLETE / CLOSED /
   CI PASS. Controller selected separate simulation-only paper fact sourcing to
   address the post-OSP fill/lifecycle evidence dependency. P07-PFS-01 is
-  COMPLETE / CLOSED / CI PASS. Supervised controlled-input-path implementation
-  remains deferred and NOT AUTHORIZED.
+  COMPLETE / CLOSED / CI PASS. Post-PFS controlled-input-path review identifies
+  a decision/Risk-Capital lineage validation gap at the RTI-12–14 / OSC boundary;
+  controller decision required. Controlled-input-path specification and
+  implementation remain NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -291,6 +293,18 @@ PFS/RTI-11/lifecycle/RTI-16/OSC regression tests passed locally. CI #162 PASS;
 implementation PR #54 was merged at `a5a4dc9`. P07-PFS-01 status is COMPLETE /
 CLOSED / CI PASS. No live/economic authority is granted; the supervised
 controlled-input path remains a separate controller decision.
+
+The bounded post-PFS controlled-input-path review is recorded in
+`docs/POST-P07-PFS-01-CONTROLLED-INPUT-PATH-DEPENDENCY-REVIEW.md`. PFS closes the
+simulation fact-sourcing gap, and its reference time can come from the explicit
+Risk/Capital policy snapshot. That snapshot must also bind the exact RTI-12
+context and RTI-13 decision digests, while OSC always executes RTI-12–14 itself.
+An OSC request constructor cannot verify those future digests; pre-executing
+the owners during preparation would execute them twice on the same invocation.
+No complete validated controlled-input-path specification is selected. The
+controller must choose structural OSC-input readiness with deferred decision/
+risk validation, or separately authorize a staged/prefix-aware OSC contract.
+G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
@@ -772,6 +786,7 @@ functionality was introduced.
 - `docs/POST-P01-OSC-01-PERSISTENCE-DEPENDENCY-REVIEW.md`
 - `docs/P01-OSP-01-EXPLICIT-ONE-SHOT-LIFECYCLE-PERSISTENCE-SPECIFICATION.md`
 - `docs/P07-PFS-01-SIMULATION-ONLY-PAPER-FACT-SOURCING-SPECIFICATION.md`
+- `docs/POST-P07-PFS-01-CONTROLLED-INPUT-PATH-DEPENDENCY-REVIEW.md`
 - `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`
