@@ -25,8 +25,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   tests, whitespace, TypeScript typechecks, workspace builds). Post-CIP-01
   bounded review selected P01-OCI-01: explicit prepared-case handoff to the
   existing OSC-02 owner, at most once, preserving the exact OSC result.
-  P01-OCI-01 specification is COMPLETE / READY FOR CONTROLLER REVIEW;
-  implementation and invocation remain NOT AUTHORIZED.
+  P01-OCI-01 specification is COMPLETE; limited implementation is
+  AUTHORIZED / IN REVIEW on a dedicated branch. CI and separate governance
+  closure remain pending. Operational paper invocation remains NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
