@@ -5,6 +5,12 @@ from backend.application.one_shot_controlled_paper_caller import (
     P01Osc01Request,
     P01Osc01Result,
 )
+from backend.application.one_shot_paper_persistence import (
+    P01_OSP_01_CONTRACT_VERSION,
+    OneShotPaperPersistenceService,
+    OneShotPersistenceOutcome,
+    P01Osp01Result,
+)
 from backend.application.decision_to_risk_capital_continuation import (
     P01_RTI_14_CONTRACT_VERSION,
     DecisionToRiskCapitalContinuationService,
@@ -71,6 +77,10 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_OSP_01_CONTRACT_VERSION",
+    "OneShotPaperPersistenceService",
+    "OneShotPersistenceOutcome",
+    "P01Osp01Result",
     "P01_OSC_01_CONTRACT_VERSION",
     "OneShotControlledPaperCaller",
     "OneShotPaperOutcome",
