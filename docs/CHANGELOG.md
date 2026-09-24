@@ -1,3 +1,21 @@
+## 2026-09-24 — P01-OCI-01 Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS. Implementation PR #68 was
+  squash-merged at `c041e0e11a98bc477e155ead07a182499a2d1352`.
+- **CI:** GitHub Actions #219 passed on exact PR head
+  `83b6f22449319e141bb54636d32bf10f77dc21aa`: 1,701 Python 3.13 tests
+  (one existing dependency warning), whitespace, TypeScript typechecks and
+  workspace builds. Local focused tests: 10 passed; relevant regression:
+  63 passed.
+- **CONTRACT:** exact canonical CIP result → stop if non-ready or pass its
+  exact `P01Osc02Request` to existing OSC-02 at most once per explicit OCI
+  invocation → preserve exact canonical `P01Osc02Result` in memory → STOP.
+  Focused OCI tests use deterministic OSC test doubles; no operational paper
+  experiment was invoked. No global idempotency guarantee.
+- **BOUNDARY:** no automatic invocation, new persistence, provider loop,
+  worker/scheduler/queue, wallet/signing/RPC/DEX, economic realization,
+  live trading, G2/G3/G4/P09. No successor gate selected or authorized.
+
 ## 2026-09-24 — P01-OCI-01 Limited Implementation Checkpoint
 
 - **STATUS:** Controller authorized bounded implementation under merged
