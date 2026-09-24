@@ -1,3 +1,16 @@
+## 2026-09-24 — Post-P01-PFX-01 Controlled-Input Dependency Review
+
+- **STATUS:** Bounded review complete; no successor implementation authorized.
+- **FINDING:** exact PFX-01 RTI-14 result and exact PFS-01 materialized
+  paper inputs can form one OSC-02-ready request after strict same-RTI-11,
+  approval, source, policy, time, state, replay and digest checks. Such
+  preparation delegates to no RTI/PFS/OSC owner and stops before OSC-02.
+- **DECISION:** future input-preparation gate requires a separate controller
+  selection/specification; canonical RTI-15 admission and RTI-16 lifecycle
+  still occur only if OSC-02 is separately invoked.
+- **BOUNDARY:** no owner replay, persistence, provider loop, autonomous
+  selection, wallet/execution, economic realization, G2/G3/G4/P09.
+
 ## 2026-09-24 — P01-PFX-01 Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS. Implementation PR #61 was
