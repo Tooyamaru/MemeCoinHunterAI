@@ -1,6 +1,10 @@
 # P01-OSC-01 — Explicit-Input One-Shot Controlled Paper Caller
 
-**Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
+**Status:** IMPLEMENTATION COMPLETE / CLOSED / CI PASS (controller authorized after specification merge)
+
+**Closure:** PR #46 merged at `dd6c0d0`; CI #142 PASS. The implementation is
+`backend/application/one_shot_controlled_paper_caller.py`, with focused tests
+in `tests/test_one_shot_controlled_paper_caller.py`.
 
 **Proposed contract:** `p01-osc-01-v1` (proposed; no runtime contract exists yet)
 

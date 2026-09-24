@@ -1,3 +1,10 @@
+## 2026-09-24 — P01-OSC-01 Bounded Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS; controller approved implementation after the formal specification merged in PR #45.
+- **IMPLEMENTATION:** `OneShotControlledPaperCaller.run` takes an exact caller-provided RTI-11 result and all explicit required inputs; validates before delegation, invokes RTI-12–16 at most once each, preserves their exact provenance and result digests, and stops at the RTI-16 in-memory result. Application exports and focused tests were added; canonical owners are unchanged.
+- **VERIFICATION:** Seven focused tests and 104 OSC/RTI-12–16 regression tests passed locally. GitHub Actions CI #142 passed both Python 3.13 and TypeScript jobs; implementation PR #46 squash-merged at `dd6c0d0`.
+- **BOUNDARY:** No RTI-11 provider diagnostic, RTI-04, persistence, provider loop, scheduler/worker/queue, wallet/signing, RPC/DEX, execution, economic realization, live trading, G2, G3, G4, or P09 authority.
+
 ## 2026-09-24 — P01-OSC-01 One-Shot Paper Caller Specification
 
 - **STATUS:** Specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT AUTHORIZED.

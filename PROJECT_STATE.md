@@ -11,8 +11,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-OSC-01 explicit-input one-shot paper
-  caller specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation
-  NOT AUTHORIZED. Post-RTI-16 natural in-memory STOP remains unchanged.
+  caller COMPLETE / CLOSED / CI PASS. Post-RTI-16 in-memory STOP remains unchanged;
+  no persistence or later integration gate is authorized.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -228,7 +228,17 @@ cannot consume RTI-16 without rerunning closed owners. RTI-03 does not retain
 the RTI-16 wrapper or original fill/evidence replay inputs; durable full-chain
 lineage would require its own explicit contract/ownership decision. The
 authorized caller-supplied in-memory paper chain has a natural STOP at RTI-16.
-No RTI-17 or implementation is selected or authorized.
+At the time of this review, no RTI-17 or implementation was selected or authorized.
+
+The controller separately authorized P01-OSC-01 after that natural-stop review.
+The explicit-input caller now accepts one already-canonical RTI-11 result and
+caller-supplied policy, observation, fill, and lifecycle inputs. It delegates
+at most once per stage to RTI-12–16 and stops on the exact in-memory RTI-16
+result. Seven focused tests and 104 OSC/RTI-12–16 regression tests passed
+locally; GitHub CI #142 passed and implementation PR #46 was squash-merged at
+`dd6c0d0`. P01-OSC-01 is COMPLETE / CLOSED / CI PASS. RTI-11 diagnostics,
+RTI-04, RTI-03 persistence, provider access, scheduler/worker, wallet,
+execution, economic realization, G2, G3, G4, and P09 remain outside this gate.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
