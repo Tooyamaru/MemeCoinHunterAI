@@ -2,7 +2,7 @@
 
 **Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
 
-**Implementation:** NOT AUTHORIZED
+**Implementation:** AUTHORIZED / IMPLEMENTED ON FEATURE BRANCH / CLOSURE PENDING CI
 
 **Contract:** `p01-osc-02-v1`
 
@@ -324,6 +324,6 @@ is authorized.
 
 This specification is ready for controller review.
 
-Implementation requires a separate explicit approval.
+Controller authorization received. Limited implementation is present on the feature branch and remains pending GitHub CI, merge, and separate governance closure.
 
 `SPECIFICATION READY FOR CONTROLLER REVIEW`
