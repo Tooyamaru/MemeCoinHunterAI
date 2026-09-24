@@ -1,3 +1,23 @@
+## 2026-09-24 — P01-PFX-01 Limited Implementation Checkpoint
+
+- **STATUS:** Controller authorized the merged `p01-pfx-01-v1` specification.
+  Limited implementation and focused tests are prepared; GitHub CI, merge, and
+  governance closure remain pending.
+- **IMPLEMENTATION:** One staged in-memory prefix service accepts one exact
+  canonical RTI-11 result plus explicit decision rules/time and an immutable
+  policy seed. It invokes RTI-12 and RTI-13 at most once, constructs the exact
+  decision/context-bound `PaperRiskCapitalPolicySnapshot` once, invokes RTI-14
+  at most once, preserves exact owner identity/results, and stops at RTI-14.
+- **POLICY SEED:** carries only controller-owned fields that exist before
+  decision materialization. Decision/context digests, candidate/chain/token
+  scope, P05/P06 provenance, and state-digest references are bound from the
+  exact materialized decision.
+- **CARDINALITY:** RTI-12/13/14 <= 1; policy constructor <= 1; RTI-15/16,
+  OSC-01/02, PFS, OSP = 0.
+- **BOUNDARY:** no persistence, provider/network loop, worker/scheduler/queue,
+  API/dashboard, wallet/signing/RPC/DEX, execution/live trading, economic
+  realization, G2/G3/G4/P09.
+
 ## 2026-09-24 — P01-PFX-01 Prevalidated Prefix Specification
 
 - **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
