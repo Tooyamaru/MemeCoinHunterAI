@@ -2,7 +2,7 @@
 
 **Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
 
-**Implementation:** NOT AUTHORIZED
+**Implementation:** AUTHORIZED / IMPLEMENTED ON FEATURE BRANCH / CLOSURE PENDING CI
 
 **Contract:** `p01-pfx-01-v1`
 
@@ -289,6 +289,6 @@ dependency, secret, worker, scheduler, frontend, wallet, or execution code.
 
 ## 18. Exit criterion
 
-Specification is complete and ready for controller review.
+Controller authorization received. Limited implementation is present on the feature branch and remains pending GitHub CI, merge, and separate governance closure.
 
-`SPECIFICATION READY FOR CONTROLLER REVIEW`
+`IMPLEMENTATION CHECKPOINT / CI PENDING`
