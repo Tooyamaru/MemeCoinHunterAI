@@ -10,11 +10,11 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-OSP-01 optional explicit one-shot
-  lifecycle persistence COMPLETE / CLOSED / CI PASS. P01-OSC-01 remains
-  COMPLETE / CLOSED / CI PASS. Post-OSP supervised controlled-input-path review
-  finds a paper fill/lifecycle evidence sourcing dependency; controller boundary
-  decision required before any complete-input successor specification.
+- **Current integration priority:** P01-OSP-01 and P01-OSC-01 COMPLETE / CLOSED /
+  CI PASS. Controller selected separate simulation-only paper fact sourcing to
+  address the post-OSP fill/lifecycle evidence dependency. P07-PFS-01 formal
+  specification is COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT
+  AUTHORIZED. Supervised controlled-input-path implementation remains deferred.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -266,6 +266,19 @@ Existing test fixtures are not a source of paper facts. A complete OSC-ready
 input-path specification is deferred pending controller selection of explicit
 paper facts, separate simulation-only sourcing ownership, or upstream-only
 preparation. No successor gate or implementation is authorized by this review.
+
+Controller selected separate simulation-only paper fact sourcing. The bounded
+`P07-PFS-01` formal specification is in
+`docs/P07-PFS-01-SIMULATION-ONLY-PAPER-FACT-SOURCING-SPECIFICATION.md`:
+an explicit versioned policy and one accepted RTI-11 historical observation may
+produce canonical `PaperFillInstruction` and `PaperLifecycleEvidence` with a
+matching initial paper state identity, strictly as hypothetical paper inputs.
+It does not assert executable liquidity, economic fills, historical portfolio
+state or external reconciliation, and it invokes no P07 outcome/lifecycle,
+OSC, provider or persistence owner. Status: SPECIFICATION COMPLETE / READY FOR
+CONTROLLER REVIEW; implementation and the later complete controlled-input path
+remain NOT AUTHORIZED. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED;
+G3/G4/P09 remain NOT AUTHORIZED.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
@@ -746,6 +759,7 @@ functionality was introduced.
 - `docs/P01-OSC-01-EXPLICIT-INPUT-ONE-SHOT-PAPER-CALLER-SPECIFICATION.md`
 - `docs/POST-P01-OSC-01-PERSISTENCE-DEPENDENCY-REVIEW.md`
 - `docs/P01-OSP-01-EXPLICIT-ONE-SHOT-LIFECYCLE-PERSISTENCE-SPECIFICATION.md`
+- `docs/P07-PFS-01-SIMULATION-ONLY-PAPER-FACT-SOURCING-SPECIFICATION.md`
 - `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`

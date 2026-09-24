@@ -1,3 +1,10 @@
+## 2026-09-24 — P07-PFS-01 Simulation-Only Paper Fact Sourcing Specification
+
+- **CONTROLLER SELECTION:** Separate P07 input-sourcing capability, dependent on an already-produced exact RTI-11 result and explicit versioned simulation policy. Formal specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT AUTHORIZED.
+- **OWNER BOUNDARY:** Construct exact canonical `PaperFillInstruction`, `PaperLifecycleEvidence`, and matching initial paper state identity via existing input owners; never run P07 fill/state/ledger/reconciliation, OSC, RTI-04 or a provider. Independently precommit a bounded paper-only reconciliation expectation; stop entirely in memory.
+- **EVIDENCE:** Closed OHLCV is a historical USD reference proxy, not executable liquidity or a real fill. Capacity, friction, initial state and accounting are explicit simulation assumptions with refusal on missing evidence; no economic/external reconciliation claims.
+- **GOVERNANCE:** Controlled-input-path implementation remains deferred. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED. No source/runtime changes, persistence, autonomous loop, wallet/signing, execution or live trading.
+
 ## 2026-09-24 — Post-OSP Controlled Input Path Dependency Decision
 
 - **FINDING:** Existing P02/P03/P04-LME/RTI-11 owners can support one supervised candidate and exact-pool opportunity result. No bounded production owner supplies canonical paper fill instruction and lifecycle evidence from that market path; historical OHLCV is not an executable quote or independent reconciliation fact.
