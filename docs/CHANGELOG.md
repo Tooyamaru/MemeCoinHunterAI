@@ -1,3 +1,19 @@
+## 2026-09-24 — Post-P01-CIP-01 Handoff Review and P01-OCI-01 Specification
+
+- **REVIEW:** CIP-01 returns an exact OSC-02 request; OSC-02 already owns
+  RTI-15/16, validation, terminal outcomes and exact result identity. No
+  market/fill/state/policy domain dependency is missing.
+- **GAP:** OSC-02 accepts a bare request and does not bind the canonical
+  CIP-01 result/preparation digest or reject non-ready CIP outcomes at an
+  explicit prepared-case handoff.
+- **SELECTION:** P01-OCI-01 — one explicit in-memory CIP-to-OSC handoff,
+  zero upstream owner calls, existing OSC-02 `run` at most once, exact
+  `P01Osc02Result` preserved, STOP. No durable global exactly-once claim.
+- **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation and OSC-02 invocation NOT AUTHORIZED.
+- **BOUNDARY:** no automatic continuation, persistence, provider loop,
+  scheduler/worker, wallet/signing/RPC/DEX, economic realization, G2/G3/G4/P09.
+
 ## 2026-09-24 — P01-CIP-01 Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS. Implementation PR #65 was
