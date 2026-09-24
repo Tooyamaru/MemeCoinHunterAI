@@ -1,3 +1,10 @@
+from backend.application.prepared_paper_case_invocation import (
+    P01_OCI_01_CONTRACT_VERSION,
+    PreparedPaperInvocationOutcome,
+    P01Oci01Request,
+    P01Oci01Result,
+    PreparedPaperCaseInvocationService,
+)
 from backend.application.controlled_paper_experiment_input_preparation import (
     P01_CIP_01_CONTRACT_VERSION,
     ControlledInputPreparationOutcome,
@@ -109,6 +116,11 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_OCI_01_CONTRACT_VERSION",
+    "PreparedPaperInvocationOutcome",
+    "P01Oci01Request",
+    "P01Oci01Result",
+    "PreparedPaperCaseInvocationService",
     "P01_CIP_01_CONTRACT_VERSION",
     "ControlledInputPreparationOutcome",
     "P01Cip01Request",

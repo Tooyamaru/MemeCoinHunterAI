@@ -1,3 +1,15 @@
+## 2026-09-24 — P01-OCI-01 Limited Implementation Checkpoint
+
+- **STATUS:** Controller authorized bounded implementation under merged
+  `p01-oci-01-v1`; CI, implementation merge, and separate closure pending.
+- **IMPLEMENTATION:** Explicit in-memory CIP-result handoff validates canonical
+  preparation and passes the exact existing OSC-02 request at most once to the
+  OSC-02 owner. Exact canonical OSC result is preserved; terminal CIP input
+  stops without owner delegation. Focused tests use deterministic test doubles.
+- **BOUNDARY:** No automatic continuation, real operational paper experiment,
+  persistence, provider loop, scheduler/worker/queue, wallet/signing/RPC/DEX,
+  economic realization, or G2/G3/G4/P09. No global idempotency guarantee.
+
 ## 2026-09-24 — Post-P01-CIP-01 Handoff Review and P01-OCI-01 Specification
 
 - **REVIEW:** CIP-01 returns an exact OSC-02 request; OSC-02 already owns
