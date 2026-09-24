@@ -25,9 +25,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   tests, whitespace, TypeScript typechecks, workspace builds). Post-CIP-01
   bounded review selected P01-OCI-01: explicit prepared-case handoff to the
   existing OSC-02 owner, at most once, preserving the exact OSC result.
-  P01-OCI-01 specification is COMPLETE; limited implementation is
-  AUTHORIZED / IN REVIEW on a dedicated branch. CI and separate governance
-  closure remain pending. Operational paper invocation remains NOT AUTHORIZED.
+  P01-OCI-01 specification and bounded implementation are COMPLETE / CLOSED /
+  CI PASS. Implementation PR #68 merged at `c041e0e`; CI #219 passed (1,701
+  Python tests, whitespace, TypeScript typechecks and workspace builds).
+  Operational paper invocation and any successor remain NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -979,8 +980,11 @@ post-CIP review is recorded in `docs/POST-P01-CIP-01-DEPENDENCY-GAP-REVIEW.md`.
 It selected P01-OCI-01 as the smallest explicit handoff for exact CIP result
 lineage to one OSC-02 invocation; its specification is
 `docs/P01-OCI-01-EXPLICIT-PREPARED-CASE-OSC-02-ONE-SHOT-INVOCATION-SPECIFICATION.md`.
-This is documentation-only; OCI implementation and OSC-02 invocation are NOT
-AUTHORIZED by this checkpoint.
+P01-OCI-01 bounded implementation is COMPLETE / CLOSED / CI PASS after
+implementation PR #68 and CI #219. It invokes OSC-02 at most once only when
+explicitly called with a ready canonical CIP result; no operational paper
+experiment was invoked during verification. Persistence, automatic caller
+wiring and any successor gate remain NOT AUTHORIZED.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,
