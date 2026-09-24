@@ -20,8 +20,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   implementation PR #61, GitHub Actions #191, and separate governance closure.
   The controller selected P01-CIP-01 as the zero-delegation controlled
   input preparer from exact PFX/PFS results to one OSC-02 request.
-  Its specification is COMPLETE / READY FOR CONTROLLER REVIEW;
-  implementation is NOT AUTHORIZED.
+  Its specification is COMPLETE; limited implementation is AUTHORIZED /
+  IN REVIEW on a dedicated branch. CI and governance closure remain pending.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;

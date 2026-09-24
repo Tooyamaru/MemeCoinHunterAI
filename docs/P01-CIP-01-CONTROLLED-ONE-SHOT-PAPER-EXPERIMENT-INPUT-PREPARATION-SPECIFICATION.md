@@ -2,7 +2,7 @@
 
 **Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
 
-**Implementation:** NOT AUTHORIZED
+**Implementation:** LIMITED IMPLEMENTATION AUTHORIZED / CI AND CLOSURE PENDING
 
 **Contract:** `p01-cip-01-v1`
 
@@ -206,9 +206,10 @@ deterministic digests; OSC request field identity; and **zero** service
 delegations or persistence. Relevant regression covers PFX-01, PFS-01,
 OSC-02, RTI-14/15, and canonical paper input validators.
 
-Only after explicit controller authorization may the future implementation add
+The controller authorized limited implementation; that implementation may add
 one thin application module, focused tests, minimal export and governance.
-No source/runtime module, API/model/migration, provider/worker/scheduler,
-wallet or execution code is authorized by this specification checkpoint.
+The authorization covers only the bounded in-memory preparer, focused tests,
+minimal exports and governance. API/model/migration, provider/worker/scheduler,
+wallet or execution code remains unauthorized.
 
-`SPECIFICATION READY FOR CONTROLLER REVIEW`
+`SPECIFICATION COMPLETE; LIMITED IMPLEMENTATION IN REVIEW`

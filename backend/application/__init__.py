@@ -1,3 +1,10 @@
+from backend.application.controlled_paper_experiment_input_preparation import (
+    P01_CIP_01_CONTRACT_VERSION,
+    ControlledInputPreparationOutcome,
+    P01Cip01Request,
+    P01Cip01Result,
+    ControlledPaperExperimentInputPreparer,
+)
 from backend.application.prevalidated_decision_risk_capital_prefix import (
     P01_PFX_01_CONTRACT_VERSION,
     P01Pfx01Request,
@@ -102,6 +109,11 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_CIP_01_CONTRACT_VERSION",
+    "ControlledInputPreparationOutcome",
+    "P01Cip01Request",
+    "P01Cip01Result",
+    "ControlledPaperExperimentInputPreparer",
     "P01_PFX_01_CONTRACT_VERSION",
     "P01Pfx01Request",
     "P01Pfx01Result",
