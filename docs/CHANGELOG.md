@@ -1,3 +1,20 @@
+## 2026-09-24 — P01-CIP-01 Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS. Implementation PR #65 was
+  squash-merged at `1916339ad90ec8bb5371658388f0bc91871367ff`.
+- **CI:** GitHub Actions #206 passed on exact PR head
+  `85583640be5afffcaccd6fb03c51266447648d99`: 1,691 Python 3.13 tests
+  (one existing dependency warning), whitespace, TypeScript typechecks, and
+  workspace builds. Local focused tests: 7 passed; relevant regression:
+  103 passed.
+- **CONTRACT:** exact canonical PFX/PFS results + explicit OSC invocation ID
+  → validate shared RTI-11 and cross-lineage evidence/policy/time/state →
+  construct one exact `P01Osc02Request` in memory → STOP before OSC-02.
+  Canonical owner service delegation = 0; request construction <= 1.
+- **BOUNDARY:** no owner replay, OSC-02/RTI-15/16 execution, persistence,
+  provider/network polling, scheduler/worker, wallet/signing/RPC/DEX,
+  economic realization, live trading, G2/G3/G4/P09. No successor selected.
+
 ## 2026-09-24 — P01-CIP-01 Limited Implementation Checkpoint
 
 - **STATUS:** Controller authorized limited implementation against merged
