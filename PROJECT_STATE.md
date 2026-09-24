@@ -14,9 +14,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   CI PASS. P07-PFS-01 COMPLETE / CLOSED / CI PASS. Controller selected the
   prevalidated-lineage architecture (Direction B) for the post-PFS controlled
   input path. P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper
-  Caller — is COMPLETE / CLOSED / CI PASS. Implementation PR #58 merged at
-  `e26f61d8e59d98f00b27b1b0c7fd5054bf4e9f22` after GitHub Actions CI #177
-  passed.
+  Caller — is COMPLETE / CLOSED / CI PASS. Post-OSC-02 bounded successor
+  review selected P01-PFX-01 — Deterministic Prevalidated Decision/Risk-Capital
+  Prefix Preparation. Its specification is COMPLETE / READY FOR CONTROLLER
+  REVIEW; implementation remains NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -933,11 +934,14 @@ OSP. P01-OSC-02 implementation is NOT AUTHORIZED by this checkpoint.
 
 ## Next action
 
-P01-OSC-02 is COMPLETE / CLOSED / CI PASS. No successor gate is selected by
-this closure. Do not start a prefix preparer, controlled-input orchestrator,
-persistence, provider loop, runtime worker/scheduler, API/dashboard,
-wallet/execution, economic realization, G2, G3, G4, or P09 without a separate
-controller decision and specification.
+P01-OSC-02 is COMPLETE / CLOSED / CI PASS. The bounded post-OSC-02 review
+selected P01-PFX-01 as the smallest missing prefix composition: exact RTI-11
+through RTI-12 and RTI-13, then one exact decision-bound Risk/Capital policy
+snapshot and RTI-14, stopping at exact RTI-14. P01-PFX-01 is specification-only
+and implementation is NOT AUTHORIZED. Do not start implementation, PFS/OSC-02
+composition, persistence, provider loop, runtime worker/scheduler,
+API/dashboard, wallet/execution, economic realization, G2, G3, G4, or P09
+without a separate controller approval.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,
