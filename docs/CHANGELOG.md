@@ -1,3 +1,16 @@
+## 2026-09-24 — P01-CIP-01 Limited Implementation Checkpoint
+
+- **STATUS:** Controller authorized limited implementation against merged
+  `p01-cip-01-v1`; GitHub CI, merge, and separate governance closure pending.
+- **IMPLEMENTATION:** One immutable in-memory preparer validates exact PFX/PFS
+  result lineage and constructs one canonical `P01Osc02Request` from exact
+  predecessor objects and explicit invocation identity. It stops before OSC-02.
+- **CARDINALITY:** OSC request constructor <= 1; canonical service/owner
+  delegation = 0. Validation failure is ValueError; canonical terminal inputs
+  yield bounded stops; unexpected construction failure is bounded unavailable.
+- **BOUNDARY:** no owner replay, OSC execution, persistence, provider polling,
+  scheduler/worker, wallet/DEX, economic realization or G2/G3/G4/P09.
+
 ## 2026-09-24 — P01-CIP-01 Controlled Input Preparation Specification
 
 - **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
