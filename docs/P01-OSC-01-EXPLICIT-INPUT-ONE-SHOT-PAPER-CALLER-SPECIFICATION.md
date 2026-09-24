@@ -6,7 +6,7 @@
 `backend/application/one_shot_controlled_paper_caller.py`, with focused tests
 in `tests/test_one_shot_controlled_paper_caller.py`.
 
-**Proposed contract:** `p01-osc-01-v1` (proposed; no runtime contract exists yet)
+**Implemented contract:** `p01-osc-01-v1`
 
 **Baseline:** GitHub `main` `ad3368ab23b6ca075ac53406ee5c884e6cea215a`, post-RTI-16 review merged in PR #44. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 
