@@ -20,8 +20,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   implementation PR #61, GitHub Actions #191, and separate governance closure.
   The controller selected P01-CIP-01 as the zero-delegation controlled
   input preparer from exact PFX/PFS results to one OSC-02 request.
-  Its specification is COMPLETE; limited implementation is AUTHORIZED /
-  IN REVIEW on a dedicated branch. CI and governance closure remain pending.
+  Its specification and bounded implementation are COMPLETE / CLOSED / CI PASS.
+  Implementation PR #65 merged at `1916339`; CI #206 passed (1,691 Python
+  tests, whitespace, TypeScript typechecks, workspace builds). STOP before
+  OSC-02; no successor implementation authorized.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -963,8 +965,9 @@ finding does not guarantee RTI-15 admission. The controller separately
 selected P01-CIP-01 as an in-memory, zero-delegation OSC-02 request
 preparation gate; its formal specification is recorded in
 `docs/P01-CIP-01-CONTROLLED-ONE-SHOT-PAPER-EXPERIMENT-INPUT-PREPARATION-SPECIFICATION.md`.
-The specification is COMPLETE / READY FOR CONTROLLER REVIEW; runtime
-implementation remains NOT AUTHORIZED.
+Specification and bounded implementation are COMPLETE / CLOSED / CI PASS.
+Implementation PR #65 merged at `1916339` after CI #206 PASS; no further
+runtime gate is selected or authorized.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,
