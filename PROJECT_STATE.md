@@ -11,12 +11,11 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-OSP-01 and P01-OSC-01 COMPLETE / CLOSED /
-  CI PASS. Controller selected separate simulation-only paper fact sourcing to
-  address the post-OSP fill/lifecycle evidence dependency. P07-PFS-01 is
-  COMPLETE / CLOSED / CI PASS. Post-PFS controlled-input-path review identifies
-  a decision/Risk-Capital lineage validation gap at the RTI-12–14 / OSC boundary;
-  controller decision required. Controlled-input-path specification and
-  implementation remain NOT AUTHORIZED.
+  CI PASS. P07-PFS-01 COMPLETE / CLOSED / CI PASS. Controller selected the
+  prevalidated-lineage architecture (Direction B) for the post-PFS controlled
+  input path. P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper
+  Caller — is SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW.
+  Implementation remains NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -920,7 +919,24 @@ both canonical APPROVED and REJECTED remain valid authority materializations. It
 does not open P07, persistence/publication, runtime caller, provider loop, wallet,
 execution, G2, G3, G4, or P09 authority.
 
+The post-PFS controlled-input decision is now resolved. The controller selected
+Direction B: preserve one already-produced canonical RTI-12/13/14 prefix and do
+not rerun those owners inside the next staged caller. The selected bounded gate
+is P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper Caller. Its
+formal specification is recorded in
+`docs/P01-OSC-02-PREVALIDATED-RISK-CAPITAL-SUFFIX-ONE-SHOT-PAPER-CALLER-SPECIFICATION.md`.
+The gate accepts one canonical RTI-14 result and explicit RTI-15/16 paper
+inputs, may invoke RTI-15 and RTI-16 at most once each, and stops at the exact
+RTI-16 result. It never invokes RTI-11/12/13/14, OSC-01, PFS, persistence, or
+OSP. P01-OSC-02 implementation is NOT AUTHORIZED by this checkpoint.
+
 ## Next action
+
+Controller review of the formal P01-OSC-02 specification. If approved, authorize
+only the limited implementation scope named by that specification. Do not start
+a prefix preparer, controlled-input orchestrator, persistence, provider loop,
+runtime worker/scheduler, API/dashboard, wallet/execution, economic realization,
+G2, G3, G4, or P09 without a separate gate.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,

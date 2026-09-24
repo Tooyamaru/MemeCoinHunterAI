@@ -1,3 +1,21 @@
+## 2026-09-24 — P01-OSC-02 Prevalidated Suffix Specification
+
+- **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation NOT AUTHORIZED.
+- **DECISION:** Controller selected post-PFS Direction B: prevalidated
+  Decision/Risk-Capital lineage with no duplicate RTI-12/13/14 execution.
+- **GATE:** P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper Caller.
+- **INPUT:** one exact canonical RTI-14 result plus explicit RTI-15/16 paper
+  inputs.
+- **CARDINALITY:** RTI-11/12/13/14 = zero calls; RTI-15 ≤ 1; RTI-16 ≤ 1.
+- **STOP:** exact RTI-16 result, in memory.
+- **PFS:** remains a separate simulation-only input owner; OSC-02 does not call
+  PFS.
+- **BOUNDARY:** no OSC-01 rerun, persistence/OSP, RTI-03/04, provider/network,
+  worker/scheduler/queue, API/dashboard, wallet/signing/RPC/DEX, execution/live
+  trading, economic realization, G2/G3/G4/P09.
+- **SCOPE:** docs/governance only.
+
 ## 2026-09-24 — Post-PFS Controlled Input Path Dependency Review
 
 - **FINDING:** P07-PFS-01 closes simulation-only fill/lifecycle input sourcing, but an exact `PaperRiskCapitalPolicySnapshot` binds RTI-12 context and RTI-13 decision digests. OSC currently re-executes RTI-12–14 from RTI-11 and accepts no already-produced prefix; preparatory execution would duplicate owner work.
