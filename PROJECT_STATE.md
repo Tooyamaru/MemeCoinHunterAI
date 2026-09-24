@@ -12,7 +12,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-OSP-01 optional explicit one-shot
   lifecycle persistence COMPLETE / CLOSED / CI PASS. P01-OSC-01 remains
-  COMPLETE / CLOSED / CI PASS. Further capability requires controller decision.
+  COMPLETE / CLOSED / CI PASS. Post-OSP supervised controlled-input-path review
+  finds a paper fill/lifecycle evidence sourcing dependency; controller boundary
+  decision required before any complete-input successor specification.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -254,6 +256,16 @@ and implementation PR #50 was squash-merged at `b5e2eab`. The separate invocatio
 prevalidates exact OSC identity and provenance, delegates at most once to RTI-03,
 and stops on the exact persistence result. It adds no full replay archive.
 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
+The post-OSP controlled-input-path review is documented in
+`docs/POST-P01-OSP-01-CONTROLLED-INPUT-PATH-DEPENDENCY-DECISION.md`.
+P02/P03/P04-LME/RTI-11 can support one controller-selected candidate and exact
+pool, but no bounded production owner supplies the complete canonical
+`PaperFillInstruction` and `PaperLifecycleEvidence` from those observations.
+Existing test fixtures are not a source of paper facts. A complete OSC-ready
+input-path specification is deferred pending controller selection of explicit
+paper facts, separate simulation-only sourcing ownership, or upstream-only
+preparation. No successor gate or implementation is authorized by this review.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09

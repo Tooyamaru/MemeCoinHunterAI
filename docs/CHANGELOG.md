@@ -1,3 +1,9 @@
+## 2026-09-24 — Post-OSP Controlled Input Path Dependency Decision
+
+- **FINDING:** Existing P02/P03/P04-LME/RTI-11 owners can support one supervised candidate and exact-pool opportunity result. No bounded production owner supplies canonical paper fill instruction and lifecycle evidence from that market path; historical OHLCV is not an executable quote or independent reconciliation fact.
+- **DECISION POINT:** Controller must choose explicit canonical paper facts, separately governed simulation-only fact sourcing, or upstream-only preparation before a complete OSC-ready input-path specification can be claimed. No successor identifier or implementation selected.
+- **BOUNDARY:** Documentation review only. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED. No autonomous selection, polling, worker/scheduler, persistence expansion, wallet, execution or live trading.
+
 ## 2026-09-24 — P01-OSP-01 Bounded Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS. The controller authorized the merged formal specification; implementation PR #50 was squash-merged at `b5e2eab` after GitHub CI #152 passed.
