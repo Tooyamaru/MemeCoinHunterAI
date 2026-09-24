@@ -1,3 +1,10 @@
+## 2026-09-24 — Operator Application Facade and Hunter Room Foundation Specification
+
+- **DECISION:** Accept Post-OCI B — READY WITH SMALL GAP. Architecture specification proposes P01-OAF-01 (operator API/application facade) followed by HR-FND-01 (responsive functional Hunter Room); advanced visual art later.
+- **IDENTITY:** Exact CIP result and OSC request remain server-side by object identity through review and explicit run. Opaque temporary case handle plus digest and atomic per-case claim prevent accidental double submission within one process; no global exactly-once or durable case archive claim.
+- **DEPENDENCIES:** Explicit trusted RTI-11 controlled-input intake and optional separate exact OSC-02 lifecycle → RTI-03 persistence handoff; existing GET digest catalog/readback stays canonical. P08 evaluation is deferred.
+- **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW. Implementation, operational paper invocation, API write routes, dashboard and provider access NOT AUTHORIZED. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-09-24 — P01-OCI-01 Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS. Implementation PR #68 was

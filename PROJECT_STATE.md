@@ -35,6 +35,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 COMPLETE / CLOSED / CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
+- **Operator/dashboard architecture checkpoint:** Post-OCI controller accepted READY WITH SMALL GAP. `docs/OPERATOR-APPLICATION-FACADE-HUNTER-ROOM-FOUNDATION-SPECIFICATION.md` specifies proposed P01-OAF-01 operator facade and HR-FND-01 functional Hunter Room as separate implementation milestones. Exact CIP/OCI case object identity requires a bounded process-local server registry; the RTI-11 trusted controlled-input intake and separate OSC-02 lifecycle → RTI-03 handoff remain explicit implementation dependencies. This checkpoint is SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW; operational paper invocation, facade/dashboard implementation and provider access are NOT AUTHORIZED. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 - **Last updated:** 2026-09-24
 
 ## Master progress
