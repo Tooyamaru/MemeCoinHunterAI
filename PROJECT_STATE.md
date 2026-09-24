@@ -16,9 +16,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   input path. P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper
   Caller — is COMPLETE / CLOSED / CI PASS. Post-OSC-02 bounded successor
   review selected P01-PFX-01 — Deterministic Prevalidated Decision/Risk-Capital
-  Prefix Preparation. Its specification is COMPLETE and limited implementation
-  is AUTHORIZED / PREPARED on the feature branch. GitHub CI, merge, and
-  governance closure remain pending.
+  Prefix Preparation. P01-PFX-01 is COMPLETE / CLOSED / CI PASS after
+  implementation PR #61, GitHub Actions #191, and separate governance closure.
+  The current priority is a bounded post-PFX-01 dependency review.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -938,11 +938,17 @@ OSP. P01-OSC-02 implementation is NOT AUTHORIZED by this checkpoint.
 P01-OSC-02 is COMPLETE / CLOSED / CI PASS. The bounded post-OSC-02 review
 selected P01-PFX-01 as the smallest missing prefix composition: exact RTI-11
 through RTI-12 and RTI-13, then one exact decision-bound Risk/Capital policy
-snapshot and RTI-14, stopping at exact RTI-14. P01-PFX-01 limited implementation is authorized and prepared on the feature
-branch. Run GitHub CI and merge only after green checks, then perform a separate
-governance closure. Do not start PFS/OSC-02 composition, persistence, provider
-loop, runtime worker/scheduler, API/dashboard, wallet/execution, economic
-realization, G2, G3, G4, or P09 without a separate controller approval.
+snapshot and RTI-14, stopping at exact RTI-14. P01-PFX-01 is COMPLETE /
+CLOSED / CI PASS. Implementation PR #61 was squash-merged at
+`d96a7a24e4b1a572b0d2453a0aca5fd2d950645b` after GitHub Actions #191
+passed: 1684 Python tests, whitespace check, TypeScript typechecks, and
+workspace builds. It preserves exact RTI-11/12/13/14 lineage and stops before
+RTI-15/16. Next, review whether exact RTI-14 plus PFS paper facts and explicit
+RTI-15 inputs can form one OSC-02-ready request; this review grants no
+successor implementation authority. Do not start PFS/OSC-02 composition,
+persistence, provider loop, runtime worker/scheduler, API/dashboard,
+wallet/execution, economic realization, G2, G3, G4, or P09 without a separate
+controller approval.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,

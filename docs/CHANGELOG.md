@@ -1,3 +1,19 @@
+## 2026-09-24 — P01-PFX-01 Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS. Implementation PR #61 was
+  squash-merged at `d96a7a24e4b1a572b0d2453a0aca5fd2d950645b`.
+- **CI:** GitHub Actions #191 passed on exact PR head
+  `d50f7a8e783cfaeb70fbbb66b43c0e97a483572c`: 1684 Python 3.13
+  tests (one existing dependency warning), whitespace check, TypeScript
+  typechecks, and workspace builds.
+- **BOUNDARY:** exact RTI-11 input → RTI-12/13 at most once each → exact
+  decision/context-bound policy snapshot once → RTI-14 at most once → exact
+  RTI-14 result. No RTI-15/16, OSC-01/02, PFS, persistence, provider loop,
+  worker/scheduler/queue, API/dashboard, wallet/signing/RPC/DEX, execution,
+  economic realization, G2/G3/G4/P09.
+- **NEXT:** bounded dependency review of RTI-14 + exact PFS facts + explicit
+  RTI-15 inputs toward an OSC-02-ready request; no implementation authorized.
+
 ## 2026-09-24 — P01-PFX-01 Limited Implementation Checkpoint
 
 - **STATUS:** Controller authorized the merged `p01-pfx-01-v1` specification.
