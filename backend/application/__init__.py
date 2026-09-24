@@ -36,6 +36,16 @@ from backend.application.rti15_to_controlled_paper_lifecycle import (
     Rti15ToControlledPaperLifecycleContinuationService,
 )
 """Application-service boundaries independent from HTTP transport."""
+from backend.application.paper_fact_sourcing import (
+    P07_PFS_01_CONTRACT_VERSION,
+    GenesisPaperDeclaration,
+    PaperFactSourcingOutcome,
+    PaperFactSourcingRequest,
+    PaperFactSourcingResult,
+    PaperFactSourcingService,
+    PaperSimulationAssumptionPolicy,
+    PaperSimulationMode,
+)
 from backend.application.controlled_paper_run_service import (
     P01_RTI_04_CONTRACT_VERSION,
     ControlledPaperRunOutcome,
@@ -77,6 +87,14 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P07_PFS_01_CONTRACT_VERSION",
+    "GenesisPaperDeclaration",
+    "PaperFactSourcingOutcome",
+    "PaperFactSourcingRequest",
+    "PaperFactSourcingResult",
+    "PaperFactSourcingService",
+    "PaperSimulationAssumptionPolicy",
+    "PaperSimulationMode",
     "P01_OSP_01_CONTRACT_VERSION",
     "OneShotPaperPersistenceService",
     "OneShotPersistenceOutcome",
