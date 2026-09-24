@@ -1,6 +1,6 @@
 # P01-OSP-01 — Explicit One-Shot Lifecycle Persistence after OSC-01
 
-**Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW / IMPLEMENTATION NOT AUTHORIZED
+**Status:** COMPLETE / CLOSED / CI PASS (implementation PR #50, CI #152)
 
 **Proposed contract:** `p01-osp-01-v1`
 
@@ -8,7 +8,7 @@
 
 ## 1. Authority and exact entry
 
-One HTTP-independent application entry point, provisionally `OneShotPaperPersistenceService.persist(osc_result: P01Osc01Result) -> P01Osp01Result`, is **async** and receives an explicit existing `ControlledPaperPersistenceService` through construction/injection. There is exactly one caller-supplied argument: the already-produced exact canonical OSC-01 result; no request for token, paper fill, policy, replay, provider, OSC re-invocation, database URL, or separate lifecycle copy is accepted. The caller's **decision to invoke this separate service** is the explicit persist choice. No implicit persistence, default-on flag, or mutation of OSC-01 is authorized. The controller must separately authorize implementation before code is written.
+One HTTP-independent application entry point, `OneShotPaperPersistenceService.persist(osc_result: P01Osc01Result) -> P01Osp01Result`, is **async** and receives an explicit existing `ControlledPaperPersistenceService` through construction/injection. There is exactly one caller-supplied argument: the already-produced exact canonical OSC-01 result; no request for token, paper fill, policy, replay, provider, OSC re-invocation, database URL, or separate lifecycle copy is accepted. The caller's **decision to invoke this separate service** is the explicit persist choice. No implicit persistence, default-on flag, or mutation of OSC-01 is authorized. The controller separately authorized implementation after specification merge.
 
 The exact input must be a canonical `P01Osc01Result` at `p01-osc-01-v1`, preserving `invocation_id`, `result_digest`, exact ordered RTI-11–16 nested results, explicit caller-input material/digests, and exact identity links. Preflight revalidates the OSC owner result and all present nested owner results/digests according to their contracts, prior to any database transaction. Tampered, malformed, identity/structure mismatched, version-mismatched, or missing canonical input raises a standardized `ValueError`; no storage delegate and no ordinary outcome. Preflight must not fabricate a lifecycle from a paper simulation input, RTI-16 compatibility admission, owner digest, or partial OSC result.
 
@@ -42,4 +42,4 @@ RTI-05 existing read service and RTI-03 `read(lifecycle_result_digest)` accept o
 
 STOP at the exact canonical `PaperLifecyclePersistenceResult` returned by RTI-03, wrapped without changing its meaning. For upstream stops, STOP at the exact OSC result with no write; for unexpected owner failure, STOP at the bounded OSP result with no invented RTI-03 result. No RTI-04 reuse, second persistence owner, schema/model/migration, new read API, publication, full provenance/replay archive, provider loop, autonomous selection, scheduler/worker/queue, automatic retry, wallet/signing/RPC/DEX, economic realization, execution, or live trading is authorized. G2 stays BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 stay NOT AUTHORIZED.
 
-Future implementation requires separate controller approval and focused tests for canonical OSC validation before any write; exact object/digest linkage; zero calls for both OSC nonterminal outcomes; one RTI-03 call for all four canonical RTI-02 outcomes; owner `STORED`/`ALREADY_STORED`/`CONFLICT`/`INVALID_INPUT`/`STORAGE_UNAVAILABLE` propagation; malformed owner result and exception behavior; cancellation; no repeat delegation; and existing RTI-03/05 readback by lifecycle digest. This checkpoint changes only specification and governance documentation.
+The separately authorized implementation includes focused tests for canonical OSC validation before any write; exact object/digest linkage; zero calls for both OSC nonterminal outcomes; one RTI-03 call for all four canonical RTI-02 outcomes; owner `STORED`/`ALREADY_STORED`/`CONFLICT`/`INVALID_INPUT`/`STORAGE_UNAVAILABLE` propagation; malformed owner result and exception behavior; cancellation; no repeat delegation; and existing RTI-03/05 readback by lifecycle digest. The closure checkpoint changes only specification status and governance documentation. Eleven focused tests and 57 relevant combined regressions passed locally; GitHub CI #152 passed before implementation PR #50 merged.
