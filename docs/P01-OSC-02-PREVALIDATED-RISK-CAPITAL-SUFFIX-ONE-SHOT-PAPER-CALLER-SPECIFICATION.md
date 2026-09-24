@@ -1,8 +1,8 @@
 # P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper Caller Specification
 
-**Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
+**Status:** COMPLETE / CLOSED / CI PASS
 
-**Implementation:** AUTHORIZED / IMPLEMENTED ON FEATURE BRANCH / CLOSURE PENDING CI
+**Implementation:** COMPLETE / CLOSED / CI PASS
 
 **Contract:** `p01-osc-02-v1`
 
@@ -324,6 +324,11 @@ is authorized.
 
 This specification is ready for controller review.
 
-Controller authorization received. Limited implementation is present on the feature branch and remains pending GitHub CI, merge, and separate governance closure.
+Controller authorization was received and the bounded implementation was completed.
+Implementation PR #58 was squash-merged at
+`e26f61d8e59d98f00b27b1b0c7fd5054bf4e9f22` after GitHub Actions CI #177
+passed. The CI run completed 1663 Python tests with one pre-existing dependency
+warning, passed whitespace validation, and passed TypeScript typechecks/builds.
+No successor gate is selected by this closure.
 
-`SPECIFICATION READY FOR CONTROLLER REVIEW`
+`COMPLETE / CLOSED / CI PASS`

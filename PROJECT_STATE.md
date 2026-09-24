@@ -14,9 +14,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   CI PASS. P07-PFS-01 COMPLETE / CLOSED / CI PASS. Controller selected the
   prevalidated-lineage architecture (Direction B) for the post-PFS controlled
   input path. P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper
-  Caller — is SPECIFICATION COMPLETE / IMPLEMENTATION AUTHORIZED. Limited
-  implementation is present on the feature branch; merge and closure remain
-  pending GitHub CI.
+  Caller — is COMPLETE / CLOSED / CI PASS. Implementation PR #58 merged at
+  `e26f61d8e59d98f00b27b1b0c7fd5054bf4e9f22` after GitHub Actions CI #177
+  passed.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -933,11 +933,11 @@ OSP. P01-OSC-02 implementation is NOT AUTHORIZED by this checkpoint.
 
 ## Next action
 
-P01-OSC-02 limited implementation is authorized and prepared. Run GitHub CI;
-merge only after green CI, then perform a separate governance closure. Do not
-start a prefix preparer, controlled-input orchestrator, persistence, provider
-loop, runtime worker/scheduler, API/dashboard, wallet/execution, economic
-realization, G2, G3, G4, or P09 without a separate gate.
+P01-OSC-02 is COMPLETE / CLOSED / CI PASS. No successor gate is selected by
+this closure. Do not start a prefix preparer, controlled-input orchestrator,
+persistence, provider loop, runtime worker/scheduler, API/dashboard,
+wallet/execution, economic realization, G2, G3, G4, or P09 without a separate
+controller decision and specification.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,
