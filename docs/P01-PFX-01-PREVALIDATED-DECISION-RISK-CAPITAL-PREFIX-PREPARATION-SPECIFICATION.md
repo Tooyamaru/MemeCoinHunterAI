@@ -2,7 +2,7 @@
 
 **Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
 
-**Implementation:** AUTHORIZED / IMPLEMENTED ON FEATURE BRANCH / CLOSURE PENDING CI
+**Implementation:** COMPLETE / CLOSED / CI PASS
 
 **Contract:** `p01-pfx-01-v1`
 
@@ -289,6 +289,11 @@ dependency, secret, worker, scheduler, frontend, wallet, or execution code.
 
 ## 18. Exit criterion
 
-Controller authorization received. Limited implementation is present on the feature branch and remains pending GitHub CI, merge, and separate governance closure.
+Controller-authorized limited implementation passed GitHub Actions #191 and was
+squash-merged through PR #61 at
+`d96a7a24e4b1a572b0d2453a0aca5fd2d950645b`. The 1684-test Python
+suite, whitespace check, TypeScript typechecks, and workspace builds passed.
+The exact RTI-14 output remains the hard STOP. No downstream or live authority
+is granted by this closure.
 
-`IMPLEMENTATION CHECKPOINT / CI PENDING`
+`IMPLEMENTATION COMPLETE / CLOSED / CI PASS`
