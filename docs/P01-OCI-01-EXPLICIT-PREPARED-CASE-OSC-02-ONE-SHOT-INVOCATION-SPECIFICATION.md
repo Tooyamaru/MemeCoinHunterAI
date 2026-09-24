@@ -1,8 +1,10 @@
 # P01-OCI-01 — Explicit Prepared-Case OSC-02 One-Shot Invocation
 
-**Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
+**Status:** COMPLETE / CLOSED / CI PASS
 
-**Implementation:** LIMITED IMPLEMENTATION AUTHORIZED / CI AND CLOSURE PENDING
+**Implementation:** COMPLETE / CLOSED / CI PASS — PR #68 squash-merged at
+`c041e0e11a98bc477e155ead07a182499a2d1352`; CI #219 PASS (1,701 Python
+3.13 tests, whitespace, TypeScript typechecks, workspace builds).
 
 **Contract:** `p01-oci-01-v1`
 
@@ -18,7 +20,7 @@ controller explicitly invokes OCI(exact P01Cip01Result)
     → STOP
 ```
 
-The future entry point is `PreparedPaperCaseInvocationService.run(request: P01Oci01Request) -> P01Oci01Result`. It owns only canonical handoff, at-most-once local delegation, and CIP→OSC provenance. OSC-02 retains all RTI-14 eligibility, RTI-15 admission and RTI-16 lifecycle ownership. OCI never reinterprets those outcomes.
+The implemented entry point is `PreparedPaperCaseInvocationService.run(request: P01Oci01Request) -> P01Oci01Result`. It owns only canonical handoff, at-most-once local delegation, and CIP→OSC provenance. OSC-02 retains all RTI-14 eligibility, RTI-15 admission and RTI-16 lifecycle ownership. OCI never reinterprets those outcomes.
 
 ## 2. Exact input
 
