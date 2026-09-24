@@ -1,3 +1,9 @@
+## 2026-09-24 — P07-PFS-01 Bounded Implementation Checkpoint
+
+- **STATUS:** Controller authorized the merged `p07-pfs-01-v1` specification. Implementation and focused/regression tests prepared; PR/CI and governance closure pending.
+- **IMPLEMENTATION:** Explicit policy and already-produced RTI-11 accepted historical USD price source produce canonical paper fill instruction, lifecycle evidence and matching initial state identity in memory. Capacity, all frictions, state declaration, accounting and independent precommitted reconciliation fields remain explicit assumptions; identity and digests are deterministic.
+- **BOUNDARY:** No RTI-11/provider, P07 fill/transition/ledger/reconciliation, OSC/lifecycle, persistence, executable/economic claim, G2/G3/G4/P09 or live trading authority.
+
 ## 2026-09-24 — P07-PFS-01 Simulation-Only Paper Fact Sourcing Specification
 
 - **CONTROLLER SELECTION:** Separate P07 input-sourcing capability, dependent on an already-produced exact RTI-11 result and explicit versioned simulation policy. Formal specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT AUTHORIZED.

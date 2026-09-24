@@ -12,9 +12,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-OSP-01 and P01-OSC-01 COMPLETE / CLOSED /
   CI PASS. Controller selected separate simulation-only paper fact sourcing to
-  address the post-OSP fill/lifecycle evidence dependency. P07-PFS-01 formal
-  specification is COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT
-  AUTHORIZED. Supervised controlled-input-path implementation remains deferred.
+  address the post-OSP fill/lifecycle evidence dependency. P07-PFS-01 bounded
+  implementation is controller-authorized and under CI review; closure pending.
+  Supervised controlled-input-path implementation remains deferred.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -279,6 +279,15 @@ OSC, provider or persistence owner. Status: SPECIFICATION COMPLETE / READY FOR
 CONTROLLER REVIEW; implementation and the later complete controlled-input path
 remain NOT AUTHORIZED. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED;
 G3/G4/P09 remain NOT AUTHORIZED.
+
+The controller subsequently authorized the bounded P07-PFS-01 implementation.
+`backend/application/paper_fact_sourcing.py` materializes only the canonical
+in-memory fill instruction, lifecycle evidence and matching initial state
+identity from one admitted RTI-11 historical price proxy plus explicit
+simulation assumptions. The capability does not run RTI-11, P07 outcome owners,
+OSC, lifecycle or persistence. Focused tests in `tests/test_paper_fact_sourcing.py`
+exercise provenance, refusals and STOP. Implementation PR/CI and formal closure
+are pending; no live/economic authority is granted.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
