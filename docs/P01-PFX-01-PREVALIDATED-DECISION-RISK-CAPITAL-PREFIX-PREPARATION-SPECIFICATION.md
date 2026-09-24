@@ -1,6 +1,6 @@
 # P01-PFX-01 — Deterministic Prevalidated Decision/Risk-Capital Prefix Preparation
 
-**Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
+**Status:** COMPLETE / CLOSED / CI PASS
 
 **Implementation:** COMPLETE / CLOSED / CI PASS
 
