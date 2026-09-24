@@ -1,3 +1,16 @@
+## 2026-09-24 — P01-CIP-01 Controlled Input Preparation Specification
+
+- **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation NOT AUTHORIZED.
+- **DECISION:** controller selected the bounded post-PFX-01 zero-delegation
+  preparation boundary, contract `p01-cip-01-v1`.
+- **FLOW:** exact PFX-01 result + exact PFS-01 result + explicit OSC
+  invocation ID → canonical lineage/approval/source/time/state compatibility
+  → exact `P01Osc02Request` in memory → STOP before OSC-02.
+- **AUTHORITY:** no PFX/PFS/RTI owner replay, no RTI-15/16, OSC execution,
+  provider loop, persistence, worker/scheduler, wallet/DEX, economic
+  realization, G2/G3/G4/P09.
+
 ## 2026-09-24 — Post-P01-PFX-01 Controlled-Input Dependency Review
 
 - **STATUS:** Bounded review complete; no successor implementation authorized.

@@ -18,9 +18,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
   review selected P01-PFX-01 — Deterministic Prevalidated Decision/Risk-Capital
   Prefix Preparation. P01-PFX-01 is COMPLETE / CLOSED / CI PASS after
   implementation PR #61, GitHub Actions #191, and separate governance closure.
-  The post-PFX-01 bounded review confirms a possible zero-delegation
-  OSC-02 request preparation from exact PFX/PFS results and explicit inputs.
-  No successor gate or implementation is authorized by this review.
+  The controller selected P01-CIP-01 as the zero-delegation controlled
+  input preparer from exact PFX/PFS results to one OSC-02 request.
+  Its specification is COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation is NOT AUTHORIZED.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -958,8 +959,12 @@ PFX-01 RTI-14 output and exact PFS-01 paper inputs can be checked against
 one another and passed into an in-memory OSC-02 request without re-executing
 owners. PFX rejection/non-materialization and PFS refusal stop preparation;
 identity, timeline, state, policy or digest mismatch fails validation. This
-finding does not guarantee RTI-15 admission and authorizes no successor
-implementation. A separate controller decision/specification is required.
+finding does not guarantee RTI-15 admission. The controller separately
+selected P01-CIP-01 as an in-memory, zero-delegation OSC-02 request
+preparation gate; its formal specification is recorded in
+`docs/P01-CIP-01-CONTROLLED-ONE-SHOT-PAPER-EXPERIMENT-INPUT-PREPARATION-SPECIFICATION.md`.
+The specification is COMPLETE / READY FOR CONTROLLER REVIEW; runtime
+implementation remains NOT AUTHORIZED.
 
 Post-P01-RTI-16 review found a natural stopping point; no RTI successor is
 selected. A specific controller decision about a future persistence,
