@@ -314,6 +314,36 @@ class P01Pfx01Result:
             }.get(self.terminal_stage)
             if expected is None or self.reason_codes != expected:
                 raise ValueError("invalid unavailable prefix result")
+            if self.terminal_stage == "RTI-11":
+                if any(value is not None for value in (
+                    self.rti12_result, self.rti13_result,
+                    self.policy_snapshot, self.rti14_result,
+                )):
+                    raise ValueError("RTI-12 unavailable cannot contain downstream results")
+            elif self.terminal_stage == "RTI-12":
+                if (
+                    self.rti12_result is None
+                    or any(value is not None for value in (
+                        self.rti13_result, self.policy_snapshot, self.rti14_result,
+                    ))
+                ):
+                    raise ValueError("RTI-13 unavailable requires exact RTI-12 only")
+            elif self.terminal_stage == "RTI-13":
+                if (
+                    self.rti12_result is None
+                    or self.rti13_result is None
+                    or self.policy_snapshot is not None
+                    or self.rti14_result is not None
+                ):
+                    raise ValueError("policy unavailable requires exact RTI-12/13 prefix")
+            elif self.terminal_stage == "POLICY":
+                if (
+                    self.rti12_result is None
+                    or self.rti13_result is None
+                    or self.policy_snapshot is None
+                    or self.rti14_result is not None
+                ):
+                    raise ValueError("RTI-14 unavailable requires exact policy prefix")
         else:
             if not self.reason_codes:
                 raise ValueError("upstream stop requires reason codes")
