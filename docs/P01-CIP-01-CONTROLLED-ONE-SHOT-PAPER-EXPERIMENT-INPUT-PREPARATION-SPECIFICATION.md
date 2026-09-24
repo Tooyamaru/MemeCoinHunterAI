@@ -1,8 +1,10 @@
 # P01-CIP-01 — Controlled One-Shot Paper Experiment Input Preparation
 
-**Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
+**Status:** COMPLETE / CLOSED / CI PASS
 
-**Implementation:** LIMITED IMPLEMENTATION AUTHORIZED / CI AND CLOSURE PENDING
+**Implementation:** COMPLETE / CLOSED / CI PASS — PR #65 squash-merged at
+`1916339ad90ec8bb5371658388f0bc91871367ff`; CI #206 PASS (1,691
+Python 3.13 tests, whitespace, TypeScript typechecks, workspace builds).
 
 **Contract:** `p01-cip-01-v1`
 
@@ -27,7 +29,7 @@ and assembly. It never replays, repairs, reinterprets, or moves owner authority.
 
 ## 2. Exact entry point and request
 
-A future pure, stateless application service
+The pure, stateless application service
 `ControlledPaperExperimentInputPreparer.prepare(request: P01Cip01Request) -> P01Cip01Result`
 accepts an immutable request with exactly:
 
@@ -198,7 +200,7 @@ BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 
 ## 9. Future verification and implementation gate
 
-A future separately approved implementation must focus tests on exact
+The separately approved implementation focused tests on exact
 same-object RTI-11 and RTI-14/PFS identity continuity; APPROVED/REJECTED PFX
 handling; PFS success/refusals; mismatched source/pool/portfolio/replay/state/
 time/policy/fill/evidence; tampering/version and constructor failures;
@@ -206,10 +208,10 @@ deterministic digests; OSC request field identity; and **zero** service
 delegations or persistence. Relevant regression covers PFX-01, PFS-01,
 OSC-02, RTI-14/15, and canonical paper input validators.
 
-The controller authorized limited implementation; that implementation may add
+The controller authorized and merged limited implementation adding
 one thin application module, focused tests, minimal export and governance.
 The authorization covers only the bounded in-memory preparer, focused tests,
 minimal exports and governance. API/model/migration, provider/worker/scheduler,
 wallet or execution code remains unauthorized.
 
-`SPECIFICATION COMPLETE; LIMITED IMPLEMENTATION IN REVIEW`
+`P01-CIP-01 COMPLETE / CLOSED / CI PASS; STOP BEFORE OSC-02`
