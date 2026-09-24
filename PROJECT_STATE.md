@@ -10,9 +10,9 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-OSC-01 explicit-input one-shot paper
-  caller COMPLETE / CLOSED / CI PASS. Post-RTI-16 in-memory STOP remains unchanged;
-  no persistence or later integration gate is authorized.
+- **Current integration priority:** P01-OSP-01 optional explicit one-shot
+  lifecycle persistence specification COMPLETE / READY FOR CONTROLLER REVIEW;
+  implementation NOT AUTHORIZED. P01-OSC-01 remains COMPLETE / CLOSED / CI PASS.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -239,6 +239,17 @@ locally; GitHub CI #142 passed and implementation PR #46 was squash-merged at
 `dd6c0d0`. P01-OSC-01 is COMPLETE / CLOSED / CI PASS. RTI-11 diagnostics,
 RTI-04, RTI-03 persistence, provider access, scheduler/worker, wallet,
 execution, economic realization, G2, G3, G4, and P09 remain outside this gate.
+
+The bounded post-P01-OSC-01 dependency review selects P01-OSP-01 as an
+optional application composition: a caller explicitly presents an already
+produced canonical OSC result; only `LIFECYCLE_RETURNED` supplies the exact
+RTI-02 lifecycle result to RTI-03 once. OSC and RTI-11–16 are not rerun;
+RTI-04 is not used. RTI-03 retains only its canonical RTI-02 bundle, not
+OSC/RTI-16 wrappers or full original replay inputs. The review and formal
+specification are in `docs/POST-P01-OSC-01-PERSISTENCE-DEPENDENCY-REVIEW.md`
+and `docs/P01-OSP-01-EXPLICIT-ONE-SHOT-LIFECYCLE-PERSISTENCE-SPECIFICATION.md`.
+P01-OSP-01 implementation is NOT AUTHORIZED; G2 remains BLOCKED / UNRESOLVED /
+NOT AUTHORIZED and G3/G4/P09 remain NOT AUTHORIZED.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
@@ -717,6 +728,8 @@ functionality was introduced.
 - `docs/P01-RTI-16-DETERMINISTIC-RTI-15-TO-CONTROLLED-PAPER-LIFECYCLE-CONTINUATION-SPECIFICATION.md`
 - `docs/POST-P01-RTI-16-DEPENDENCY-GAP-REVIEW.md`
 - `docs/P01-OSC-01-EXPLICIT-INPUT-ONE-SHOT-PAPER-CALLER-SPECIFICATION.md`
+- `docs/POST-P01-OSC-01-PERSISTENCE-DEPENDENCY-REVIEW.md`
+- `docs/P01-OSP-01-EXPLICIT-ONE-SHOT-LIFECYCLE-PERSISTENCE-SPECIFICATION.md`
 - `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`

@@ -1,3 +1,9 @@
+## 2026-09-24 — Post-OSC-01 Persistence Selection and P01-OSP-01 Specification
+
+- **DECISION:** Exact OSC-01 `LIFECYCLE_RETURNED` contains the RTI-02 result already accepted by RTI-03. Select optional P01-OSP-01 to take an existing canonical OSC result and delegate its exact lifecycle to RTI-03 once. The caller decides to persist by invoking this separate gate; OSC itself remains in-memory and RTI-04 is not rerun.
+- **STATUS:** Formal specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation NOT AUTHORIZED.
+- **LIMIT:** Storage/readback covers the canonical RTI-02 bundle by lifecycle digest; OSC/RTI-16 wrappers and complete original replay inputs are not durable. No runtime/source/tests, model/schema, provider, worker/scheduler, wallet, execution, G2/G3/G4/P09, or live trading changes.
+
 ## 2026-09-24 — P01-OSC-01 Bounded Implementation Closure
 
 - **STATUS:** COMPLETE / CLOSED / CI PASS; controller approved implementation after the formal specification merged in PR #45.
