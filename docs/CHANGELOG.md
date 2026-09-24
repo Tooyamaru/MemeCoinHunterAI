@@ -1,3 +1,10 @@
+## 2026-09-24 — P01-OSP-01 Bounded Implementation Closure
+
+- **STATUS:** COMPLETE / CLOSED / CI PASS. The controller authorized the merged formal specification; implementation PR #50 was squash-merged at `b5e2eab` after GitHub CI #152 passed.
+- **IMPLEMENTATION:** A separate explicit invocation validates the exact canonical OSC-01 result before at most one RTI-03 call with the same RTI-02 lifecycle object. It preserves owner outcomes, invocation and digest provenance, safe failure handling, and readback by lifecycle digest. OSC and RTI-11–16 are not rerun.
+- **VERIFICATION:** Eleven focused tests and 57 relevant combined regression tests passed locally; CI Python 3.13 and TypeScript jobs passed.
+- **BOUNDARY:** No OSC-01 default persistence, RTI-04 reuse, full replay archive, schema change, provider loop, worker/scheduler, wallet/signing, RPC/DEX, economic realization, execution/live trading, G2, G3, G4, or P09 authority.
+
 ## 2026-09-24 — Post-OSC-01 Persistence Selection and P01-OSP-01 Specification
 
 - **DECISION:** Exact OSC-01 `LIFECYCLE_RETURNED` contains the RTI-02 result already accepted by RTI-03. Select optional P01-OSP-01 to take an existing canonical OSC result and delegate its exact lifecycle to RTI-03 once. The caller decides to persist by invoking this separate gate; OSC itself remains in-memory and RTI-04 is not rerun.

@@ -11,8 +11,8 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
 - **Current integration priority:** P01-OSP-01 optional explicit one-shot
-  lifecycle persistence specification COMPLETE / READY FOR CONTROLLER REVIEW;
-  implementation NOT AUTHORIZED. P01-OSC-01 remains COMPLETE / CLOSED / CI PASS.
+  lifecycle persistence COMPLETE / CLOSED / CI PASS. P01-OSC-01 remains
+  COMPLETE / CLOSED / CI PASS. Further capability requires controller decision.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
@@ -248,8 +248,12 @@ RTI-04 is not used. RTI-03 retains only its canonical RTI-02 bundle, not
 OSC/RTI-16 wrappers or full original replay inputs. The review and formal
 specification are in `docs/POST-P01-OSC-01-PERSISTENCE-DEPENDENCY-REVIEW.md`
 and `docs/P01-OSP-01-EXPLICIT-ONE-SHOT-LIFECYCLE-PERSISTENCE-SPECIFICATION.md`.
-P01-OSP-01 implementation is NOT AUTHORIZED; G2 remains BLOCKED / UNRESOLVED /
-NOT AUTHORIZED and G3/G4/P09 remain NOT AUTHORIZED.
+P01-OSP-01 implementation is COMPLETE / CLOSED / CI PASS. Eleven focused tests
+and 57 relevant combined regression tests passed locally; GitHub CI #152 passed
+and implementation PR #50 was squash-merged at `b5e2eab`. The separate invocation
+prevalidates exact OSC identity and provenance, delegates at most once to RTI-03,
+and stops on the exact persistence result. It adds no full replay archive.
+G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 
 Post-P01-RTI-09 candidate selection is documented in
 `docs/POST-P01-RTI-09-NEXT-GATE-SELECTION.md`. The RTI-05 through RTI-09
