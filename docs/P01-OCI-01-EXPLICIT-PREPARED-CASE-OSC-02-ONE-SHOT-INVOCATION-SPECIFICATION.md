@@ -92,7 +92,7 @@ Hard STOP is **the exact canonical `P01Osc02Result` in memory**, if OSC-02 retur
 
 Forbidden: autonomous discovery/selection, provider/network/polling, hidden paper facts, recurring invocation, scheduler/worker/queue, API/WebSocket/dashboard, RTI-04, wallet/signing/RPC/DEX, transaction/broadcast, live trading and economic realization. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 
-## 8. Future implementation and focused verification
+## 8. Implementation and focused verification
 
 The controller authorized bounded implementation: one thin application module,
 one focused test module, minimal application export and governance closure.
