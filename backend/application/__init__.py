@@ -1,3 +1,11 @@
+from backend.application.prevalidated_decision_risk_capital_prefix import (
+    P01_PFX_01_CONTRACT_VERSION,
+    P01Pfx01Request,
+    P01Pfx01Result,
+    PaperRiskCapitalPolicySeed,
+    PrevalidatedDecisionRiskCapitalPrefixService,
+    PrevalidatedPrefixOutcome,
+)
 from backend.application.prevalidated_risk_capital_suffix_caller import (
     P01_OSC_02_CONTRACT_VERSION,
     P01Osc02Request,
@@ -94,6 +102,12 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_PFX_01_CONTRACT_VERSION",
+    "P01Pfx01Request",
+    "P01Pfx01Result",
+    "PaperRiskCapitalPolicySeed",
+    "PrevalidatedDecisionRiskCapitalPrefixService",
+    "PrevalidatedPrefixOutcome",
     "P01_OSC_02_CONTRACT_VERSION",
     "P01Osc02Request",
     "P01Osc02Result",
