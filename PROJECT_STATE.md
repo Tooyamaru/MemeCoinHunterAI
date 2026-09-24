@@ -10,15 +10,16 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 - **Current phase:** P08 — Outcome Learning
 - **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
 - **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** Post-P01-RTI-16 bounded dependency/gap
-  review complete — natural in-memory STOP; no RTI successor selected
+- **Current integration priority:** P01-OSC-01 explicit-input one-shot paper
+  caller specification COMPLETE / READY FOR CONTROLLER REVIEW; implementation
+  NOT AUTHORIZED. Post-RTI-16 natural in-memory STOP remains unchanged.
 - **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
   P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
   P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
   P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 COMPLETE / CLOSED / CI PASS
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
-- **Last updated:** 2026-09-23
+- **Last updated:** 2026-09-24
 
 ## Master progress
 
@@ -705,6 +706,7 @@ functionality was introduced.
 - `docs/POST-P01-RTI-15-NEXT-GATE-SELECTION.md`
 - `docs/P01-RTI-16-DETERMINISTIC-RTI-15-TO-CONTROLLED-PAPER-LIFECYCLE-CONTINUATION-SPECIFICATION.md`
 - `docs/POST-P01-RTI-16-DEPENDENCY-GAP-REVIEW.md`
+- `docs/P01-OSC-01-EXPLICIT-INPUT-ONE-SHOT-PAPER-CALLER-SPECIFICATION.md`
 - `docs/POST-P01-RTI-08-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-07-NEXT-GATE-SELECTION.md`
 - `docs/POST-P01-RTI-06-NEXT-GATE-SELECTION.md`
