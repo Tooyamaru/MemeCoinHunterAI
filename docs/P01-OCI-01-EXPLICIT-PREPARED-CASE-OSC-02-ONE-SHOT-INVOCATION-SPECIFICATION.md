@@ -2,7 +2,7 @@
 
 **Status:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW
 
-**Implementation:** NOT AUTHORIZED
+**Implementation:** LIMITED IMPLEMENTATION AUTHORIZED / CI AND CLOSURE PENDING
 
 **Contract:** `p01-oci-01-v1`
 
@@ -92,8 +92,11 @@ Forbidden: autonomous discovery/selection, provider/network/polling, hidden pape
 
 ## 8. Future implementation and focused verification
 
-Separate explicit controller authorization is required before any runtime implementation. If approved, limited scope is one thin application module, one focused test module, minimal application export and governance closure; do not modify CIP, OSC, RTI, PFS or Risk/Capital owners simply to make tests pass.
+The controller authorized bounded implementation: one thin application module,
+one focused test module, minimal application export and governance closure.
+CIP, OSC, RTI, PFS and Risk/Capital owners remain unchanged; operational paper
+experiment invocation is not authorized by implementation tests.
 
 Test matrix: canonical ready CIP passes exact same request object once; successful OSC lifecycle result remains exact; each OSC canonical terminal outcome remains exact without wrapper rewriting; each canonical CIP non-ready outcome causes zero calls; tampered CIP/version/digest/identity fails before owner; owner `ValueError` standardized; unexpected owner exception and wrong/noncanonical/foreign-request result bounded with one call; deterministic digest for fixed owner response; no repeated calls on failure; zero direct PFX/PFS/RTI/lifecycle/persistence/provider calls. Relevant regression: CIP-01 and OSC-02 focused suites plus RTI-15/16 identity/validation tests. No real provider or runtime invocation in tests.
 
-`SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW; IMPLEMENTATION NOT AUTHORIZED`
+`SPECIFICATION COMPLETE; LIMITED IMPLEMENTATION IN REVIEW`
