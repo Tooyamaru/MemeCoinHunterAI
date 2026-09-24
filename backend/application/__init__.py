@@ -1,3 +1,10 @@
+from backend.application.prevalidated_risk_capital_suffix_caller import (
+    P01_OSC_02_CONTRACT_VERSION,
+    P01Osc02Request,
+    P01Osc02Result,
+    PrevalidatedRiskCapitalSuffixCaller,
+    PrevalidatedSuffixOutcome,
+)
 from backend.application.one_shot_controlled_paper_caller import (
     P01_OSC_01_CONTRACT_VERSION,
     OneShotControlledPaperCaller,
@@ -87,6 +94,11 @@ from backend.application.market_to_opportunity_composition import (
 )
 
 __all__ = [
+    "P01_OSC_02_CONTRACT_VERSION",
+    "P01Osc02Request",
+    "P01Osc02Result",
+    "PrevalidatedRiskCapitalSuffixCaller",
+    "PrevalidatedSuffixOutcome",
     "P07_PFS_01_CONTRACT_VERSION",
     "GenesisPaperDeclaration",
     "PaperFactSourcingOutcome",

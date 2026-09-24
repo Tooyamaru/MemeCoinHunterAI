@@ -1,3 +1,21 @@
+## 2026-09-24 — P01-OSC-02 Limited Implementation Checkpoint
+
+- **STATUS:** Controller authorized the merged `p01-osc-02-v1` specification.
+  Limited implementation and focused tests are prepared; GitHub CI, merge, and
+  governance closure remain pending.
+- **IMPLEMENTATION:** One staged in-memory suffix caller accepts one exact
+  canonical RTI-14 result and explicit paper inputs, delegates only to RTI-15
+  and RTI-16 at most once each, preserves exact owner identity/results, and
+  stops at the exact RTI-16 result.
+- **CARDINALITY:** RTI-11/12/13/14 = zero calls; OSC-01/PFS/OSP = zero calls;
+  RTI-15 <= 1; RTI-16 <= 1.
+- **FAILURE SEMANTICS:** validation failures remain safe ValueError; unexpected
+  or invalid owner results become finite stage-unavailable outcomes with no
+  retry or raw exception leakage.
+- **BOUNDARY:** no provider/network, persistence/publication, RTI-03/04,
+  worker/scheduler/queue, API/dashboard, wallet/signing/RPC/DEX,
+  execution/live trading, economic realization, G2/G3/G4/P09.
+
 ## 2026-09-24 — P01-OSC-02 Prevalidated Suffix Specification
 
 - **STATUS:** SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW;
