@@ -1,8 +1,14 @@
 from datetime import datetime, timedelta, timezone
+
+import pytest
+
 from core.data.contracts import FreshnessPolicy
 from core.data.solana_oaf_source import SolanaMintSnapshot, SolanaRpcObservation
 from core.risk.safety_evidence import EligibilityStatus, SafetyDomain, SafetyStatus
-from backend.application.oaf_solana_upstream_composition import OafSolanaCanonicalComposer
+from backend.application.oaf_solana_upstream_composition import (
+    OafSolanaCanonicalComposer,
+    OafUpstreamCompositionError,
+)
 
 MINT="So11111111111111111111111111111111111111112"
 T=datetime(2026,9,25,4,0,tzinfo=timezone.utc)
@@ -29,7 +35,6 @@ def test_authority_or_concentration_failure_is_not_overridden():
     assert r.safety_evaluation.domain_results[SafetyDomain.MINT_FREEZE_AUTHORITY] is SafetyStatus.FAIL
     assert r.safety_evaluation.domain_results[SafetyDomain.TOP_HOLDER_CONCENTRATION] is SafetyStatus.FAIL
 
-def test_stale_source_becomes_unknown_not_pass():
-    r=compose(snapshot(),reference=T+timedelta(minutes=2),stale=timedelta(seconds=30))
-    assert r.eligibility.status is EligibilityStatus.UNKNOWN
-    assert all(v is SafetyStatus.UNKNOWN for v in r.safety_evaluation.domain_results.values())
+def test_stale_p02_source_fails_closed_before_p03_and_rti11():
+    with pytest.raises(OafUpstreamCompositionError, match="P02 discovery rejected"):
+        compose(snapshot(),reference=T+timedelta(minutes=2),stale=timedelta(seconds=30))
