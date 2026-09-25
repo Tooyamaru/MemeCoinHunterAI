@@ -13,6 +13,9 @@ from backend.api.operator_paper_cases import (
     router as operator_paper_cases_router,
 )
 from backend.api.paper_lifecycle_results import router as paper_lifecycle_router
+from backend.application.oaf_operator_prepare_invocation import (
+    OafOperatorPrepareInvocationService,
+)
 from backend.application.operator_paper_case_registry import OperatorPaperCaseRegistry
 from backend.application.service import ApplicationService
 from backend.core.config import get_settings
@@ -21,6 +24,7 @@ from backend.core.logging import configure_logging, get_logger
 from backend.core.request_id import RequestIdMiddleware, get_request_id
 from backend.core.runtime import RuntimeMetadata, RuntimeState
 from backend.core.safety import SafetyBoundary
+from core.data.solana_oaf_source import SolanaJsonRpcSource
 
 settings = get_settings()
 configure_logging(settings)
@@ -49,6 +53,20 @@ def create_lifespan(app_settings):
             capacity=app_settings.operator_case_registry_capacity,
             ttl=timedelta(seconds=app_settings.operator_case_ttl_seconds),
         )
+        if app_settings.solana_rpc_url:
+            solana_source = SolanaJsonRpcSource(
+                rpc_url=app_settings.solana_rpc_url,
+                timeout_seconds=app_settings.solana_rpc_timeout_seconds,
+                max_response_bytes=app_settings.solana_rpc_max_response_bytes,
+            )
+            application.state.operator_prepare_service = (
+                OafOperatorPrepareInvocationService(
+                    solana_source=solana_source,
+                    registry=application.state.operator_case_registry,
+                )
+            )
+        else:
+            application.state.operator_prepare_service = None
         logger.info(
             "application.startup",
             extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
