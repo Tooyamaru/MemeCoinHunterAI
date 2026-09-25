@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 
@@ -131,3 +132,20 @@ def test_missing_transport_receipt_fails_closed_instead_of_substituting_source_t
         match="receipt time is required separately",
     ):
         compose(source)
+
+
+def test_p02_t05_rejection_stops_before_t06(monkeypatch):
+    def reject_t05(self, result, *, processing_time, reference_time):
+        return SimpleNamespace(
+            published_as_current=False,
+            ingestion_result=None,
+            reasons=("T05_BLOCK",),
+        )
+
+    monkeypatch.setattr(
+        "backend.application.oaf_solana_upstream_composition."
+        "DiscoveryToOrchestrationBoundary.process",
+        reject_t05,
+    )
+    with pytest.raises(OafUpstreamCompositionError, match="P02 orchestration rejected: T05_BLOCK"):
+        compose(snapshot())
