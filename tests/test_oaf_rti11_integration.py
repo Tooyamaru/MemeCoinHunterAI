@@ -37,13 +37,24 @@ def _snapshot():
             }
         },
     }
+    received = T + timedelta(seconds=1)
     return SolanaMintSnapshot(
         MINT,
-        SolanaRpcObservation("getAccountInfo", 10, T, mint),
+        SolanaRpcObservation("getAccountInfo", 10, T, mint, received_at=received),
         SolanaRpcObservation(
-            "getTokenLargestAccounts", 11, T, [{"amount": "100", "decimals": 9}]
+            "getTokenLargestAccounts",
+            11,
+            T,
+            [{"amount": "100", "decimals": 9}],
+            received_at=received,
         ),
-        SolanaRpcObservation("getTokenSupply", 12, T, {"amount": "1000", "decimals": 9}),
+        SolanaRpcObservation(
+            "getTokenSupply",
+            12,
+            T,
+            {"amount": "1000", "decimals": 9},
+            received_at=received,
+        ),
     )
 
 

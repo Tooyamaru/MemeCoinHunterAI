@@ -1,6 +1,6 @@
 """Bounded Solana JSON-RPC source for the P01-OAF-01 trusted upstream path.
 
-This module is transport/evidence plumbing only.  It performs no autonomous
+This module is transport/evidence plumbing only. It performs no autonomous
 selection, polling, retry, subscription, trading, wallet, signing, or
 eligibility decision.
 """
@@ -29,6 +29,7 @@ class SolanaRpcObservation:
     slot: int
     observed_at: datetime
     result: Any
+    received_at: datetime | None = None
     source_id: str = "solana-json-rpc"
     source_version: str = SOLANA_OAF_SOURCE_VERSION
 
@@ -43,6 +44,15 @@ class SolanaRpcObservation:
             or self.observed_at.utcoffset() is None
         ):
             raise ValueError("observed_at must be timezone-aware")
+        if self.received_at is not None:
+            if (
+                not isinstance(self.received_at, datetime)
+                or self.received_at.tzinfo is None
+                or self.received_at.utcoffset() is None
+            ):
+                raise ValueError("received_at must be timezone-aware")
+            if self.received_at < self.observed_at:
+                raise ValueError("received_at cannot precede source observed_at")
 
 
 @dataclass(frozen=True)
@@ -58,6 +68,7 @@ class SolanaMintSnapshot:
 
 
 RpcCall = Callable[[str, list[Any]], Mapping[str, Any]]
+Clock = Callable[[], datetime]
 
 
 class SolanaJsonRpcSource:
@@ -70,6 +81,7 @@ class SolanaJsonRpcSource:
         timeout_seconds: float,
         max_response_bytes: int = DEFAULT_MAX_RESPONSE_BYTES,
         rpc_call: RpcCall | None = None,
+        clock: Clock | None = None,
     ) -> None:
         if not isinstance(rpc_url, str) or not rpc_url.startswith(("http://", "https://")):
             raise ValueError("rpc_url must be an HTTP(S) URL")
@@ -85,12 +97,12 @@ class SolanaJsonRpcSource:
         self._timeout_seconds = float(timeout_seconds)
         self._max_response_bytes = max_response_bytes
         self._rpc_call = rpc_call or self._http_call
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
         self._block_times: dict[int, datetime] = {}
 
     def snapshot_mint(self, token_mint: str) -> SolanaMintSnapshot:
         if not isinstance(token_mint, str) or not token_mint.strip():
             raise ValueError("token_mint is required")
-        # Exactly the three source reads authorized by the specification.
         mint = self._context_observation(
             "getAccountInfo",
             [token_mint, {"encoding": "jsonParsed", "commitment": "finalized"}],
@@ -108,6 +120,7 @@ class SolanaJsonRpcSource:
 
     def _context_observation(self, method: str, params: list[Any]) -> SolanaRpcObservation:
         payload = self._rpc_call(method, params)
+        received_at = self._utc_clock()
         result = _rpc_result(payload)
         if not isinstance(result, Mapping):
             raise SolanaSourceUnavailable("RPC_RESULT_INVALID")
@@ -118,7 +131,16 @@ class SolanaJsonRpcSource:
         if slot < 0:
             raise SolanaSourceUnavailable("RPC_CONTEXT_SLOT_INVALID")
         observed_at = self._block_time(slot)
-        return SolanaRpcObservation(method, slot, observed_at, result.get("value"))
+        try:
+            return SolanaRpcObservation(
+                method,
+                slot,
+                observed_at,
+                result.get("value"),
+                received_at=received_at,
+            )
+        except ValueError:
+            raise SolanaSourceUnavailable("RPC_RECEIPT_TIMELINE_INVALID") from None
 
     def _block_time(self, slot: int) -> datetime:
         cached = self._block_times.get(slot)
@@ -128,9 +150,22 @@ class SolanaJsonRpcSource:
         value = _rpc_result(payload)
         if type(value) not in (int, float):
             raise SolanaSourceUnavailable("RPC_BLOCK_TIME_UNAVAILABLE")
-        observed = datetime.fromtimestamp(value, tz=timezone.utc)
+        try:
+            observed = datetime.fromtimestamp(value, tz=timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            raise SolanaSourceUnavailable("RPC_BLOCK_TIME_INVALID") from None
         self._block_times[slot] = observed
         return observed
+
+    def _utc_clock(self) -> datetime:
+        value = self._clock()
+        if (
+            not isinstance(value, datetime)
+            or value.tzinfo is None
+            or value.utcoffset() is None
+        ):
+            raise SolanaSourceUnavailable("RPC_RECEIPT_TIME_INVALID")
+        return value.astimezone(timezone.utc)
 
     @staticmethod
     def _validate_mint_account(value: Any) -> None:
@@ -160,8 +195,6 @@ class SolanaJsonRpcSource:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        # urllib does not follow POST redirects as a normal successful RPC path;
-        # any HTTP/URL failure is collapsed to a bounded source error.
         try:
             with urllib_request.urlopen(req, timeout=self._timeout_seconds) as response:
                 raw = response.read(self._max_response_bytes + 1)
