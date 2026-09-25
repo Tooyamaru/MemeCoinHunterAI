@@ -39,6 +39,10 @@ P01_OAF_OPERATOR_PAPER_INTENT_VERSION = "p01-oaf-01-operator-paper-intent-v1"
 class OafOperatorPaperIntentError(ValueError):
     """Fail-closed operator paper-intent linkage error."""
 
+    def __init__(self, message: str, *, reason_codes: tuple[str, ...] = ()) -> None:
+        super().__init__(message)
+        self.reason_codes = reason_codes
+
 
 @dataclass(frozen=True)
 class OafOperatorPaperIntent:
@@ -112,7 +116,8 @@ class OafOperatorPaperIntentBuilder:
 
         if rti11_result.outcome is not MarketToOpportunityCompositionOutcome.COMPOSED:
             raise OafOperatorPaperIntentError(
-                "RTI-11 did not produce selectable historical evidence"
+                "RTI-11 did not produce selectable historical evidence",
+                reason_codes=rti11_result.reason_codes,
             )
         diagnostic = rti11_result.diagnostic
         if diagnostic is None or diagnostic.diagnostic is None:
