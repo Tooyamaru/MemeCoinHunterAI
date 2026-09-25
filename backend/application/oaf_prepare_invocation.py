@@ -47,49 +47,6 @@ class OafPrepareInvocation:
 
 
 class OafPrepareInvocationService:
-    """Run one bounded trusted prepare using one exact paper-input bundle."""
-
-    def __init__(
-        self,
-        *,
-        trusted_prepare: Any,
-        paper_factory: OafPaperRequestFactory | None = None,
-    ) -> None:
-        if not callable(getattr(trusted_prepare, "prepare", None)):
-            raise OafPrepareInvocationError("invalid trusted prepare seam")
-        self._trusted_prepare = trusted_prepare
-        self._paper_factory = paper_factory or OafPaperRequestFactory()
-
-    def prepare(self, invocation: OafPrepareInvocation) -> OafTrustedPrepareResult:
-        if not isinstance(invocation, OafPrepareInvocation):
-            raise OafPrepareInvocationError("invalid prepare invocation")
-        invocation.__post_init__()
-
-        command = invocation.command
-        paper_inputs = invocation.paper_inputs
-
-        def exact_factory(rti11_result, received_command):
-            if received_command is not command:
-                raise OafPrepareInvocationError(
-                    "trusted prepare did not preserve exact command identity"
-                )
-            return self._paper_factory.build(rti11_result, paper_inputs)
-
-        # The trusted service already owns source -> P02/P03 -> RTI-11 ->
-        # prepare -> registry. This invocation layer only binds explicit paper
-        # inputs to that one call and never invokes owners itself.
-        original_factory = getattr(self._trusted_prepare, "_factory", None)
-        if original_factory is not None:
-            raise OafPrepareInvocationError(
-                "trusted prepare service must be invocation-scoped"
-            )
-
-        raise OafPrepareInvocationError(
-            "trusted prepare service requires invocation-scoped factory binding"
-        )
-
-
-class OafPrepareInvocationServiceV1:
     """Concrete invocation service that constructs a fresh trusted service per call.
 
     The source/upstream/RTI-11/prepare owners and registry are injected once;
@@ -141,6 +98,6 @@ class OafPrepareInvocationServiceV1:
 __all__ = [
     "OafPrepareInvocation",
     "OafPrepareInvocationError",
-    "OafPrepareInvocationServiceV1",
+    "OafPrepareInvocationService",
     "P01_OAF_PREPARE_INVOCATION_VERSION",
 ]
