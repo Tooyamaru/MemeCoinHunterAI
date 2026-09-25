@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     database_url: str | None = None
     log_level: LogLevel = "INFO"
+    operator_bearer_token: str | None = None
+    operator_case_registry_capacity: int = Field(default=64, ge=1, le=4096)
+    operator_case_ttl_seconds: int = Field(default=1800, ge=1, le=86400)
 
 
 @lru_cache
