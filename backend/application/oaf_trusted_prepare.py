@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Callable
 
+from backend.application.market_to_opportunity_composition import P01Rti11CompositionResult
 from backend.application.oaf_prepare_case import (
     OafPrepareCaseRequest,
     OafPrepareCaseResult,
@@ -152,6 +153,14 @@ class OafTrustedPrepareService:
                 analytical_context={"source": "operator-facade-trusted-prepare"},
             )
         )
+
+        if not isinstance(rti11_result, P01Rti11CompositionResult):
+            raise OafTrustedPrepareError("RTI-11 integration returned noncanonical result")
+        if (
+            rti11_result.request.candidate_id != command.candidate_id
+            or rti11_result.request.target != command.target
+        ):
+            raise OafTrustedPrepareError("RTI-11 result identity mismatch")
 
         prepare_request = self._factory(rti11_result, command)
         if not isinstance(prepare_request, OafPrepareCaseRequest):
