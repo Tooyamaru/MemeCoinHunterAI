@@ -1,3 +1,9 @@
+## 2026-09-25 — P01-OAF-01 Trusted P02/P03 Owner-Path Audit (Documentation Only)
+
+- **AUDIT:** P02-T04/T05/T06 own discovery admission and current token snapshot; P03-T01/T02/T03 own source evidence, safety evaluation and eligibility derivation. RTI-11 consumes the exact paired outputs; it does not create them.
+- **GAP:** DexScreener latest profiles are NOT_ADMITTED and cannot establish current Solana P02 state; the existing GoPlus integration is EVM-only and cannot supply observed-time-backed Solana P03 safety evidence. RTI-11's downstream CoinGecko permission does not authorize an upstream provider. See OAF/HR specification §8 for owner sequence and explicit controller source/authority decision.
+- **STATUS:** Documentation-only audit; TRUSTED P02/P03 SOURCE AUTHORITY BLOCKED / CONTROLLER DECISION REQUIRED. Authenticated prepare must fail closed before RTI-11 if the required canonical upstream objects are absent. No OAF implementation, provider call or operational paper experiment. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-09-25 — Operator Facade Trusted Intake and Access Amendment
 
 - **CONTROLLER DECISION:** One explicitly requested authenticated prepare may use the existing RTI-11 → controlled exact-pool CoinGecko diagnostic once after canonical P02/P03 prerequisite validation. No polling, retry, autonomous selection or provider call at review/run/persist.
