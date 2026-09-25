@@ -1,12 +1,19 @@
 """FastAPI application entrypoint for the P01 foundation."""
 
 from contextlib import asynccontextmanager
+from datetime import timedelta
 from typing import AsyncIterator
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from backend.api.operator_paper_cases import (
+    OperatorHttpError,
+    operator_http_error_handler,
+    router as operator_paper_cases_router,
+)
 from backend.api.paper_lifecycle_results import router as paper_lifecycle_router
+from backend.application.operator_paper_case_registry import OperatorPaperCaseRegistry
 from backend.application.service import ApplicationService
 from backend.core.config import get_settings
 from backend.core.database import DatabaseRuntime
@@ -37,6 +44,11 @@ def create_lifespan(app_settings):
         application.state.database = database
         application.state.safety = safety
         application.state.service = service
+        application.state.operator_bearer_token = app_settings.operator_bearer_token
+        application.state.operator_case_registry = OperatorPaperCaseRegistry(
+            capacity=app_settings.operator_case_registry_capacity,
+            ttl=timedelta(seconds=app_settings.operator_case_ttl_seconds),
+        )
         logger.info(
             "application.startup",
             extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
@@ -66,6 +78,7 @@ def create_app(app_settings=None) -> FastAPI:
         lifespan=create_lifespan(active_settings),
     )
     application.add_middleware(RequestIdMiddleware)
+    application.add_exception_handler(OperatorHttpError, operator_http_error_handler)
 
     @application.exception_handler(Exception)
     async def internal_error(request: Request, exc: Exception) -> JSONResponse:
@@ -90,6 +103,7 @@ def create_app(app_settings=None) -> FastAPI:
         )
 
     application.include_router(paper_lifecycle_router)
+    application.include_router(operator_paper_cases_router)
 
     @application.get("/health", tags=["runtime"])
     def health() -> dict[str, str]:
