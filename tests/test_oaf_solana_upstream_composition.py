@@ -94,8 +94,9 @@ def test_p02_provenance_keeps_ledger_source_time_distinct_from_receipt_time():
     assert provenance.discovery_time == T
     assert provenance.received_time == RECEIVED
     assert provenance.observation_time == RECEIVED
-    assert provenance.source_metadata["rpc_method"] == "getAccountInfo"
-    assert provenance.source_metadata["slot"] == 10
+    assert provenance.source_metadata["raw_event"]["rpc_method"] == "getAccountInfo"
+    assert provenance.source_metadata["raw_event"]["slot"] == 10
+    assert provenance.source_metadata["adapter"]["adapter_contract_version"] == "p02-t03-v1"
 
 
 def test_authority_or_concentration_failure_is_not_overridden():
