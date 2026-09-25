@@ -52,13 +52,14 @@ def _inputs(rti11):
 def test_factory_builds_exact_pfx_and_pfs_around_same_rti11_object():
     base = _request_pfs()
     rti11 = base.rti11_result
-    request = OafPaperRequestFactory().build(rti11, _inputs(rti11))
+    inputs = _inputs(rti11)
+    request = OafPaperRequestFactory().build(rti11, inputs)
 
     assert request.rti11_result is rti11
     assert request.pfx_request.rti11_result is rti11
     assert request.pfs_request.rti11_result is rti11
     assert request.pfx_request.decision_ruleset is not None
-    assert request.pfs_request.execution_observation is _inputs(rti11).execution_observation
+    assert request.pfs_request.execution_observation is inputs.execution_observation
     assert request.invocation_id == "oaf:cip:factory"
 
 
