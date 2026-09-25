@@ -125,7 +125,7 @@ def _error(status_code: int, code: str, message: str) -> JSONResponse:
     request_id = get_request_id()
     return JSONResponse(
         status_code=status_code,
-        headers={**NO_STORE_HEADERS, "X-Request-ID": request_id},
+        headers=NO_STORE_HEADERS,
         content={"error": {"code": code, "message": message, "request_id": request_id}},
     )
 
