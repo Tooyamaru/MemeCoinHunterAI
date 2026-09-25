@@ -1,3 +1,10 @@
+## 2026-09-25 — Operator Facade Trusted Intake and Access Amendment
+
+- **CONTROLLER DECISION:** One explicitly requested authenticated prepare may use the existing RTI-11 → controlled exact-pool CoinGecko diagnostic once after canonical P02/P03 prerequisite validation. No polling, retry, autonomous selection or provider call at review/run/persist.
+- **ACCESS:** Single-controller server-secret bearer authentication and separate mutation authorization; handle is only a case locator. Missing configuration fails closed before lookup/owner calls. No cookie session or third-party identity service; cross-origin requests require explicit allowlist and public transport requires TLS.
+- **PROVENANCE:** Browser cannot supply preconstructed RTI-11/internal digest as trusted evidence. Exact P02 predecessor and paired P03 evaluation/eligibility must be server-held canonical owner outputs or validated underlying evidence before invoking provider. Existing RTI-03 exact lifecycle handoff and readback boundaries remain separate.
+- **STATUS:** Documentation-only amendment SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW. Operator facade implementation, provider call, operational paper experiment, frontend and economic authority are NOT AUTHORIZED. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-09-24 — Operator Application Facade and Hunter Room Foundation Specification
 
 - **DECISION:** Accept Post-OCI B — READY WITH SMALL GAP. Architecture specification proposes P01-OAF-01 (operator API/application facade) followed by HR-FND-01 (responsive functional Hunter Room); advanced visual art later.
