@@ -18,6 +18,7 @@ from core.data.solana_oaf_source import SolanaMintSnapshot, SolanaRpcObservation
 
 MINT = "So11111111111111111111111111111111111111112"
 OTHER = "11111111111111111111111111111111"
+POOL = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 T = datetime(2026, 9, 25, 6, 0, tzinfo=timezone.utc)
 FRESHNESS = FreshnessPolicy(stale_after=timedelta(minutes=5))
 
@@ -63,9 +64,9 @@ def _target(token=MINT):
     return ExactPoolDiagnosticTarget(
         chain_id="solana",
         token_mint=token,
-        pool_address="pool-address-1",
+        pool_address=POOL,
         base_mint=token,
-        quote_mint="So11111111111111111111111111111111111111112",
+        quote_mint=OTHER,
         target_reference_id="caller:exact-pool:1",
         target_reference_digest="a" * 64,
         target_contract_version="exact-pool-target-v1",
