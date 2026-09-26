@@ -24,7 +24,7 @@ secret storage.
 
 The current HR-FND-01 functional preview lives at
 `artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx` and is
-rendered by the mockup sandbox at `/preview/HunterRoom`. Its bearer token is
+rendered by the mockup sandbox at `/__mockup/preview/HunterRoom` in the managed Replit artifact (or `/preview/HunterRoom` when the sandbox is served at `/`). Its bearer token is
 held only in component memory. For an action-capable deployment, serve the
 Hunter Room through a trusted same-origin/reverse-proxy arrangement or another
 explicitly reviewed transport boundary; do not weaken operator authentication
