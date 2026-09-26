@@ -17,10 +17,19 @@ from threading import RLock
 from typing import Callable
 
 from backend.application.oaf_prepare_case import OafPrepareCaseResult
-from backend.application.prepared_paper_case_invocation import P01Oci01Result
+from backend.application.prepared_paper_case_invocation import (
+    P01Oci01Result,
+    PreparedPaperInvocationOutcome,
+)
+from backend.application.paper_lifecycle_persistence import (
+    PaperLifecyclePersistenceResult,
+)
+from backend.application.prevalidated_risk_capital_suffix_caller import (
+    PrevalidatedSuffixOutcome,
+)
 
 
-P01_OAF_CASE_REGISTRY_VERSION = "p01-oaf-01-case-registry-v2"
+P01_OAF_CASE_REGISTRY_VERSION = "p01-oaf-01-case-registry-v3"
 
 
 class OperatorPaperCaseState(StrEnum):
@@ -30,6 +39,9 @@ class OperatorPaperCaseState(StrEnum):
     RUN_CLAIMED = "RUN_CLAIMED"
     RUN_TERMINAL = "RUN_TERMINAL"
     RUN_OUTCOME_UNKNOWN = "RUN_OUTCOME_UNKNOWN"
+    PERSIST_CLAIMED = "PERSIST_CLAIMED"
+    PERSIST_TERMINAL = "PERSIST_TERMINAL"
+    PERSIST_OUTCOME_UNKNOWN = "PERSIST_OUTCOME_UNKNOWN"
 
 
 class OperatorPaperCaseRegistryError(RuntimeError):
@@ -49,6 +61,7 @@ class OperatorPaperCaseRecord:
     created_at: datetime
     expires_at: datetime
     oci_result: P01Oci01Result | None = None
+    persistence_result: PaperLifecyclePersistenceResult | None = None
     contract_version: str = P01_OAF_CASE_REGISTRY_VERSION
 
     def __post_init__(self) -> None:
@@ -68,13 +81,32 @@ class OperatorPaperCaseRecord:
                 raise ValueError(f"{name} must be timezone-aware")
         if self.expires_at <= self.created_at:
             raise ValueError("expires_at must be after created_at")
-        if self.state is OperatorPaperCaseState.RUN_TERMINAL:
+        states_with_oci = {
+            OperatorPaperCaseState.RUN_TERMINAL,
+            OperatorPaperCaseState.PERSIST_CLAIMED,
+            OperatorPaperCaseState.PERSIST_TERMINAL,
+            OperatorPaperCaseState.PERSIST_OUTCOME_UNKNOWN,
+        }
+        if self.state in states_with_oci:
             if not isinstance(self.oci_result, P01Oci01Result):
-                raise ValueError("RUN_TERMINAL requires exact OCI result")
+                raise ValueError("terminal/persist states require exact OCI result")
             if self.oci_result.request.cip_result is not self.prepared.cip_result:
                 raise ValueError("OCI result must retain exact prepared CIP identity")
         elif self.oci_result is not None:
-            raise ValueError("OCI result is only retained for RUN_TERMINAL")
+            raise ValueError("OCI result is only retained after terminal run")
+        if self.state is OperatorPaperCaseState.PERSIST_TERMINAL:
+            if not isinstance(self.persistence_result, PaperLifecyclePersistenceResult):
+                raise ValueError("PERSIST_TERMINAL requires exact RTI-03 result")
+            lifecycle = _persistable_lifecycle(self.oci_result)
+            if lifecycle is None:
+                raise ValueError("persist terminal requires exact lifecycle")
+            if self.persistence_result.lifecycle_result_digest not in (
+                None,
+                lifecycle.digest,
+            ):
+                raise ValueError("RTI-03 result does not match exact lifecycle")
+        elif self.persistence_result is not None:
+            raise ValueError("RTI-03 result is only retained for PERSIST_TERMINAL")
 
 
 class OperatorPaperCaseRegistry:
@@ -202,6 +234,105 @@ class OperatorPaperCaseRegistry:
             self._records[handle] = unknown
             return unknown
 
+    def claim_persist(
+        self,
+        handle: str,
+        *,
+        case_digest: str,
+        oci_digest: str,
+        osc_digest: str,
+        lifecycle_result_digest: str,
+    ) -> OperatorPaperCaseRecord:
+        """Atomically claim one lifecycle-bearing terminal run for RTI-03."""
+
+        for value, code in (
+            (case_digest, "CASE_DIGEST_MISMATCH"),
+            (oci_digest, "OCI_DIGEST_MISMATCH"),
+            (osc_digest, "OSC_DIGEST_MISMATCH"),
+            (lifecycle_result_digest, "LIFECYCLE_DIGEST_MISMATCH"),
+        ):
+            if not isinstance(value, str) or len(value) != 64:
+                raise OperatorPaperCaseRegistryError(code)
+        with self._lock:
+            now = self._utc(self._clock())
+            record = self._records.get(handle)
+            if record is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.expires_at <= now:
+                del self._records[handle]
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.case_digest != case_digest:
+                raise OperatorPaperCaseRegistryError("CASE_DIGEST_MISMATCH")
+            if record.state is not OperatorPaperCaseState.RUN_TERMINAL:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_PERSISTABLE")
+            oci = record.oci_result
+            lifecycle = _persistable_lifecycle(oci)
+            if oci is None or oci.result_digest != oci_digest:
+                raise OperatorPaperCaseRegistryError("OCI_DIGEST_MISMATCH")
+            osc = oci.osc02_result
+            if osc is None or osc.result_digest != osc_digest:
+                raise OperatorPaperCaseRegistryError("OSC_DIGEST_MISMATCH")
+            if lifecycle is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_PERSISTABLE")
+            if lifecycle.digest != lifecycle_result_digest:
+                raise OperatorPaperCaseRegistryError("LIFECYCLE_DIGEST_MISMATCH")
+            claimed = replace(
+                record,
+                state=OperatorPaperCaseState.PERSIST_CLAIMED,
+            )
+            self._records[handle] = claimed
+            return claimed
+
+    def complete_persist(
+        self,
+        handle: str,
+        *,
+        persistence_result: PaperLifecyclePersistenceResult,
+    ) -> OperatorPaperCaseRecord:
+        """Retain one exact RTI-03 terminal result for the claimed lifecycle."""
+
+        if not isinstance(persistence_result, PaperLifecyclePersistenceResult):
+            raise OperatorPaperCaseRegistryError("PERSIST_RESULT_INVALID")
+        with self._lock:
+            record = self._records.get(handle)
+            if record is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.state is not OperatorPaperCaseState.PERSIST_CLAIMED:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_PERSIST_CLAIMED")
+            lifecycle = _persistable_lifecycle(record.oci_result)
+            if lifecycle is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_PERSISTABLE")
+            if persistence_result.lifecycle_result_digest not in (
+                None,
+                lifecycle.digest,
+            ):
+                raise OperatorPaperCaseRegistryError(
+                    "PERSIST_RESULT_IDENTITY_MISMATCH"
+                )
+            completed = replace(
+                record,
+                state=OperatorPaperCaseState.PERSIST_TERMINAL,
+                persistence_result=persistence_result,
+            )
+            self._records[handle] = completed
+            return completed
+
+    def mark_persist_unknown(self, handle: str) -> OperatorPaperCaseRecord:
+        """Make an uncertain RTI-03 call terminally non-retryable."""
+
+        with self._lock:
+            record = self._records.get(handle)
+            if record is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.state is not OperatorPaperCaseState.PERSIST_CLAIMED:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_PERSIST_CLAIMED")
+            unknown = replace(
+                record,
+                state=OperatorPaperCaseState.PERSIST_OUTCOME_UNKNOWN,
+            )
+            self._records[handle] = unknown
+            return unknown
+
     def remove(self, handle: str) -> bool:
         if not isinstance(handle, str) or not handle:
             return False
@@ -232,6 +363,17 @@ class OperatorPaperCaseRegistry:
         if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
             raise ValueError("clock must return timezone-aware datetime")
         return value.astimezone(timezone.utc)
+
+
+def _persistable_lifecycle(oci_result: P01Oci01Result | None):
+    if (
+        not isinstance(oci_result, P01Oci01Result)
+        or oci_result.outcome is not PreparedPaperInvocationOutcome.OSC_RESULT_RETURNED
+        or oci_result.osc02_result is None
+        or oci_result.osc02_result.outcome is not PrevalidatedSuffixOutcome.LIFECYCLE_RETURNED
+    ):
+        return None
+    return oci_result.osc02_result.lifecycle_result
 
 
 def _state_for(prepared: OafPrepareCaseResult) -> OperatorPaperCaseState:

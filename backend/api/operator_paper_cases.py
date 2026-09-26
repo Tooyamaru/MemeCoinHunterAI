@@ -16,6 +16,9 @@ from backend.api.operator_prepare_transport import (
     decode_operator_prepare_request,
 )
 from backend.application.oaf_operator_paper_intent import OafOperatorPaperIntentError
+from backend.application.operator_paper_case_persist import (
+    OperatorPaperPersistOutcome,
+)
 from backend.application.operator_paper_case_registry import (
     OperatorPaperCaseRecord,
     OperatorPaperCaseRegistry,
@@ -28,6 +31,31 @@ from core.data.solana_oaf_source import SolanaSourceUnavailable
 
 
 NO_STORE_HEADERS = {"Cache-Control": "no-store"}
+
+
+class OperatorPersistRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    case_digest: str
+    oci_digest: str
+    osc_digest: str
+    lifecycle_result_digest: str
+    confirm_persist: bool
+
+
+class OperatorPersistResponse(BaseModel):
+    contract_version: str
+    handle: str
+    case_digest: str
+    state: str
+    outcome: str
+    reason_codes: list[str]
+    persistence_outcome: str | None
+    persistence_digest: str | None
+    lifecycle_result_digest: str | None
+    artifact_count: int | None
+    readback_path: str | None
+    simulation_only: bool = True
 
 
 class OperatorRunRequest(BaseModel):
@@ -70,6 +98,15 @@ class OperatorCaseReviewResponse(BaseModel):
     pfs_outcome: str
     cip_outcome: str
     cip_digest: str
+    oci_outcome: str | None
+    oci_digest: str | None
+    osc_outcome: str | None
+    osc_digest: str | None
+    lifecycle_result_digest: str | None
+    persistence_outcome: str | None
+    persistence_digest: str | None
+    persistence_artifact_count: int | None
+    readback_path: str | None
     simulation_only: bool
     source_label: str
 
@@ -276,6 +313,93 @@ async def run_operator_case(
     )
 
 
+@router.post(
+    "/{handle}/persist",
+    dependencies=[Depends(authorize_operator)],
+)
+async def persist_operator_case(
+    handle: str,
+    payload: OperatorPersistRequest,
+    request: Request,
+) -> JSONResponse:
+    if payload.confirm_persist is not True:
+        return _error(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "operator_persist_confirmation_required",
+            "Explicit persistence confirmation is required",
+        )
+    service = getattr(request.app.state, "operator_persist_service", None)
+    if service is None:
+        return _error(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "operator_persist_unavailable",
+            "Operator persistence service is unavailable",
+        )
+
+    result = await service.persist_once(
+        handle=handle,
+        case_digest=payload.case_digest,
+        oci_digest=payload.oci_digest,
+        osc_digest=payload.osc_digest,
+        lifecycle_result_digest=payload.lifecycle_result_digest,
+    )
+    if result.outcome is OperatorPaperPersistOutcome.CASE_NOT_FOUND:
+        return _error(
+            status.HTTP_404_NOT_FOUND,
+            "operator_case_not_found",
+            "Prepared paper case was not found or has expired",
+        )
+    conflict_codes = {
+        OperatorPaperPersistOutcome.CASE_DIGEST_MISMATCH: "operator_case_digest_mismatch",
+        OperatorPaperPersistOutcome.OCI_DIGEST_MISMATCH: "operator_oci_digest_mismatch",
+        OperatorPaperPersistOutcome.OSC_DIGEST_MISMATCH: "operator_osc_digest_mismatch",
+        OperatorPaperPersistOutcome.LIFECYCLE_DIGEST_MISMATCH: "operator_lifecycle_digest_mismatch",
+        OperatorPaperPersistOutcome.CASE_NOT_PERSISTABLE: "operator_case_not_persistable",
+    }
+    if result.outcome in conflict_codes:
+        return _error(
+            status.HTTP_409_CONFLICT,
+            conflict_codes[result.outcome],
+            "Prepared paper case does not satisfy the persistence precondition",
+        )
+
+    record = result.record
+    if record is None:
+        return _error(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "operator_persist_unavailable",
+            "Operator persistence result is unavailable",
+        )
+    owner = record.persistence_result
+    lifecycle_digest = (
+        owner.lifecycle_result_digest
+        if owner is not None and owner.lifecycle_result_digest is not None
+        else payload.lifecycle_result_digest
+    )
+    response = OperatorPersistResponse(
+        contract_version=result.contract_version,
+        handle=record.handle,
+        case_digest=record.case_digest,
+        state=record.state.value,
+        outcome=result.outcome.value,
+        reason_codes=list(result.reason_codes),
+        persistence_outcome=owner.outcome.value if owner is not None else None,
+        persistence_digest=owner.result_digest if owner is not None else None,
+        lifecycle_result_digest=lifecycle_digest,
+        artifact_count=owner.artifact_count if owner is not None else None,
+        readback_path=(
+            f"/api/v1/paper-lifecycle-results/{lifecycle_digest}"
+            if lifecycle_digest is not None
+            else None
+        ),
+    )
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        headers=NO_STORE_HEADERS,
+        content=response.model_dump(mode="json"),
+    )
+
+
 @router.get(
     "/{handle}",
     response_model=OperatorCaseReviewResponse,
@@ -304,6 +428,15 @@ def _project(record: OperatorPaperCaseRecord) -> OperatorCaseReviewResponse:
     prepared = record.prepared
     rti11 = prepared.request.rti11_result
     target = rti11.request.target
+    oci = record.oci_result
+    osc = oci.osc02_result if oci is not None else None
+    lifecycle = osc.lifecycle_result if osc is not None else None
+    persistence = record.persistence_result
+    lifecycle_digest = (
+        persistence.lifecycle_result_digest
+        if persistence is not None and persistence.lifecycle_result_digest is not None
+        else (lifecycle.digest if lifecycle is not None else None)
+    )
     return OperatorCaseReviewResponse(
         contract_version=record.contract_version,
         handle=record.handle,
@@ -320,6 +453,19 @@ def _project(record: OperatorPaperCaseRecord) -> OperatorCaseReviewResponse:
         pfs_outcome=prepared.pfs_result.outcome.value,
         cip_outcome=prepared.cip_result.outcome.value,
         cip_digest=prepared.cip_result.result_digest,
+        oci_outcome=oci.outcome.value if oci is not None else None,
+        oci_digest=oci.result_digest if oci is not None else None,
+        osc_outcome=osc.outcome.value if osc is not None else None,
+        osc_digest=osc.result_digest if osc is not None else None,
+        lifecycle_result_digest=lifecycle_digest,
+        persistence_outcome=persistence.outcome.value if persistence is not None else None,
+        persistence_digest=persistence.result_digest if persistence is not None else None,
+        persistence_artifact_count=persistence.artifact_count if persistence is not None else None,
+        readback_path=(
+            f"/api/v1/paper-lifecycle-results/{lifecycle_digest}"
+            if lifecycle_digest is not None
+            else None
+        ),
         simulation_only=True,
         source_label="historical_price_proxy_and_explicit_simulation_assumptions",
     )
@@ -345,9 +491,12 @@ async def operator_http_error_handler(_request: Request, exc: OperatorHttpError)
 
 __all__ = [
     "OperatorCaseReviewResponse",
+    "OperatorPersistRequest",
+    "OperatorPersistResponse",
     "OperatorRunRequest",
     "OperatorRunResponse",
     "prepare_operator_case",
+    "persist_operator_case",
     "run_operator_case",
     "OperatorHttpError",
     "authorize_operator",
