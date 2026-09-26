@@ -7,38 +7,17 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** P08 — Outcome Learning
-- **Current governed task:** P08 — G2 Realization / Settlement Endpoint Boundary
-- **Governed task status:** DISCOVERY COMPLETE / BLOCKED / UNRESOLVED / NOT AUTHORIZED
-- **Current integration priority:** P01-OSP-01 and P01-OSC-01 COMPLETE / CLOSED /
-  CI PASS. P07-PFS-01 COMPLETE / CLOSED / CI PASS. Controller selected the
-  prevalidated-lineage architecture (Direction B) for the post-PFS controlled
-  input path. P01-OSC-02 — Prevalidated Risk/Capital Suffix One-Shot Paper
-  Caller — is COMPLETE / CLOSED / CI PASS. Post-OSC-02 bounded successor
-  review selected P01-PFX-01 — Deterministic Prevalidated Decision/Risk-Capital
-  Prefix Preparation. P01-PFX-01 is COMPLETE / CLOSED / CI PASS after
-  implementation PR #61, GitHub Actions #191, and separate governance closure.
-  The controller selected P01-CIP-01 as the zero-delegation controlled
-  input preparer from exact PFX/PFS results to one OSC-02 request.
-  Its specification and bounded implementation are COMPLETE / CLOSED / CI PASS.
-  Implementation PR #65 merged at `1916339`; CI #206 passed (1,691 Python
-  tests, whitespace, TypeScript typechecks, workspace builds). Post-CIP-01
-  bounded review selected P01-OCI-01: explicit prepared-case handoff to the
-  existing OSC-02 owner, at most once, preserving the exact OSC result.
-  P01-OCI-01 specification and bounded implementation are COMPLETE / CLOSED /
-  CI PASS. Implementation PR #68 merged at `c041e0e`; CI #219 passed (1,701
-  Python tests, whitespace, TypeScript typechecks and workspace builds).
-  Operational paper invocation and any successor remain NOT AUTHORIZED.
-- **Integration priority status:** P01-RTI-10 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-11 COMPLETE / CLOSED / CI PASS; P01-RTI-12 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-13 COMPLETE / CLOSED / CI PASS; P01-RTI-14 COMPLETE / CLOSED / CI PASS;
-  P01-RTI-15 COMPLETE / CLOSED / CI PASS; P01-RTI-16 COMPLETE / CLOSED / CI PASS
+- **Current phase:** P01-OAF-01 / HR-FND-01 controlled-paper operator integration, while P08 G2 remains separately blocked
+- **Current governed task:** Operator Facade run/persist completion, Hunter Room functional foundation, and governance reconciliation
+- **Governed task status:** IMPLEMENTATION ACTIVE / CONTROLLED PAPER ONLY; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED
+- **Current integration priority:** The canonical domain and integration owners through P01-RTI-16, P07-PFS-01, P01-PFX-01, P01-CIP-01 and P01-OCI-01 remain COMPLETE / CLOSED / CI PASS. P01-OAF-01 has progressed from architecture into bounded implementation: trusted Solana upstream composition, RTI-11 integration, prepare-case composition, bearer access, temporary exact-object registry, authenticated prepare/review transport, and atomic run-once foundation are merged through PR #85. The current stacked completion chain adds authenticated run transport (#86), exact lifecycle→RTI-03 persist-once handoff/transport (#87), and the HR-FND-01 functional Hunter Room preview (#88), each remaining subject to CI and merge until recorded otherwise. No scheduler, automatic retry, wallet, signing, broadcast, DEX execution or economic settlement is opened.
+- **Integration priority status:** P01-RTI-10 through P01-RTI-16 COMPLETE / CLOSED / CI PASS; P01-OAF-01 prepare/review and run-once foundation MERGED / CI PASS through PR #85; run API / persistence / Hunter Room completion chain IN REVIEW; P08 G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED
 - **Workflow baseline:** hybrid GitHub + ChatGPT/Codex + Replit workflow and CI
   merged to `main` at `71e0dea`; local verification and GitHub Actions passed
-- **Operator/dashboard architecture checkpoint:** Post-OCI controller accepted READY WITH SMALL GAP. `docs/OPERATOR-APPLICATION-FACADE-HUNTER-ROOM-FOUNDATION-SPECIFICATION.md` specifies proposed P01-OAF-01 operator facade and HR-FND-01 functional Hunter Room as separate implementation milestones. Exact CIP/OCI case object identity requires a bounded process-local server registry; the RTI-11 trusted controlled-input intake and separate OSC-02 lifecycle → RTI-03 handoff remain explicit implementation dependencies. This checkpoint is SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW; operational paper invocation, facade/dashboard implementation and provider access are NOT AUTHORIZED. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
-- **Operator facade controller amendment:** The controller selected server-side bounded one-shot RTI-11 diagnostic on explicit authenticated prepare, conditional on canonical P02 current-token predecessor and paired P03 safety/eligibility provenance. Existing CoinGecko exact-pool owner/transport alone may be delegated once; no poll/retry. Operator mutation/case-review access is specified as fail-closed single-controller bearer authentication plus explicit mutation authorization, without public unauthenticated routes. Opaque handles are not credentials. Amendment is SPECIFICATION COMPLETE / READY FOR CONTROLLER REVIEW; facade, frontend, provider invocation and operational paper experiment implementation remain NOT AUTHORIZED. See `docs/OPERATOR-APPLICATION-FACADE-HUNTER-ROOM-FOUNDATION-SPECIFICATION.md` §7. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
-- **P01-OAF-01 trusted upstream owner-path audit (2026-09-25):** P02-T03/T04/T05/T06 and P03-T01/T02/T03 transformations exist, but no authorized admitted Solana discovery/current-universe source or exact paired Solana safety evidence owner is established for a bounded authenticated prepare. DexScreener latest candidate listings remain NOT_ADMITTED; the existing GoPlus adapter is EVM-only and has no source observation timestamp for positive safety evidence. RTI-11's CoinGecko one-shot authority does not extend upstream. See OAF/HR specification §8 for exact conditional owner path and controller decision on source, provenance, continuity, freshness and bounds. TRUSTED P02/P03 SOURCE AUTHORITY BLOCKED / CONTROLLER DECISION REQUIRED; no facade/provider/paper runtime authorized by this audit. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
-- **Last updated:** 2026-09-25
+- **Operator/dashboard architecture checkpoint:** P01-OAF-01 bounded implementation is active under controller authorization. The exact-object process-local registry, authenticated trusted prepare/review path and atomic one-shot run foundation are implemented; run transport, explicit RTI-03 persistence handoff and HR-FND-01 functional Hunter Room are in the current completion chain. The registry remains finite/process-local and does not claim cross-process or restart-safe exactly-once semantics.
+- **Operator facade controller amendment:** The selected server-side bounded one-shot RTI-11 diagnostic and fail-closed single-controller bearer model are now implemented for the controlled-paper facade. Opaque handles remain locators, not credentials; prepare is explicit and bounded, review makes no provider call, and run/persist are explicit one-shot actions with no automatic retry.
+- **P01-OAF-01 trusted upstream resolution:** The §8 audit blocker was subsequently resolved by the controller-selected bounded Solana JSON-RPC source authority. The implementation retains finalized ledger time separately from RPC receipt time, verifies the selected SPL mint, routes exact current-token membership through P02-T03/T04/T05/T06, derives paired P03 evidence/evaluation/eligibility, then permits at most one RTI-11 exact-pool diagnostic. DexScreener listing and the older EVM GoPlus surface remain non-authoritative for this trusted Solana path.
+- **Last updated:** 2026-09-26
 
 ## Master progress
 
@@ -102,11 +81,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Phase status
 
 - **Done:** P00 governance map, architecture boundaries, continuation rules, safety and testing principles; P01-T01 technical baseline and minimal runtime; P01-T02 runtime and configuration foundation; P01-T03 persistence foundation; P01-T04 application service and worker foundation; P01-T05 application service and worker extensions; P02-T01 provider-neutral data ingestion and normalization contract; P02-T02 provider-neutral ingestion orchestration and source health boundary; P02-T03 provider-neutral source adapter contract; P02-T04 provider-neutral token universe / discovery contract; P02-T05 discovery-to-orchestration integration boundary; P02-T06 provider-neutral token-universe state / materialization boundary; P02-T07 provider-neutral token-scoped market observation evidence contract; P02-T08 provider-neutral market state materialization boundary; P02-T09 provider-neutral market intelligence boundary — FINAL; P03-T01 token safety evidence and eligibility contract — IMPLEMENTED / AUDITED / PASS WITH NON-BLOCKING OBSERVATIONS / TECHNICALLY COMPLETE; P03-T02 safety evaluation boundary — IMPLEMENTED / CORRECTIVE FIX COMPLETED / AUDITED / VERIFIED / FORMALLY CLOSED; P03-T03 token safety eligibility derivation — IMPLEMENTED / AUDITED / VERIFIED / FORMALLY CLOSED; P04-T01 Signal Evidence Contract — COMPLETE; P04-T02 Signal Evidence Normalization — COMPLETE; P04-T03 Signal Evidence Quality — COMPLETE; P04-T04 Signal Evidence Evaluation — COMPLETE; P04-T05 Signal Evidence Aggregation — COMPLETE / CLOSED; P04-T06 Signal Evidence Snapshot Contract — COMPLETE / CLOSED / AUDITED PASS; P04-T07 Signal Evidence Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P04-T08 Python Environment Stabilization — COMPLETE / CLOSED; P04-T09 Feature Calculation Snapshot Boundary — COMPLETE / CLOSED; P04-T10 Feature Snapshot History Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T01 Candidate Boundary — COMPLETE; P05-T02 Normalization / Evidence Contract — COMPLETE; P05-T03 Opportunity Hard-Risk and Disqualification Boundary — COMPLETE / CLOSED / AUDITED PASS; P05-T04 Per-Candidate Feature and Quality Evaluation — COMPLETE / CLOSED / AUDITED PASS WITH NON-BLOCKING OBSERVATIONS; P05-T05 Per-Candidate Opportunity Score (Fast Pre-Score) — COMPLETE / CLOSED / AUDITED PASS
-- **In progress:** No further P04-LME-03 implementation is authorized; no
-  scheduler, application wiring, wallet, or trading runtime is active
-- **Blocked:** G2 realization/settlement endpoint and authoritative provider/source owner decision unresolved
-- **On hold:** None
-- **Not started:** P06 runtime; later P08 tasks; P09–P12
+- **In progress:** P01-OAF-01 controlled-paper operator completion and HR-FND-01 functional Hunter Room reconciliation. No scheduler, autonomous hunting loop, wallet, signing, broadcast, DEX execution, or live/economic trading runtime is active.
+- **Blocked:** P08 G2 realization/settlement authority remains unresolved and unauthorized.
+- **On hold:** Production Hunter Room packaging/deployment beyond the functional preview is deferred until the operator transport chain is merged and verified.
+- **Not started:** P09–P12 live/execution/production phases remain outside the current authority.
 
 ## Current objective
 
@@ -860,6 +838,16 @@ functionality was introduced.
 - `pyproject.toml`
 - `uv.lock`
 - `backend/api/main.py`
+- `backend/api/operator_paper_cases.py`
+- `backend/api/operator_prepare_transport.py`
+- `backend/application/oaf_trusted_prepare.py`
+- `backend/application/oaf_operator_prepare_invocation.py`
+- `backend/application/operator_paper_case_registry.py`
+- `backend/application/operator_paper_case_run.py`
+- `backend/application/operator_paper_case_persist.py`
+- `core/data/solana_oaf_source.py`
+- `docs/OPERATOR-APPLICATION-FACADE-HUNTER-ROOM-FOUNDATION-SPECIFICATION.md`
+- `artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx`
 - `backend/api/paper_lifecycle_results.py`
 - `backend/core/config.py`
 - `backend/core/logging.py`
@@ -892,7 +880,7 @@ functionality was introduced.
 
 - Do not scan the full repository.
 - Later implementation phases must not begin without explicit approval and review of the applicable architecture baseline.
-- Do not implement Solana, DEX, wallet, AI/ML, signals, paper trading, execution, Railway, Redis, or a full dashboard before their planned phases.
+- Do not broaden the current controlled-paper Operator Facade into autonomous hunting, continuous provider polling, wallet/signing, DEX routing, live/economic execution, settlement, G2/G3/G4/P09, Railway/Redis production topology, or unrelated phase work without a new explicit gate. The bounded Solana read-only prepare source, paper simulation, and HR-FND-01 functional preview described above are already within the authorized scope.
 
 ## Known issues
 

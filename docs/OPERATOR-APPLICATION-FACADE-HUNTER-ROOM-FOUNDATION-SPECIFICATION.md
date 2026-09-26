@@ -125,3 +125,51 @@ The RTI-11 request itself retains the exact predecessor and paired P03 objects, 
 Until that decision, an authenticated prepare lacking either exact upstream object fails closed **before** RTI-11/diagnostic/GET, creates no review-ready case, and performs no hidden discovery, GoPlus request, retry, polling, background work or follow-up source call. A timeout, unsupported chain, stale/conflicting evidence, absent owner state, or unverified provenance likewise yields bounded safe STOP without synthetic safety/eligibility or forged P02 membership. Retain the §7 bearer/authorization gate before lookup and any mutation; opaque handles never grant access.
 
 **Gate:** TRUSTED P02/P03 SOURCE AUTHORITY BLOCKED / CONTROLLER DECISION REQUIRED. This documentation checkpoint is ready for controller review of the *gap*, not a claim that OAF-01 is ready for runtime activation. HR-FND-01 remains outside this cycle. G2 is BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 are NOT AUTHORIZED. No provider call, paper experiment, wallet/signing, RPC/DEX, economic realization, autonomous hunting or live trading is authorized by this amendment.
+
+
+## 9. Implementation reconciliation — controlled paper operator path (2026-09-26)
+
+Sections 1–8 above are retained as the design-time and decision history. Their
+"future", "not implemented", and STOP statements describe the authority state
+at the time those amendments were written; they are not a current inventory of
+merged code.
+
+The controller subsequently authorized the bounded controlled-paper
+implementation sequence while keeping G2/G3/G4/P09 closed. The implemented
+path now preserves the design invariants above:
+
+- trusted authenticated prepare uses the bounded Solana JSON-RPC snapshot
+  authority selected after the §8 blocker review, keeps ledger source time
+  separate from RPC receipt time, and routes current membership through
+  P02-T03/T04/T05/T06 before paired P03-T02/T03 and RTI-11;
+- the process-local finite registry retains exact immutable prepared objects and
+  opaque handles under fail-closed bearer authentication;
+- `POST /api/v1/operator/paper-cases` prepares one explicit controlled-paper
+  case; `GET /api/v1/operator/paper-cases/{handle}` projects safe review state;
+- explicit run is guarded by matching case digest plus an atomic
+  `REVIEW_READY → RUN_CLAIMED → RUN_TERMINAL | RUN_OUTCOME_UNKNOWN` transition
+  and delegates the exact CIP result through OCI-01/OSC-02 at most once;
+- explicit persistence is separately guarded by matching case/OCI/OSC/lifecycle
+  digests plus an atomic persistence claim and passes the exact in-memory
+  lifecycle directly to RTI-03 at most once. It never reruns OCI/OSC/RTI and
+  does not use RTI-04 or OSP-01 as a shortcut;
+- existing lifecycle digest read/catalog routes remain the durable readback
+  surface; the temporary case registry is not a durable replay archive and
+  makes no cross-process/restart exactly-once claim;
+- HR-FND-01 now has a responsive functional Hunter Room preview in the existing
+  mockup sandbox. It exposes explicit prepare/review/run/persist/readback
+  controls, mirrors actual server case state, performs no automatic polling or
+  retry, and labels historical prices/friction/capacity as paper-simulation
+  evidence/assumptions.
+
+The Python Operator Facade and the TypeScript Memecoin Inspection artifact are
+separate runtime surfaces. The inspection artifact's
+`lib/api-spec/openapi.yaml` remains its own read-only bridge contract; it is
+not the authoritative schema for the FastAPI Operator Facade.
+
+Operational scope remains strictly **controlled paper simulation**. The
+implementation does not authorize or implement autonomous candidate hunting,
+scheduler/worker execution loops, wallet custody, signing, transaction
+broadcast, DEX routing, settlement, real-money execution, or economic outcome
+authority. G2 remains **BLOCKED / UNRESOLVED / NOT AUTHORIZED**; G3/G4/P09
+remain **NOT AUTHORIZED**.

@@ -15,23 +15,26 @@ Meme Coin Hunter AI is a future selective, deterministic, explainable, risk-firs
 
 ## Current status
 
-The project is currently at P08 — Outcome Learning. P07-T01 through P07-T07
-and P08-T01 through P08-T07 are complete, closed, and audited PASS. P04-LME-01
-through P04-LME-03 also provide a bounded CoinGecko pool-OHLCV mapper,
-single-attempt server-side read-only transport, diagnostic, and caller-directed
-one-shot orchestration. Live provider verification has not run. The G2
-realization/settlement endpoint boundary discovery is complete but remains
-documentation-only, blocked, unresolved, and unauthorized pending an
-owner-approved realization/settlement source. No continuous polling, automatic
-pool selection, application runtime wiring, wallet, live trading, AI/ML, or P09
-execution functionality has been implemented.
+The deterministic paper-first domain pipeline is mature through P07 and the
+bounded RTI-11→RTI-16 integration path. The Operator Application Facade now
+provides an authenticated, explicitly controlled paper workflow: trusted
+Solana/P03 upstream composition, one-shot exact-pool RTI-11 preparation,
+temporary identity-preserving case review, explicit run-once OCI/OSC handoff,
+optional explicit RTI-03 persistence, and the existing durable lifecycle
+readback surface.
 
-The controlled paper path now has one-shot admission (P01-RTI-01), lifecycle
-(P01-RTI-02), append-only persistence (P01-RTI-03), and one explicit
-caller-triggered application-service invocation (P01-RTI-04), all merged and CI
-verified. P01-RTI-04 is complete through PR #13. A later API, result-query,
-upstream runtime-composition, scheduler, or dashboard gate requires separate
-approval.
+The functional HR-FND-01 Hunter Room foundation is implemented as a responsive
+operator preview in the existing mockup sandbox. It reflects server case state
+and provides explicit prepare/review/run/persist/readback controls without
+automatic polling or retry. It is not yet a separately packaged production
+dashboard deployment.
+
+The project remains **paper/simulation only**. There is no wallet ownership,
+signing, transaction broadcast, DEX execution, autonomous hunting loop, or
+real-money trading. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED;
+G3/G4/P09 remain NOT AUTHORIZED. The existing TypeScript Memecoin Inspection
+artifact and its `lib/api-spec/openapi.yaml` remain a separate read-only
+inspection surface from the Python FastAPI Operator Facade.
 
 ## Architecture summary
 
@@ -63,7 +66,7 @@ bash scripts/replit_setup.sh
 uv run uvicorn backend.api.main:app --host "${APP_HOST:-0.0.0.0}" --port "${PORT:-${APP_PORT:-8000}}"
 ```
 
-The only endpoint currently provided by the Python foundation is `GET /health`.
+The Python FastAPI surface now includes health/readiness, persisted paper lifecycle readback, and authenticated Operator Facade prepare/review/run/persist routes. See `docs/TECHNICAL_BASELINE.md` and the OAF/Hunter Room specification for the bounded contract.
 
 ### Python environment and tests
 
@@ -87,7 +90,7 @@ uv run pytest -q --collect-only
 
 ## Repository structure
 
-- `apps/dashboard/` — future presentation application
+- `apps/dashboard/` — reserved production dashboard package location; current functional Hunter Room preview lives in the mockup sandbox
 - `backend/api/` — future API boundary
 - `backend/core/` — configuration, logging, and infrastructure boundaries
 - `workers/` — future long-running workers

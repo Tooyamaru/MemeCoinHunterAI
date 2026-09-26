@@ -14,6 +14,26 @@ Read-only workspace for inspecting all source-returned DexScreener pairs for a t
 - `pnpm --filter @workspace/memecoin-inspection run test` — run Chromium-backed mocked frontend interaction checks against `APP_URL` (defaults to the proxied preview)
 - `uv run pytest -q tests/test_dexscreener_inspection.py` — run the focused Python inspector checks
 
+## Operator Facade and Hunter Room
+
+The Python FastAPI Operator Facade is a separate controlled-paper surface from
+the TypeScript Memecoin Inspection bridge. Run it with
+`uv run uvicorn backend.api.main:app --host 0.0.0.0 --port <port>` and provide
+operator/Solana/CoinGecko values through Replit Secrets or equivalent runtime
+secret storage.
+
+The current HR-FND-01 functional preview lives at
+`artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx` and is
+rendered by the mockup sandbox at `/__mockup/preview/HunterRoom` in the managed Replit artifact (or `/preview/HunterRoom` when the sandbox is served at `/`). Its bearer token is
+held only in component memory. For an action-capable deployment, serve the
+Hunter Room through a trusted same-origin/reverse-proxy arrangement or another
+explicitly reviewed transport boundary; do not weaken operator authentication
+or enable permissive credentialed CORS merely to make the preview connect.
+
+The Operator Facade is paper/simulation-only. It has explicit prepare, review,
+run-once, persist-once and lifecycle readback actions; it does not poll,
+auto-retry, sign, broadcast, route live trades or open G2/G3/G4/P09.
+
 ## Stack
 
 - pnpm workspaces, Node.js 20, Python 3.13, TypeScript 5.9
