@@ -838,6 +838,16 @@ functionality was introduced.
 - `pyproject.toml`
 - `uv.lock`
 - `backend/api/main.py`
+- `backend/api/operator_paper_cases.py`
+- `backend/api/operator_prepare_transport.py`
+- `backend/application/oaf_trusted_prepare.py`
+- `backend/application/oaf_operator_prepare_invocation.py`
+- `backend/application/operator_paper_case_registry.py`
+- `backend/application/operator_paper_case_run.py`
+- `backend/application/operator_paper_case_persist.py`
+- `core/data/solana_oaf_source.py`
+- `docs/OPERATOR-APPLICATION-FACADE-HUNTER-ROOM-FOUNDATION-SPECIFICATION.md`
+- `artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx`
 - `backend/api/paper_lifecycle_results.py`
 - `backend/core/config.py`
 - `backend/core/logging.py`
@@ -870,7 +880,7 @@ functionality was introduced.
 
 - Do not scan the full repository.
 - Later implementation phases must not begin without explicit approval and review of the applicable architecture baseline.
-- Do not implement Solana, DEX, wallet, AI/ML, signals, paper trading, execution, Railway, Redis, or a full dashboard before their planned phases.
+- Do not broaden the current controlled-paper Operator Facade into autonomous hunting, continuous provider polling, wallet/signing, DEX routing, live/economic execution, settlement, G2/G3/G4/P09, Railway/Redis production topology, or unrelated phase work without a new explicit gate. The bounded Solana read-only prepare source, paper simulation, and HR-FND-01 functional preview described above are already within the authorized scope.
 
 ## Known issues
 
