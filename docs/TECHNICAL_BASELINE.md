@@ -16,7 +16,7 @@
 - `backend/application/` — HTTP-independent application-service orchestration and request context
 - `backend/workers/` — explicit, independently testable worker lifecycle foundation; no concrete market or trading workers
 - `core/` — future domain logic such as data, signals, opportunity, decision, risk, execution, and learning; currently empty
-- `apps/dashboard/` — future dashboard surface; the visual dashboard is deferred to a later P01 task
+- `apps/dashboard/` — reserved production dashboard package location; the current HR-FND-01 functional Hunter Room preview is implemented in `artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx`
 - `workers/` — future process entrypoints; no domain-specific workers are implemented yet
 - `database/` — future migrations and database assets
 - `tests/` — targeted foundation and future domain tests
@@ -26,12 +26,20 @@ This ownership model avoids duplicate `core` responsibilities: `backend/core` ow
 
 ## Runtime foundation
 
-The current entrypoint is `backend.api.main:app`. It exposes only:
+The current entrypoint is `backend.api.main:app`. Its bounded runtime surfaces include:
 
 ```text
-GET /health
-GET /ready
+GET  /health
+GET  /ready
+GET  /api/v1/paper-lifecycle-results
+GET  /api/v1/paper-lifecycle-results/{lifecycle_result_digest}
+POST /api/v1/operator/paper-cases
+GET  /api/v1/operator/paper-cases/{handle}
+POST /api/v1/operator/paper-cases/{handle}/run
+POST /api/v1/operator/paper-cases/{handle}/persist
 ```
+
+The operator routes are controlled-paper-only and require the configured single-controller bearer credential. Prepare may use the bounded trusted Solana JSON-RPC source and existing one-shot CoinGecko exact-pool diagnostic. Review performs no provider call; run invokes the exact prepared paper case at most once; persist delegates the exact returned lifecycle to RTI-03 at most once. No route signs, broadcasts, routes a live trade, or opens G2/G3/G4/P09.
 
 Run it with:
 
@@ -73,7 +81,7 @@ The application uses a lazy async SQLAlchemy boundary with PostgreSQL/asyncpg as
 
 ## Configuration and secrets
 
-Configuration is environment-based with safe development defaults. `.env` is ignored by Git; `.env.example` contains names and non-secret defaults only. Current names are `APP_ENV`, `APP_HOST`, `APP_PORT`, `APP_VERSION`, `DATABASE_URL`, and `LOG_LEVEL`. No wallet, Solana, DEX, or trading secret names are needed yet.
+Configuration is environment-based with safe development defaults. `.env` is ignored by Git; `.env.example` contains names and non-secret defaults only. In addition to the application/database settings, the bounded Operator Facade uses `OPERATOR_BEARER_TOKEN`, finite case-registry capacity/TTL settings, and optional `SOLANA_RPC_URL` plus its timeout/response cap. The existing exact-pool diagnostic reads `COINGECKO_DEMO_API_KEY` server-side. These are runtime/provider credentials only: no wallet, seed phrase, signing key, DEX execution secret, or live-trading credential is part of this baseline.
 
 ## Application services, workers, and lifecycle
 
@@ -90,7 +98,7 @@ than becoming a microservice prematurely.
 
 ## Replit and future Railway compatibility
 
-After cloning into a blank Replit workspace, run `bash scripts/replit_setup.sh`, configure environment values through secrets when needed, and start the API with the command above. Replit supplies the runtime port through `PORT` when a workflow is added. The stateless FastAPI/Uvicorn process and environment-based configuration can later move to Railway without requiring a framework rewrite.
+After cloning into a blank Replit workspace, run `bash scripts/replit_setup.sh`, configure environment values through secrets when needed, and start the API with the command above. Replit supplies the runtime port through `PORT` when a workflow is added. The FastAPI/Uvicorn process and environment-based configuration can later move to Railway without requiring a framework rewrite. The OAF prepared-case registry is deliberately process-local and identity-preserving, so operator prepare/review/run/persist must stay on one process while a case is active; it does not claim cross-process or restart-safe exactly-once semantics. Durable paper lifecycle data is separately owned by RTI-03 persistence.
 
 ## Rejected or deferred alternatives
 
