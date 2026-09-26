@@ -1,3 +1,11 @@
+## 2026-09-26 — P01-OAF-01 / HR-FND-01 Controlled-Paper Operator Completion Chain
+
+- **MERGED BASELINE:** Authenticated trusted prepare/review and the atomic run-once foundation are merged through PR #85. The process-local registry preserves exact canonical objects and prevents automatic duplicate run attempts within one process.
+- **CURRENT COMPLETION CHAIN:** PR #86 adds authenticated explicit run transport; PR #87 adds a separate exact OCI/OSC lifecycle → RTI-03 persist-once handoff and transport; PR #88 adds the responsive functional Hunter Room operator preview. Each remains subject to its own CI/merge checkpoint until recorded as merged.
+- **HUNTER ROOM:** Central command-floor layout, actual case-derived status, explicit prepare/review/run/persist/readback controls, manual refresh only, session-memory bearer handling, and visible simulation-only/historical-proxy labeling. No invented live agent activity.
+- **GOVERNANCE:** Documentation/runtime configuration is being reconciled with the implemented facade. The TypeScript Memecoin Inspection OpenAPI remains a separate read-only artifact contract from the Python FastAPI Operator Facade.
+- **BOUNDARY:** Controlled paper simulation only. No autonomous hunting loop, automatic retry, wallet/signing, transaction broadcast, DEX routing, settlement, G2/G3/G4/P09 or real-money execution.
+
 ## 2026-09-25 — P01-OAF-01 Trusted P02/P03 Owner-Path Audit (Documentation Only)
 
 - **AUDIT:** P02-T04/T05/T06 own discovery admission and current token snapshot; P03-T01/T02/T03 own source evidence, safety evaluation and eligibility derivation. RTI-11 consumes the exact paired outputs; it does not create them.
