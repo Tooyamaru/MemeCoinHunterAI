@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     operator_bearer_token: str | None = None
     operator_case_registry_capacity: int = Field(default=64, ge=1, le=4096)
     operator_case_ttl_seconds: int = Field(default=1800, ge=1, le=86400)
+    solana_rpc_url: str | None = None
+    solana_rpc_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
+    solana_rpc_max_response_bytes: int = Field(default=262144, ge=1024, le=1048576)
 
 
 @lru_cache
