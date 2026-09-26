@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Request, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from backend.api.operator_access import OperatorAccessDenied, require_operator_bearer
 from backend.api.operator_prepare_transport import (
@@ -20,11 +20,38 @@ from backend.application.operator_paper_case_registry import (
     OperatorPaperCaseRecord,
     OperatorPaperCaseRegistry,
 )
+from backend.application.operator_paper_case_run import (
+    OperatorPaperRunOutcome,
+)
 from backend.core.request_id import get_request_id
 from core.data.solana_oaf_source import SolanaSourceUnavailable
 
 
 NO_STORE_HEADERS = {"Cache-Control": "no-store"}
+
+
+class OperatorRunRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    case_digest: str
+    confirm_run: bool
+
+
+class OperatorRunResponse(BaseModel):
+    contract_version: str
+    handle: str
+    case_digest: str
+    state: str
+    outcome: str
+    reason_codes: list[str]
+    oci_outcome: str | None
+    oci_digest: str | None
+    osc_outcome: str | None
+    osc_digest: str | None
+    osc_terminal_stage: str | None
+    lifecycle_result_digest: str | None
+    persist_eligible: bool
+    simulation_only: bool = True
 
 
 class OperatorCaseReviewResponse(BaseModel):
@@ -167,6 +194,88 @@ async def prepare_operator_case(
     )
 
 
+@router.post(
+    "/{handle}/run",
+    dependencies=[Depends(authorize_operator)],
+)
+async def run_operator_case(
+    handle: str,
+    payload: OperatorRunRequest,
+    request: Request,
+) -> JSONResponse:
+    if payload.confirm_run is not True:
+        return _error(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "operator_run_confirmation_required",
+            "Explicit run confirmation is required",
+        )
+    service = getattr(request.app.state, "operator_run_service", None)
+    if service is None:
+        return _error(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "operator_run_unavailable",
+            "Operator run service is unavailable",
+        )
+
+    result = service.run_once(
+        handle=handle,
+        case_digest=payload.case_digest,
+    )
+    if result.outcome is OperatorPaperRunOutcome.CASE_NOT_FOUND:
+        return _error(
+            status.HTTP_404_NOT_FOUND,
+            "operator_case_not_found",
+            "Prepared paper case was not found or has expired",
+        )
+    if result.outcome is OperatorPaperRunOutcome.CASE_DIGEST_MISMATCH:
+        return _error(
+            status.HTTP_409_CONFLICT,
+            "operator_case_digest_mismatch",
+            "Prepared paper case digest does not match reviewed case",
+        )
+    if result.outcome is OperatorPaperRunOutcome.CASE_NOT_RUNNABLE:
+        return _error(
+            status.HTTP_409_CONFLICT,
+            "operator_case_not_runnable",
+            "Prepared paper case is not in a runnable state",
+        )
+
+    record = result.record
+    if record is None:
+        return _error(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "operator_run_unavailable",
+            "Operator run result is unavailable",
+        )
+    oci = record.oci_result
+    osc = oci.osc02_result if oci is not None else None
+    lifecycle = osc.lifecycle_result if osc is not None else None
+    response = OperatorRunResponse(
+        contract_version=result.contract_version,
+        handle=record.handle,
+        case_digest=record.case_digest,
+        state=record.state.value,
+        outcome=result.outcome.value,
+        reason_codes=list(result.reason_codes),
+        oci_outcome=oci.outcome.value if oci is not None else None,
+        oci_digest=oci.result_digest if oci is not None else None,
+        osc_outcome=osc.outcome.value if osc is not None else None,
+        osc_digest=osc.result_digest if osc is not None else None,
+        osc_terminal_stage=osc.terminal_stage if osc is not None else None,
+        lifecycle_result_digest=lifecycle.digest if lifecycle is not None else None,
+        persist_eligible=(
+            osc is not None
+            and osc.outcome.value == "LIFECYCLE_RETURNED"
+            and lifecycle is not None
+        ),
+    )
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        headers=NO_STORE_HEADERS,
+        content=response.model_dump(mode="json"),
+    )
+
+
 @router.get(
     "/{handle}",
     response_model=OperatorCaseReviewResponse,
@@ -236,7 +345,10 @@ async def operator_http_error_handler(_request: Request, exc: OperatorHttpError)
 
 __all__ = [
     "OperatorCaseReviewResponse",
+    "OperatorRunRequest",
+    "OperatorRunResponse",
     "prepare_operator_case",
+    "run_operator_case",
     "OperatorHttpError",
     "authorize_operator",
     "get_operator_case_registry",

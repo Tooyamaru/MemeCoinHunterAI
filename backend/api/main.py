@@ -17,6 +17,7 @@ from backend.application.oaf_operator_prepare_invocation import (
     OafOperatorPrepareInvocationService,
 )
 from backend.application.operator_paper_case_registry import OperatorPaperCaseRegistry
+from backend.application.operator_paper_case_run import OperatorPaperCaseRunService
 from backend.application.service import ApplicationService
 from backend.core.config import get_settings
 from backend.core.database import DatabaseRuntime
@@ -52,6 +53,9 @@ def create_lifespan(app_settings):
         application.state.operator_case_registry = OperatorPaperCaseRegistry(
             capacity=app_settings.operator_case_registry_capacity,
             ttl=timedelta(seconds=app_settings.operator_case_ttl_seconds),
+        )
+        application.state.operator_run_service = OperatorPaperCaseRunService(
+            registry=application.state.operator_case_registry,
         )
         if app_settings.solana_rpc_url:
             solana_source = SolanaJsonRpcSource(
