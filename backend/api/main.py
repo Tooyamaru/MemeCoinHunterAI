@@ -16,8 +16,14 @@ from backend.api.paper_lifecycle_results import router as paper_lifecycle_router
 from backend.application.oaf_operator_prepare_invocation import (
     OafOperatorPrepareInvocationService,
 )
+from backend.application.operator_paper_case_persist import (
+    OperatorPaperCasePersistService,
+)
 from backend.application.operator_paper_case_registry import OperatorPaperCaseRegistry
 from backend.application.operator_paper_case_run import OperatorPaperCaseRunService
+from backend.application.paper_lifecycle_persistence import (
+    ControlledPaperPersistenceService,
+)
 from backend.application.service import ApplicationService
 from backend.core.config import get_settings
 from backend.core.database import DatabaseRuntime
@@ -56,6 +62,10 @@ def create_lifespan(app_settings):
         )
         application.state.operator_run_service = OperatorPaperCaseRunService(
             registry=application.state.operator_case_registry,
+        )
+        application.state.operator_persist_service = OperatorPaperCasePersistService(
+            registry=application.state.operator_case_registry,
+            persistence=ControlledPaperPersistenceService(database),
         )
         if app_settings.solana_rpc_url:
             solana_source = SolanaJsonRpcSource(
