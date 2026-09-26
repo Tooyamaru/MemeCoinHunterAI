@@ -17,15 +17,27 @@ from threading import RLock
 from typing import Callable
 
 from backend.application.oaf_prepare_case import OafPrepareCaseResult
+from backend.application.prepared_paper_case_invocation import P01Oci01Result
 
 
-P01_OAF_CASE_REGISTRY_VERSION = "p01-oaf-01-case-registry-v1"
+P01_OAF_CASE_REGISTRY_VERSION = "p01-oaf-01-case-registry-v2"
 
 
 class OperatorPaperCaseState(StrEnum):
     REVIEW_READY = "REVIEW_READY"
     PREPARATION_STOPPED = "PREPARATION_STOPPED"
     PREPARATION_UNAVAILABLE = "PREPARATION_UNAVAILABLE"
+    RUN_CLAIMED = "RUN_CLAIMED"
+    RUN_TERMINAL = "RUN_TERMINAL"
+    RUN_OUTCOME_UNKNOWN = "RUN_OUTCOME_UNKNOWN"
+
+
+class OperatorPaperCaseRegistryError(RuntimeError):
+    """Bounded registry mutation error with a stable safe code."""
+
+    def __init__(self, code: str) -> None:
+        self.code = code
+        super().__init__(code)
 
 
 @dataclass(frozen=True)
@@ -36,6 +48,7 @@ class OperatorPaperCaseRecord:
     prepared: OafPrepareCaseResult
     created_at: datetime
     expires_at: datetime
+    oci_result: P01Oci01Result | None = None
     contract_version: str = P01_OAF_CASE_REGISTRY_VERSION
 
     def __post_init__(self) -> None:
@@ -55,6 +68,13 @@ class OperatorPaperCaseRecord:
                 raise ValueError(f"{name} must be timezone-aware")
         if self.expires_at <= self.created_at:
             raise ValueError("expires_at must be after created_at")
+        if self.state is OperatorPaperCaseState.RUN_TERMINAL:
+            if not isinstance(self.oci_result, P01Oci01Result):
+                raise ValueError("RUN_TERMINAL requires exact OCI result")
+            if self.oci_result.request.cip_result is not self.prepared.cip_result:
+                raise ValueError("OCI result must retain exact prepared CIP identity")
+        elif self.oci_result is not None:
+            raise ValueError("OCI result is only retained for RUN_TERMINAL")
 
 
 class OperatorPaperCaseRegistry:
@@ -111,6 +131,76 @@ class OperatorPaperCaseRegistry:
                 del self._records[handle]
                 return None
             return record
+
+    def claim_run(
+        self,
+        handle: str,
+        *,
+        case_digest: str,
+    ) -> OperatorPaperCaseRecord:
+        """Atomically move one review-ready case into RUN_CLAIMED."""
+
+        if not isinstance(handle, str) or not handle:
+            raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+        if not isinstance(case_digest, str) or len(case_digest) != 64:
+            raise OperatorPaperCaseRegistryError("CASE_DIGEST_MISMATCH")
+        with self._lock:
+            now = self._utc(self._clock())
+            record = self._records.get(handle)
+            if record is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.expires_at <= now:
+                del self._records[handle]
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.case_digest != case_digest:
+                raise OperatorPaperCaseRegistryError("CASE_DIGEST_MISMATCH")
+            if record.state is not OperatorPaperCaseState.REVIEW_READY:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_RUNNABLE")
+            claimed = replace(record, state=OperatorPaperCaseState.RUN_CLAIMED)
+            self._records[handle] = claimed
+            return claimed
+
+    def complete_run(
+        self,
+        handle: str,
+        *,
+        oci_result: P01Oci01Result,
+    ) -> OperatorPaperCaseRecord:
+        """Store the exact OCI result and finish one claimed run."""
+
+        if not isinstance(oci_result, P01Oci01Result):
+            raise OperatorPaperCaseRegistryError("RUN_RESULT_INVALID")
+        with self._lock:
+            record = self._records.get(handle)
+            if record is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.state is not OperatorPaperCaseState.RUN_CLAIMED:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_CLAIMED")
+            if oci_result.request.cip_result is not record.prepared.cip_result:
+                raise OperatorPaperCaseRegistryError("RUN_RESULT_IDENTITY_MISMATCH")
+            completed = replace(
+                record,
+                state=OperatorPaperCaseState.RUN_TERMINAL,
+                oci_result=oci_result,
+            )
+            self._records[handle] = completed
+            return completed
+
+    def mark_run_unknown(self, handle: str) -> OperatorPaperCaseRecord:
+        """Make an in-flight uncertain run terminally non-retryable."""
+
+        with self._lock:
+            record = self._records.get(handle)
+            if record is None:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_FOUND")
+            if record.state is not OperatorPaperCaseState.RUN_CLAIMED:
+                raise OperatorPaperCaseRegistryError("CASE_NOT_CLAIMED")
+            unknown = replace(
+                record,
+                state=OperatorPaperCaseState.RUN_OUTCOME_UNKNOWN,
+            )
+            self._records[handle] = unknown
+            return unknown
 
     def remove(self, handle: str) -> bool:
         if not isinstance(handle, str) or not handle:
@@ -179,6 +269,7 @@ def _case_digest(prepared: OafPrepareCaseResult) -> str:
 __all__ = [
     "OperatorPaperCaseRecord",
     "OperatorPaperCaseRegistry",
+    "OperatorPaperCaseRegistryError",
     "OperatorPaperCaseState",
     "P01_OAF_CASE_REGISTRY_VERSION",
 ]
