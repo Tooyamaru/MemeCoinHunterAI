@@ -5,8 +5,12 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "dev:hunter-room": "VITE_HUNTER_ROOM_STANDALONE=1 vite dev",
+    "build": "pnpm run build:preview && pnpm run build:hunter-room",
+    "build:preview": "vite build",
+    "build:hunter-room": "VITE_HUNTER_ROOM_STANDALONE=1 vite build",
     "preview": "vite preview",
+    "preview:hunter-room": "VITE_HUNTER_ROOM_STANDALONE=1 vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

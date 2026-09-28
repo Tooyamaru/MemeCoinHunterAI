@@ -1,6 +1,7 @@
 import { useEffect, useState, type ComponentType } from "react";
 
 import { modules as discoveredModules } from "./.generated/mockup-components";
+import HunterRoom from "./components/mockups/HunterRoom";
 
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 
@@ -129,6 +130,10 @@ function getPreviewPath(): string | null {
 }
 
 function App() {
+  if (import.meta.env.VITE_HUNTER_ROOM_STANDALONE === "1") {
+    return <HunterRoom />;
+  }
+
   const previewPath = getPreviewPath();
 
   if (previewPath) {

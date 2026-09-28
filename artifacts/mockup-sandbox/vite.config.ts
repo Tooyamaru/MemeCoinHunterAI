@@ -20,6 +20,7 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 const basePath = process.env.BASE_PATH;
+const standaloneHunterRoom = process.env.VITE_HUNTER_ROOM_STANDALONE === "1";
 
 if (!basePath) {
   throw new Error(
@@ -30,7 +31,7 @@ if (!basePath) {
 export default defineConfig({
   base: basePath,
   plugins: [
-    mockupPreviewPlugin(),
+    ...(standaloneHunterRoom ? [] : [mockupPreviewPlugin()]),
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
@@ -52,7 +53,10 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist"),
+    outDir: path.resolve(
+      import.meta.dirname,
+      standaloneHunterRoom ? "dist-hunter-room" : "dist",
+    ),
     emptyOutDir: true,
   },
   server: {
