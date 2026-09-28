@@ -29,3 +29,17 @@ VITE_HUNTER_ROOM_STANDALONE = "1"
 
 [services.development]
 run = "pnpm --filter @workspace/mockup-sandbox run dev:hunter-room"
+
+
+[[services]]
+localPort = 8083
+name = "Operator Facade"
+paths = ["/api/v1", "/health", "/ready"]
+
+[services.env]
+APP_ENV = "development"
+APP_HOST = "0.0.0.0"
+APP_PORT = "8083"
+
+[services.development]
+run = "uv run uvicorn backend.api.main:app --host 0.0.0.0 --port 8083"
