@@ -46,7 +46,7 @@ async def test_authenticated_operator_readiness_is_no_store_and_no_provider_prob
         body = response.json()
         assert body["contract_version"] == "p01-oaf-01-operator-readiness-v1"
         assert body["status"] == "READY"
-        assert body["checks"]["database"] == "ready"
+        assert body["checks"]["database"] == "connected"
         assert body["checks"]["case_registry"] == "enabled"
         assert body["checks"]["prepare_service"] == "configured"
         assert body["checks"]["run_service"] == "configured"
