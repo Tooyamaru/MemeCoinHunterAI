@@ -56,31 +56,40 @@ def create_lifespan(app_settings):
         application.state.safety = safety
         application.state.service = service
         application.state.operator_bearer_token = app_settings.operator_bearer_token
-        application.state.operator_case_registry = OperatorPaperCaseRegistry(
-            capacity=app_settings.operator_case_registry_capacity,
-            ttl=timedelta(seconds=app_settings.operator_case_ttl_seconds),
+        operator_registry_enabled = (
+            app_settings.app_env in {"development", "test"}
+            or app_settings.operator_process_local_registry_ack
         )
-        application.state.operator_run_service = OperatorPaperCaseRunService(
-            registry=application.state.operator_case_registry,
-        )
-        application.state.operator_persist_service = OperatorPaperCasePersistService(
-            registry=application.state.operator_case_registry,
-            persistence=ControlledPaperPersistenceService(database),
-        )
-        if app_settings.solana_rpc_url:
-            solana_source = SolanaJsonRpcSource(
-                rpc_url=app_settings.solana_rpc_url,
-                timeout_seconds=app_settings.solana_rpc_timeout_seconds,
-                max_response_bytes=app_settings.solana_rpc_max_response_bytes,
+        application.state.operator_registry_enabled = operator_registry_enabled
+        application.state.operator_case_registry = None
+        application.state.operator_run_service = None
+        application.state.operator_persist_service = None
+        application.state.operator_prepare_service = None
+
+        if operator_registry_enabled:
+            application.state.operator_case_registry = OperatorPaperCaseRegistry(
+                capacity=app_settings.operator_case_registry_capacity,
+                ttl=timedelta(seconds=app_settings.operator_case_ttl_seconds),
             )
-            application.state.operator_prepare_service = (
-                OafOperatorPrepareInvocationService(
-                    solana_source=solana_source,
-                    registry=application.state.operator_case_registry,
+            application.state.operator_run_service = OperatorPaperCaseRunService(
+                registry=application.state.operator_case_registry,
+            )
+            application.state.operator_persist_service = OperatorPaperCasePersistService(
+                registry=application.state.operator_case_registry,
+                persistence=ControlledPaperPersistenceService(database),
+            )
+            if app_settings.solana_rpc_url:
+                solana_source = SolanaJsonRpcSource(
+                    rpc_url=app_settings.solana_rpc_url,
+                    timeout_seconds=app_settings.solana_rpc_timeout_seconds,
+                    max_response_bytes=app_settings.solana_rpc_max_response_bytes,
                 )
-            )
-        else:
-            application.state.operator_prepare_service = None
+                application.state.operator_prepare_service = (
+                    OafOperatorPrepareInvocationService(
+                        solana_source=solana_source,
+                        registry=application.state.operator_case_registry,
+                    )
+                )
         logger.info(
             "application.startup",
             extra={"service": runtime.metadata.service, "environment": runtime.metadata.environment},
@@ -155,13 +164,27 @@ def create_app(app_settings=None) -> FastAPI:
 
         runtime: RuntimeState = application.state.runtime
         database: DatabaseRuntime = application.state.database
-        is_ready = runtime.ready and database.is_ready
+        operator_registry_required = bool(application.state.operator_bearer_token)
+        operator_registry_ready = (
+            not operator_registry_required
+            or bool(application.state.operator_registry_enabled)
+        )
+        is_ready = runtime.ready and database.is_ready and operator_registry_ready
         response = {
             "status": "ready" if is_ready else "not_ready",
             "service": runtime.metadata.service,
             "checks": {
                 "application": "ok" if runtime.ready else "not_ready",
                 "database": database.state.value.lower(),
+                "operator_case_registry": (
+                    "process_local_acknowledged"
+                    if application.state.operator_registry_enabled
+                    else (
+                        "not_configured"
+                        if not operator_registry_required
+                        else "process_local_ack_required"
+                    )
+                ),
             },
         }
         if not is_ready:
