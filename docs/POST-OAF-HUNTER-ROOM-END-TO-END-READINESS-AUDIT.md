@@ -1,8 +1,8 @@
 # Post-OAF / Hunter Room End-to-End Readiness Audit
 
-Status: AUDIT COMPLETE / DOCUMENTATION RECONCILIATION REQUIRED / NO NEW RUNTIME AUTHORITY
+Status: AUDIT COMPLETE / BOUNDED OPERATOR E2E VERIFIED / PRODUCTION PACKAGING NEXT / NO NEW ECONOMIC AUTHORITY
 
-Repository checkpoint audited: `63f281efd0c7718b33da8790ffca4c8e503923dd` (`main` after PR #89).
+Repository checkpoint audited: `1163df00f3d02de1f635dbf399517dc96128b0d9` (`main` after PR #92).
 
 ## Verified completion chain
 
@@ -25,19 +25,31 @@ The repository is ready for a bounded controlled-paper end-to-end verification o
 
 This readiness statement does not assert that a production deployment has been exercised against real operator credentials or that every runtime environment has been configured. It states that the required merged application/API/UI surfaces are present and the repository CI is green.
 
+## Verification closure after PR #92
+
+PR #92 added focused bounded integration coverage for the merged operator
+surface and passed full repository CI on `main`. The verification proves the
+review → run-once → persist-once → readback chain across the actual FastAPI
+transport with fail-closed bearer authentication, digest mismatches, second-run
+and second-persist rejection, exact in-memory lifecycle identity into the
+persistence handoff, and simulation-only terminal projections.
+
+The verification intentionally starts from existing canonical prepared/terminal
+fixtures. It does not claim that a live Solana/CoinGecko prepare was exercised
+in a deployed environment, and it does not constitute wallet/live/economic
+execution.
+
 ## Remaining gaps
 
-1. `PROJECT_STATE.md` contains stale wording that still describes the #86/#87/#88 completion chain as in review even though #87 and #88 are merged and #89 governance reconciliation is merged.
-2. Production Hunter Room packaging/deployment remains a separate operational step. The previous prerequisite that the operator transport chain be merged and verified is now satisfied at repository/CI level.
-3. The operator case registry remains finite and process-local. It does not provide cross-process or restart-safe exactly-once semantics.
-4. A real environment still requires explicit operator bearer and bounded provider/runtime configuration. No secrets belong in source control.
+1. Production Hunter Room packaging/deployment remains the next bounded engineering step; repository/CI verification of the operator chain is complete.
+2. The operator case registry remains finite and process-local. It does not provide cross-process or restart-safe exactly-once semantics.
+3. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by a paper-only smoke verification. No secrets belong in source control.
+4. The merged E2E test does not exercise a live provider-backed prepare or browser runtime; those are operational verification gaps, not missing canonical owners.
 5. No autonomous hunting loop, scheduler, automatic retry, wallet, signing, broadcast, DEX execution, economic settlement, or live trading authority is opened by this audit.
 
 ## Recommended next gate
 
-Perform one bounded controlled-paper end-to-end operational verification using the merged surfaces and record the exact result. The verification should prove the UI/API path and failure behavior without adding autonomous behavior.
-
-Only after that verification should the controller select a production packaging/deployment gate or another bounded successor based on observed gaps.
+Select the production Hunter Room packaging/deployment gate: produce a standalone build from the verified HR-FND-01 surface, preserve same-origin or explicitly reviewed transport assumptions, keep bearer material session-only, and add build/packaging verification. A later real-environment smoke check may exercise the bounded provider-backed prepare path using deployment secrets without changing domain authority.
 
 ## Governance boundary
 
