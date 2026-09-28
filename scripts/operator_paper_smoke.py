@@ -107,6 +107,17 @@ def run_smoke(
     base = config.base_url.rstrip("/")
     result: dict[str, Any] = {}
 
+    readiness_status, readiness = request_json(
+        "GET",
+        f"{base}/api/v1/operator/paper-cases/readiness",
+        config.token,
+        None,
+        config.timeout_seconds,
+    )
+    result["readiness"] = {"status": readiness_status, "body": readiness}
+    if readiness_status != 200 or readiness.get("status") != "READY":
+        raise OperatorSmokeError("operator readiness preflight did not pass")
+
     prepare_status, prepare = request_json(
         "POST",
         f"{base}/api/v1/operator/paper-cases",
