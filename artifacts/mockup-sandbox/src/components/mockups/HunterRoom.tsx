@@ -93,7 +93,14 @@ type LifecycleRead = {
   lifecycle_result_digest: string;
   result_digest: string;
   run: { artifact_count: number; outcome: string } | null;
-  artifacts: Array<{ artifact_kind: string; artifact_digest: string }>;
+  artifacts: Array<{
+    artifact_kind: string;
+    artifact_digest: string;
+    payload_digest: string;
+    owner_contract_version: string;
+    canonical_payload: string;
+    ordinal: number;
+  }>;
 };
 
 type LifecycleCatalog = {
@@ -274,6 +281,34 @@ function short(value: string | null | undefined, size = 10) {
     : `${value.slice(0, size)}…${value.slice(-size)}`;
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
+function artifactPayload(readback: LifecycleRead | null, kind: string): Record<string, unknown> | null {
+  const artifact = readback?.artifacts.find((item) => item.artifact_kind === kind);
+  if (!artifact) return null;
+  try {
+    return asRecord(JSON.parse(artifact.canonical_payload));
+  } catch {
+    return null;
+  }
+}
+
+function displayCanonical(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (typeof value === "boolean") return value ? "true" : "false";
+  return null;
+}
+
+function displayIdentity(value: unknown): string | null {
+  const record = asRecord(value);
+  if (!record) return null;
+  return JSON.stringify(record);
+}
+
 function stateTone(state: string | undefined) {
   if (!state) return "border-slate-700 bg-slate-900/70 text-slate-300";
   if (
@@ -378,6 +413,50 @@ export default function HunterRoom() {
   const [message, setMessage] = useState("No case loaded. Hunter Room is idle.");
 
   const base = useMemo(() => apiBase.trim().replace(/\/$/, ""), [apiBase]);
+
+  const lifecycleDetail = useMemo(() => {
+    if (!readback) return null;
+    const fill = artifactPayload(readback, "FILL_OUTCOME");
+    const transition = artifactPayload(readback, "STATE_TRANSITION");
+    const resultingState = artifactPayload(readback, "RESULTING_PAPER_STATE");
+    const accounting = asRecord(transition?.accounting_effect);
+    const quantityEffect = asRecord(transition?.quantity_effect);
+    const exposure = asRecord(resultingState?.exposure);
+    const positions = Array.isArray(resultingState?.positions) ? resultingState.positions : [];
+    const firstPosition = positions.length === 1 ? asRecord(positions[0]) : null;
+
+    return {
+      fillStatus: displayCanonical(fill?.status),
+      side: displayCanonical(fill?.side),
+      requestedQuantity: displayCanonical(fill?.requested_quantity),
+      filledQuantity: displayCanonical(fill?.filled_quantity),
+      remainingQuantity: displayCanonical(fill?.remaining_quantity),
+      quantityUnit: displayCanonical(fill?.quantity_unit),
+      effectivePrice: displayCanonical(fill?.effective_price),
+      priceUnit: displayCanonical(fill?.price_unit),
+      quoteCurrency: displayCanonical(fill?.quote_currency),
+      fillTime: displayCanonical(fill?.fill_time),
+      assetIdentity: displayIdentity(fill?.asset_identity),
+      transitionStatus: displayCanonical(transition?.transition_status),
+      transitionTime: displayCanonical(transition?.transition_reference_time),
+      nextQuantity: displayCanonical(quantityEffect?.next_quantity),
+      tradeValue: displayCanonical(accounting?.trade_value),
+      acquisitionCost: displayCanonical(accounting?.acquisition_cost),
+      removedCost: displayCanonical(accounting?.removed_cost),
+      proceeds: displayCanonical(accounting?.proceeds),
+      feeAmount: displayCanonical(accounting?.fee_amount),
+      priorityFeeAmount: displayCanonical(accounting?.priority_fee_amount),
+      accountingUnit: displayCanonical(accounting?.unit),
+      stateQuality: displayCanonical(resultingState?.state_quality),
+      stateAsOf: displayCanonical(resultingState?.as_of_time),
+      positionQuantity: displayCanonical(firstPosition?.quantity),
+      totalCostBasis: displayCanonical(firstPosition?.total_cost_basis),
+      averageCost: displayCanonical(firstPosition?.average_cost),
+      costBasisUnit: displayCanonical(firstPosition?.cost_basis_unit),
+      valuationStatus: displayCanonical(exposure?.valuation_status),
+      grossNotionalExposure: displayCanonical(exposure?.gross_notional_exposure),
+    };
+  }, [readback]);
 
   function authHeaders() {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -961,6 +1040,104 @@ export default function HunterRoom() {
                   <KeyValue label="Artifacts" value={readback.artifacts.length} />
                   <KeyValue label="Lifecycle digest" value={short(readback.lifecycle_result_digest, 8)} />
                   <KeyValue label="Result digest" value={short(readback.result_digest, 8)} />
+
+                  {lifecycleDetail && (
+                    <div className="space-y-3 rounded-xl border border-emerald-300/12 bg-black/20 p-3">
+                      <div>
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200/70">
+                          Canonical paper detail
+                        </div>
+                        <div className="mt-1 text-[11px] leading-5 text-slate-500">
+                          Direct projection of persisted canonical artifacts. No P&amp;L or profitability is inferred here.
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <KeyValue label="Fill status" value={lifecycleDetail.fillStatus} />
+                        <KeyValue label="Side" value={lifecycleDetail.side} />
+                        <KeyValue
+                          label="Requested quantity"
+                          value={
+                            lifecycleDetail.requestedQuantity && lifecycleDetail.quantityUnit
+                              ? `${lifecycleDetail.requestedQuantity} ${lifecycleDetail.quantityUnit}`
+                              : lifecycleDetail.requestedQuantity
+                          }
+                        />
+                        <KeyValue
+                          label="Filled quantity"
+                          value={
+                            lifecycleDetail.filledQuantity && lifecycleDetail.quantityUnit
+                              ? `${lifecycleDetail.filledQuantity} ${lifecycleDetail.quantityUnit}`
+                              : lifecycleDetail.filledQuantity
+                          }
+                        />
+                        <KeyValue
+                          label="Effective price"
+                          value={
+                            lifecycleDetail.effectivePrice && lifecycleDetail.priceUnit
+                              ? `${lifecycleDetail.effectivePrice} ${lifecycleDetail.priceUnit}`
+                              : lifecycleDetail.effectivePrice
+                          }
+                        />
+                        <KeyValue label="Fill time" value={lifecycleDetail.fillTime} />
+                        <KeyValue label="Transition" value={lifecycleDetail.transitionStatus} />
+                        <KeyValue label="Transition time" value={lifecycleDetail.transitionTime} />
+                        <KeyValue
+                          label="Trade value"
+                          value={
+                            lifecycleDetail.tradeValue && lifecycleDetail.accountingUnit
+                              ? `${lifecycleDetail.tradeValue} ${lifecycleDetail.accountingUnit}`
+                              : lifecycleDetail.tradeValue
+                          }
+                        />
+                        <KeyValue
+                          label="Fee amount"
+                          value={
+                            lifecycleDetail.feeAmount && lifecycleDetail.accountingUnit
+                              ? `${lifecycleDetail.feeAmount} ${lifecycleDetail.accountingUnit}`
+                              : lifecycleDetail.feeAmount
+                          }
+                        />
+                        <KeyValue
+                          label="Priority fee"
+                          value={
+                            lifecycleDetail.priorityFeeAmount && lifecycleDetail.accountingUnit
+                              ? `${lifecycleDetail.priorityFeeAmount} ${lifecycleDetail.accountingUnit}`
+                              : lifecycleDetail.priorityFeeAmount
+                          }
+                        />
+                        <KeyValue label="Next quantity" value={lifecycleDetail.nextQuantity} />
+                        <KeyValue label="State quality" value={lifecycleDetail.stateQuality} />
+                        <KeyValue label="State as-of" value={lifecycleDetail.stateAsOf} />
+                        <KeyValue label="Position quantity" value={lifecycleDetail.positionQuantity} />
+                        <KeyValue
+                          label="Total cost basis"
+                          value={
+                            lifecycleDetail.totalCostBasis && lifecycleDetail.costBasisUnit
+                              ? `${lifecycleDetail.totalCostBasis} ${lifecycleDetail.costBasisUnit}`
+                              : lifecycleDetail.totalCostBasis
+                          }
+                        />
+                        <KeyValue
+                          label="Average cost"
+                          value={
+                            lifecycleDetail.averageCost && lifecycleDetail.costBasisUnit
+                              ? `${lifecycleDetail.averageCost} ${lifecycleDetail.costBasisUnit}`
+                              : lifecycleDetail.averageCost
+                          }
+                        />
+                        <KeyValue label="Valuation status" value={lifecycleDetail.valuationStatus} />
+                        <KeyValue
+                          label="Gross notional exposure"
+                          value={lifecycleDetail.grossNotionalExposure}
+                        />
+                      </div>
+
+                      {lifecycleDetail.assetIdentity && (
+                        <KeyValue label="Canonical asset identity" value={lifecycleDetail.assetIdentity} />
+                      )}
+                    </div>
+                  )}
                   {readback.artifacts.length > 0 && (
                     <div className="rounded-xl border border-white/8 bg-black/20 p-3">
                       <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
