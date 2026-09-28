@@ -15,7 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Mapping
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
 class OperatorSmokeError(RuntimeError):
@@ -36,8 +37,13 @@ class SmokeConfig:
     confirm_persist: bool = False
 
     def __post_init__(self) -> None:
-        if not isinstance(self.base_url, str) or not self.base_url.startswith(("http://", "https://")):
+        if not isinstance(self.base_url, str):
             raise OperatorSmokeError("base_url must be HTTP(S)")
+        parsed = urlsplit(self.base_url)
+        if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+            raise OperatorSmokeError("base_url must be HTTP(S)")
+        if parsed.scheme == "http" and parsed.hostname not in {"localhost", "127.0.0.1", "::1"}:
+            raise OperatorSmokeError("non-local operator smoke requires HTTPS")
         if not isinstance(self.token, str) or not self.token:
             raise OperatorSmokeError("operator token is required")
         if not isinstance(self.prepare_payload, dict) or not self.prepare_payload:
@@ -64,8 +70,14 @@ def _request_json(
         body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
         headers["Content-Type"] = "application/json"
     req = Request(url, data=body, headers=headers, method=method)
+
+    class NoRedirect(HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+
+    opener = build_opener(NoRedirect())
     try:
-        with urlopen(req, timeout=timeout_seconds) as response:
+        with opener.open(req, timeout=timeout_seconds) as response:
             status = int(response.status)
             raw = response.read()
     except HTTPError as exc:
