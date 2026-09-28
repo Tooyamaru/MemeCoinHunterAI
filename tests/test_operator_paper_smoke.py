@@ -189,3 +189,23 @@ def test_preparation_stop_does_not_review_or_run():
 
     assert list(result) == ["prepare"]
     assert len(calls) == 1
+
+
+def test_non_local_plain_http_is_rejected_before_any_request():
+    with pytest.raises(OperatorSmokeError, match="requires HTTPS"):
+        SmokeConfig(
+            base_url="http://operator.example",
+            token="test-token",
+            prepare_payload={"explicit": "payload"},
+            timeout_seconds=5,
+        )
+
+
+def test_local_plain_http_remains_available_for_controlled_development():
+    config = SmokeConfig(
+        base_url="http://127.0.0.1:8000",
+        token="test-token",
+        prepare_payload={"explicit": "payload"},
+        timeout_seconds=5,
+    )
+    assert config.base_url == "http://127.0.0.1:8000"
