@@ -33,6 +33,16 @@ from core.data.solana_oaf_source import SolanaSourceUnavailable
 NO_STORE_HEADERS = {"Cache-Control": "no-store"}
 
 
+class OperatorReadinessResponse(BaseModel):
+    contract_version: str
+    status: str
+    environment: str
+    checks: dict[str, str]
+    process_local_registry: bool
+    provider_connectivity_checked: bool = False
+    simulation_only: bool = True
+
+
 class OperatorPersistRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -148,6 +158,46 @@ class OperatorHttpError(Exception):
 
 
 router = APIRouter(prefix="/api/v1/operator/paper-cases", tags=["operator-paper-cases"])
+
+
+@router.get(
+    "/readiness",
+    dependencies=[Depends(authorize_operator)],
+)
+async def operator_readiness(request: Request) -> JSONResponse:
+    """Report bounded operator-service readiness without calling providers."""
+
+    database = request.app.state.database
+    registry_enabled = bool(getattr(request.app.state, "operator_registry_enabled", False))
+    prepare_ready = getattr(request.app.state, "operator_prepare_service", None) is not None
+    run_ready = getattr(request.app.state, "operator_run_service", None) is not None
+    persist_ready = getattr(request.app.state, "operator_persist_service", None) is not None
+    database_ready = bool(getattr(database, "is_ready", False))
+    ready = (
+        database_ready
+        and registry_enabled
+        and prepare_ready
+        and run_ready
+        and persist_ready
+    )
+    response = OperatorReadinessResponse(
+        contract_version="p01-oaf-01-operator-readiness-v1",
+        status="READY" if ready else "NOT_READY",
+        environment=request.app.state.runtime.metadata.environment,
+        checks={
+            "database": database.state.value.lower(),
+            "case_registry": "enabled" if registry_enabled else "unavailable",
+            "prepare_service": "configured" if prepare_ready else "unavailable",
+            "run_service": "configured" if run_ready else "unavailable",
+            "persist_service": "configured" if persist_ready else "unavailable",
+        },
+        process_local_registry=registry_enabled,
+    )
+    return JSONResponse(
+        status_code=status.HTTP_200_OK if ready else status.HTTP_503_SERVICE_UNAVAILABLE,
+        headers=NO_STORE_HEADERS,
+        content=response.model_dump(mode="json"),
+    )
 
 
 @router.post(
@@ -499,6 +549,7 @@ async def operator_http_error_handler(_request: Request, exc: OperatorHttpError)
 __all__ = [
     "OperatorCaseReviewResponse",
     "OperatorPersistRequest",
+    "OperatorReadinessResponse",
     "OperatorPersistResponse",
     "OperatorRunRequest",
     "OperatorRunResponse",
@@ -509,5 +560,6 @@ __all__ = [
     "authorize_operator",
     "get_operator_case_registry",
     "operator_http_error_handler",
+    "operator_readiness",
     "router",
 ]
