@@ -27,7 +27,7 @@ uv run python scripts/operator_paper_smoke.py \
   --confirm-persist
 ```
 
-The token is read from the environment and is never accepted as a URL argument.
+The token is read from the environment and is never accepted as a URL argument. Non-local smoke targets require HTTPS, and the harness refuses HTTP redirects so the bearer cannot be forwarded to a different endpoint.
 Use `--token-env SOME_OTHER_SECRET_NAME` only when deployment policy requires
 another environment variable name.
 
