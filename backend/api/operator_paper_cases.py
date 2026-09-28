@@ -112,7 +112,13 @@ class OperatorCaseReviewResponse(BaseModel):
 
 
 def get_operator_case_registry(request: Request) -> OperatorPaperCaseRegistry:
-    return request.app.state.operator_case_registry
+    registry = getattr(request.app.state, "operator_case_registry", None)
+    if not isinstance(registry, OperatorPaperCaseRegistry):
+        raise OperatorHttpError(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "OPERATOR_CASE_REGISTRY_UNAVAILABLE",
+        )
+    return registry
 
 
 def authorize_operator(
