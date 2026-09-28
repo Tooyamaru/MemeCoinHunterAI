@@ -22,10 +22,8 @@ the TypeScript Memecoin Inspection bridge. Run it with
 operator/Solana/CoinGecko values through Replit Secrets or equivalent runtime
 secret storage.
 
-The current HR-FND-01 functional preview lives at
-`artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx` and is
-rendered by the mockup sandbox at `/__mockup/preview/HunterRoom` in the managed Replit artifact (or `/preview/HunterRoom` when the sandbox is served at `/`). Its bearer token is
-held only in component memory. For an action-capable deployment, serve the
+The HR-FND-01 component lives at
+`artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx`. The design preview remains at `/__mockup/preview/HunterRoom`. HR-FND-02 also exposes a standalone managed service at `/hunter-room` using `pnpm --filter @workspace/mockup-sandbox run dev:hunter-room`, and production builds emit `artifacts/mockup-sandbox/dist-hunter-room/`. Its bearer token is held only in component memory. For an action-capable deployment, serve the
 Hunter Room through a trusted same-origin/reverse-proxy arrangement or another
 explicitly reviewed transport boundary; do not weaken operator authentication
 or enable permissive credentialed CORS merely to make the preview connect.
