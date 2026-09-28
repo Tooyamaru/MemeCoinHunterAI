@@ -491,6 +491,7 @@ async def operator_http_error_handler(_request: Request, exc: OperatorHttpError)
         "OPERATOR_AUTH_REQUIRED": "Operator bearer authorization is required",
         "OPERATOR_AUTH_INVALID": "Operator bearer authorization is invalid",
         "OPERATOR_ACCESS_UNAVAILABLE": "Operator access is not configured",
+        "OPERATOR_CASE_REGISTRY_UNAVAILABLE": "Operator case registry is unavailable",
     }.get(exc.code, "Operator access denied")
     return _error(exc.status_code, exc.code.lower(), message)
 
