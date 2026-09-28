@@ -15,3 +15,17 @@ BASE_PATH = "/__mockup"
 
 [services.development]
 run = "pnpm --filter @workspace/mockup-sandbox run dev"
+
+
+[[services]]
+localPort = 8082
+name = "Hunter Room Standalone"
+paths = ["/hunter-room"]
+
+[services.env]
+PORT = "8082"
+BASE_PATH = "/hunter-room"
+VITE_HUNTER_ROOM_STANDALONE = "1"
+
+[services.development]
+run = "pnpm --filter @workspace/mockup-sandbox run dev:hunter-room"
