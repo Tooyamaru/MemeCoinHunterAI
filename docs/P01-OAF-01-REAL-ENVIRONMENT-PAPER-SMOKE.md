@@ -10,7 +10,7 @@ adding polling, retries, autonomous discovery, or a second domain owner.
 The CLI consumes a complete explicit prepare JSON file. It never invents
 paper-policy defaults. By default it performs only:
 
-`prepare -> review`
+`readiness -> prepare -> review`
 
 The operator must add `--confirm-run` to invoke one paper run, and must add
 both `--confirm-run --confirm-persist` to permit one persistence action and
@@ -35,12 +35,17 @@ another environment variable name.
 
 For a full eligible chain the harness performs exactly:
 
-1. one POST prepare;
-2. one GET review;
-3. one POST run;
-4. one GET post-run review;
-5. one POST persist;
-6. one GET durable readback.
+1. one authenticated GET operator readiness preflight;
+2. one POST prepare;
+3. one GET review;
+4. one POST run;
+5. one GET post-run review;
+6. one POST persist;
+7. one GET durable readback.
+
+The readiness endpoint performs no provider connectivity probe; it reports only
+configured application/database/operator service readiness. If readiness is not
+`READY`, the harness stops before prepare.
 
 There is no retry, polling, fallback provider, second run, or second persist.
 
