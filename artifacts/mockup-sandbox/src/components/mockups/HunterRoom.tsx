@@ -114,6 +114,21 @@ type LifecycleCatalog = {
   result_digest: string;
 };
 
+type PrepareValidation = {
+  contract_version: string;
+  status: "VALID";
+  candidate_id: string;
+  token_mint: string;
+  chain_id: string;
+  pool_address: string;
+  pfx_invocation_id: string;
+  cip_invocation_id: string;
+  selected_observation_time: string;
+  provider_connectivity_checked: boolean;
+  mutates_case: boolean;
+  simulation_only: boolean;
+};
+
 type OperatorReadiness = {
   contract_version: string;
   status: "READY" | "NOT_READY";
@@ -420,7 +435,8 @@ export default function HunterRoom() {
   const [readback, setReadback] = useState<LifecycleRead | null>(null);
   const [history, setHistory] = useState<LifecycleCatalog | null>(null);
   const [readiness, setReadiness] = useState<OperatorReadiness | null>(null);
-  const [busy, setBusy] = useState<"prepare" | "refresh" | "run" | "persist" | "readback" | "history" | "readiness" | null>(null);
+  const [prepareValidation, setPrepareValidation] = useState<PrepareValidation | null>(null);
+  const [busy, setBusy] = useState<"prepare" | "validate" | "refresh" | "run" | "persist" | "readback" | "history" | "readiness" | null>(null);
   const [message, setMessage] = useState("No case loaded. Hunter Room is idle.");
 
   const base = useMemo(() => apiBase.trim().replace(/\/$/, ""), [apiBase]);
@@ -540,6 +556,31 @@ export default function HunterRoom() {
       throw new Error("Readiness response did not match the expected contract.");
     } catch (error) {
       setReadiness(null);
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function validatePreparePayload() {
+    if (!token.trim()) {
+      setMessage("Operator bearer token is required for payload validation.");
+      return;
+    }
+    setBusy("validate");
+    setPrepareValidation(null);
+    try {
+      const payload = JSON.parse(prepareJson);
+      const result = await api<PrepareValidation>(
+        "/api/v1/operator/paper-cases/validate",
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        },
+      );
+      setPrepareValidation(result);
+      setMessage("Prepare payload is locally canonical. Provider/eligibility checks were not run.");
+    } catch (error) {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setBusy(null);
@@ -875,18 +916,34 @@ export default function HunterRoom() {
               <CardContent className="space-y-3">
                 <Textarea
                   value={prepareJson}
-                  onChange={(event) => setPrepareJson(event.target.value)}
+                  onChange={(event) => {
+                    setPrepareJson(event.target.value);
+                    setPrepareValidation(null);
+                  }}
                   className="min-h-[290px] border-white/10 bg-black/20 font-mono text-[11px] leading-5 text-slate-200"
                   spellCheck={false}
                 />
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   <Button
                     type="button"
                     variant="outline"
                     className="border-white/10 bg-white/5 text-slate-200"
-                    onClick={() => setPrepareJson(formatJson(TEMPLATE))}
+                    onClick={() => {
+                      setPrepareJson(formatJson(TEMPLATE));
+                      setPrepareValidation(null);
+                    }}
                   >
                     Reset template
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={busy !== null || !token.trim()}
+                    className="border-emerald-300/20 bg-emerald-300/5 text-emerald-100"
+                    onClick={() => void validatePreparePayload()}
+                  >
+                    {busy === "validate" ? <LoaderCircle className="animate-spin" /> : <CheckCircle2 />}
+                    Validate
                   </Button>
                   <Button
                     type="button"
@@ -902,6 +959,28 @@ export default function HunterRoom() {
                   No hidden defaults. The template is only a schema aid; every policy,
                   time, identity and simulation assumption must be explicitly reviewed.
                 </p>
+
+                {prepareValidation && (
+                  <div className="rounded-xl border border-emerald-300/15 bg-emerald-300/5 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-200/75">
+                        Payload validation
+                      </div>
+                      <span className="rounded-full border border-emerald-300/20 px-2 py-1 text-[10px] font-semibold text-emerald-100">
+                        {prepareValidation.status}
+                      </span>
+                    </div>
+                    <div className="mt-2 grid gap-1 text-[11px] text-slate-400">
+                      <div>Candidate: <span className="font-mono text-slate-300">{prepareValidation.candidate_id}</span></div>
+                      <div>Pool: <span className="font-mono text-slate-300">{short(prepareValidation.pool_address, 8)}</span></div>
+                      <div>Selected observation: <span className="font-mono text-slate-300">{prepareValidation.selected_observation_time}</span></div>
+                    </div>
+                    <div className="mt-2 text-[10px] leading-4 text-slate-500">
+                      Local canonical decode only. No provider connectivity, eligibility, RTI-11,
+                      PFX/PFS/CIP execution or case mutation was performed.
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </aside>
