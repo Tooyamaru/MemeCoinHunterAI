@@ -43,6 +43,21 @@ class OperatorReadinessResponse(BaseModel):
     simulation_only: bool = True
 
 
+class OperatorPrepareValidationResponse(BaseModel):
+    contract_version: str
+    status: str
+    candidate_id: str
+    token_mint: str
+    chain_id: str
+    pool_address: str
+    pfx_invocation_id: str
+    cip_invocation_id: str
+    selected_observation_time: str
+    provider_connectivity_checked: bool = False
+    mutates_case: bool = False
+    simulation_only: bool = True
+
+
 class OperatorPersistRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -195,6 +210,44 @@ async def operator_readiness(request: Request) -> JSONResponse:
     )
     return JSONResponse(
         status_code=status.HTTP_200_OK if ready else status.HTTP_503_SERVICE_UNAVAILABLE,
+        headers=NO_STORE_HEADERS,
+        content=response.model_dump(mode="json"),
+    )
+
+
+@router.post(
+    "/validate",
+    dependencies=[Depends(authorize_operator)],
+)
+async def validate_operator_prepare_payload(
+    payload: OperatorPrepareRequest,
+) -> JSONResponse:
+    """Decode one explicit prepare payload without provider access or case mutation."""
+
+    try:
+        invocation = decode_operator_prepare_request(payload)
+    except OperatorPrepareDecodeError:
+        return _error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "operator_prepare_invalid",
+            "Operator prepare payload is invalid",
+        )
+
+    command = invocation.command
+    intent = invocation.paper_intent
+    response = OperatorPrepareValidationResponse(
+        contract_version="p01-oaf-01-prepare-validation-v1",
+        status="VALID",
+        candidate_id=command.candidate_id,
+        token_mint=command.token_mint,
+        chain_id=command.target.chain_id,
+        pool_address=command.target.pool_address,
+        pfx_invocation_id=intent.pfx_invocation_id,
+        cip_invocation_id=intent.cip_invocation_id,
+        selected_observation_time=intent.selected_observation_time.isoformat(),
+    )
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
         headers=NO_STORE_HEADERS,
         content=response.model_dump(mode="json"),
     )
@@ -549,11 +602,13 @@ async def operator_http_error_handler(_request: Request, exc: OperatorHttpError)
 __all__ = [
     "OperatorCaseReviewResponse",
     "OperatorPersistRequest",
+    "OperatorPrepareValidationResponse",
     "OperatorReadinessResponse",
     "OperatorPersistResponse",
     "OperatorRunRequest",
     "OperatorRunResponse",
     "prepare_operator_case",
+    "validate_operator_prepare_payload",
     "persist_operator_case",
     "run_operator_case",
     "OperatorHttpError",
