@@ -6,6 +6,7 @@ import {
   Database,
   Eye,
   FileClock,
+  History,
   KeyRound,
   LoaderCircle,
   Play,
@@ -93,6 +94,17 @@ type LifecycleRead = {
   result_digest: string;
   run: { artifact_count: number; outcome: string } | null;
   artifacts: Array<{ artifact_kind: string; artifact_digest: string }>;
+};
+
+type LifecycleCatalog = {
+  contract_version: string;
+  outcome: string;
+  reason_codes: string[];
+  limit: number;
+  after_digest: string | null;
+  lifecycle_result_digests: string[];
+  next_after_digest: string | null;
+  result_digest: string;
 };
 
 type ApiErrorPayload = {
@@ -361,7 +373,8 @@ export default function HunterRoom() {
   const [lastRun, setLastRun] = useState<RunResponse | null>(null);
   const [lastPersist, setLastPersist] = useState<PersistResponse | null>(null);
   const [readback, setReadback] = useState<LifecycleRead | null>(null);
-  const [busy, setBusy] = useState<"prepare" | "refresh" | "run" | "persist" | "readback" | null>(null);
+  const [history, setHistory] = useState<LifecycleCatalog | null>(null);
+  const [busy, setBusy] = useState<"prepare" | "refresh" | "run" | "persist" | "readback" | "history" | null>(null);
   const [message, setMessage] = useState("No case loaded. Hunter Room is idle.");
 
   const base = useMemo(() => apiBase.trim().replace(/\/$/, ""), [apiBase]);
@@ -479,6 +492,42 @@ export default function HunterRoom() {
   async function readLifecycle() {
     const digest = caseView?.lifecycle_result_digest || lastPersist?.lifecycle_result_digest;
     if (!digest) return;
+    setBusy("readback");
+    try {
+      const result = await api<LifecycleRead>(
+        `/api/v1/paper-lifecycle-results/${encodeURIComponent(digest)}`,
+      );
+      setReadback(result);
+      setMessage(`Readback: ${result.outcome}`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function loadHistory(afterDigest?: string) {
+    setBusy("history");
+    try {
+      const query = new URLSearchParams({ limit: "20" });
+      if (afterDigest) query.set("after_digest", afterDigest);
+      const result = await api<LifecycleCatalog>(
+        `/api/v1/paper-lifecycle-results?${query.toString()}`,
+      );
+      setHistory(result);
+      setMessage(
+        result.lifecycle_result_digests.length
+          ? `Loaded ${result.lifecycle_result_digests.length} persisted lifecycle identities.`
+          : "Persisted lifecycle catalog is empty.",
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function inspectHistoryDigest(digest: string) {
     setBusy("readback");
     try {
       const result = await api<LifecycleRead>(
@@ -819,6 +868,86 @@ export default function HunterRoom() {
               </CardContent>
             </Card>
 
+            <Card className="border-white/10 bg-slate-950/80 text-slate-100">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center justify-between gap-2 text-base">
+                  <span className="flex items-center gap-2">
+                    <History className="h-4 w-4 text-sky-300" />
+                    Persisted lifecycle catalog
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="border-white/10 bg-white/5 text-slate-200"
+                    disabled={busy !== null}
+                    onClick={() => void loadHistory()}
+                  >
+                    {busy === "history" ? <LoaderCircle className="animate-spin" /> : <RefreshCw />}
+                    Load
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-[11px] leading-5 text-slate-500">
+                  RTI-07 returns canonical digests in lexicographic order, not a profitability or
+                  recency ranking. Detail is fetched only when you inspect one digest.
+                </p>
+                {history ? (
+                  <>
+                    {history.lifecycle_result_digests.length ? (
+                      <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+                        {history.lifecycle_result_digests.map((digest) => (
+                          <button
+                            key={digest}
+                            type="button"
+                            disabled={busy !== null}
+                            onClick={() => void inspectHistoryDigest(digest)}
+                            className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/8 bg-white/[0.035] px-3 py-2 text-left transition hover:border-sky-300/25 hover:bg-sky-300/5 disabled:opacity-50"
+                          >
+                            <span className="font-mono text-[11px] text-slate-300">
+                              {short(digest, 10)}
+                            </span>
+                            <Eye className="h-3.5 w-3.5 shrink-0 text-sky-300" />
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-white/10 px-3 py-5 text-center text-xs text-slate-500">
+                        No persisted lifecycle identities in this catalog page.
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-white/10 bg-white/5 text-slate-200"
+                        disabled={busy !== null || history.after_digest === null}
+                        onClick={() => void loadHistory()}
+                      >
+                        First page
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-white/10 bg-white/5 text-slate-200"
+                        disabled={busy !== null || !history.next_after_digest}
+                        onClick={() => void loadHistory(history.next_after_digest || undefined)}
+                      >
+                        Next page
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="rounded-xl border border-dashed border-white/10 px-3 py-5 text-center text-xs text-slate-500">
+                    Load the bounded persisted lifecycle catalog manually.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {readback && (
               <Card className="border-emerald-400/20 bg-emerald-400/5 text-slate-100">
                 <CardHeader className="pb-3">
@@ -830,7 +959,25 @@ export default function HunterRoom() {
                 <CardContent className="space-y-2 text-xs">
                   <KeyValue label="Outcome" value={readback.outcome} />
                   <KeyValue label="Artifacts" value={readback.artifacts.length} />
+                  <KeyValue label="Lifecycle digest" value={short(readback.lifecycle_result_digest, 8)} />
                   <KeyValue label="Result digest" value={short(readback.result_digest, 8)} />
+                  {readback.artifacts.length > 0 && (
+                    <div className="rounded-xl border border-white/8 bg-black/20 p-3">
+                      <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        Artifact kinds
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {readback.artifacts.map((artifact) => (
+                          <span
+                            key={artifact.artifact_digest}
+                            className="rounded-full border border-emerald-300/15 bg-emerald-300/5 px-2 py-1 text-[10px] text-emerald-100"
+                          >
+                            {artifact.artifact_kind}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
