@@ -48,7 +48,7 @@ async def test_production_operator_registry_is_fail_closed_without_explicit_ack(
             headers={"Authorization": f"Bearer {TOKEN}"},
         )
         assert review.status_code == 503
-        assert review.json()["error"]["code"] == "OPERATOR_CASE_REGISTRY_UNAVAILABLE"
+        assert review.json()["error"]["code"] == "operator_case_registry_unavailable"
 
 
 @pytest.mark.asyncio
