@@ -1,0 +1,191 @@
+from scripts.operator_paper_smoke import (
+    OperatorSmokeError,
+    SmokeConfig,
+    run_smoke,
+)
+
+import pytest
+
+
+DIGEST_A = "a" * 64
+DIGEST_B = "b" * 64
+DIGEST_C = "c" * 64
+DIGEST_D = "d" * 64
+
+
+def _config(*, run=False, persist=False):
+    return SmokeConfig(
+        base_url="https://operator.example",
+        token="test-token",
+        prepare_payload={"explicit": "payload"},
+        timeout_seconds=5,
+        confirm_run=run,
+        confirm_persist=persist,
+    )
+
+
+def test_default_smoke_stops_after_prepare_and_review_without_hidden_actions():
+    calls = []
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        if len(calls) == 1:
+            return 201, {
+                "handle": "opaque-handle",
+                "case_digest": DIGEST_A,
+                "state": "REVIEW_READY",
+            }
+        return 200, {
+            "handle": "opaque-handle",
+            "case_digest": DIGEST_A,
+            "state": "REVIEW_READY",
+        }
+
+    result = run_smoke(_config(), request_json=request)
+
+    assert list(result) == ["prepare", "review_after_prepare"]
+    assert [call[0] for call in calls] == ["POST", "GET"]
+
+
+def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
+    calls = []
+
+    responses = [
+        (
+            201,
+            {
+                "handle": "opaque-handle",
+                "case_digest": DIGEST_A,
+                "state": "REVIEW_READY",
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque-handle",
+                "case_digest": DIGEST_A,
+                "state": "REVIEW_READY",
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque-handle",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "outcome": "RUN_TERMINAL",
+                "persist_eligible": True,
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque-handle",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque-handle",
+                "case_digest": DIGEST_A,
+                "state": "PERSIST_TERMINAL",
+                "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
+            },
+        ),
+        (
+            200,
+            {
+                "outcome": "FOUND",
+                "lifecycle_result_digest": DIGEST_D,
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    result = run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert list(result) == [
+        "prepare",
+        "review_after_prepare",
+        "run",
+        "review_after_run",
+        "persist",
+        "readback",
+    ]
+    assert [call[0] for call in calls] == ["POST", "GET", "POST", "GET", "POST", "GET"]
+    assert calls[2][2] == {"case_digest": DIGEST_A, "confirm_run": True}
+    assert calls[4][2] == {
+        "case_digest": DIGEST_A,
+        "oci_digest": DIGEST_B,
+        "osc_digest": DIGEST_C,
+        "lifecycle_result_digest": DIGEST_D,
+        "confirm_persist": True,
+    }
+
+
+def test_persist_requires_explicit_run_confirmation():
+    with pytest.raises(OperatorSmokeError, match="requires --confirm-run"):
+        _config(persist=True)
+
+
+def test_non_persistable_run_stops_without_persist_or_readback():
+    calls = []
+
+    responses = [
+        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "outcome": "RUN_TERMINAL",
+                "persist_eligible": False,
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    result = run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert "persist_skipped" in result
+    assert "persist" not in result
+    assert "readback" not in result
+    assert len(calls) == 4
+
+
+def test_preparation_stop_does_not_review_or_run():
+    calls = []
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return 200, {
+            "state": "PREPARATION_STOPPED",
+            "reason_codes": ["ELIGIBILITY_REJECTED"],
+            "simulation_only": True,
+        }
+
+    result = run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert list(result) == ["prepare"]
+    assert len(calls) == 1
