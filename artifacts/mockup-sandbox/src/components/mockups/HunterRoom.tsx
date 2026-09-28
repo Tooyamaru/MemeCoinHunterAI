@@ -114,6 +114,16 @@ type LifecycleCatalog = {
   result_digest: string;
 };
 
+type OperatorReadiness = {
+  contract_version: string;
+  status: "READY" | "NOT_READY";
+  environment: string;
+  checks: Record<string, string>;
+  process_local_registry: boolean;
+  provider_connectivity_checked: boolean;
+  simulation_only: boolean;
+};
+
 type ApiErrorPayload = {
   error?: {
     code?: string;
@@ -409,7 +419,8 @@ export default function HunterRoom() {
   const [lastPersist, setLastPersist] = useState<PersistResponse | null>(null);
   const [readback, setReadback] = useState<LifecycleRead | null>(null);
   const [history, setHistory] = useState<LifecycleCatalog | null>(null);
-  const [busy, setBusy] = useState<"prepare" | "refresh" | "run" | "persist" | "readback" | "history" | null>(null);
+  const [readiness, setReadiness] = useState<OperatorReadiness | null>(null);
+  const [busy, setBusy] = useState<"prepare" | "refresh" | "run" | "persist" | "readback" | "history" | "readiness" | null>(null);
   const [message, setMessage] = useState("No case loaded. Hunter Room is idle.");
 
   const base = useMemo(() => apiBase.trim().replace(/\/$/, ""), [apiBase]);
@@ -474,6 +485,65 @@ export default function HunterRoom() {
         },
       }),
     );
+  }
+
+  async function checkReadiness() {
+    if (!token.trim()) {
+      setMessage("Operator bearer token is required for readiness.");
+      return;
+    }
+    setBusy("readiness");
+    try {
+      const response = await fetch(`${base}/api/v1/operator/paper-cases/readiness`, {
+        headers: authHeaders(),
+      });
+      const raw = await response.text();
+      let parsed: unknown = null;
+      if (raw) {
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          parsed = raw;
+        }
+      }
+
+      if (
+        (response.status === 200 || response.status === 503) &&
+        parsed &&
+        typeof parsed === "object" &&
+        "contract_version" in parsed &&
+        "status" in parsed
+      ) {
+        const result = parsed as OperatorReadiness;
+        setReadiness(result);
+        setMessage(
+          result.status === "READY"
+            ? "Operator chain is configured for controlled-paper use."
+            : "Operator chain is not ready; review the reported checks.",
+        );
+        return;
+      }
+
+      if (!response.ok) {
+        const error = parsed as ApiErrorPayload;
+        const detail = error?.error;
+        throw new Error(
+          [
+            detail?.code || `HTTP_${response.status}`,
+            detail?.message,
+            detail?.request_id ? `request ${detail.request_id}` : undefined,
+          ]
+            .filter(Boolean)
+            .join(" · "),
+        );
+      }
+      throw new Error("Readiness response did not match the expected contract.");
+    } catch (error) {
+      setReadiness(null);
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function refreshCase(handle = activeHandle || handleInput.trim()) {
@@ -717,6 +787,57 @@ export default function HunterRoom() {
                 <p className="text-[11px] leading-5 text-slate-500">
                   The token stays in browser memory only. Use TLS or a trusted same-origin proxy.
                 </p>
+
+                <div className="rounded-xl border border-white/8 bg-black/20 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        Operator readiness
+                      </div>
+                      <div className="mt-1 text-xs text-slate-300">
+                        {readiness ? readiness.status : "Not checked"}
+                      </div>
+                    </div>
+                    <span className={`rounded-full border px-2 py-1 text-[10px] font-semibold ${
+                      readiness?.status === "READY"
+                        ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-100"
+                        : readiness?.status === "NOT_READY"
+                          ? "border-amber-400/30 bg-amber-400/10 text-amber-100"
+                          : "border-white/10 bg-white/5 text-slate-400"
+                    }`}>
+                      {readiness?.environment || "manual"}
+                    </span>
+                  </div>
+
+                  {readiness && (
+                    <div className="mt-3 grid gap-1.5">
+                      {Object.entries(readiness.checks).map(([name, value]) => (
+                        <div
+                          key={name}
+                          className="flex items-center justify-between gap-3 text-[11px]"
+                        >
+                          <span className="text-slate-500">{name.replaceAll("_", " ")}</span>
+                          <span className="font-mono text-slate-300">{value}</span>
+                        </div>
+                      ))}
+                      <div className="mt-1 text-[10px] leading-4 text-slate-600">
+                        Provider connectivity is not probed by this check.
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 w-full border-emerald-300/20 bg-emerald-300/5 text-emerald-100"
+                    disabled={busy !== null || !token.trim()}
+                    onClick={() => void checkReadiness()}
+                  >
+                    {busy === "readiness" ? <LoaderCircle className="animate-spin" /> : <CheckCircle2 />}
+                    Check readiness
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
