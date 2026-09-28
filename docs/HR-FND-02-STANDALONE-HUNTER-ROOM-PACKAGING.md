@@ -26,7 +26,9 @@ standalone Hunter Room bundle, so GitHub CI verifies both packaging modes.
 
 ## Runtime topology
 
-The preferred deployment is same-origin. The managed Replit artifact now exposes the standalone Hunter Room at `/hunter-room` and the Python Operator Facade on the same origin under `/api/v1` (plus `/health` and `/ready`):
+The preferred browser/API topology is same-origin. The managed artifact can route
+the standalone Hunter Room at `/hunter-room` and the Python Operator Facade
+under `/api/v1` (plus `/health` and `/ready`):
 
 ```text
 browser
@@ -35,11 +37,28 @@ browser
   -> /api/v1/paper-lifecycle-results
 ```
 
-In another hosting environment, an equivalent reverse proxy may serve the static bundle and FastAPI under one HTTPS origin.
-Hunter Room defaults to a blank API base, which means relative same-origin
-requests. A separate API base remains available for controlled testing, but any
-cross-origin production deployment requires an explicitly reviewed origin/CORS
-policy.
+In another hosting environment, an equivalent reverse proxy may serve the static
+bundle and FastAPI under one HTTPS origin. Hunter Room defaults to a blank API
+base, which means relative same-origin requests. A separate API base remains
+available for controlled testing, but any cross-origin production deployment
+requires an explicitly reviewed origin/CORS policy.
+
+### Process-local operator case boundary
+
+The OAF prepared-case registry intentionally preserves exact in-memory Python
+object identity between prepare, review, run and persist. It is finite,
+process-local and not restart-safe or cross-process.
+
+For `staging` and `production`, operator case mutation is therefore disabled
+unless `OPERATOR_PROCESS_LOCAL_REGISTRY_ACK=true`. This setting is an explicit
+deployment acknowledgement, not a distributed-safety mechanism. It may only be
+enabled when the deployment guarantees one stable application process for the
+entire active case lifetime.
+
+Autoscaling, multi-worker, process-restart or request-routing topologies that
+can move one case between processes remain unsupported for OAF mutation until a
+separately governed durable/reconstructable case-state contract exists. Durable
+RTI-03 lifecycle readback is unaffected because it is database-backed.
 
 ## Secret handling
 
