@@ -916,7 +916,10 @@ export default function HunterRoom() {
               <CardContent className="space-y-3">
                 <Textarea
                   value={prepareJson}
-                  onChange={(event) => setPrepareJson(event.target.value)}
+                  onChange={(event) => {
+                    setPrepareJson(event.target.value);
+                    setPrepareValidation(null);
+                  }}
                   className="min-h-[290px] border-white/10 bg-black/20 font-mono text-[11px] leading-5 text-slate-200"
                   spellCheck={false}
                 />
@@ -925,7 +928,10 @@ export default function HunterRoom() {
                     type="button"
                     variant="outline"
                     className="border-white/10 bg-white/5 text-slate-200"
-                    onClick={() => setPrepareJson(formatJson(TEMPLATE))}
+                    onClick={() => {
+                      setPrepareJson(formatJson(TEMPLATE));
+                      setPrepareValidation(null);
+                    }}
                   >
                     Reset template
                   </Button>
