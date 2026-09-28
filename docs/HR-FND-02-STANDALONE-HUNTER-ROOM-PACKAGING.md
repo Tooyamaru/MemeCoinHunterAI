@@ -26,7 +26,7 @@ standalone Hunter Room bundle, so GitHub CI verifies both packaging modes.
 
 ## Runtime topology
 
-The preferred deployment is same-origin:
+The preferred deployment is same-origin. The managed Replit artifact now exposes the standalone Hunter Room at `/hunter-room` and the Python Operator Facade on the same origin under `/api/v1` (plus `/health` and `/ready`):
 
 ```text
 browser
@@ -35,7 +35,7 @@ browser
   -> /api/v1/paper-lifecycle-results
 ```
 
-A reverse proxy may serve the static bundle and FastAPI under one HTTPS origin.
+In another hosting environment, an equivalent reverse proxy may serve the static bundle and FastAPI under one HTTPS origin.
 Hunter Room defaults to a blank API base, which means relative same-origin
 requests. A separate API base remains available for controlled testing, but any
 cross-origin production deployment requires an explicitly reviewed origin/CORS
