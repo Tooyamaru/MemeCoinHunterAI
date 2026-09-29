@@ -1,3 +1,11 @@
+## 2026-09-29 — Real-Environment Smoke Validation Preflight Alignment
+
+- **SMOKE HARNESS:** The explicit controlled-paper smoke sequence now performs authenticated configuration readiness and authenticated no-I/O canonical prepare-payload validation before any provider-backed prepare request.
+- **CARDINALITY:** A full eligible sequence is exactly eight requests: `readiness -> validate -> prepare -> review -> run -> review -> persist -> readback`. There is still no retry, polling, fallback provider, second run, or second persist.
+- **FAIL-CLOSED:** Non-`READY` stops before validation/prepare; non-`VALID` stops before provider-backed prepare. Validation reuses the exact explicit prepare payload, creates no case, and performs no provider/source I/O.
+- **OPERATIONAL STATUS:** The real-environment provider-backed controlled-paper smoke itself remains NOT YET EXECUTED and still requires explicit operational authorization plus intentionally available runtime secrets.
+- **BOUNDARY:** No autonomous hunting, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Post-OAF Hunter Room Hardening Reconciliation
 
 - **MERGED CHAIN:** PR #99 through PR #108 advance the controlled-paper operator surface from durability/deployment audit through authenticated readiness, no-I/O payload validation, explicit prepare preflight gating, two-step run/persist confirmation, case lifetime/provenance visibility, stale-arm invalidation, durable readback gating, and explicit browser-session cleanup.
