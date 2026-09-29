@@ -21,12 +21,16 @@ bounded operator/deployment hardening:
 - two-step run/persist confirmation;
 - server case lifetime/provenance visibility and stale-arm invalidation;
 - durable readback gating on RTI-03 `STORED` / `ALREADY_STORED`;
-- explicit browser-memory operator-session cleanup.
+- explicit browser-memory operator-session cleanup;
+- real-environment smoke-harness alignment so authenticated readiness and
+  authenticated no-I/O payload validation both pass before provider-backed
+  prepare is attempted.
 
-The remaining operational gap is no longer production packaging. It is one
-explicit provider-backed controlled-paper smoke sequence in a known
-single-process environment when separately authorized and when runtime secrets
-are intentionally available. The smoke has NOT YET BEEN EXECUTED.
+The remaining operational gap is no longer production packaging or smoke-harness
+preflight parity. It is one explicit provider-backed controlled-paper smoke
+sequence in a known single-process environment when separately authorized and
+when runtime secrets are intentionally available. The smoke has NOT YET BEEN
+EXECUTED.
 
 Current reconciled main checkpoint: `701726622f62c907fbe42e822543f9cb5c3f6cee`.
 
@@ -69,8 +73,8 @@ execution.
 
 1. Production Hunter Room packaging/deployment remains the next bounded engineering step; repository/CI verification of the operator chain is complete.
 2. The operator case registry remains finite and process-local. It does not provide cross-process or restart-safe exactly-once semantics.
-3. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by a paper-only smoke verification. No secrets belong in source control.
-4. The merged E2E test does not exercise a live provider-backed prepare or browser runtime; those are operational verification gaps, not missing canonical owners.
+3. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by a paper-only smoke verification. The harness now performs no-I/O validation before provider-backed prepare. No secrets belong in source control.
+4. The merged E2E test and offline smoke tests do not exercise a live provider-backed prepare or browser runtime; those are operational verification gaps, not missing canonical owners.
 5. No autonomous hunting loop, scheduler, automatic retry, wallet, signing, broadcast, DEX execution, economic settlement, or live trading authority is opened by this audit.
 
 ## Recommended next gate
