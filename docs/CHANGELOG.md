@@ -1,3 +1,12 @@
+## 2026-09-29 — Operator Smoke Preparation STOP Proof
+
+- **STOP CONTRACT:** A provider-backed `PREPARATION_STOPPED` response is accepted only under `p01-oaf-01-post-prepare-v1`.
+- **SAFETY BOUNDARY:** STOP must remain `simulation_only=true`.
+- **REASONS:** STOP must expose at least one explicit non-empty reason code; malformed or reasonless STOP responses fail closed.
+- **CARDINALITY:** A valid STOP still terminates after the single prepare request and does not review, run, persist, or read back.
+- **OPERATIONAL STATUS:** No provider-backed smoke is executed by this change.
+- **BOUNDARY:** No retry/polling, autonomous hunting, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke Terminal Contract Proof
 
 - **RUN:** Require the run-once contract, exact case identity, `RUN_TERMINAL` state/outcome, and simulation-only before post-run review.
