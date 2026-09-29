@@ -2,10 +2,13 @@
 
 ## Purpose
 
-GitHub is the source of truth, ChatGPT/Codex is the architecture, implementation,
-test, and review workspace, and Replit is the interactive runtime and preview
-environment. A Replit workspace may be replaced without becoming a separate
-source-code authority.
+GitHub `main` is the source of truth. ChatGPT is the primary controller and
+normal architecture, implementation, test, review, and documentation workspace.
+ChatGPT Work may be used for heavier multi-step execution when available, but it
+does not replace the normal ChatGPT workflow. Replit is fallback-only for a
+specific interactive runtime/environment task that cannot be completed in
+ChatGPT/Work. A Replit workspace never becomes an independent source-code
+authority.
 
 ## Standard change path
 
@@ -18,9 +21,12 @@ source-code authority.
 6. Run focused checks locally, followed by the applicable full checks.
 7. Push the branch and open a pull request against `main`.
 8. Require the GitHub Actions checks to pass before merge.
-9. Use Replit for runtime, UI, and integration validation when the change needs
-   an interactive environment.
+9. Use ChatGPT/Work for runtime, UI, or integration validation when supported.
+   Use Replit only as a fallback for a concrete interactive environment blocker.
 10. Merge only after review; do not develop directly on `main`.
+11. After each material milestone, reconcile `PROJECT_STATE.md`,
+    `docs/MASTER_BLUEPRINT.md`, `docs/CHANGELOG.md`, and any architecture,
+    readiness, workflow, or operator documentation made stale by the change.
 
 ## Required automated checks
 
@@ -74,27 +80,28 @@ scope exclusions.
 
 ## Replit responsibility
 
-Replit pulls the reviewed GitHub branch, runs the application, and provides UI
-or runtime validation. Runtime-only findings return to the same branch as code,
-tests, or documentation. Replit must not retain an unpublished divergent copy
-of the project.
+Replit is a fallback execution environment, not the default development center.
+Use it only when a concrete runtime/UI/environment task cannot be completed with
+the available ChatGPT/Work tools. When used, Replit pulls the reviewed GitHub
+branch and returns findings to that same branch as code, tests, or
+documentation. Replit must not retain an unpublished divergent copy of the
+project.
 
 ## Current development boundary
 
-The canonical evidence producer is present and tested with offline fixtures.
-P04-LME-01 subsequently approved CoinGecko Demo Onchain pool OHLCV as the
-bounded V1 analytical historical-price source and `price-direction-v1` as the
-deterministic observational market-to-signal policy. P04-LME-02 and
-P04-LME-03 completed the bounded one-shot transport and caller-directed exact-
-pool diagnostic orchestration.
+The bounded controlled-paper Operator Facade and Hunter Room chain is now the
+active development boundary. The repository is merged through HR-FND-11:
+authenticated readiness, no-I/O prepare validation, explicit prepare gating,
+review, two-step run/persist confirmation, case-lifetime/provenance display,
+stale-arm invalidation, durable readback gating, manual persisted history/detail,
+and explicit browser-memory session cleanup.
 
-Application/runtime composition remains blocked pending a separately approved
-contract for the application caller, exact inputs, single-invocation boundary,
-failure propagation, policy-version binding, time/cutoff semantics, provenance,
-and output handoff. Source and policy approval alone does not authorize
-application wiring, automatic pool selection, retry, polling, worker,
-scheduler, queue, or persistence.
+Active cases remain process-local and require one stable application process;
+no restart-safe or multi-worker active-case reconstruction is claimed. The next
+operational verification remains one explicit provider-backed paper-only smoke
+sequence when explicitly authorized and runtime secrets are intentionally
+available.
 
-G2 realization/settlement remains a separate blocked governance decision. This
-workflow change does not authorize G2, wallet integration, signing, broadcast,
-live execution, or P09 behavior.
+No automatic discovery, polling, retry, worker/scheduler loop, wallet/signing,
+broadcast, DEX execution, settlement, live trading, or G2/G3/G4/P09 authority
+is opened by this workflow.
