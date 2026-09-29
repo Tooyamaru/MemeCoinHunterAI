@@ -41,13 +41,56 @@ closed at their governed deterministic/optional-analysis boundaries, but no
 operational decision loop is active. Trading, execution, and wallet behavior
 remain future boundaries.
 
-P01-RTI-01 and P01-RTI-02 provide the bounded one-shot paper admission and
-lifecycle compositions. P01-RTI-03 append-only persistence is COMPLETE /
-CLOSED / CI PASS through PR #11 at `43ab170`. P01-RTI-04 provides one
-caller-triggered persisted paper-run application-service boundary and is
-COMPLETE / CLOSED / CI PASS through PR #13 at `6fdcd72`. API publication,
-workers, scheduling, dashboard wiring, and live behavior remain unauthorized.
+P01-RTI-01 through P01-RTI-16 now provide the bounded controlled-paper
+composition path from admission through lifecycle continuation. The post-RTI
+application chain adds OSC/OSP/PFX/PFS/CIP/OCI composition, then P01-OAF-01
+publishes the explicitly authenticated controlled-paper operator facade.
+Append-only RTI-03 persistence and RTI-05/06/07/08 read-only lifecycle
+readback/catalog remain the durable result owners.
 
+The Hunter Room operator surface is implemented through HR-FND-11. Current
+merged behavior includes standalone packaging, explicit prepare/review,
+authenticated readiness, no-I/O prepare-payload validation, prepare preflight
+gating, two-step run/persist confirmation, server case lifetime/provenance
+visibility, stale armed-action invalidation, durable readback gating,
+persisted lifecycle catalog/detail inspection, and explicit browser-memory
+session cleanup. Active prepare/review/run/persist cases remain process-local
+because the closed CIP/OCI/OAF contracts preserve exact Python object identity;
+one stable application process is required for an active case and no
+restart-safe or multi-worker active-case reconstruction is claimed.
+
+The current controlled-paper operator chain is implemented and CI-verified, but
+one real-environment provider-backed paper smoke sequence remains an operational
+verification task and has not been executed. Autonomous hunting, automatic
+polling/retry, wallet/signing, transaction broadcast, DEX execution,
+settlement/economic realization, and live trading remain outside current
+authority. P08 G2 is BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain
+NOT AUTHORIZED.
+
+## Current controlled-paper operator milestone map — 2026-09-29
+
+```text
+Authenticated readiness
+→ explicit payload validation (no provider I/O)
+→ trusted one-shot prepare
+→ review exact process-local case
+→ two-step run confirmation
+→ terminal review
+→ two-step persistence confirmation
+→ RTI-03 durable persistence
+→ durable readback / manual history
+→ explicit browser-session cleanup
+```
+
+Current presentation/runtime safety properties:
+
+- no automatic polling or automatic retry;
+- no browser-supplied trusted RTI-11 result;
+- no mutation until explicit operator confirmation;
+- no lifecycle readback claim before durable RTI-03 confirmation;
+- no client-side expiry authority; server case lifetime remains authoritative;
+- no cross-process or restart-safe active-case claim;
+- no live/economic authority.
 ## V1.1 architectural baseline
 
 V1.1 defines the intended system as a selective, explainable, risk-first crypto
