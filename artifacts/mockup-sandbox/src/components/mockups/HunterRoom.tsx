@@ -488,6 +488,25 @@ export default function HunterRoom() {
     };
   }, [readback]);
 
+  function clearOperatorSession() {
+    setApiBase("");
+    setToken("");
+    setPrepareJson(formatJson(TEMPLATE));
+    setHandleInput("");
+    setActiveHandle("");
+    setCaseView(null);
+    setLastRun(null);
+    setLastPersist(null);
+    setReadback(null);
+    setHistory(null);
+    setReadiness(null);
+    setPrepareValidation(null);
+    setArmedAction(null);
+    setArmedCaseDigest("");
+    setArmedCaseState("");
+    setMessage("Operator session cleared from browser memory.");
+  }
+
   function authHeaders() {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (token.trim()) headers.Authorization = `Bearer ${token.trim()}`;
@@ -875,6 +894,21 @@ export default function HunterRoom() {
                 </div>
                 <p className="text-[11px] leading-5 text-slate-500">
                   The token stays in browser memory only. Use TLS or a trusted same-origin proxy.
+                </p>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="w-full border-rose-300/20 bg-rose-300/5 text-rose-100"
+                  disabled={busy !== null}
+                  onClick={clearOperatorSession}
+                >
+                  Clear operator session
+                </Button>
+                <p className="text-[10px] leading-4 text-slate-600">
+                  Clears the bearer, API target, prepare payload, active case, history/readback,
+                  preflight results and any armed action from this browser tab only.
                 </p>
 
                 <div className="rounded-xl border border-white/8 bg-black/20 p-3">
