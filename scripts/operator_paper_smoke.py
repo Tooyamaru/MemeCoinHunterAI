@@ -123,6 +123,14 @@ def run_smoke(
     result["readiness"] = {"status": readiness_status, "body": readiness}
     if readiness_status != 200 or readiness.get("status") != "READY":
         raise OperatorSmokeError("operator readiness preflight did not pass")
+    if readiness.get("contract_version") != "p01-oaf-01-operator-readiness-v1":
+        raise OperatorSmokeError("operator readiness contract mismatch")
+    if readiness.get("process_local_registry") is not True:
+        raise OperatorSmokeError("operator readiness process-local registry mismatch")
+    if readiness.get("provider_connectivity_checked") is not False:
+        raise OperatorSmokeError("operator readiness unexpectedly checked provider connectivity")
+    if readiness.get("simulation_only") is not True:
+        raise OperatorSmokeError("operator readiness lost simulation-only boundary")
 
     validation_status, validation = request_json(
         "POST",
@@ -134,6 +142,32 @@ def run_smoke(
     result["validation"] = {"status": validation_status, "body": validation}
     if validation_status != 200 or validation.get("status") != "VALID":
         raise OperatorSmokeError("operator prepare validation preflight did not pass")
+    if validation.get("contract_version") != "p01-oaf-01-prepare-validation-v1":
+        raise OperatorSmokeError("operator prepare validation contract mismatch")
+    if validation.get("provider_connectivity_checked") is not False:
+        raise OperatorSmokeError("operator validation unexpectedly checked provider connectivity")
+    if validation.get("mutates_case") is not False:
+        raise OperatorSmokeError("operator validation unexpectedly mutated case state")
+    if validation.get("simulation_only") is not True:
+        raise OperatorSmokeError("operator validation lost simulation-only boundary")
+
+    target = config.prepare_payload.get("target")
+    paper_intent = config.prepare_payload.get("paper_intent")
+    if not isinstance(target, dict) or not isinstance(paper_intent, dict):
+        raise OperatorSmokeError("prepare payload identity projection is unavailable")
+    expected_identity = {
+        "candidate_id": config.prepare_payload.get("candidate_id"),
+        "token_mint": config.prepare_payload.get("token_mint"),
+        "chain_id": target.get("chain_id"),
+        "pool_address": target.get("pool_address"),
+        "pfx_invocation_id": paper_intent.get("pfx_invocation_id"),
+        "cip_invocation_id": paper_intent.get("cip_invocation_id"),
+    }
+    for name, expected in expected_identity.items():
+        if not isinstance(expected, str) or not expected:
+            raise OperatorSmokeError(f"prepare payload missing explicit {name}")
+        if validation.get(name) != expected:
+            raise OperatorSmokeError(f"operator validation {name} mismatch")
 
     if config.preflight_only:
         return result

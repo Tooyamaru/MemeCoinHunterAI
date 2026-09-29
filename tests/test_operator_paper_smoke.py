@@ -13,11 +13,26 @@ DIGEST_C = "c" * 64
 DIGEST_D = "d" * 64
 
 
+def _prepare_payload():
+    return {
+        "candidate_id": "candidate-1",
+        "token_mint": "mint-1",
+        "target": {
+            "chain_id": "solana",
+            "pool_address": "pool-1",
+        },
+        "paper_intent": {
+            "pfx_invocation_id": "pfx-1",
+            "cip_invocation_id": "cip-1",
+        },
+    }
+
+
 def _config(*, run=False, persist=False, preflight=False):
     return SmokeConfig(
         base_url="https://operator.example",
         token="test-token",
-        prepare_payload={"explicit": "payload"},
+        prepare_payload=_prepare_payload(),
         timeout_seconds=5,
         confirm_run=run,
         confirm_persist=persist,
@@ -84,6 +99,54 @@ def test_preflight_only_rejects_run_or_persist_confirmation():
         _config(run=True, persist=True, preflight=True)
 
 
+def test_readiness_contract_mismatch_stops_before_validation():
+    calls = []
+
+    bad_ready = _ready()
+    bad_ready[1]["provider_connectivity_checked"] = True
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return bad_ready
+
+    with pytest.raises(OperatorSmokeError, match="unexpectedly checked provider connectivity"):
+        run_smoke(_config(preflight=True), request_json=request)
+
+    assert len(calls) == 1
+
+
+def test_validation_identity_mismatch_stops_before_prepare():
+    calls = []
+    bad_valid = _valid()
+    bad_valid[1]["candidate_id"] = "different-candidate"
+    responses = [_ready(), bad_valid]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="validation candidate_id mismatch"):
+        run_smoke(_config(), request_json=request)
+
+    assert len(calls) == 2
+
+
+def test_validation_mutation_claim_stops_before_prepare():
+    calls = []
+    bad_valid = _valid()
+    bad_valid[1]["mutates_case"] = True
+    responses = [_ready(), bad_valid]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="unexpectedly mutated case state"):
+        run_smoke(_config(), request_json=request)
+
+    assert len(calls) == 2
+
+
 def test_default_smoke_checks_readiness_and_validation_then_stops_after_prepare_and_review():
     calls = []
 
@@ -118,7 +181,7 @@ def test_default_smoke_checks_readiness_and_validation_then_stops_after_prepare_
     assert [call[0] for call in calls] == ["GET", "POST", "POST", "GET"]
     assert calls[0][1].endswith("/api/v1/operator/paper-cases/readiness")
     assert calls[1][1].endswith("/api/v1/operator/paper-cases/validate")
-    assert calls[1][2] == {"explicit": "payload"}
+    assert calls[1][2] == _prepare_payload()
 
 
 def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():

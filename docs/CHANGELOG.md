@@ -1,3 +1,12 @@
+## 2026-09-29 — Operator Smoke Preflight Contract & Identity Proof
+
+- **READINESS CONTRACT:** Smoke preflight now requires the exact operator-readiness contract, process-local registry readiness for the current phase, no provider-connectivity probe, and the simulation-only boundary.
+- **VALIDATION CONTRACT:** Validation must use the expected contract, claim no provider connectivity check, claim no case mutation, and remain simulation-only.
+- **IDENTITY PROJECTION:** Candidate, token, chain, pool, PFX invocation, and CIP invocation returned by validation must exactly match the explicit submitted prepare payload before any trusted prepare/provider access.
+- **FAIL-CLOSED:** Contract, safety-claim, or identity mismatch stops before prepare; no retry or fallback is introduced.
+- **OPERATIONAL STATUS:** Provider-backed prepare/run/persist remains separately authorized and is NOT executed by this change.
+- **BOUNDARY:** No autonomous hunting, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke No-Provider Preflight Mode
 
 - **PREFLIGHT-ONLY:** The controlled-paper smoke CLI now supports `--preflight-only`, which performs exactly authenticated readiness plus no-I/O canonical payload validation, then stops before trusted prepare/provider access and before any case mutation.
