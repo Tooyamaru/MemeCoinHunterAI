@@ -607,6 +607,10 @@ export default function HunterRoom() {
   }
 
   async function prepareCase() {
+    if (readiness?.status !== "READY" || prepareValidation?.status !== "VALID") {
+      setMessage("Prepare requires a fresh READY check and VALID payload validation.");
+      return;
+    }
     setBusy("prepare");
     setReadback(null);
     setLastRun(null);
@@ -733,6 +737,8 @@ export default function HunterRoom() {
   }
 
   const state = caseView?.state || "IDLE";
+  const canPrepare =
+    readiness?.status === "READY" && prepareValidation?.status === "VALID";
   const canRun = state === "REVIEW_READY";
   const canPersist =
     state === "RUN_TERMINAL" &&
@@ -809,7 +815,11 @@ export default function HunterRoom() {
                   <label className="mb-1 block text-xs text-slate-400">API base</label>
                   <Input
                     value={apiBase}
-                    onChange={(event) => setApiBase(event.target.value)}
+                    onChange={(event) => {
+                      setApiBase(event.target.value);
+                      setReadiness(null);
+                      setPrepareValidation(null);
+                    }}
                     placeholder="Same origin, or https://api.example"
                     className="border-white/10 bg-white/5 text-slate-100"
                   />
@@ -820,7 +830,10 @@ export default function HunterRoom() {
                     type="password"
                     autoComplete="off"
                     value={token}
-                    onChange={(event) => setToken(event.target.value)}
+                    onChange={(event) => {
+                      setToken(event.target.value);
+                      setReadiness(null);
+                    }}
                     placeholder="Session only; never stored"
                     className="border-white/10 bg-white/5 text-slate-100"
                   />
@@ -947,8 +960,8 @@ export default function HunterRoom() {
                   </Button>
                   <Button
                     type="button"
-                    disabled={busy !== null || !token.trim()}
-                    className="bg-amber-300 text-slate-950 hover:bg-amber-200"
+                    disabled={busy !== null || !token.trim() || !canPrepare}
+                    className="bg-amber-300 text-slate-950 hover:bg-amber-200 disabled:bg-slate-800 disabled:text-slate-500"
                     onClick={() => void prepareCase()}
                   >
                     {busy === "prepare" ? <LoaderCircle className="animate-spin" /> : <ScanSearch />}
@@ -959,6 +972,29 @@ export default function HunterRoom() {
                   No hidden defaults. The template is only a schema aid; every policy,
                   time, identity and simulation assumption must be explicitly reviewed.
                 </p>
+
+                <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <div className={`rounded-lg border px-2 py-1.5 ${
+                    readiness?.status === "READY"
+                      ? "border-emerald-300/20 bg-emerald-300/5 text-emerald-100"
+                      : "border-white/8 bg-white/[0.025] text-slate-500"
+                  }`}>
+                    Readiness: {readiness?.status || "REQUIRED"}
+                  </div>
+                  <div className={`rounded-lg border px-2 py-1.5 ${
+                    prepareValidation?.status === "VALID"
+                      ? "border-emerald-300/20 bg-emerald-300/5 text-emerald-100"
+                      : "border-white/8 bg-white/[0.025] text-slate-500"
+                  }`}>
+                    Payload: {prepareValidation?.status || "REQUIRED"}
+                  </div>
+                </div>
+                {!canPrepare && (
+                  <p className="text-[10px] leading-4 text-amber-200/60">
+                    Prepare stays disabled until both manual preflights pass. Server-side
+                    authorization and canonical prepare validation remain authoritative.
+                  </p>
+                )}
 
                 {prepareValidation && (
                   <div className="rounded-xl border border-emerald-300/15 bg-emerald-300/5 p-3">
