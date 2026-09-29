@@ -84,11 +84,13 @@ Any mismatch stops before trusted prepare/provider access.
 
 There is no retry, polling, fallback provider, second run, or second persist.
 
-A canonical preparation STOP returns immediately. A successful prepare must use
-the trusted-prepare contract, remain simulation-only, reach `REVIEW_READY`,
-project the exact candidate/token/chain/pool identity validated before provider
-access, return a canonical CIP digest, and expose the exact review path for the
-opaque handle. The first review must retain the registry contract, the same
+A canonical preparation STOP returns immediately only when it uses the
+post-prepare STOP contract, remains simulation-only, and carries at least one
+explicit non-empty reason code. Any malformed or boundary-breaking STOP is
+rejected. A successful prepare must use the trusted-prepare contract, remain
+simulation-only, reach `REVIEW_READY`, project the exact
+candidate/token/chain/pool identity validated before provider access, return a
+canonical CIP digest, and expose the exact review path for the opaque handle. The first review must retain the registry contract, the same
 handle/case digest, the same candidate/token/chain/pool identity, the same CIP
 digest, the simulation-only boundary, and the expected historical-price-proxy
 source label. Any mismatch stops before run.
