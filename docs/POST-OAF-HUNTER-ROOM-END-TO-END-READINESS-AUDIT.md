@@ -37,6 +37,10 @@ bounded operator/deployment hardening:
 - preflight contract/identity proof requiring expected readiness/validation
   contracts, process-local/simulation-only/no-provider safety claims, and exact
   candidate/token/chain/pool/PFX/CIP identity projection before prepare.
+- successful prepare/first-review identity proof requiring trusted-prepare and
+  registry contracts, exact case/candidate/token/chain/pool/CIP continuity,
+  canonical review path, simulation-only state, and expected source label
+  before run.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke
