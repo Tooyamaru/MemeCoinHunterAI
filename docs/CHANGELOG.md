@@ -1,3 +1,13 @@
+## 2026-09-29 — Operator Smoke Terminal Contract Proof
+
+- **RUN:** Require the run-once contract, exact case identity, `RUN_TERMINAL` state/outcome, and simulation-only before post-run review.
+- **POST-RUN REVIEW:** Require the case-registry contract, same case identity, retained terminal state, simulation-only, and controlled source label.
+- **PERSIST:** Require the persist-once contract, terminal persistence outcome, simulation-only, canonical persistence digest, non-negative artifact count, and durable `STORED`/`ALREADY_STORED`.
+- **READBACK:** Require the RTI-03 contract, exact lifecycle root, canonical result digest, matching run lifecycle root, artifact-list shape, and artifact-count agreement with persistence.
+- **FAIL-CLOSED:** Contract, terminal-state, simulation/source, digest, or artifact-count mismatch stops immediately with no retry or fallback.
+- **OPERATIONAL STATUS:** No provider-backed smoke is executed by this change; real-environment execution remains separately authorized.
+- **BOUNDARY:** No autonomous hunting, polling/retry, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke Prepare/Review Identity Proof
 
 - **PREPARE CONTRACT:** Successful provider-backed prepare must use the trusted-prepare contract, remain simulation-only, reach `REVIEW_READY`, and project the exact validated candidate/token/chain/pool identity.
