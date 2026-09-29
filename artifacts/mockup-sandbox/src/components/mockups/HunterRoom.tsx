@@ -774,6 +774,10 @@ export default function HunterRoom() {
   const canPersist =
     state === "RUN_TERMINAL" &&
     Boolean(caseView?.oci_digest && caseView?.osc_digest && caseView?.lifecycle_result_digest);
+  const canReadPersisted =
+    Boolean(caseView?.readback_path) &&
+    (caseView?.persistence_outcome === "STORED" ||
+      caseView?.persistence_outcome === "ALREADY_STORED");
 
   const agentStates = [
     {
@@ -1216,12 +1220,19 @@ export default function HunterRoom() {
                   type="button"
                   variant="outline"
                   className="w-full border-emerald-300/20 bg-emerald-300/5 text-emerald-100"
-                  disabled={!caseView?.lifecycle_result_digest || busy !== null}
+                  disabled={!canReadPersisted || busy !== null}
                   onClick={() => void readLifecycle()}
                 >
                   {busy === "readback" ? <LoaderCircle className="animate-spin" /> : <Database />}
                   Read persisted lifecycle
                 </Button>
+
+                <div className="rounded-xl border border-white/8 bg-black/20 p-3 text-[11px] leading-5 text-slate-400">
+                  <div className="font-semibold text-slate-200">Durable readback gate</div>
+                  {canReadPersisted
+                    ? "RTI-03 reports STORED/ALREADY_STORED and exposes a server readback path."
+                    : "Readback stays disabled until persistence is durably confirmed by the server."}
+                </div>
 
                 <div className="rounded-xl border border-white/8 bg-black/20 p-3 text-[11px] leading-5 text-slate-400">
                   <div className="font-semibold text-slate-200">No automatic retry</div>
@@ -1240,6 +1251,7 @@ export default function HunterRoom() {
                 <KeyValue label="OSC digest" value={short(caseView?.osc_digest, 8)} />
                 <KeyValue label="Lifecycle digest" value={short(caseView?.lifecycle_result_digest, 8)} />
                 <KeyValue label="RTI-03 digest" value={short(caseView?.persistence_digest, 8)} />
+                <KeyValue label="Readback path" value={caseView?.readback_path || "Not durably stored"} />
                 <KeyValue
                   label="Stored artifacts"
                   value={caseView?.persistence_artifact_count ?? "—"}
