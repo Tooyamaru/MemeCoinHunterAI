@@ -1,6 +1,6 @@
 # Post-OAF / Hunter Room End-to-End Readiness Audit
 
-Status: AUDIT COMPLETE / BOUNDED OPERATOR E2E VERIFIED / PRODUCTION PACKAGING NEXT / NO NEW ECONOMIC AUTHORITY
+Status: AUDIT COMPLETE / BOUNDED OPERATOR E2E VERIFIED / REAL-ENVIRONMENT CONTROLLED-PAPER SMOKE NEXT / NO NEW ECONOMIC AUTHORITY
 
 Repository checkpoint audited: `1163df00f3d02de1f635dbf399517dc96128b0d9` (`main` after PR #92).
 
@@ -27,7 +27,10 @@ bounded operator/deployment hardening:
   prepare is attempted;
 - smoke-harness durable-readback verification requiring `STORED` or
   `ALREADY_STORED`, exact lifecycle-digest continuity, the exact canonical
-  readback path, and `FOUND` readback of that same digest.
+  readback path, and `FOUND` readback of that same digest;
+- smoke-harness case identity continuity requiring the same handle/case digest
+  across review/run/post-run review/persist and exact OCI/OSC/lifecycle digest
+  agreement between persist-eligible run and post-run review.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke
