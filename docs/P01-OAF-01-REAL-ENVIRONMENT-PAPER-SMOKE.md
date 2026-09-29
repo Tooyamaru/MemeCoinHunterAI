@@ -94,17 +94,24 @@ digest, the simulation-only boundary, and the expected historical-price-proxy
 source label. Any mismatch stops before run.
 
 Across later run, post-run review, and persist, the harness requires the same
-opaque case handle and exact case digest. For persist-eligible runs,
-OCI/OSC/lifecycle digests from the run response must exactly match the post-run
-review before persistence is attempted. A non-persistable run returns without
-calling persistence.
+opaque case handle and exact case digest. Run must use the run-once contract,
+remain simulation-only, and reach the terminal controlled-paper outcome. The
+post-run review must retain the case-registry contract, terminal run state,
+simulation-only boundary, and controlled source label. For persist-eligible
+runs, OCI/OSC/lifecycle digests from the run response must exactly match the
+post-run review before persistence is attempted. A non-persistable terminal run
+returns without calling persistence.
 
-After persistence, durable readback is attempted only when the persistence owner
-reports `STORED` or `ALREADY_STORED`, the returned lifecycle digest matches
-the exact run lifecycle digest, and the readback path is the exact canonical
-path for that digest. The readback itself must return `FOUND` for the same
-lifecycle digest. Any identity, path, or durable-storage mismatch stops
-immediately. Transport/HTTP/schema failures also stop immediately.
+Persistence must use the persist-once contract, remain simulation-only, reach
+`PERSIST_TERMINAL`, expose a canonical persistence digest and non-negative
+artifact count, and report `STORED` or `ALREADY_STORED`. Durable readback is
+then attempted only for the exact canonical lifecycle path. The readback must
+use the RTI-03 contract, return `FOUND` for the same lifecycle digest, expose a
+canonical result digest, project the same lifecycle root in its run snapshot,
+and keep the run artifact count equal to both the returned artifact list and
+the persistence artifact count. Any contract, identity, path, artifact-count,
+or durable-storage mismatch stops immediately. Transport/HTTP/schema failures
+also stop immediately.
 
 ## Boundary
 
