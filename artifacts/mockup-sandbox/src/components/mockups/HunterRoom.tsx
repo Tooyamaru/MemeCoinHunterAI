@@ -436,6 +436,8 @@ export default function HunterRoom() {
   const [history, setHistory] = useState<LifecycleCatalog | null>(null);
   const [readiness, setReadiness] = useState<OperatorReadiness | null>(null);
   const [prepareValidation, setPrepareValidation] = useState<PrepareValidation | null>(null);
+  const [armedAction, setArmedAction] = useState<"run" | "persist" | null>(null);
+  const [armedCaseDigest, setArmedCaseDigest] = useState("");
   const [busy, setBusy] = useState<"prepare" | "validate" | "refresh" | "run" | "persist" | "readback" | "history" | "readiness" | null>(null);
   const [message, setMessage] = useState("No case loaded. Hunter Room is idle.");
 
@@ -596,6 +598,10 @@ export default function HunterRoom() {
     try {
       const result = await api<CaseReview>(`/api/v1/operator/paper-cases/${encodeURIComponent(handle)}`);
       setCaseView(result);
+      if (armedCaseDigest && armedCaseDigest !== result.case_digest) {
+        setArmedAction(null);
+        setArmedCaseDigest("");
+      }
       setActiveHandle(handle);
       setHandleInput(handle);
       setMessage(`Case refreshed: ${result.state}`);
@@ -634,6 +640,12 @@ export default function HunterRoom() {
 
   async function runCase() {
     if (!caseView) return;
+    if (armedAction !== "run" || armedCaseDigest !== caseView.case_digest) {
+      setArmedAction("run");
+      setArmedCaseDigest(caseView.case_digest);
+      setMessage("Run is armed for this exact case digest. Press again to confirm one paper run.");
+      return;
+    }
     setBusy("run");
     try {
       const result = await api<RunResponse>(
@@ -647,6 +659,8 @@ export default function HunterRoom() {
         },
       );
       setLastRun(result);
+      setArmedAction(null);
+      setArmedCaseDigest("");
       setMessage(`Run result: ${result.outcome}`);
       await refreshCase(caseView.handle);
     } catch (error) {
@@ -658,6 +672,12 @@ export default function HunterRoom() {
 
   async function persistCase() {
     if (!caseView?.oci_digest || !caseView.osc_digest || !caseView.lifecycle_result_digest) return;
+    if (armedAction !== "persist" || armedCaseDigest !== caseView.case_digest) {
+      setArmedAction("persist");
+      setArmedCaseDigest(caseView.case_digest);
+      setMessage("Persistence is armed for this exact case digest. Press again to confirm one persistence action.");
+      return;
+    }
     setBusy("persist");
     try {
       const result = await api<PersistResponse>(
@@ -674,6 +694,8 @@ export default function HunterRoom() {
         },
       );
       setLastPersist(result);
+      setArmedAction(null);
+      setArmedCaseDigest("");
       setMessage(`Persistence result: ${result.persistence_outcome || result.outcome}`);
       await refreshCase(caseView.handle);
     } catch (error) {
@@ -1137,7 +1159,9 @@ export default function HunterRoom() {
                   onClick={() => void runCase()}
                 >
                   {busy === "run" ? <LoaderCircle className="animate-spin" /> : <Play />}
-                  Run paper case once
+                  {armedAction === "run" && armedCaseDigest === caseView?.case_digest
+                    ? "Confirm one paper run"
+                    : "Arm paper run"}
                 </Button>
                 <Button
                   type="button"
@@ -1146,8 +1170,34 @@ export default function HunterRoom() {
                   onClick={() => void persistCase()}
                 >
                   {busy === "persist" ? <LoaderCircle className="animate-spin" /> : <Save />}
-                  Persist exact lifecycle
+                  {armedAction === "persist" && armedCaseDigest === caseView?.case_digest
+                    ? "Confirm persistence"
+                    : "Arm persistence"}
                 </Button>
+
+                {armedAction && armedCaseDigest === caseView?.case_digest && (
+                  <div className="rounded-xl border border-amber-300/20 bg-amber-300/5 p-3 text-[11px] leading-5 text-amber-100/80">
+                    <div className="font-semibold text-amber-100">
+                      {armedAction === "run" ? "Paper run armed" : "Persistence armed"}
+                    </div>
+                    The next matching button press sends the existing explicit server confirmation
+                    for this exact case digest. Refreshing to a different case clears the arm state.
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="mt-2 w-full border-white/10 bg-white/5 text-slate-200"
+                      disabled={busy !== null}
+                      onClick={() => {
+                        setArmedAction(null);
+                        setArmedCaseDigest("");
+                        setMessage("Armed operator action cancelled.");
+                      }}
+                    >
+                      Cancel armed action
+                    </Button>
+                  </div>
+                )}
                 <Button
                   type="button"
                   variant="outline"
