@@ -13,7 +13,7 @@ DIGEST_C = "c" * 64
 DIGEST_D = "d" * 64
 
 
-def _config(*, run=False, persist=False):
+def _config(*, run=False, persist=False, preflight=False):
     return SmokeConfig(
         base_url="https://operator.example",
         token="test-token",
@@ -21,6 +21,7 @@ def _config(*, run=False, persist=False):
         timeout_seconds=5,
         confirm_run=run,
         confirm_persist=persist,
+        preflight_only=preflight,
     )
 
 
@@ -56,6 +57,31 @@ def _valid():
         "mutates_case": False,
         "simulation_only": True,
     }
+
+
+def test_preflight_only_stops_after_readiness_and_validation_without_prepare():
+    calls = []
+    responses = [_ready(), _valid()]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    result = run_smoke(_config(preflight=True), request_json=request)
+
+    assert list(result) == ["readiness", "validation"]
+    assert [call[0] for call in calls] == ["GET", "POST"]
+    assert calls[0][1].endswith("/api/v1/operator/paper-cases/readiness")
+    assert calls[1][1].endswith("/api/v1/operator/paper-cases/validate")
+    assert len(calls) == 2
+
+
+def test_preflight_only_rejects_run_or_persist_confirmation():
+    with pytest.raises(OperatorSmokeError, match="preflight-only"):
+        _config(run=True, preflight=True)
+
+    with pytest.raises(OperatorSmokeError, match="preflight-only"):
+        _config(run=True, persist=True, preflight=True)
 
 
 def test_default_smoke_checks_readiness_and_validation_then_stops_after_prepare_and_review():

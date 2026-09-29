@@ -29,7 +29,9 @@ two-step run/persist confirmation, server case lifetime/provenance visibility,
 stale armed-action invalidation, durable readback gating, manual persisted
 history/detail inspection, and explicit browser-memory session cleanup.
 There is no automatic polling or retry. Active cases remain process-local and
-require one stable application process from prepare through run/persist.
+require one stable application process from prepare through run/persist. The
+controlled-paper smoke CLI also supports a no-provider `--preflight-only` mode
+that stops after authenticated readiness and canonical payload validation.
 
 The project remains **paper/simulation only**. There is no wallet ownership,
 signing, transaction broadcast, DEX execution, autonomous hunting loop, or

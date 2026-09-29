@@ -31,6 +31,9 @@ bounded operator/deployment hardening:
 - smoke-harness case identity continuity requiring the same handle/case digest
   across review/run/post-run review/persist and exact OCI/OSC/lifecycle digest
   agreement between persist-eligible run and post-run review.
+- no-provider smoke preflight mode performing only authenticated readiness plus
+  authenticated no-I/O payload validation before stopping without prepare or
+  case mutation.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke
@@ -78,7 +81,7 @@ execution.
 ## Remaining gaps
 
 1. The operator case registry remains finite and process-local. It does not provide cross-process or restart-safe exactly-once semantics.
-2. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by one paper-only smoke verification. The harness performs no-I/O validation before provider-backed prepare. No secrets belong in source control.
+2. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by one paper-only smoke verification. The harness can now run readiness + no-I/O payload validation as a two-call preflight-only sequence before any provider-backed prepare. No secrets belong in source control.
 3. The merged E2E test and offline smoke tests do not exercise a live provider-backed prepare or browser runtime; those are operational verification gaps, not missing canonical owners.
 4. No autonomous hunting loop, scheduler, automatic retry, wallet, signing, broadcast, DEX execution, economic settlement, or live trading authority is opened by this audit.
 

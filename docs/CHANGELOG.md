@@ -1,3 +1,11 @@
+## 2026-09-29 — Operator Smoke No-Provider Preflight Mode
+
+- **PREFLIGHT-ONLY:** The controlled-paper smoke CLI now supports `--preflight-only`, which performs exactly authenticated readiness plus no-I/O canonical payload validation, then stops before trusted prepare/provider access and before any case mutation.
+- **MUTUAL EXCLUSION:** `--preflight-only` cannot be combined with run or persist confirmation flags.
+- **CARDINALITY:** Preflight-only performs exactly two requests; the existing full eligible chain remains exactly eight requests with no retry or polling.
+- **OPERATIONAL STATUS:** Provider-backed prepare/run/persist is still not executed automatically and still requires separate operational authorization plus intentionally available runtime secrets.
+- **BOUNDARY:** No autonomous hunting, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke Case Identity Continuity
 
 - **CASE IDENTITY:** The smoke harness now requires the exact prepared case handle and case digest to remain unchanged across initial review, run, post-run review, and persistence.

@@ -16,14 +16,29 @@ The validation call is the existing authenticated no-I/O canonical payload
 preflight. It does not probe Solana/CoinGecko and does not mutate an operator
 case.
 
+Use `--preflight-only` to stop after authenticated readiness plus no-I/O
+canonical payload validation. This mode performs no trusted prepare/provider
+call and creates no operator case.
+
 The operator must add `--confirm-run` to invoke one paper run, and must add
 both `--confirm-run --confirm-persist` to permit one persistence action and
-one readback.
+one readback. `--preflight-only` cannot be combined with either confirmation.
 
 ## Example
 
+No-provider preflight only:
+
 ```bash
 export OPERATOR_BEARER_TOKEN='set-in-secret-storage'
+uv run python scripts/operator_paper_smoke.py \
+  --base-url https://your-controlled-paper-host.example \
+  --prepare-payload /secure/path/prepare.json \
+  --preflight-only
+```
+
+Full explicit controlled-paper sequence:
+
+```bash
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
@@ -36,6 +51,13 @@ Use `--token-env SOME_OTHER_SECRET_NAME` only when deployment policy requires
 another environment variable name.
 
 ## Cardinality
+
+Preflight-only mode performs exactly two authenticated requests:
+
+1. one GET operator readiness preflight;
+2. one POST no-I/O prepare-payload validation.
+
+It then stops before the trusted prepare/provider path.
 
 For a full eligible chain the harness performs exactly:
 

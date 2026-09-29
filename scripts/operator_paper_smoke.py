@@ -36,6 +36,7 @@ class SmokeConfig:
     timeout_seconds: float
     confirm_run: bool = False
     confirm_persist: bool = False
+    preflight_only: bool = False
 
     def __post_init__(self) -> None:
         if not isinstance(self.base_url, str):
@@ -53,6 +54,10 @@ class SmokeConfig:
             raise OperatorSmokeError("timeout must be positive")
         if self.confirm_persist and not self.confirm_run:
             raise OperatorSmokeError("--confirm-persist requires --confirm-run")
+        if self.preflight_only and (self.confirm_run or self.confirm_persist):
+            raise OperatorSmokeError(
+                "--preflight-only cannot be combined with run/persist confirmation"
+            )
 
 
 def _request_json(
@@ -129,6 +134,9 @@ def run_smoke(
     result["validation"] = {"status": validation_status, "body": validation}
     if validation_status != 200 or validation.get("status") != "VALID":
         raise OperatorSmokeError("operator prepare validation preflight did not pass")
+
+    if config.preflight_only:
+        return result
 
     prepare_status, prepare = request_json(
         "POST",
@@ -283,6 +291,14 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--token-env", default="OPERATOR_BEARER_TOKEN")
     parser.add_argument("--timeout-seconds", type=float, default=30.0)
     parser.add_argument(
+        "--preflight-only",
+        action="store_true",
+        help=(
+            "Stop after readiness + no-I/O payload validation without calling "
+            "the trusted prepare/provider path."
+        ),
+    )
+    parser.add_argument(
         "--confirm-run",
         action="store_true",
         help="Explicitly authorize the one-shot controlled-paper run transition.",
@@ -307,6 +323,7 @@ def main() -> int:
             timeout_seconds=args.timeout_seconds,
             confirm_run=args.confirm_run,
             confirm_persist=args.confirm_persist,
+            preflight_only=args.preflight_only,
         )
         output = run_smoke(config)
     except (OSError, json.JSONDecodeError, OperatorSmokeError) as exc:
