@@ -41,11 +41,29 @@ def _ready():
     }
 
 
-def test_default_smoke_checks_readiness_then_stops_after_prepare_and_review():
+def _valid():
+    return 200, {
+        "contract_version": "p01-oaf-01-prepare-validation-v1",
+        "status": "VALID",
+        "candidate_id": "candidate-1",
+        "token_mint": "mint-1",
+        "chain_id": "solana",
+        "pool_address": "pool-1",
+        "pfx_invocation_id": "pfx-1",
+        "cip_invocation_id": "cip-1",
+        "selected_observation_time": "2026-09-29T00:00:00+00:00",
+        "provider_connectivity_checked": False,
+        "mutates_case": False,
+        "simulation_only": True,
+    }
+
+
+def test_default_smoke_checks_readiness_and_validation_then_stops_after_prepare_and_review():
     calls = []
 
     responses = [
         _ready(),
+        _valid(),
         (
             201,
             {
@@ -70,9 +88,11 @@ def test_default_smoke_checks_readiness_then_stops_after_prepare_and_review():
 
     result = run_smoke(_config(), request_json=request)
 
-    assert list(result) == ["readiness", "prepare", "review_after_prepare"]
-    assert [call[0] for call in calls] == ["GET", "POST", "GET"]
+    assert list(result) == ["readiness", "validation", "prepare", "review_after_prepare"]
+    assert [call[0] for call in calls] == ["GET", "POST", "POST", "GET"]
     assert calls[0][1].endswith("/api/v1/operator/paper-cases/readiness")
+    assert calls[1][1].endswith("/api/v1/operator/paper-cases/validate")
+    assert calls[1][2] == {"explicit": "payload"}
 
 
 def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
@@ -80,6 +100,7 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
 
     responses = [
         _ready(),
+        _valid(),
         (
             201,
             {
@@ -143,6 +164,7 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
 
     assert list(result) == [
         "readiness",
+        "validation",
         "prepare",
         "review_after_prepare",
         "run",
@@ -150,9 +172,9 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
         "persist",
         "readback",
     ]
-    assert [call[0] for call in calls] == ["GET", "POST", "GET", "POST", "GET", "POST", "GET"]
-    assert calls[3][2] == {"case_digest": DIGEST_A, "confirm_run": True}
-    assert calls[5][2] == {
+    assert [call[0] for call in calls] == ["GET", "POST", "POST", "GET", "POST", "GET", "POST", "GET"]
+    assert calls[4][2] == {"case_digest": DIGEST_A, "confirm_run": True}
+    assert calls[6][2] == {
         "case_digest": DIGEST_A,
         "oci_digest": DIGEST_B,
         "osc_digest": DIGEST_C,
@@ -178,6 +200,27 @@ def test_readiness_failure_stops_before_prepare():
     assert calls[0][0] == "GET"
 
 
+def test_validation_failure_stops_before_prepare():
+    calls = []
+
+    responses = [
+        _ready(),
+        (422, {"error": {"code": "operator_prepare_invalid"}}),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="validation preflight"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 2
+    assert calls[0][0] == "GET"
+    assert calls[1][0] == "POST"
+    assert calls[1][1].endswith("/api/v1/operator/paper-cases/validate")
+
+
 def test_persist_requires_explicit_run_confirmation():
     with pytest.raises(OperatorSmokeError, match="requires --confirm-run"):
         _config(persist=True)
@@ -188,6 +231,7 @@ def test_non_persistable_run_stops_without_persist_or_readback():
 
     responses = [
         _ready(),
+        _valid(),
         (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
         (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
         (
@@ -219,7 +263,7 @@ def test_non_persistable_run_stops_without_persist_or_readback():
     assert "persist_skipped" in result
     assert "persist" not in result
     assert "readback" not in result
-    assert len(calls) == 5
+    assert len(calls) == 6
 
 
 def test_preparation_stop_does_not_review_or_run():
@@ -227,6 +271,7 @@ def test_preparation_stop_does_not_review_or_run():
 
     responses = [
         _ready(),
+        _valid(),
         (
             200,
             {
@@ -243,8 +288,8 @@ def test_preparation_stop_does_not_review_or_run():
 
     result = run_smoke(_config(run=True, persist=True), request_json=request)
 
-    assert list(result) == ["readiness", "prepare"]
-    assert len(calls) == 2
+    assert list(result) == ["readiness", "validation", "prepare"]
+    assert len(calls) == 3
 
 
 def test_non_local_plain_http_is_rejected_before_any_request():
