@@ -438,6 +438,7 @@ export default function HunterRoom() {
   const [prepareValidation, setPrepareValidation] = useState<PrepareValidation | null>(null);
   const [armedAction, setArmedAction] = useState<"run" | "persist" | null>(null);
   const [armedCaseDigest, setArmedCaseDigest] = useState("");
+  const [armedCaseState, setArmedCaseState] = useState("");
   const [busy, setBusy] = useState<"prepare" | "validate" | "refresh" | "run" | "persist" | "readback" | "history" | "readiness" | null>(null);
   const [message, setMessage] = useState("No case loaded. Hunter Room is idle.");
 
@@ -598,9 +599,13 @@ export default function HunterRoom() {
     try {
       const result = await api<CaseReview>(`/api/v1/operator/paper-cases/${encodeURIComponent(handle)}`);
       setCaseView(result);
-      if (armedCaseDigest && armedCaseDigest !== result.case_digest) {
+      if (
+        armedCaseDigest &&
+        (armedCaseDigest !== result.case_digest || armedCaseState !== result.state)
+      ) {
         setArmedAction(null);
         setArmedCaseDigest("");
+        setArmedCaseState("");
       }
       setActiveHandle(handle);
       setHandleInput(handle);
@@ -643,6 +648,7 @@ export default function HunterRoom() {
     if (armedAction !== "run" || armedCaseDigest !== caseView.case_digest) {
       setArmedAction("run");
       setArmedCaseDigest(caseView.case_digest);
+      setArmedCaseState(caseView.state);
       setMessage("Run is armed for this exact case digest. Press again to confirm one paper run.");
       return;
     }
@@ -661,6 +667,7 @@ export default function HunterRoom() {
       setLastRun(result);
       setArmedAction(null);
       setArmedCaseDigest("");
+      setArmedCaseState("");
       setMessage(`Run result: ${result.outcome}`);
       await refreshCase(caseView.handle);
     } catch (error) {
@@ -675,6 +682,7 @@ export default function HunterRoom() {
     if (armedAction !== "persist" || armedCaseDigest !== caseView.case_digest) {
       setArmedAction("persist");
       setArmedCaseDigest(caseView.case_digest);
+      setArmedCaseState(caseView.state);
       setMessage("Persistence is armed for this exact case digest. Press again to confirm one persistence action.");
       return;
     }
@@ -696,6 +704,7 @@ export default function HunterRoom() {
       setLastPersist(result);
       setArmedAction(null);
       setArmedCaseDigest("");
+      setArmedCaseState("");
       setMessage(`Persistence result: ${result.persistence_outcome || result.outcome}`);
       await refreshCase(caseView.handle);
     } catch (error) {
@@ -1122,6 +1131,9 @@ export default function HunterRoom() {
                       <KeyValue label="PFS" value={caseView.pfs_outcome} />
                       <KeyValue label="CIP" value={caseView.cip_outcome} />
                       <KeyValue label="Case digest" value={short(caseView.case_digest, 9)} />
+                      <KeyValue label="Created at" value={caseView.created_at} />
+                      <KeyValue label="Expires at" value={caseView.expires_at} />
+                      <KeyValue label="Source" value={caseView.source_label} />
                     </div>
 
                     <div className="rounded-xl border border-sky-400/15 bg-sky-400/5 px-3 py-2 text-xs leading-5 text-sky-100/80">
@@ -1181,7 +1193,8 @@ export default function HunterRoom() {
                       {armedAction === "run" ? "Paper run armed" : "Persistence armed"}
                     </div>
                     The next matching button press sends the existing explicit server confirmation
-                    for this exact case digest. Refreshing to a different case clears the arm state.
+                    for this exact case digest and server state. Refreshing after any state change,
+                    or switching to a different case, clears the arm state.
                     <Button
                       type="button"
                       size="sm"
@@ -1191,6 +1204,7 @@ export default function HunterRoom() {
                       onClick={() => {
                         setArmedAction(null);
                         setArmedCaseDigest("");
+                        setArmedCaseState("");
                         setMessage("Armed operator action cancelled.");
                       }}
                     >
