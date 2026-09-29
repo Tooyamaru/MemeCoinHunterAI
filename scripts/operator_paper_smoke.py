@@ -185,6 +185,15 @@ def run_smoke(
         return result
     if prepare_status != 201:
         raise OperatorSmokeError(f"unexpected prepare status: {prepare_status}")
+    if prepare.get("contract_version") != "p01-oaf-01-trusted-prepare-v1":
+        raise OperatorSmokeError("operator prepare contract mismatch")
+    if prepare.get("state") != "REVIEW_READY":
+        raise OperatorSmokeError("operator prepare did not reach review-ready state")
+    if prepare.get("simulation_only") is not True:
+        raise OperatorSmokeError("operator prepare lost simulation-only boundary")
+    for name in ("candidate_id", "token_mint", "chain_id", "pool_address"):
+        if prepare.get(name) != expected_identity[name]:
+            raise OperatorSmokeError(f"operator prepare {name} mismatch")
 
     handle = prepare.get("handle")
     case_digest = prepare.get("case_digest")
@@ -192,6 +201,12 @@ def run_smoke(
         raise OperatorSmokeError("prepare response missing handle")
     if not isinstance(case_digest, str) or len(case_digest) != 64:
         raise OperatorSmokeError("prepare response missing canonical case digest")
+    cip_digest = prepare.get("cip_digest")
+    if not isinstance(cip_digest, str) or len(cip_digest) != 64:
+        raise OperatorSmokeError("prepare response missing canonical cip digest")
+    expected_review_path = f"/api/v1/operator/paper-cases/{handle}"
+    if prepare.get("review_path") != expected_review_path:
+        raise OperatorSmokeError("prepare review path mismatch")
 
     review_status, review = request_json(
         "GET",
@@ -202,10 +217,23 @@ def run_smoke(
     )
     if review_status != 200:
         raise OperatorSmokeError(f"unexpected review status: {review_status}")
+    if review.get("contract_version") != "p01-oaf-01-case-registry-v3":
+        raise OperatorSmokeError("review contract mismatch")
     if review.get("handle") != handle:
         raise OperatorSmokeError("review handle mismatch")
     if review.get("case_digest") != case_digest:
         raise OperatorSmokeError("review case digest mismatch")
+    if review.get("state") != "REVIEW_READY":
+        raise OperatorSmokeError("review did not retain review-ready state")
+    if review.get("simulation_only") is not True:
+        raise OperatorSmokeError("review lost simulation-only boundary")
+    if review.get("source_label") != "historical_price_proxy_and_explicit_simulation_assumptions":
+        raise OperatorSmokeError("review source label mismatch")
+    for name in ("candidate_id", "token_mint", "chain_id", "pool_address"):
+        if review.get(name) != prepare.get(name):
+            raise OperatorSmokeError(f"prepare/review {name} mismatch")
+    if review.get("cip_digest") != cip_digest:
+        raise OperatorSmokeError("prepare/review cip_digest mismatch")
     result["review_after_prepare"] = {"status": review_status, "body": review}
 
     if not config.confirm_run:
