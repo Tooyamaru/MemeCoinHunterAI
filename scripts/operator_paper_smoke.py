@@ -2,8 +2,9 @@
 
 This tool is intentionally operator-driven. It accepts one explicit prepare JSON
 payload, performs at most one request per requested transition, and never polls
-or retries. By default it stops after prepare+review. Run and persistence each
-require their own command-line confirmation flag.
+or retries. By default it performs readiness + no-I/O validation, then stops
+after prepare+review. Run and persistence each require their own command-line
+confirmation flag.
 """
 
 from __future__ import annotations
@@ -117,6 +118,17 @@ def run_smoke(
     result["readiness"] = {"status": readiness_status, "body": readiness}
     if readiness_status != 200 or readiness.get("status") != "READY":
         raise OperatorSmokeError("operator readiness preflight did not pass")
+
+    validation_status, validation = request_json(
+        "POST",
+        f"{base}/api/v1/operator/paper-cases/validate",
+        config.token,
+        config.prepare_payload,
+        config.timeout_seconds,
+    )
+    result["validation"] = {"status": validation_status, "body": validation}
+    if validation_status != 200 or validation.get("status") != "VALID":
+        raise OperatorSmokeError("operator prepare validation preflight did not pass")
 
     prepare_status, prepare = request_json(
         "POST",
