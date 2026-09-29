@@ -45,6 +45,9 @@ bounded operator/deployment hardening:
   contracts, terminal state/outcome continuity, simulation/source boundaries,
   canonical persistence/readback digests, exact lifecycle root, and artifact-count
   agreement before the smoke can be considered complete.
+- preparation STOP proof requiring the post-prepare STOP contract,
+  simulation-only state, and explicit non-empty reason codes before a bounded
+  STOP is accepted.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke
