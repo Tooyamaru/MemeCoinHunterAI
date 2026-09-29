@@ -33,7 +33,10 @@ bounded operator/deployment hardening:
   agreement between persist-eligible run and post-run review.
 - no-provider smoke preflight mode performing only authenticated readiness plus
   authenticated no-I/O payload validation before stopping without prepare or
-  case mutation.
+  case mutation;
+- preflight contract/identity proof requiring expected readiness/validation
+  contracts, process-local/simulation-only/no-provider safety claims, and exact
+  candidate/token/chain/pool/PFX/CIP identity projection before prepare.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke
