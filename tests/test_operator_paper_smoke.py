@@ -225,8 +225,8 @@ def test_non_durable_persist_outcome_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
-                "state": "PERSIST_OUTCOME_UNKNOWN",
-                "persistence_outcome": None,
+                "state": "PERSIST_TERMINAL",
+                "persistence_outcome": "STORAGE_UNAVAILABLE",
                 "lifecycle_result_digest": DIGEST_D,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
             },
