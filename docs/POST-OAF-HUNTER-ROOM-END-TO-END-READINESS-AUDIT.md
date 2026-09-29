@@ -32,7 +32,7 @@ sequence in a known single-process environment when separately authorized and
 when runtime secrets are intentionally available. The smoke has NOT YET BEEN
 EXECUTED.
 
-Current reconciled main checkpoint: `701726622f62c907fbe42e822543f9cb5c3f6cee`.
+Documentation-reconciled main checkpoint before this smoke-harness alignment: `5c3f8eecc62bd9a33c28487c7ac3de0f5d6c8dd7` (PR #109).
 
 ## Verified completion chain
 
@@ -71,15 +71,14 @@ execution.
 
 ## Remaining gaps
 
-1. Production Hunter Room packaging/deployment remains the next bounded engineering step; repository/CI verification of the operator chain is complete.
-2. The operator case registry remains finite and process-local. It does not provide cross-process or restart-safe exactly-once semantics.
-3. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by a paper-only smoke verification. The harness now performs no-I/O validation before provider-backed prepare. No secrets belong in source control.
-4. The merged E2E test and offline smoke tests do not exercise a live provider-backed prepare or browser runtime; those are operational verification gaps, not missing canonical owners.
-5. No autonomous hunting loop, scheduler, automatic retry, wallet, signing, broadcast, DEX execution, economic settlement, or live trading authority is opened by this audit.
+1. The operator case registry remains finite and process-local. It does not provide cross-process or restart-safe exactly-once semantics.
+2. A real environment still requires explicit operator bearer and bounded provider/runtime configuration, followed by one paper-only smoke verification. The harness performs no-I/O validation before provider-backed prepare. No secrets belong in source control.
+3. The merged E2E test and offline smoke tests do not exercise a live provider-backed prepare or browser runtime; those are operational verification gaps, not missing canonical owners.
+4. No autonomous hunting loop, scheduler, automatic retry, wallet, signing, broadcast, DEX execution, economic settlement, or live trading authority is opened by this audit.
 
 ## Recommended next gate
 
-Select the production Hunter Room packaging/deployment gate: produce a standalone build from the verified HR-FND-01 surface, preserve same-origin or explicitly reviewed transport assumptions, keep bearer material session-only, and add build/packaging verification. A later real-environment smoke check may exercise the bounded provider-backed prepare path using deployment secrets without changing domain authority.
+The next bounded gate is one explicit real-environment controlled-paper smoke sequence in a known single-process deployment, but execution remains separately operationally authorized. Before any provider-backed prepare, require the existing authenticated readiness preflight and the authenticated no-I/O canonical payload validation. A full eligible smoke then performs exactly one request for each selected transition: readiness -> validate -> prepare -> review -> run -> review -> persist -> durable readback. No retry, polling, autonomous discovery, wallet, signing, DEX, settlement, or live/economic authority is introduced.
 
 ## Governance boundary
 
