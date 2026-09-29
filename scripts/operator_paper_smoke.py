@@ -182,6 +182,17 @@ def run_smoke(
     result["prepare"] = {"status": prepare_status, "body": prepare}
 
     if prepare_status == 200 and prepare.get("state") == "PREPARATION_STOPPED":
+        if prepare.get("contract_version") != "p01-oaf-01-post-prepare-v1":
+            raise OperatorSmokeError("preparation stop contract mismatch")
+        if prepare.get("simulation_only") is not True:
+            raise OperatorSmokeError("preparation stop lost simulation-only boundary")
+        reason_codes = prepare.get("reason_codes")
+        if (
+            not isinstance(reason_codes, list)
+            or not reason_codes
+            or any(not isinstance(code, str) or not code for code in reason_codes)
+        ):
+            raise OperatorSmokeError("preparation stop reason codes are invalid")
         return result
     if prepare_status != 201:
         raise OperatorSmokeError(f"unexpected prepare status: {prepare_status}")
