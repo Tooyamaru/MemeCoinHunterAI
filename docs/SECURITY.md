@@ -23,6 +23,18 @@ target, request bounds, and current candidate membership before passing the
 environment mapping unchanged to P04-LME-02. Rejected orchestration inputs
 therefore cannot trigger credential lookup or network access.
 
+## Current controlled-paper operator access boundary
+
+- Operator mutation/review routes require the configured server-side bearer token.
+- Bearer material remains browser-memory/session-only in Hunter Room and is never stored in localStorage or committed to source.
+- `Clear operator session` removes the current bearer and operator context from the browser tab without calling the backend.
+- Opaque case handles are locators, not credentials.
+- Auth is checked before case lookup/provider/run/persist owner access.
+- Public transport requires TLS or a trusted same-origin proxy.
+- Readiness and local prepare validation are authenticated but perform no provider connectivity probe or case mutation.
+- Run and persist remain backend one-shot/state-machine controlled even though Hunter Room adds a two-step arm/confirm gesture.
+- Active cases are process-local; production/staging must fail closed unless the single-process constraint is explicitly acknowledged.
+
 ## V1.1 security boundaries
 
 Capital protection is the highest-priority invariant. When uncertainty exists,
