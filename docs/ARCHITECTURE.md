@@ -140,9 +140,40 @@ keys, sign, broadcast, or call a venue directly. The Risk Governor has higher
 authority and can ALLOW, REDUCE, BLOCK, or EMERGENCY STOP. P01-T05 preserves
 these boundaries. Later services remain gated until explicitly authorized.
 
+## Current controlled-paper operator architecture
+
+The current operator path is a bounded application/presentation layer over
+existing canonical owners. The browser does not own trusted market/safety
+evidence and does not bypass backend authorization or state machines.
+
+```text
+Hunter Room
+→ authenticated readiness
+→ no-I/O explicit payload validation
+→ trusted prepare (server-owned source/RTI composition)
+→ exact process-local review
+→ two-step browser confirmation
+→ backend run-once claim
+→ terminal review
+→ two-step browser persistence confirmation
+→ RTI-03 durable persistence
+→ durable readback / manual persisted catalog
+```
+
+Active-case identity is intentionally retained in one stable Python process.
+The registry is not cross-process or restart-safe, and staging/production must
+fail closed unless that process-local deployment constraint is explicitly
+acknowledged. Durable RTI-03 storage owns terminal lifecycle results, not
+reconstruction of a pre-run OAF object graph.
+
+Hunter Room adds usability/safety gates only: readiness + payload preflight,
+two-step mutation confirmation, stale-arm invalidation, server case lifetime
+visibility, durable-readback gating, and browser-memory session cleanup.
+Backend authentication, canonical validation, case state, exact digests, and
+one-shot claims remain authoritative.
 ## Future portability
 
-The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastructure in `backend/core`. The initial Replit environment is for development and preview. GitHub is the source of truth. P04-LME-01 through P04-LME-03 add only a bounded read-only CoinGecko diagnostic path; they are not an operational application loop. A future stable 24/7 runtime may use Railway, but Railway remains out of scope until its planned production phase.
+The P01 runtime baseline is Python/FastAPI in `backend/api` with shared infrastructure in `backend/core`. GitHub `main` is the source of truth; ChatGPT/Work is the primary development/control surface and Replit is fallback-only for concrete interactive runtime or preview needs. P04-LME-01 through P04-LME-03 remain bounded analytical/provider components inside the explicitly invoked prepare path rather than an autonomous application loop. A future stable 24/7 runtime may use another hosting platform only after a separately governed deployment decision.
 
 
 ## P05 Current Boundary
