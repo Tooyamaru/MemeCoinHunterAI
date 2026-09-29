@@ -248,10 +248,16 @@ def run_smoke(
     )
     if run_status != 200:
         raise OperatorSmokeError(f"unexpected run status: {run_status}")
+    if run.get("contract_version") != "p01-oaf-01-run-once-v1":
+        raise OperatorSmokeError("run contract mismatch")
     if run.get("handle") != handle:
         raise OperatorSmokeError("run handle mismatch")
     if run.get("case_digest") != case_digest:
         raise OperatorSmokeError("run case digest mismatch")
+    if run.get("state") != "RUN_TERMINAL" or run.get("outcome") != "RUN_TERMINAL":
+        raise OperatorSmokeError("run did not reach terminal controlled-paper outcome")
+    if run.get("simulation_only") is not True:
+        raise OperatorSmokeError("run lost simulation-only boundary")
     result["run"] = {"status": run_status, "body": run}
 
     review2_status, review2 = request_json(
@@ -263,10 +269,18 @@ def run_smoke(
     )
     if review2_status != 200:
         raise OperatorSmokeError(f"unexpected post-run review status: {review2_status}")
+    if review2.get("contract_version") != "p01-oaf-01-case-registry-v3":
+        raise OperatorSmokeError("post-run review contract mismatch")
     if review2.get("handle") != handle:
         raise OperatorSmokeError("post-run review handle mismatch")
     if review2.get("case_digest") != case_digest:
         raise OperatorSmokeError("post-run review case digest mismatch")
+    if review2.get("state") != "RUN_TERMINAL":
+        raise OperatorSmokeError("post-run review did not retain terminal run state")
+    if review2.get("simulation_only") is not True:
+        raise OperatorSmokeError("post-run review lost simulation-only boundary")
+    if review2.get("source_label") != "historical_price_proxy_and_explicit_simulation_assumptions":
+        raise OperatorSmokeError("post-run review source label mismatch")
     result["review_after_run"] = {"status": review2_status, "body": review2}
 
     if not config.confirm_persist:
@@ -308,12 +322,22 @@ def run_smoke(
     )
     if persist_status != 200:
         raise OperatorSmokeError(f"unexpected persist status: {persist_status}")
+    if persist.get("contract_version") != "p01-oaf-01-persist-once-v1":
+        raise OperatorSmokeError("persist contract mismatch")
     if persist.get("handle") != handle:
         raise OperatorSmokeError("persist handle mismatch")
     if persist.get("case_digest") != case_digest:
         raise OperatorSmokeError("persist case digest mismatch")
-    if persist.get("state") != "PERSIST_TERMINAL":
+    if persist.get("state") != "PERSIST_TERMINAL" or persist.get("outcome") != "PERSIST_TERMINAL":
         raise OperatorSmokeError("persist did not reach terminal state")
+    if persist.get("simulation_only") is not True:
+        raise OperatorSmokeError("persist lost simulation-only boundary")
+    persistence_digest = persist.get("persistence_digest")
+    if not isinstance(persistence_digest, str) or len(persistence_digest) != 64:
+        raise OperatorSmokeError("persist response missing canonical persistence digest")
+    artifact_count = persist.get("artifact_count")
+    if isinstance(artifact_count, bool) or not isinstance(artifact_count, int) or artifact_count < 0:
+        raise OperatorSmokeError("persist response has invalid artifact count")
     result["persist"] = {"status": persist_status, "body": persist}
 
     persistence_outcome = persist.get("persistence_outcome")
@@ -336,10 +360,29 @@ def run_smoke(
     )
     if read_status != 200:
         raise OperatorSmokeError(f"unexpected readback status: {read_status}")
+    if readback.get("contract_version") != "p01-rti-03-v1":
+        raise OperatorSmokeError("readback contract mismatch")
     if readback.get("outcome") != "FOUND":
         raise OperatorSmokeError("readback did not confirm persisted lifecycle")
     if readback.get("lifecycle_result_digest") != lifecycle_digest:
         raise OperatorSmokeError("readback lifecycle digest mismatch")
+    result_digest = readback.get("result_digest")
+    if not isinstance(result_digest, str) or len(result_digest) != 64:
+        raise OperatorSmokeError("readback response missing canonical result digest")
+    read_run = readback.get("run")
+    artifacts = readback.get("artifacts")
+    if not isinstance(read_run, dict) or read_run.get("lifecycle_result_digest") != lifecycle_digest:
+        raise OperatorSmokeError("readback run lifecycle identity mismatch")
+    if not isinstance(artifacts, list):
+        raise OperatorSmokeError("readback artifacts projection is invalid")
+    read_artifact_count = read_run.get("artifact_count")
+    if (
+        isinstance(read_artifact_count, bool)
+        or not isinstance(read_artifact_count, int)
+        or read_artifact_count != len(artifacts)
+        or read_artifact_count != artifact_count
+    ):
+        raise OperatorSmokeError("readback artifact count mismatch")
     result["readback"] = {"status": read_status, "body": readback}
     return result
 
