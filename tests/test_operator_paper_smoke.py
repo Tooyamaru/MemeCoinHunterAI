@@ -979,6 +979,7 @@ def test_preparation_stop_does_not_review_or_run():
         (
             200,
             {
+                "contract_version": "p01-oaf-01-post-prepare-v1",
                 "state": "PREPARATION_STOPPED",
                 "reason_codes": ["ELIGIBILITY_REJECTED"],
                 "simulation_only": True,
@@ -993,6 +994,84 @@ def test_preparation_stop_does_not_review_or_run():
     result = run_smoke(_config(run=True, persist=True), request_json=request)
 
     assert list(result) == ["readiness", "validation", "prepare"]
+    assert len(calls) == 3
+
+
+def test_preparation_stop_contract_mismatch_is_rejected():
+    calls = []
+    responses = [
+        _ready(),
+        _valid(),
+        (
+            200,
+            {
+                "contract_version": "wrong-post-prepare-contract",
+                "state": "PREPARATION_STOPPED",
+                "reason_codes": ["ELIGIBILITY_REJECTED"],
+                "simulation_only": True,
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="preparation stop contract mismatch"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 3
+
+
+def test_preparation_stop_simulation_boundary_is_required():
+    calls = []
+    responses = [
+        _ready(),
+        _valid(),
+        (
+            200,
+            {
+                "contract_version": "p01-oaf-01-post-prepare-v1",
+                "state": "PREPARATION_STOPPED",
+                "reason_codes": ["ELIGIBILITY_REJECTED"],
+                "simulation_only": False,
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="lost simulation-only boundary"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 3
+
+
+def test_preparation_stop_requires_explicit_reason_codes():
+    calls = []
+    responses = [
+        _ready(),
+        _valid(),
+        (
+            200,
+            {
+                "contract_version": "p01-oaf-01-post-prepare-v1",
+                "state": "PREPARATION_STOPPED",
+                "reason_codes": [],
+                "simulation_only": True,
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="reason codes are invalid"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
     assert len(calls) == 3
 
 
