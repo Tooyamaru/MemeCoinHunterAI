@@ -75,7 +75,12 @@ configured application/database/operator service readiness. If readiness is not
 `READY`, the harness stops before validation or prepare.
 
 The validation endpoint performs no provider/source I/O and creates no case. If
-the explicit payload is not `VALID`, the harness stops before prepare.
+the explicit payload is not `VALID`, the harness stops before prepare. The
+harness also verifies the readiness/validation contract versions and safety
+claims, requires process-local registry readiness for the current phase, and
+checks that validation projects the exact explicit candidate, token, chain,
+pool, PFX invocation, and CIP invocation identities from the submitted payload.
+Any mismatch stops before trusted prepare/provider access.
 
 There is no retry, polling, fallback provider, second run, or second persist.
 
