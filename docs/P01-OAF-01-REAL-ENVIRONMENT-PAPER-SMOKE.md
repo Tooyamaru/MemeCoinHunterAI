@@ -10,7 +10,11 @@ adding polling, retries, autonomous discovery, or a second domain owner.
 The CLI consumes a complete explicit prepare JSON file. It never invents
 paper-policy defaults. By default it performs only:
 
-`readiness -> prepare -> review`
+`readiness -> validate -> prepare -> review`
+
+The validation call is the existing authenticated no-I/O canonical payload
+preflight. It does not probe Solana/CoinGecko and does not mutate an operator
+case.
 
 The operator must add `--confirm-run` to invoke one paper run, and must add
 both `--confirm-run --confirm-persist` to permit one persistence action and
@@ -36,16 +40,20 @@ another environment variable name.
 For a full eligible chain the harness performs exactly:
 
 1. one authenticated GET operator readiness preflight;
-2. one POST prepare;
-3. one GET review;
-4. one POST run;
-5. one GET post-run review;
-6. one POST persist;
-7. one GET durable readback.
+2. one authenticated POST no-I/O prepare-payload validation;
+3. one POST prepare;
+4. one GET review;
+5. one POST run;
+6. one GET post-run review;
+7. one POST persist;
+8. one GET durable readback.
 
 The readiness endpoint performs no provider connectivity probe; it reports only
 configured application/database/operator service readiness. If readiness is not
-`READY`, the harness stops before prepare.
+`READY`, the harness stops before validation or prepare.
+
+The validation endpoint performs no provider/source I/O and creates no case. If
+the explicit payload is not `VALID`, the harness stops before prepare.
 
 There is no retry, polling, fallback provider, second run, or second persist.
 
