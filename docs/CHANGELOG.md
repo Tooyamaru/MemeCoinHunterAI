@@ -1,3 +1,11 @@
+## 2026-09-29 — Operator Smoke Durable Readback Verification
+
+- **DURABLE GATE:** The real-environment controlled-paper smoke harness now attempts lifecycle readback only after persistence reports `STORED` or `ALREADY_STORED`.
+- **IDENTITY:** Persistence must return the exact lifecycle digest produced by the run, the readback path must be the exact canonical digest path, and readback must return `FOUND` for that same lifecycle digest.
+- **FAIL-CLOSED:** Unknown/non-durable persistence, persistence digest mismatch, readback-path mismatch, non-`FOUND` readback, or readback digest mismatch stops the smoke immediately with no retry.
+- **OPERATIONAL STATUS:** No provider-backed real-environment smoke is executed by this change; explicit operational authorization and runtime secrets are still required.
+- **BOUNDARY:** No autonomous hunting, polling/retry, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Real-Environment Smoke Validation Preflight Alignment
 
 - **SMOKE HARNESS:** The explicit controlled-paper smoke sequence now performs authenticated configuration readiness and authenticated no-I/O canonical prepare-payload validation before any provider-backed prepare request.

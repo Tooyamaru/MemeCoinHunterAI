@@ -228,9 +228,16 @@ def run_smoke(
         raise OperatorSmokeError(f"unexpected persist status: {persist_status}")
     result["persist"] = {"status": persist_status, "body": persist}
 
+    persistence_outcome = persist.get("persistence_outcome")
+    if persistence_outcome not in {"STORED", "ALREADY_STORED"}:
+        raise OperatorSmokeError("persistence did not confirm durable storage")
+    if persist.get("lifecycle_result_digest") != lifecycle_digest:
+        raise OperatorSmokeError("persist lifecycle digest mismatch")
+
     readback_path = persist.get("readback_path")
-    if not isinstance(readback_path, str) or not readback_path.startswith("/api/v1/"):
-        raise OperatorSmokeError("persist response missing bounded readback path")
+    expected_readback_path = f"/api/v1/paper-lifecycle-results/{lifecycle_digest}"
+    if readback_path != expected_readback_path:
+        raise OperatorSmokeError("persist response readback path mismatch")
 
     read_status, readback = request_json(
         "GET",
@@ -241,6 +248,10 @@ def run_smoke(
     )
     if read_status != 200:
         raise OperatorSmokeError(f"unexpected readback status: {read_status}")
+    if readback.get("outcome") != "FOUND":
+        raise OperatorSmokeError("readback did not confirm persisted lifecycle")
+    if readback.get("lifecycle_result_digest") != lifecycle_digest:
+        raise OperatorSmokeError("readback lifecycle digest mismatch")
     result["readback"] = {"status": read_status, "body": readback}
     return result
 

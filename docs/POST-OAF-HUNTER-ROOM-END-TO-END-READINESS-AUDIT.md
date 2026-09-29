@@ -24,7 +24,10 @@ bounded operator/deployment hardening:
 - explicit browser-memory operator-session cleanup;
 - real-environment smoke-harness alignment so authenticated readiness and
   authenticated no-I/O payload validation both pass before provider-backed
-  prepare is attempted.
+  prepare is attempted;
+- smoke-harness durable-readback verification requiring `STORED` or
+  `ALREADY_STORED`, exact lifecycle-digest continuity, the exact canonical
+  readback path, and `FOUND` readback of that same digest.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke

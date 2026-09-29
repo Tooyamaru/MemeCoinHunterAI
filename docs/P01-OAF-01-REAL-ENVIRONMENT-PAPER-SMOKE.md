@@ -58,7 +58,12 @@ the explicit payload is not `VALID`, the harness stops before prepare.
 There is no retry, polling, fallback provider, second run, or second persist.
 
 A canonical preparation STOP returns immediately. A non-persistable run returns
-without calling persistence. Transport/HTTP/schema failures stop immediately.
+without calling persistence. After persistence, durable readback is attempted
+only when the persistence owner reports `STORED` or `ALREADY_STORED`, the
+returned lifecycle digest matches the exact run lifecycle digest, and the
+readback path is the exact canonical path for that digest. The readback itself
+must return `FOUND` for the same lifecycle digest. Any mismatch stops
+immediately. Transport/HTTP/schema failures also stop immediately.
 
 ## Boundary
 
