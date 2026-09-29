@@ -33,7 +33,10 @@ require one stable application process from prepare through run/persist. The
 controlled-paper smoke CLI also supports a no-provider `--preflight-only` mode
 that stops after authenticated readiness and canonical payload validation, and
 fails closed if the preflight contract, safety claims, or explicit identity
-projection do not match the submitted case intent.
+projection do not match the submitted case intent. Successful prepare and first
+review must then preserve the exact case, candidate/token/chain/pool identity,
+CIP digest, review path, simulation-only boundary, and controlled source label
+before run is permitted.
 
 The project remains **paper/simulation only**. There is no wallet ownership,
 signing, transaction broadcast, DEX execution, autonomous hunting loop, or

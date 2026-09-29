@@ -1,3 +1,12 @@
+## 2026-09-29 — Operator Smoke Prepare/Review Identity Proof
+
+- **PREPARE CONTRACT:** Successful provider-backed prepare must use the trusted-prepare contract, remain simulation-only, reach `REVIEW_READY`, and project the exact validated candidate/token/chain/pool identity.
+- **CASE HANDOFF:** Prepare must return a canonical case digest, canonical CIP digest, opaque handle, and the exact review path derived from that handle.
+- **FIRST REVIEW:** The initial review must use the case-registry contract and retain the same handle, case digest, candidate/token/chain/pool identity, CIP digest, simulation-only boundary, and expected historical-price-proxy source label.
+- **FAIL-CLOSED:** Any prepare/review contract, identity, CIP digest, review-path, source-label, or state mismatch stops before run.
+- **OPERATIONAL STATUS:** No provider-backed smoke is executed by this change; actual provider-backed verification remains separately authorized.
+- **BOUNDARY:** No retry/polling, autonomous hunting, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke Preflight Contract & Identity Proof
 
 - **READINESS CONTRACT:** Smoke preflight now requires the exact operator-readiness contract, process-local registry readiness for the current phase, no provider-connectivity probe, and the simulation-only boundary.

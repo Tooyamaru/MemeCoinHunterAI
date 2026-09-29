@@ -11,6 +11,7 @@ DIGEST_A = "a" * 64
 DIGEST_B = "b" * 64
 DIGEST_C = "c" * 64
 DIGEST_D = "d" * 64
+DIGEST_E = "e" * 64
 
 
 def _prepare_payload():
@@ -71,6 +72,38 @@ def _valid():
         "provider_connectivity_checked": False,
         "mutates_case": False,
         "simulation_only": True,
+    }
+
+
+def _prepared(handle="opaque", case_digest=DIGEST_A):
+    return 201, {
+        "contract_version": "p01-oaf-01-trusted-prepare-v1",
+        "handle": handle,
+        "case_digest": case_digest,
+        "state": "REVIEW_READY",
+        "candidate_id": "candidate-1",
+        "chain_id": "solana",
+        "token_mint": "mint-1",
+        "pool_address": "pool-1",
+        "cip_digest": DIGEST_E,
+        "review_path": f"/api/v1/operator/paper-cases/{handle}",
+        "simulation_only": True,
+    }
+
+
+def _review_ready(handle="opaque", case_digest=DIGEST_A):
+    return 200, {
+        "contract_version": "p01-oaf-01-case-registry-v3",
+        "handle": handle,
+        "case_digest": case_digest,
+        "state": "REVIEW_READY",
+        "candidate_id": "candidate-1",
+        "chain_id": "solana",
+        "token_mint": "mint-1",
+        "pool_address": "pool-1",
+        "cip_digest": DIGEST_E,
+        "simulation_only": True,
+        "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
     }
 
 
@@ -147,28 +180,62 @@ def test_validation_mutation_claim_stops_before_prepare():
     assert len(calls) == 2
 
 
+def test_prepare_identity_mismatch_stops_before_review():
+    calls = []
+    prepared = _prepared()
+    prepared[1]["candidate_id"] = "different-candidate"
+    responses = [_ready(), _valid(), prepared]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="prepare candidate_id mismatch"):
+        run_smoke(_config(), request_json=request)
+
+    assert len(calls) == 3
+
+
+def test_prepare_review_path_mismatch_stops_before_review():
+    calls = []
+    prepared = _prepared()
+    prepared[1]["review_path"] = "/api/v1/operator/paper-cases/different"
+    responses = [_ready(), _valid(), prepared]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="prepare review path mismatch"):
+        run_smoke(_config(), request_json=request)
+
+    assert len(calls) == 3
+
+
+def test_review_identity_mismatch_stops_before_run():
+    calls = []
+    reviewed = _review_ready()
+    reviewed[1]["pool_address"] = "different-pool"
+    responses = [_ready(), _valid(), _prepared(), reviewed]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="prepare/review pool_address mismatch"):
+        run_smoke(_config(run=True), request_json=request)
+
+    assert len(calls) == 4
+
+
 def test_default_smoke_checks_readiness_and_validation_then_stops_after_prepare_and_review():
     calls = []
 
     responses = [
         _ready(),
         _valid(),
-        (
-            201,
-            {
-                "handle": "opaque-handle",
-                "case_digest": DIGEST_A,
-                "state": "REVIEW_READY",
-            },
-        ),
-        (
-            200,
-            {
-                "handle": "opaque-handle",
-                "case_digest": DIGEST_A,
-                "state": "REVIEW_READY",
-            },
-        ),
+        _prepared("opaque-handle"),
+        _review_ready("opaque-handle"),
     ]
 
     def request(method, url, token, payload, timeout):
@@ -190,22 +257,8 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
     responses = [
         _ready(),
         _valid(),
-        (
-            201,
-            {
-                "handle": "opaque-handle",
-                "case_digest": DIGEST_A,
-                "state": "REVIEW_READY",
-            },
-        ),
-        (
-            200,
-            {
-                "handle": "opaque-handle",
-                "case_digest": DIGEST_A,
-                "state": "REVIEW_READY",
-            },
-        ),
+        _prepared("opaque-handle"),
+        _review_ready("opaque-handle"),
         (
             200,
             {
@@ -283,8 +336,8 @@ def test_non_durable_persist_outcome_stops_before_readback():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
@@ -339,8 +392,8 @@ def test_persist_digest_mismatch_stops_before_readback():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
@@ -394,8 +447,8 @@ def test_readback_digest_mismatch_is_rejected():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
@@ -456,8 +509,8 @@ def test_run_case_identity_mismatch_stops_before_post_run_review():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
@@ -486,8 +539,8 @@ def test_run_and_post_run_review_digest_mismatch_stops_before_persist():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
@@ -533,8 +586,8 @@ def test_persist_case_identity_mismatch_stops_before_readback():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
@@ -631,8 +684,8 @@ def test_non_persistable_run_stops_without_persist_or_readback():
     responses = [
         _ready(),
         _valid(),
-        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
-        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        _prepared(),
+        _review_ready(),
         (
             200,
             {
