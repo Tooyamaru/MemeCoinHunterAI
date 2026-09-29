@@ -36,7 +36,9 @@ fails closed if the preflight contract, safety claims, or explicit identity
 projection do not match the submitted case intent. Successful prepare and first
 review must then preserve the exact case, candidate/token/chain/pool identity,
 CIP digest, review path, simulation-only boundary, and controlled source label
-before run is permitted.
+before run is permitted. Run, post-run review, persistence, and durable readback
+then each require their exact current contract, terminal/simulation boundaries,
+and canonical digest/artifact projections before the smoke may continue.
 
 The project remains **paper/simulation only**. There is no wallet ownership,
 signing, transaction broadcast, DEX execution, autonomous hunting loop, or

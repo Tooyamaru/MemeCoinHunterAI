@@ -264,8 +264,10 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
             {
                 "handle": "opaque-handle",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -277,7 +279,10 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
             {
                 "handle": "opaque-handle",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -288,7 +293,12 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
             {
                 "handle": "opaque-handle",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-persist-once-v1",
                 "state": "PERSIST_TERMINAL",
+                "outcome": "PERSIST_TERMINAL",
+                "simulation_only": True,
+                "persistence_digest": DIGEST_E,
+                "artifact_count": 0,
                 "persistence_outcome": "STORED",
                 "lifecycle_result_digest": DIGEST_D,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
@@ -297,8 +307,15 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
         (
             200,
             {
+                "contract_version": "p01-rti-03-v1",
                 "outcome": "FOUND",
                 "lifecycle_result_digest": DIGEST_D,
+                "result_digest": DIGEST_E,
+                "run": {
+                    "lifecycle_result_digest": DIGEST_D,
+                    "artifact_count": 0,
+                },
+                "artifacts": [],
             },
         ),
     ]
@@ -343,8 +360,10 @@ def test_non_durable_persist_outcome_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -356,7 +375,10 @@ def test_non_durable_persist_outcome_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -367,7 +389,12 @@ def test_non_durable_persist_outcome_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-persist-once-v1",
                 "state": "PERSIST_TERMINAL",
+                "outcome": "PERSIST_TERMINAL",
+                "simulation_only": True,
+                "persistence_digest": DIGEST_E,
+                "artifact_count": 0,
                 "persistence_outcome": "STORAGE_UNAVAILABLE",
                 "lifecycle_result_digest": DIGEST_D,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
@@ -399,8 +426,10 @@ def test_persist_digest_mismatch_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -412,7 +441,10 @@ def test_persist_digest_mismatch_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -423,7 +455,12 @@ def test_persist_digest_mismatch_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-persist-once-v1",
                 "state": "PERSIST_TERMINAL",
+                "outcome": "PERSIST_TERMINAL",
+                "simulation_only": True,
+                "persistence_digest": DIGEST_E,
+                "artifact_count": 0,
                 "persistence_outcome": "STORED",
                 "lifecycle_result_digest": DIGEST_C,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_C}",
@@ -454,8 +491,10 @@ def test_readback_digest_mismatch_is_rejected():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -467,7 +506,10 @@ def test_readback_digest_mismatch_is_rejected():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -478,7 +520,12 @@ def test_readback_digest_mismatch_is_rejected():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-persist-once-v1",
                 "state": "PERSIST_TERMINAL",
+                "outcome": "PERSIST_TERMINAL",
+                "simulation_only": True,
+                "persistence_digest": DIGEST_E,
+                "artifact_count": 0,
                 "persistence_outcome": "STORED",
                 "lifecycle_result_digest": DIGEST_D,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
@@ -487,8 +534,15 @@ def test_readback_digest_mismatch_is_rejected():
         (
             200,
             {
+                "contract_version": "p01-rti-03-v1",
                 "outcome": "FOUND",
                 "lifecycle_result_digest": DIGEST_C,
+                "result_digest": DIGEST_E,
+                "run": {
+                    "lifecycle_result_digest": DIGEST_C,
+                    "artifact_count": 0,
+                },
+                "artifacts": [],
             },
         ),
     ]
@@ -516,8 +570,10 @@ def test_run_case_identity_mismatch_stops_before_post_run_review():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_B,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "persist_eligible": False,
             },
         ),
@@ -546,8 +602,10 @@ def test_run_and_post_run_review_digest_mismatch_stops_before_persist():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -559,7 +617,10 @@ def test_run_and_post_run_review_digest_mismatch_stops_before_persist():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_A,
@@ -593,8 +654,10 @@ def test_persist_case_identity_mismatch_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -606,7 +669,10 @@ def test_persist_case_identity_mismatch_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
                 "oci_digest": DIGEST_B,
                 "osc_digest": DIGEST_C,
                 "lifecycle_result_digest": DIGEST_D,
@@ -617,7 +683,12 @@ def test_persist_case_identity_mismatch_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_B,
+                "contract_version": "p01-oaf-01-persist-once-v1",
                 "state": "PERSIST_TERMINAL",
+                "outcome": "PERSIST_TERMINAL",
+                "simulation_only": True,
+                "persistence_digest": DIGEST_E,
+                "artifact_count": 0,
                 "persistence_outcome": "STORED",
                 "lifecycle_result_digest": DIGEST_D,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
@@ -678,6 +749,182 @@ def test_persist_requires_explicit_run_confirmation():
         _config(persist=True)
 
 
+def test_run_contract_mismatch_stops_before_post_run_review():
+    calls = []
+    run = {
+        "contract_version": "wrong-run-contract",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "outcome": "RUN_TERMINAL",
+        "simulation_only": True,
+        "persist_eligible": False,
+    }
+    responses = [_ready(), _valid(), _prepared(), _review_ready(), (200, run)]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="run contract mismatch"):
+        run_smoke(_config(run=True), request_json=request)
+
+    assert len(calls) == 5
+
+
+def test_post_run_review_contract_mismatch_stops_before_persist():
+    calls = []
+    run = {
+        "contract_version": "p01-oaf-01-run-once-v1",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "outcome": "RUN_TERMINAL",
+        "simulation_only": True,
+        "persist_eligible": False,
+    }
+    review = {
+        "contract_version": "wrong-review-contract",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "simulation_only": True,
+        "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
+    }
+    responses = [_ready(), _valid(), _prepared(), _review_ready(), (200, run), (200, review)]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="post-run review contract mismatch"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 6
+
+
+def test_persist_contract_mismatch_stops_before_readback():
+    calls = []
+    run = {
+        "contract_version": "p01-oaf-01-run-once-v1",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "outcome": "RUN_TERMINAL",
+        "simulation_only": True,
+        "oci_digest": DIGEST_B,
+        "osc_digest": DIGEST_C,
+        "lifecycle_result_digest": DIGEST_D,
+        "persist_eligible": True,
+    }
+    review = {
+        "contract_version": "p01-oaf-01-case-registry-v3",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "simulation_only": True,
+        "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
+        "oci_digest": DIGEST_B,
+        "osc_digest": DIGEST_C,
+        "lifecycle_result_digest": DIGEST_D,
+    }
+    persist = {
+        "contract_version": "wrong-persist-contract",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "PERSIST_TERMINAL",
+        "outcome": "PERSIST_TERMINAL",
+        "simulation_only": True,
+        "persistence_digest": DIGEST_E,
+        "artifact_count": 0,
+        "persistence_outcome": "STORED",
+        "lifecycle_result_digest": DIGEST_D,
+        "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
+    }
+    responses = [
+        _ready(),
+        _valid(),
+        _prepared(),
+        _review_ready(),
+        (200, run),
+        (200, review),
+        (200, persist),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="persist contract mismatch"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 7
+
+
+def test_readback_contract_mismatch_is_rejected():
+    calls = []
+    run = {
+        "contract_version": "p01-oaf-01-run-once-v1",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "outcome": "RUN_TERMINAL",
+        "simulation_only": True,
+        "oci_digest": DIGEST_B,
+        "osc_digest": DIGEST_C,
+        "lifecycle_result_digest": DIGEST_D,
+        "persist_eligible": True,
+    }
+    review = {
+        "contract_version": "p01-oaf-01-case-registry-v3",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "RUN_TERMINAL",
+        "simulation_only": True,
+        "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
+        "oci_digest": DIGEST_B,
+        "osc_digest": DIGEST_C,
+        "lifecycle_result_digest": DIGEST_D,
+    }
+    persist = {
+        "contract_version": "p01-oaf-01-persist-once-v1",
+        "handle": "opaque",
+        "case_digest": DIGEST_A,
+        "state": "PERSIST_TERMINAL",
+        "outcome": "PERSIST_TERMINAL",
+        "simulation_only": True,
+        "persistence_digest": DIGEST_E,
+        "artifact_count": 0,
+        "persistence_outcome": "STORED",
+        "lifecycle_result_digest": DIGEST_D,
+        "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
+    }
+    readback = {
+        "contract_version": "wrong-readback-contract",
+        "outcome": "FOUND",
+        "lifecycle_result_digest": DIGEST_D,
+    }
+    responses = [
+        _ready(),
+        _valid(),
+        _prepared(),
+        _review_ready(),
+        (200, run),
+        (200, review),
+        (200, persist),
+        (200, readback),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="readback contract mismatch"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 8
+
+
 def test_non_persistable_run_stops_without_persist_or_readback():
     calls = []
 
@@ -691,17 +938,22 @@ def test_non_persistable_run_stops_without_persist_or_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
+                "contract_version": "p01-oaf-01-run-once-v1",
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "simulation_only": True,
                 "persist_eligible": False,
             },
         ),
         (
             200,
             {
+                "contract_version": "p01-oaf-01-case-registry-v3",
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
                 "state": "RUN_TERMINAL",
+                "simulation_only": True,
+                "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
             },
         ),
     ]
