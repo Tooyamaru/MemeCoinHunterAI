@@ -160,6 +160,8 @@ def run_smoke(
     )
     if review_status != 200:
         raise OperatorSmokeError(f"unexpected review status: {review_status}")
+    if review.get("handle") != handle:
+        raise OperatorSmokeError("review handle mismatch")
     if review.get("case_digest") != case_digest:
         raise OperatorSmokeError("review case digest mismatch")
     result["review_after_prepare"] = {"status": review_status, "body": review}
@@ -176,6 +178,10 @@ def run_smoke(
     )
     if run_status != 200:
         raise OperatorSmokeError(f"unexpected run status: {run_status}")
+    if run.get("handle") != handle:
+        raise OperatorSmokeError("run handle mismatch")
+    if run.get("case_digest") != case_digest:
+        raise OperatorSmokeError("run case digest mismatch")
     result["run"] = {"status": run_status, "body": run}
 
     review2_status, review2 = request_json(
@@ -187,6 +193,10 @@ def run_smoke(
     )
     if review2_status != 200:
         raise OperatorSmokeError(f"unexpected post-run review status: {review2_status}")
+    if review2.get("handle") != handle:
+        raise OperatorSmokeError("post-run review handle mismatch")
+    if review2.get("case_digest") != case_digest:
+        raise OperatorSmokeError("post-run review case digest mismatch")
     result["review_after_run"] = {"status": review2_status, "body": review2}
 
     if not config.confirm_persist:
@@ -210,6 +220,8 @@ def run_smoke(
     ):
         if not isinstance(value, str) or len(value) != 64:
             raise OperatorSmokeError(f"post-run review missing canonical {name}")
+        if run.get(name) != value:
+            raise OperatorSmokeError(f"run/post-run review {name} mismatch")
 
     persist_status, persist = request_json(
         "POST",
@@ -226,6 +238,12 @@ def run_smoke(
     )
     if persist_status != 200:
         raise OperatorSmokeError(f"unexpected persist status: {persist_status}")
+    if persist.get("handle") != handle:
+        raise OperatorSmokeError("persist handle mismatch")
+    if persist.get("case_digest") != case_digest:
+        raise OperatorSmokeError("persist case digest mismatch")
+    if persist.get("state") != "PERSIST_TERMINAL":
+        raise OperatorSmokeError("persist did not reach terminal state")
     result["persist"] = {"status": persist_status, "body": persist}
 
     persistence_outcome = persist.get("persistence_outcome")

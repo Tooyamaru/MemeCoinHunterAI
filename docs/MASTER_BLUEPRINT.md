@@ -78,12 +78,15 @@ Authenticated readiness
 → terminal review
 → two-step persistence confirmation
 → RTI-03 durable persistence
-→ durable readback / manual history
+→ exact durable readback / manual history
 → explicit browser-session cleanup
 ```
 
 Current presentation/runtime safety properties:
 
+- the real-environment smoke harness requires exact prepared-case handle/case-digest continuity through review/run/post-run review/persist;
+- persist-eligible OCI/OSC/lifecycle digests must agree between run and post-run review before persistence;
+- durable readback requires `STORED` or `ALREADY_STORED`, the exact canonical lifecycle path, and `FOUND` for the same lifecycle digest;
 - no automatic polling or automatic retry;
 - no browser-supplied trusted RTI-11 result;
 - no mutation until explicit operator confirmation;

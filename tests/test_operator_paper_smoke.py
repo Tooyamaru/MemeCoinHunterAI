@@ -124,6 +124,9 @@ def test_full_smoke_is_one_explicit_request_per_transition_with_no_retry():
                 "case_digest": DIGEST_A,
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
                 "persist_eligible": True,
             },
         ),
@@ -200,6 +203,9 @@ def test_non_durable_persist_outcome_stops_before_readback():
                 "case_digest": DIGEST_A,
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
                 "persist_eligible": True,
             },
         ),
@@ -219,8 +225,8 @@ def test_non_durable_persist_outcome_stops_before_readback():
             {
                 "handle": "opaque",
                 "case_digest": DIGEST_A,
-                "state": "PERSIST_OUTCOME_UNKNOWN",
-                "persistence_outcome": None,
+                "state": "PERSIST_TERMINAL",
+                "persistence_outcome": "STORAGE_UNAVAILABLE",
                 "lifecycle_result_digest": DIGEST_D,
                 "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
             },
@@ -253,6 +259,9 @@ def test_persist_digest_mismatch_stops_before_readback():
                 "case_digest": DIGEST_A,
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
                 "persist_eligible": True,
             },
         ),
@@ -305,6 +314,9 @@ def test_readback_digest_mismatch_is_rejected():
                 "case_digest": DIGEST_A,
                 "state": "RUN_TERMINAL",
                 "outcome": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
                 "persist_eligible": True,
             },
         ),
@@ -347,6 +359,138 @@ def test_readback_digest_mismatch_is_rejected():
         run_smoke(_config(run=True, persist=True), request_json=request)
 
     assert len(calls) == 8
+
+
+def test_run_case_identity_mismatch_stops_before_post_run_review():
+    calls = []
+
+    responses = [
+        _ready(),
+        _valid(),
+        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_B,
+                "state": "RUN_TERMINAL",
+                "outcome": "RUN_TERMINAL",
+                "persist_eligible": False,
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="run case digest mismatch"):
+        run_smoke(_config(run=True), request_json=request)
+
+    assert len(calls) == 5
+
+
+def test_run_and_post_run_review_digest_mismatch_stops_before_persist():
+    calls = []
+
+    responses = [
+        _ready(),
+        _valid(),
+        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "outcome": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
+                "persist_eligible": True,
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_A,
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(
+        OperatorSmokeError,
+        match="run/post-run review lifecycle_result_digest mismatch",
+    ):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 6
+
+
+def test_persist_case_identity_mismatch_stops_before_readback():
+    calls = []
+
+    responses = [
+        _ready(),
+        _valid(),
+        (201, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (200, {"handle": "opaque", "case_digest": DIGEST_A, "state": "REVIEW_READY"}),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "outcome": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
+                "persist_eligible": True,
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_A,
+                "state": "RUN_TERMINAL",
+                "oci_digest": DIGEST_B,
+                "osc_digest": DIGEST_C,
+                "lifecycle_result_digest": DIGEST_D,
+            },
+        ),
+        (
+            200,
+            {
+                "handle": "opaque",
+                "case_digest": DIGEST_B,
+                "state": "PERSIST_TERMINAL",
+                "persistence_outcome": "STORED",
+                "lifecycle_result_digest": DIGEST_D,
+                "readback_path": f"/api/v1/paper-lifecycle-results/{DIGEST_D}",
+            },
+        ),
+    ]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(OperatorSmokeError, match="persist case digest mismatch"):
+        run_smoke(_config(run=True, persist=True), request_json=request)
+
+    assert len(calls) == 7
 
 
 def test_readiness_failure_stops_before_prepare():
