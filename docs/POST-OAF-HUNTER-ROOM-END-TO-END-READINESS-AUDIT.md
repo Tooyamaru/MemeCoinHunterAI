@@ -4,6 +4,32 @@ Status: AUDIT COMPLETE / BOUNDED OPERATOR E2E VERIFIED / PRODUCTION PACKAGING NE
 
 Repository checkpoint audited: `1163df00f3d02de1f635dbf399517dc96128b0d9` (`main` after PR #92).
 
+
+## Follow-up reconciliation — 2026-09-29
+
+The original audit checkpoint is retained as historical evidence. Subsequent
+merged work through PR #108 closes the packaging recommendation and adds
+bounded operator/deployment hardening:
+
+- standalone Hunter Room packaging and explicit controlled-paper smoke harness;
+- persisted lifecycle catalog and canonical persisted detail;
+- fail-closed process-local deployment acknowledgement;
+- active-case durability audit retaining one stable process for exact-object cases;
+- authenticated no-provider-I/O readiness preflight;
+- authenticated no-I/O prepare payload validation;
+- explicit prepare preflight gate;
+- two-step run/persist confirmation;
+- server case lifetime/provenance visibility and stale-arm invalidation;
+- durable readback gating on RTI-03 `STORED` / `ALREADY_STORED`;
+- explicit browser-memory operator-session cleanup.
+
+The remaining operational gap is no longer production packaging. It is one
+explicit provider-backed controlled-paper smoke sequence in a known
+single-process environment when separately authorized and when runtime secrets
+are intentionally available. The smoke has NOT YET BEEN EXECUTED.
+
+Current reconciled main checkpoint: `701726622f62c907fbe42e822543f9cb5c3f6cee`.
+
 ## Verified completion chain
 
 The merged repository now contains the controlled-paper operator chain required for an explicit operator-driven flow:

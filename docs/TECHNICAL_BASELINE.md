@@ -16,7 +16,7 @@
 - `backend/application/` — HTTP-independent application-service orchestration and request context
 - `backend/workers/` — explicit, independently testable worker lifecycle foundation; no concrete market or trading workers
 - `core/` — future domain logic such as data, signals, opportunity, decision, risk, execution, and learning; currently empty
-- `apps/dashboard/` — reserved production dashboard package location; the current HR-FND-01 functional Hunter Room preview is implemented in `artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx`
+- `apps/dashboard/` — reserved production dashboard package location; the current standalone Hunter Room implementation is packaged from `artifacts/mockup-sandbox/src/components/mockups/HunterRoom.tsx`
 - `workers/` — future process entrypoints; no domain-specific workers are implemented yet
 - `database/` — future migrations and database assets
 - `tests/` — targeted foundation and future domain tests
@@ -33,13 +33,15 @@ GET  /health
 GET  /ready
 GET  /api/v1/paper-lifecycle-results
 GET  /api/v1/paper-lifecycle-results/{lifecycle_result_digest}
+GET  /api/v1/operator/paper-cases/readiness
+POST /api/v1/operator/paper-cases/validate
 POST /api/v1/operator/paper-cases
 GET  /api/v1/operator/paper-cases/{handle}
 POST /api/v1/operator/paper-cases/{handle}/run
 POST /api/v1/operator/paper-cases/{handle}/persist
 ```
 
-The operator routes are controlled-paper-only and require the configured single-controller bearer credential. Prepare may use the bounded trusted Solana JSON-RPC source and existing one-shot CoinGecko exact-pool diagnostic. Review performs no provider call; run invokes the exact prepared paper case at most once; persist delegates the exact returned lifecycle to RTI-03 at most once. No route signs, broadcasts, routes a live trade, or opens G2/G3/G4/P09.
+The operator routes are controlled-paper-only and require the configured single-controller bearer credential. The readiness route performs configuration/application readiness checks only and does not probe providers. The validation route performs the same local canonical prepare decode without provider I/O or registry mutation. Prepare may use the bounded trusted Solana JSON-RPC source and existing one-shot CoinGecko exact-pool diagnostic. Review performs no provider call; run invokes the exact prepared paper case at most once; persist delegates the exact returned lifecycle to RTI-03 at most once. Hunter Room adds browser-side preflight, two-step confirmation, stale-arm invalidation, durable-readback gating, and session cleanup, while backend authorization/state remains authoritative. No route signs, broadcasts, routes a live trade, or opens G2/G3/G4/P09.
 
 Run it with:
 
@@ -96,9 +98,9 @@ scanner, market-data, signal, decision, risk, paper/execution, and learning
 workers. Each future process will reuse the infrastructure boundaries rather
 than becoming a microservice prematurely.
 
-## Replit and future Railway compatibility
+## Runtime portability
 
-After cloning into a blank Replit workspace, run `bash scripts/replit_setup.sh`, configure environment values through secrets when needed, and start the API with the command above. Replit supplies the runtime port through `PORT` when a workflow is added. The FastAPI/Uvicorn process and environment-based configuration can later move to Railway without requiring a framework rewrite. The OAF prepared-case registry is deliberately process-local and identity-preserving, so operator prepare/review/run/persist must stay on one process while a case is active; it does not claim cross-process or restart-safe exactly-once semantics. Durable paper lifecycle data is separately owned by RTI-03 persistence.
+GitHub `main` is the source of truth and ChatGPT/Work is the primary development/control surface. Replit is fallback-only for a concrete interactive runtime/preview need. When Replit is used, run `bash scripts/replit_setup.sh`, configure environment values through secrets, and start the API with the command above. The FastAPI/Uvicorn process and environment-based configuration remain portable to a later hosting decision without a framework rewrite. The OAF prepared-case registry is deliberately process-local and identity-preserving, so operator prepare/review/run/persist must stay on one stable process while a case is active; it does not claim cross-process or restart-safe exactly-once semantics. Durable paper lifecycle data is separately owned by RTI-03 persistence.
 
 ## Rejected or deferred alternatives
 

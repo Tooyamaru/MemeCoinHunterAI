@@ -1,3 +1,12 @@
+## 2026-09-29 — Post-OAF Hunter Room Hardening Reconciliation
+
+- **MERGED CHAIN:** PR #99 through PR #108 advance the controlled-paper operator surface from durability/deployment audit through authenticated readiness, no-I/O payload validation, explicit prepare preflight gating, two-step run/persist confirmation, case lifetime/provenance visibility, stale-arm invalidation, durable readback gating, and explicit browser-session cleanup.
+- **CURRENT MAIN CHECKPOINT:** `701726622f62c907fbe42e822543f9cb5c3f6cee` after PR #108.
+- **PROCESS MODEL:** Active prepare/review/run/persist cases remain exact-object and process-local; one stable application process is required. No restart-safe or multi-worker active-case reconstruction is claimed.
+- **READBACK:** Hunter Room no longer treats a lifecycle digest as proof of storage; persisted readback is enabled only after RTI-03 reports `STORED` or `ALREADY_STORED` and exposes the server readback path.
+- **OPERATOR SAFETY:** Prepare requires manual readiness + current-payload validation; Run/Persist require explicit two-step arm/confirm gestures; stale arm state is invalidated when server-observed case state changes; bearer/session context can be cleared from browser memory explicitly.
+- **OPERATIONAL GAP:** The real-environment provider-backed controlled-paper smoke sequence remains NOT YET EXECUTED and requires explicit operational authorization plus intentionally available runtime secrets.
+- **BOUNDARY:** No autonomous hunting loop, automatic retry/polling, wallet/signing, broadcast, DEX execution, settlement/economic realization, or live trading authority. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
 ## 2026-09-26 — P01-OAF-01 / HR-FND-01 Controlled-Paper Operator Completion Chain
 
 - **MERGED BASELINE:** Authenticated trusted prepare/review and the atomic run-once foundation are merged through PR #85. The process-local registry preserves exact canonical objects and prevents automatic duplicate run attempts within one process.
