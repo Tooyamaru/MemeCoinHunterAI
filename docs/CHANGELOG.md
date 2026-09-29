@@ -1,3 +1,12 @@
+## 2026-09-29 — Operator Smoke Case Identity Continuity
+
+- **CASE IDENTITY:** The smoke harness now requires the exact prepared case handle and case digest to remain unchanged across initial review, run, post-run review, and persistence.
+- **RUN/REVIEW DIGESTS:** For persist-eligible runs, OCI, OSC, and lifecycle digests returned by the run must exactly match the post-run review before persistence is attempted.
+- **FAIL-CLOSED:** Handle mismatch, case-digest mismatch, run/review digest mismatch, or non-terminal persistence stops the smoke immediately with no retry or fallback.
+- **DURABLE READBACK:** Existing `STORED`/`ALREADY_STORED`, canonical readback-path, and exact lifecycle readback checks remain mandatory.
+- **OPERATIONAL STATUS:** The provider-backed real-environment smoke itself remains NOT YET EXECUTED and still requires explicit operational authorization plus intentionally available runtime secrets.
+- **BOUNDARY:** No autonomous hunting, polling/retry, worker/scheduler, wallet/signing, DEX/live/economic behavior. P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke Durable Readback Verification
 
 - **DURABLE GATE:** The real-environment controlled-paper smoke harness now attempts lifecycle readback only after persistence reports `STORED` or `ALREADY_STORED`.
