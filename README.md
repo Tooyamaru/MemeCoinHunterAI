@@ -31,7 +31,9 @@ history/detail inspection, and explicit browser-memory session cleanup.
 There is no automatic polling or retry. Active cases remain process-local and
 require one stable application process from prepare through run/persist. The
 controlled-paper smoke CLI also supports a no-provider `--preflight-only` mode
-that stops after authenticated readiness and canonical payload validation.
+that stops after authenticated readiness and canonical payload validation, and
+fails closed if the preflight contract, safety claims, or explicit identity
+projection do not match the submitted case intent.
 
 The project remains **paper/simulation only**. There is no wallet ownership,
 signing, transaction broadcast, DEX execution, autonomous hunting loop, or
