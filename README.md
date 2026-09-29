@@ -20,14 +20,16 @@ bounded RTI-11→RTI-16 integration path. The Operator Application Facade now
 provides an authenticated, explicitly controlled paper workflow: trusted
 Solana/P03 upstream composition, one-shot exact-pool RTI-11 preparation,
 temporary identity-preserving case review, explicit run-once OCI/OSC handoff,
-optional explicit RTI-03 persistence, and the existing durable lifecycle
-readback surface.
+explicit RTI-03 persistence, and durable lifecycle readback/catalog surfaces.
 
-The functional HR-FND-01 Hunter Room foundation is implemented as a responsive
-operator preview in the existing mockup sandbox. It reflects server case state
-and provides explicit prepare/review/run/persist/readback controls without
-automatic polling or retry. It is not yet a separately packaged production
-dashboard deployment.
+The standalone Hunter Room controlled-paper operator surface is implemented
+through HR-FND-11. It reflects server case state and provides authenticated
+readiness, no-I/O payload validation, explicit prepare gating, review,
+two-step run/persist confirmation, server case lifetime/provenance visibility,
+stale armed-action invalidation, durable readback gating, manual persisted
+history/detail inspection, and explicit browser-memory session cleanup.
+There is no automatic polling or retry. Active cases remain process-local and
+require one stable application process from prepare through run/persist.
 
 The project remains **paper/simulation only**. There is no wallet ownership,
 signing, transaction broadcast, DEX execution, autonomous hunting loop, or
@@ -46,10 +48,13 @@ The Risk Governor has authority over the Decision Engine. Any future execution m
 
 ## Development workflow
 
-GitHub is the source of truth. Development uses short-lived branches and pull
-requests; Replit is the runtime/preview environment rather than an independent
-copy of the project. See `docs/HYBRID_DEVELOPMENT_WORKFLOW.md` for the complete
-change, test, review, and merge path.
+GitHub `main` is the source of truth. ChatGPT is the primary controller,
+architecture, implementation, review, and documentation surface; ChatGPT Work
+may be used for heavier multi-step execution when available. Replit is a
+fallback runtime/preview environment only when a specific interactive runtime
+or environment task cannot be completed in ChatGPT. See
+`docs/HYBRID_DEVELOPMENT_WORKFLOW.md` for the complete change, test, review,
+and merge path.
 
 1. Read `REPLIT_RULES.md` and `PROJECT_STATE.md`.
 2. Create a scoped branch from the latest `main`.
@@ -90,7 +95,7 @@ uv run pytest -q --collect-only
 
 ## Repository structure
 
-- `apps/dashboard/` — reserved production dashboard package location; current functional Hunter Room preview lives in the mockup sandbox
+- `apps/dashboard/` — reserved production dashboard package location; the standalone Hunter Room build is currently packaged from the mockup-sandbox implementation
 - `backend/api/` — future API boundary
 - `backend/core/` — configuration, logging, and infrastructure boundaries
 - `workers/` — future long-running workers
