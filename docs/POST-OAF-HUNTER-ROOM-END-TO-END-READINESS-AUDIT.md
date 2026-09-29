@@ -41,6 +41,10 @@ bounded operator/deployment hardening:
   registry contracts, exact case/candidate/token/chain/pool/CIP continuity,
   canonical review path, simulation-only state, and expected source label
   before run.
+- terminal contract proof requiring run-once/case-registry/persist-once/RTI-03
+  contracts, terminal state/outcome continuity, simulation/source boundaries,
+  canonical persistence/readback digests, exact lifecycle root, and artifact-count
+  agreement before the smoke can be considered complete.
 
 The remaining operational gap is no longer production packaging or smoke-harness
 preflight parity. It is one explicit provider-backed controlled-paper smoke
