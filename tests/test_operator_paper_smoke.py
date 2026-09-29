@@ -73,7 +73,7 @@ def test_preflight_only_stops_after_readiness_and_validation_without_prepare():
     assert [call[0] for call in calls] == ["GET", "POST"]
     assert calls[0][1].endswith("/api/v1/operator/paper-cases/readiness")
     assert calls[1][1].endswith("/api/v1/operator/paper-cases/validate")
-    assert all("/api/v1/operator/paper-cases" not in call[1].removesuffix("/validate") for call in calls[1:])
+    assert len(calls) == 2
 
 
 def test_preflight_only_rejects_run_or_persist_confirmation():
