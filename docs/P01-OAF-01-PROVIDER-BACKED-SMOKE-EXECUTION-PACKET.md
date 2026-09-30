@@ -102,12 +102,14 @@ Before operational authorization for provider access, run:
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
+  --expected-environment staging \
   --preflight-only
 ```
 
 Required result:
 
 - authenticated readiness returns `READY`;
+- readiness environment exactly matches the explicit `--expected-environment`;
 - readiness uses `p01-oaf-01-operator-readiness-v1`;
 - `process_local_registry=true`;
 - readiness reports no provider-connectivity probe and remains simulation-only;
@@ -128,12 +130,14 @@ runtime secrets may the full smoke be run:
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
+  --expected-environment staging \
   --confirm-provider-prepare \
   --confirm-run \
   --confirm-persist
 ```
 
-The `--confirm-provider-prepare` flag is mandatory before the first trusted
+The expected environment must already have matched authenticated readiness, and
+the `--confirm-provider-prepare` flag is mandatory before the first trusted
 prepare/provider request. Run/persist confirmation cannot bypass this gate.
 
 For an eligible full chain the harness performs exactly eight requests:
