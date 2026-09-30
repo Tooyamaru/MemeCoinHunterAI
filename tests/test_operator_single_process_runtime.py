@@ -81,7 +81,10 @@ def test_single_process_runtime_rejects_unknown_expected_environment():
 def test_single_process_runtime_rejects_environment_mismatch_before_launch_readiness():
     with pytest.raises(SingleProcessRuntimeError, match="runtime environment mismatch"):
         validate_single_process_runtime(
-            settings=_settings(app_env="production", operator_process_local_registry_ack=True),
+            settings=_settings(
+                app_env="production",
+                operator_process_local_registry_ack=True,
+            ),
             environment=_environment(),
             expected_environment="staging",
         )
@@ -95,6 +98,7 @@ def test_staging_requires_explicit_process_local_acknowledgement():
         validate_single_process_runtime(
             settings=_settings(app_env="staging"),
             environment=_environment(),
+            expected_environment="staging",
         )
 
     readiness = validate_single_process_runtime(
