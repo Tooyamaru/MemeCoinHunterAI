@@ -1,3 +1,10 @@
+## 2026-09-30 — Paper-Only One-Cycle Composition Decision Gate
+
+- **STATUS:** Documentation-only conditional contract; controller decisions required before runtime authorization.
+- **OWNER PATH:** Reuses admitted P02, paired P03, RTI-11/P04/P05, independent Risk/Capital veto, P07 and existing OAF/RTI-03 paper lifecycle. Preserves exact identity, provenance, STOP and process-local case semantics.
+- **UNSELECTED:** Discovery event/source, candidate/exact-pool policy, unattended trigger/service access, provider budgets and freshness, risk veto, review/run/persist permissions and restart handling.
+- **NO RUNTIME:** No provider invocation, paper experiment, worker, scheduler, retry, autonomous selection, wallet, execution or economic realization. Controlled-paper provider-backed smoke remains a separate operational gate. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-09-30 — Post-Operator Controlled-Paper Dependency Review
 
 - **STATUS:** Documentation-only owner-path audit after PR #126. Offline controlled-paper smoke preparation closed; provider-backed operational smoke remains separately authorized and unexecuted.
