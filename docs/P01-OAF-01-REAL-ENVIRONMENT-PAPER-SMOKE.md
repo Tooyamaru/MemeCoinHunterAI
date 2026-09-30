@@ -8,9 +8,8 @@ Provide one bounded CLI for exercising the deployed Operator Facade without
 adding polling, retries, autonomous discovery, or a second domain owner.
 
 The CLI consumes a complete explicit prepare JSON file. It never invents
-paper-policy defaults. By default it performs only:
-
-`readiness -> validate -> prepare -> review`
+paper-policy defaults. Without provider confirmation it performs readiness and
+no-I/O validation, then fails closed before trusted prepare/provider access.
 
 The validation call is the existing authenticated no-I/O canonical payload
 preflight. It does not probe Solana/CoinGecko and does not mutate an operator
@@ -20,9 +19,12 @@ Use `--preflight-only` to stop after authenticated readiness plus no-I/O
 canonical payload validation. This mode performs no trusted prepare/provider
 call and creates no operator case.
 
-The operator must add `--confirm-run` to invoke one paper run, and must add
-both `--confirm-run --confirm-persist` to permit one persistence action and
-one readback. `--preflight-only` cannot be combined with either confirmation.
+The operator must add `--confirm-provider-prepare` before any trusted
+prepare/provider call. `--confirm-run` additionally permits one paper run, and
+`--confirm-persist` additionally permits one persistence action and one
+readback after an eligible run. Run/persist confirmation requires provider
+confirmation. `--preflight-only` cannot be combined with provider/run/persist
+confirmation.
 
 ## Example
 
@@ -42,6 +44,7 @@ Full explicit controlled-paper sequence:
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
+  --confirm-provider-prepare \
   --confirm-run \
   --confirm-persist
 ```
@@ -59,7 +62,12 @@ Preflight-only mode performs exactly two authenticated requests:
 
 It then stops before the trusted prepare/provider path.
 
-For a full eligible chain the harness performs exactly:
+Outside `--preflight-only`, omission of `--confirm-provider-prepare` also
+fails closed immediately after the same readiness + validation pair, before any
+trusted prepare/provider request.
+
+For a full eligible chain with explicit provider/run/persist confirmation the
+harness performs exactly:
 
 1. one authenticated GET operator readiness preflight;
 2. one authenticated POST no-I/O prepare-payload validation;
