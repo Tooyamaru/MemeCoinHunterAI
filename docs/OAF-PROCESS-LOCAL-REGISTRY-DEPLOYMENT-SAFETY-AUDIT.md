@@ -19,6 +19,19 @@ Repository checkpoint: `bdcaedcbd7260758d6619591d4311fd2039edcbf` (main after HR
   cannot by itself guarantee that every request for one active case reaches the
   same process or survives process restart.
 
+## Current smoke-topology checkpoint — 2026-09-30
+
+The repository still declares `deploymentTarget = "autoscale"` in root
+`.replit`. For the provider-backed smoke gate, that topology is treated as a
+blocking mismatch with the current process-local active-case model. A smoke
+environment must instead guarantee one stable application process for the full
+prepare -> review -> run -> persist lifetime before operational authorization
+can be exercised.
+
+This checkpoint does not select or purchase a replacement deployment type and
+does not alter `.replit`; deployment topology/cost remains an explicit
+controller/deployer choice.
+
 ## Decision
 
 The current OAF mutation path is authorized only for one stable application

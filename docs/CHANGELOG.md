@@ -1,3 +1,12 @@
+## 2026-09-30 — Controlled-Paper Smoke Deployment Topology Blocker
+
+- **REPOSITORY FACT:** Current root `.replit` declares `deploymentTarget = "autoscale"`.
+- **PROCESS-LOCAL CONFLICT:** The governed OAF active-case path requires one stable application process for prepare -> review -> run -> persist. Autoscale is therefore not accepted as the qualifying real-environment smoke topology under the current contract.
+- **FAIL-CLOSED:** Provider-backed smoke remains blocked until a known single-process deployment/environment is selected and kept stable for the entire active-case lifetime.
+- **NO IMPLICIT DEPLOYMENT CHANGE:** This checkpoint does not silently change deployment type, cost model, or hosting topology.
+- **NEXT GATE:** After a qualifying single-process environment exists, the smoke still requires intentionally available runtime secrets and separate operational authorization.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Provider-Backed Controlled-Paper Smoke Execution Packet
 
 - **OPERATIONAL PREPARATION:** Added `docs/P01-OAF-01-PROVIDER-BACKED-SMOKE-EXECUTION-PACKET.md` for the next separately authorized real-environment paper-only gate.

@@ -40,6 +40,25 @@ The smoke CLI itself reads the operator bearer from `OPERATOR_BEARER_TOKEN` by
 default and accepts a different environment-variable name only through
 `--token-env`.
 
+## Deployment topology checkpoint
+
+At the current repository checkpoint, root `.replit` declares:
+
+```toml
+[deployment]
+deploymentTarget = "autoscale"
+```
+
+That target is **not** accepted as the qualifying smoke environment for the
+current OAF case model. The active case registry and exact-object lifecycle are
+process-local and require one stable application process from prepare through
+persist. `OPERATOR_PROCESS_LOCAL_REGISTRY_ACK=true` acknowledges that
+constraint but does not turn autoscale into sticky single-process routing.
+
+Do not run the provider-backed smoke against the current autoscale topology.
+Select/provision a known single-process environment first. This packet does not
+silently change the deployment type or cost model.
+
 ## Deployment preconditions
 
 Before any provider-backed prepare is authorized:
