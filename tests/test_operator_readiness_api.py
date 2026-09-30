@@ -17,11 +17,16 @@ async def _api(
     app_env="test",
     solana_rpc_url="https://solana.example",
     ack=False,
+    database_configured=True,
 ):
     settings = Settings(
         _env_file=None,
         app_env=app_env,
-        database_url=f"sqlite+aiosqlite:///{tmp_path / 'operator-readiness.db'}",
+        database_url=(
+            f"sqlite+aiosqlite:///{tmp_path / 'operator-readiness.db'}"
+            if database_configured
+            else None
+        ),
         operator_bearer_token=TOKEN,
         operator_process_local_registry_ack=ack,
         solana_rpc_url=solana_rpc_url,
@@ -52,6 +57,26 @@ async def test_authenticated_operator_readiness_is_no_store_and_no_provider_prob
         assert body["checks"]["run_service"] == "configured"
         assert body["checks"]["persist_service"] == "configured"
         assert body["process_local_registry"] is True
+        assert body["provider_connectivity_checked"] is False
+        assert body["simulation_only"] is True
+
+
+@pytest.mark.asyncio
+async def test_operator_readiness_requires_connected_durable_database(tmp_path):
+    async with _api(tmp_path, database_configured=False) as (_app, client):
+        response = await client.get(
+            "/api/v1/operator/paper-cases/readiness",
+            headers={"Authorization": f"Bearer {TOKEN}"},
+        )
+
+        assert response.status_code == 503
+        body = response.json()
+        assert body["status"] == "NOT_READY"
+        assert body["checks"]["database"] == "not_configured"
+        assert body["checks"]["case_registry"] == "enabled"
+        assert body["checks"]["prepare_service"] == "configured"
+        assert body["checks"]["run_service"] == "configured"
+        assert body["checks"]["persist_service"] == "configured"
         assert body["provider_connectivity_checked"] is False
         assert body["simulation_only"] is True
 

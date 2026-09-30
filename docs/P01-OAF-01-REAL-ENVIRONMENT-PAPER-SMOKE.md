@@ -83,9 +83,13 @@ harness performs exactly:
 8. one GET durable readback.
 
 The readiness endpoint performs no provider connectivity probe; it reports only
-configured application/database/operator service readiness and the application
-environment. If readiness is not `READY`, or if its environment does not exactly
-match `--expected-environment`, the harness stops before validation or prepare.
+application/database/operator service readiness and the application environment.
+For this operator gate, `READY` requires the database to be durably connected,
+not merely globally acceptable as unconfigured. The smoke additionally requires
+the exact readiness projection: database `connected`, case registry `enabled`,
+and prepare/run/persist services `configured`. If readiness is not `READY`,
+its environment does not exactly match `--expected-environment`, or that service
+projection differs, the harness stops before validation or prepare.
 
 The validation endpoint performs no provider/source I/O and creates no case. If
 the explicit payload is not `VALID`, the harness stops before prepare. The

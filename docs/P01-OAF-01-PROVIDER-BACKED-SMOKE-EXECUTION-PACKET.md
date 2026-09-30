@@ -90,6 +90,8 @@ Before any provider-backed prepare is authorized:
 2. Disable autoscale/multi-worker behavior for that active-case path unless a
    separately authorized architecture replaces the process-local registry.
 3. Confirm the database is connected and durable RTI-03 readback is available.
+   Authenticated operator readiness must report the database check as
+   `connected`; an unconfigured database is a STOP for this gate.
 4. Confirm the deployed base URL uses HTTPS for any non-local target.
 5. Keep all bearer/provider credentials in runtime secret storage only.
 6. Prepare one explicit JSON payload outside source control. The payload must
@@ -116,6 +118,8 @@ Required result:
 - authenticated readiness returns `READY`;
 - readiness environment exactly matches the explicit `--expected-environment`;
 - readiness uses `p01-oaf-01-operator-readiness-v1`;
+- readiness reports database `connected`, case registry `enabled`, and
+  prepare/run/persist services `configured`;
 - `process_local_registry=true`;
 - readiness reports no provider-connectivity probe and remains simulation-only;
 - validation returns `VALID` under

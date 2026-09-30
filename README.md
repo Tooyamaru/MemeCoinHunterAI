@@ -42,7 +42,10 @@ that stops after authenticated readiness and canonical payload validation, and
 fails closed if the preflight contract, safety claims, deployment environment,
 or explicit identity projection do not match the submitted case intent. The CLI
 requires an explicit expected environment and authenticated readiness must report
-the same value before validation. Outside preflight-only mode, the first trusted
+the same value before validation. Operator readiness also requires a connected
+database and the exact configured case/prepare/run/persist service projection;
+an unconfigured database cannot enter this controlled-paper smoke gate. Outside
+preflight-only mode, the first trusted
 prepare/provider call requires explicit `--confirm-provider-prepare`; run/persist
 confirmation cannot bypass it. Successful prepare and first
 review must then preserve the exact case, candidate/token/chain/pool identity,

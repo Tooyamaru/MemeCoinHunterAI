@@ -1,3 +1,13 @@
+## 2026-09-30 — Durable Operator Readiness Gate
+
+- **DATABASE REQUIREMENT:** Authenticated operator readiness now requires the application database state to be exactly `CONNECTED`; a globally acceptable `NOT_CONFIGURED` database is no longer sufficient for the controlled-paper operator gate.
+- **PERSISTENCE SAFETY:** This aligns readiness with the existing RTI-03 durable persistence/readback requirement instead of allowing a smoke to begin against a host that cannot persist the terminal lifecycle.
+- **SMOKE PROJECTION:** The smoke CLI now requires the exact readiness checks projection: database `connected`, case registry `enabled`, and prepare/run/persist services `configured`.
+- **FAIL-CLOSED:** Any readiness-check drift stops before validation or trusted provider access.
+- **NO-PROVIDER:** Readiness still performs no Solana/CoinGecko connectivity probe.
+- **NOT EXECUTED:** No provider-backed smoke is executed by this change.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Single-Process Runtime Environment Identity Guard
 
 - **LAUNCH IDENTITY:** `scripts/operator_single_process_runtime.py` now requires explicit `--expected-environment` from the existing application environment vocabulary.
