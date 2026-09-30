@@ -1,6 +1,6 @@
 # OAF Process-Local Registry Deployment Safety Audit
 
-Status: IMPLEMENTATION HARDENING / CONTROLLED PAPER ONLY
+Status: CURRENT SINGLE-PROCESS IMPLEMENTATION HARDENING CLOSED / CONTROLLED PAPER ONLY
 
 Repository checkpoint: `bdcaedcbd7260758d6619591d4311fd2039edcbf` (main after HR-FND-04).
 
@@ -85,6 +85,13 @@ local acknowledgement is absent:
 
 Existing durable paper lifecycle readback remains database-owned and available
 under its existing contract.
+
+## Current operational-preparation closure — 2026-09-30
+
+For the current single-process controlled-paper smoke scope, repository-owned
+deployment and pre-provider hardening is closed. The remaining gate is one
+separately authorized provider-backed smoke using intentionally available
+runtime secrets. This audit does not authorize that invocation.
 
 ## Authority
 
