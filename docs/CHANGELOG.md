@@ -1,3 +1,13 @@
+## 2026-09-30 — Provider-Backed Controlled-Paper Smoke Execution Packet
+
+- **OPERATIONAL PREPARATION:** Added `docs/P01-OAF-01-PROVIDER-BACKED-SMOKE-EXECUTION-PACKET.md` for the next separately authorized real-environment paper-only gate.
+- **EXACT CONFIGURATION:** Records the current runtime settings and secret names used by the application: database, operator bearer, process-local acknowledgement, Solana RPC, and CoinGecko demo key.
+- **PREFLIGHT:** Requires the existing two-call no-provider readiness + validation sequence before provider-backed prepare.
+- **EXECUTION CARDINALITY:** Preserves the full eligible smoke as exactly eight requests with no retry, polling, fallback provider, second run, or second persist.
+- **STOP/EVIDENCE:** Defines mandatory STOP conditions and the exact non-secret evidence to retain for prepare/STOP, review, run, persistence, and durable RTI-03 readback.
+- **NOT AUTHORIZATION:** The packet does not execute a provider call and does not itself authorize the operational smoke.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Controlled-Paper Smoke Offline Hardening Closure
 
 - **CLOSURE:** Offline hardening of the explicit controlled-paper smoke harness is complete through PR #117 and main CI PASS.
