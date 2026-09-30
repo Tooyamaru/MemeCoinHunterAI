@@ -37,6 +37,7 @@ def _config(*, provider=None, run=False, persist=False, preflight=False):
         token="test-token",
         prepare_payload=_prepare_payload(),
         timeout_seconds=5,
+        expected_environment="development",
         confirm_provider_prepare=provider,
         confirm_run=run,
         confirm_persist=persist,
@@ -48,6 +49,7 @@ def _ready():
     return 200, {
         "contract_version": "p01-oaf-01-operator-readiness-v1",
         "status": "READY",
+        "environment": "development",
         "checks": {
             "database": "ready",
             "case_registry": "enabled",
@@ -159,6 +161,32 @@ def test_preflight_only_rejects_run_or_persist_confirmation():
 
     with pytest.raises(OperatorSmokeError, match="preflight-only"):
         _config(run=True, persist=True, preflight=True)
+
+
+def test_expected_environment_is_required_to_be_known():
+    with pytest.raises(OperatorSmokeError, match="expected_environment is invalid"):
+        SmokeConfig(
+            base_url="https://operator.example",
+            token="test-token",
+            prepare_payload=_prepare_payload(),
+            timeout_seconds=5,
+            expected_environment="unknown",
+        )
+
+
+def test_readiness_environment_mismatch_stops_before_validation():
+    calls = []
+    bad_ready = _ready()
+    bad_ready[1]["environment"] = "production"
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return bad_ready
+
+    with pytest.raises(OperatorSmokeError, match="readiness environment mismatch"):
+        run_smoke(_config(preflight=True), request_json=request)
+
+    assert len(calls) == 1
 
 
 def test_readiness_contract_mismatch_stops_before_validation():
@@ -1111,6 +1139,7 @@ def test_non_local_plain_http_is_rejected_before_any_request():
             token="test-token",
             prepare_payload={"explicit": "payload"},
             timeout_seconds=5,
+            expected_environment="development",
         )
 
 
@@ -1120,5 +1149,6 @@ def test_local_plain_http_remains_available_for_controlled_development():
         token="test-token",
         prepare_payload={"explicit": "payload"},
         timeout_seconds=5,
+        expected_environment="development",
     )
     assert config.base_url == "http://127.0.0.1:8000"

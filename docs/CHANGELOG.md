@@ -1,3 +1,13 @@
+## 2026-09-30 — Operator Smoke Environment Identity Guard
+
+- **EXPECTED ENVIRONMENT:** The smoke CLI now requires an explicit `--expected-environment` value from the current application environment vocabulary: development, test, staging, or production.
+- **READINESS IDENTITY:** Authenticated readiness must report the exact expected environment before validation or any trusted provider access.
+- **FAIL-CLOSED:** Environment mismatch stops after the single readiness request; no validation, prepare, provider, run, or persist request follows.
+- **OPERATIONAL SAFETY:** This prevents an otherwise valid smoke command from silently targeting the wrong deployment environment.
+- **CARDINALITY:** Existing two-request no-provider preflight and eight-request full eligible chain remain unchanged when the environment matches.
+- **NOT EXECUTED:** No provider-backed smoke is executed by this change.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Explicit Provider Prepare Confirmation Gate
 
 - **PROVIDER GATE:** `scripts/operator_paper_smoke.py` now requires `--confirm-provider-prepare` before the first trusted prepare/provider request.

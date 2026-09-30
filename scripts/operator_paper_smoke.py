@@ -34,6 +34,7 @@ class SmokeConfig:
     token: str
     prepare_payload: dict[str, Any]
     timeout_seconds: float
+    expected_environment: str
     confirm_provider_prepare: bool = False
     confirm_run: bool = False
     confirm_persist: bool = False
@@ -53,6 +54,8 @@ class SmokeConfig:
             raise OperatorSmokeError("prepare payload must be a non-empty JSON object")
         if self.timeout_seconds <= 0:
             raise OperatorSmokeError("timeout must be positive")
+        if self.expected_environment not in {"development", "test", "staging", "production"}:
+            raise OperatorSmokeError("expected_environment is invalid")
         if self.preflight_only and (
             self.confirm_provider_prepare or self.confirm_run or self.confirm_persist
         ):
@@ -132,6 +135,8 @@ def run_smoke(
         raise OperatorSmokeError("operator readiness preflight did not pass")
     if readiness.get("contract_version") != "p01-oaf-01-operator-readiness-v1":
         raise OperatorSmokeError("operator readiness contract mismatch")
+    if readiness.get("environment") != config.expected_environment:
+        raise OperatorSmokeError("operator readiness environment mismatch")
     if readiness.get("process_local_registry") is not True:
         raise OperatorSmokeError("operator readiness process-local registry mismatch")
     if readiness.get("provider_connectivity_checked") is not False:
@@ -418,6 +423,12 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--token-env", default="OPERATOR_BEARER_TOKEN")
     parser.add_argument("--timeout-seconds", type=float, default=30.0)
     parser.add_argument(
+        "--expected-environment",
+        required=True,
+        choices=("development", "test", "staging", "production"),
+        help="Require the readiness environment to match before any validation/provider access.",
+    )
+    parser.add_argument(
         "--preflight-only",
         action="store_true",
         help=(
@@ -456,6 +467,7 @@ def main() -> int:
             token=token,
             prepare_payload=payload,
             timeout_seconds=args.timeout_seconds,
+            expected_environment=args.expected_environment,
             confirm_provider_prepare=args.confirm_provider_prepare,
             confirm_run=args.confirm_run,
             confirm_persist=args.confirm_persist,
