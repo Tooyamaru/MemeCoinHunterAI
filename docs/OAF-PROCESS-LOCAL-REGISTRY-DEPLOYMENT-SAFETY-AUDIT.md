@@ -34,8 +34,9 @@ controller/deployer choice.
 
 The repository now also provides
 `scripts/operator_single_process_runtime.py` as a portable local/VM launcher
-for a qualifying smoke host. It validates the required runtime configuration
-without provider connectivity and hardcodes one Uvicorn worker with reload
+for a qualifying smoke host. It requires an explicit expected environment, fails closed when `APP_ENV`
+does not match it, validates the remaining required runtime configuration
+without provider connectivity, and hardcodes one Uvicorn worker with reload
 disabled. This does not make Replit autoscale qualifying and does not provide
 restart durability; it only provides a bounded one-process execution option.
 

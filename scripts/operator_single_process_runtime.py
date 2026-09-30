@@ -42,6 +42,7 @@ def validate_single_process_runtime(
     *,
     settings: Settings,
     environment: Mapping[str, str],
+    expected_environment: str,
 ) -> SingleProcessRuntimeReadiness:
     """Validate configuration required before a one-process smoke host starts."""
 
@@ -49,6 +50,13 @@ def validate_single_process_runtime(
         raise SingleProcessRuntimeError("settings are required")
     if not isinstance(environment, Mapping):
         raise SingleProcessRuntimeError("environment mapping is required")
+    if expected_environment not in {"development", "test", "staging", "production"}:
+        raise SingleProcessRuntimeError("expected_environment is invalid")
+    if settings.app_env != expected_environment:
+        raise SingleProcessRuntimeError(
+            "single-process runtime environment mismatch: "
+            f"expected {expected_environment}, got {settings.app_env}"
+        )
 
     database_configured = bool(settings.database_url)
     operator_bearer_configured = bool(settings.operator_bearer_token)
@@ -129,6 +137,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument(
+        "--expected-environment",
+        required=True,
+        choices=("development", "test", "staging", "production"),
+        help="Require APP_ENV to match before readiness passes or Uvicorn starts.",
+    )
+    parser.add_argument(
         "--check-only",
         action="store_true",
         help="Validate local runtime configuration without starting Uvicorn.",
@@ -142,6 +156,7 @@ def main() -> int:
         readiness = validate_single_process_runtime(
             settings=Settings(),
             environment=os.environ,
+            expected_environment=args.expected_environment,
         )
         print(json.dumps(asdict(readiness), sort_keys=True))
         if args.check_only:

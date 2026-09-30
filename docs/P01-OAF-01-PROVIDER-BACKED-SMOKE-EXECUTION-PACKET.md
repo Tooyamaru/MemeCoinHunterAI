@@ -62,14 +62,19 @@ silently change the deployment type or cost model.
 A portable repository-owned option is now available for a local or VM host:
 
 ```bash
-uv run python scripts/operator_single_process_runtime.py --check-only
 uv run python scripts/operator_single_process_runtime.py \
+  --expected-environment staging \
+  --check-only
+uv run python scripts/operator_single_process_runtime.py \
+  --expected-environment staging \
   --host 127.0.0.1 \
   --port 8000
 ```
 
-The check-only command validates the required database/operator/Solana/CoinGecko
-configuration without provider connectivity. The launch command then starts the
+The check-only command first requires `APP_ENV` to exactly match the explicit
+`--expected-environment`, then validates the required
+database/operator/Solana/CoinGecko configuration without provider connectivity.
+The launch command enforces the same environment identity before starting the
 existing FastAPI app with exactly one Uvicorn worker and reload disabled. It
 does not run the smoke itself and does not authorize provider access.
 

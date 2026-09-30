@@ -31,6 +31,7 @@ def test_single_process_runtime_readiness_is_safe_and_bounded():
     readiness = validate_single_process_runtime(
         settings=_settings(),
         environment=_environment(),
+        expected_environment="development",
     )
 
     assert readiness.status == "READY_FOR_SINGLE_PROCESS_LAUNCH"
@@ -64,6 +65,28 @@ def test_single_process_runtime_rejects_missing_required_configuration(
         validate_single_process_runtime(
             settings=_settings(**overrides),
             environment=environment,
+            expected_environment="development",
+        )
+
+
+def test_single_process_runtime_rejects_unknown_expected_environment():
+    with pytest.raises(SingleProcessRuntimeError, match="expected_environment is invalid"):
+        validate_single_process_runtime(
+            settings=_settings(),
+            environment=_environment(),
+            expected_environment="unknown",
+        )
+
+
+def test_single_process_runtime_rejects_environment_mismatch_before_launch_readiness():
+    with pytest.raises(SingleProcessRuntimeError, match="runtime environment mismatch"):
+        validate_single_process_runtime(
+            settings=_settings(
+                app_env="production",
+                operator_process_local_registry_ack=True,
+            ),
+            environment=_environment(),
+            expected_environment="staging",
         )
 
 
@@ -75,6 +98,7 @@ def test_staging_requires_explicit_process_local_acknowledgement():
         validate_single_process_runtime(
             settings=_settings(app_env="staging"),
             environment=_environment(),
+            expected_environment="staging",
         )
 
     readiness = validate_single_process_runtime(
@@ -83,6 +107,7 @@ def test_staging_requires_explicit_process_local_acknowledgement():
             operator_process_local_registry_ack=True,
         ),
         environment=_environment(),
+        expected_environment="staging",
     )
     assert readiness.process_local_ack_required is True
     assert readiness.process_local_acknowledged is True
@@ -92,6 +117,7 @@ def test_launcher_hardcodes_one_worker_and_disables_reload():
     readiness = validate_single_process_runtime(
         settings=_settings(),
         environment=_environment(),
+        expected_environment="development",
     )
     calls = []
 
