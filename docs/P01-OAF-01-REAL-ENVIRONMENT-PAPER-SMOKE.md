@@ -1,6 +1,6 @@
 # P01-OAF-01 — Real-Environment Controlled-Paper Smoke Harness
 
-Status: OFFLINE HARDENING COMPLETE / EXPLICIT OPERATOR ACTION ONLY
+Status: OFFLINE HARDENING + OPERATIONAL PREPARATION COMPLETE / EXPLICIT OPERATOR ACTION ONLY
 
 ## Purpose
 
@@ -142,13 +142,15 @@ next separately authorized operational gate are recorded in
 That packet is preparation only. It does not itself authorize a provider-backed
 invocation.
 
-## Offline Closure
+## Offline / Operational Preparation Closure
 
-The harness is considered offline-hardening complete for the current governed
-single-process controlled-paper scope. The remaining verification is operational:
-one separately authorized provider-backed smoke in a known single-process
-environment with intentionally available runtime secrets. No provider-backed
-smoke is performed by this document or by repository CI.
+The harness and its repository-owned operational preparation are complete for
+the current governed single-process controlled-paper scope. No further
+repository-only hardening gap is selected for this gate. The remaining
+verification is the operational event itself: one separately authorized
+provider-backed smoke in a known single-process environment with intentionally
+available runtime secrets. No provider-backed smoke is performed by this
+document or by repository CI.
 
 ## Boundary
 
