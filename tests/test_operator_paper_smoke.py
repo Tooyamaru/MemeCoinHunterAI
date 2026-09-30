@@ -51,7 +51,7 @@ def _ready():
         "status": "READY",
         "environment": "development",
         "checks": {
-            "database": "ready",
+            "database": "connected",
             "case_registry": "enabled",
             "prepare_service": "configured",
             "run_service": "configured",
@@ -184,6 +184,21 @@ def test_readiness_environment_mismatch_stops_before_validation():
         return bad_ready
 
     with pytest.raises(OperatorSmokeError, match="readiness environment mismatch"):
+        run_smoke(_config(preflight=True), request_json=request)
+
+    assert len(calls) == 1
+
+
+def test_readiness_service_checks_mismatch_stops_before_validation():
+    calls = []
+    bad_ready = _ready()
+    bad_ready[1]["checks"]["database"] = "not_configured"
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return bad_ready
+
+    with pytest.raises(OperatorSmokeError, match="readiness service checks mismatch"):
         run_smoke(_config(preflight=True), request_json=request)
 
     assert len(calls) == 1
