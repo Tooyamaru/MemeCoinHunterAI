@@ -1139,6 +1139,7 @@ def test_non_local_plain_http_is_rejected_before_any_request():
             token="test-token",
             prepare_payload={"explicit": "payload"},
             timeout_seconds=5,
+            expected_environment="development",
         )
 
 
@@ -1148,5 +1149,6 @@ def test_local_plain_http_remains_available_for_controlled_development():
         token="test-token",
         prepare_payload={"explicit": "payload"},
         timeout_seconds=5,
+        expected_environment="development",
     )
     assert config.base_url == "http://127.0.0.1:8000"
