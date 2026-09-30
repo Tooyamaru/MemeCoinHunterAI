@@ -128,9 +128,13 @@ runtime secrets may the full smoke be run:
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
+  --confirm-provider-prepare \
   --confirm-run \
   --confirm-persist
 ```
+
+The `--confirm-provider-prepare` flag is mandatory before the first trusted
+prepare/provider request. Run/persist confirmation cannot bypass this gate.
 
 For an eligible full chain the harness performs exactly eight requests:
 

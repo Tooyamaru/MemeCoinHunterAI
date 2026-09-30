@@ -39,7 +39,9 @@ is one separately authorized provider-backed controlled-paper smoke. The control
 supports a no-provider `--preflight-only` mode
 that stops after authenticated readiness and canonical payload validation, and
 fails closed if the preflight contract, safety claims, or explicit identity
-projection do not match the submitted case intent. Successful prepare and first
+projection do not match the submitted case intent. Outside preflight-only mode,
+the first trusted prepare/provider call now requires explicit
+`--confirm-provider-prepare`; run/persist confirmation cannot bypass it. Successful prepare and first
 review must then preserve the exact case, candidate/token/chain/pool identity,
 CIP digest, review path, simulation-only boundary, and controlled source label
 before run is permitted. A provider-backed preparation STOP is accepted only

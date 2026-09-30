@@ -1,3 +1,13 @@
+## 2026-09-30 — Explicit Provider Prepare Confirmation Gate
+
+- **PROVIDER GATE:** `scripts/operator_paper_smoke.py` now requires `--confirm-provider-prepare` before the first trusted prepare/provider request.
+- **DEFAULT SAFE BEHAVIOR:** Without that confirmation, the harness may complete readiness + no-I/O validation but fails closed before Solana/CoinGecko-backed prepare.
+- **DEPENDENCY:** `--confirm-run` and `--confirm-persist` require provider-prepare confirmation and cannot bypass it.
+- **PREFLIGHT:** `--preflight-only` remains strictly no-provider and cannot be combined with provider/run/persist confirmation.
+- **CARDINALITY:** The full eligible eight-request chain is unchanged once all required confirmations are explicit.
+- **NOT EXECUTED:** No provider-backed smoke is executed by this change.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Portable Single-Process Smoke Runtime
 
 - **LAUNCHER:** Added `scripts/operator_single_process_runtime.py` as a portable one-process launcher for the controlled-paper smoke environment.
