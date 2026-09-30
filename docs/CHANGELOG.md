@@ -1,3 +1,12 @@
+## 2026-09-30 — Provider-Backed Smoke Operational Preparation Closure
+
+- **CLOSURE:** Offline operational preparation for the current single-process controlled-paper provider-backed smoke gate is complete through PR #125.
+- **VERIFIED PREPARATION:** The repository now provides a one-worker/no-reload local/VM launch path, explicit environment identity, connected-database/operator-service readiness, no-I/O payload validation, explicit provider confirmation, bounded prepare/STOP handling, case identity continuity, terminal run/persist proof, and durable RTI-03 readback verification.
+- **NO FURTHER OFFLINE GAP SELECTED:** The targeted audit found no additional repository-only change necessary before the operational smoke itself.
+- **NEXT GATE:** One explicit provider-backed controlled-paper smoke in a qualifying single-process environment with intentionally available runtime secrets and separate operational authorization.
+- **NOT EXECUTED:** This closure does not call Solana or CoinGecko and does not itself authorize provider access.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Durable Operator Readiness Gate
 
 - **DATABASE REQUIREMENT:** Authenticated operator readiness now requires the application database state to be exactly `CONNECTED`; a globally acceptable `NOT_CONFIGURED` database is no longer sufficient for the controlled-paper operator gate.
