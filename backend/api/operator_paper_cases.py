@@ -26,6 +26,7 @@ from backend.application.operator_paper_case_registry import (
 from backend.application.operator_paper_case_run import (
     OperatorPaperRunOutcome,
 )
+from backend.core.database import DatabaseState
 from backend.core.request_id import get_request_id
 from core.data.solana_oaf_source import SolanaSourceUnavailable
 
@@ -187,7 +188,7 @@ async def operator_readiness(request: Request) -> JSONResponse:
     prepare_ready = getattr(request.app.state, "operator_prepare_service", None) is not None
     run_ready = getattr(request.app.state, "operator_run_service", None) is not None
     persist_ready = getattr(request.app.state, "operator_persist_service", None) is not None
-    database_ready = bool(getattr(database, "is_ready", False))
+    database_ready = getattr(database, "state", None) is DatabaseState.CONNECTED
     ready = (
         database_ready
         and registry_enabled
