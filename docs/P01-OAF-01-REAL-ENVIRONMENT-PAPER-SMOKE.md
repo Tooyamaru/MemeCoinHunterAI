@@ -7,9 +7,11 @@ Status: OFFLINE HARDENING COMPLETE / EXPLICIT OPERATOR ACTION ONLY
 Provide one bounded CLI for exercising the deployed Operator Facade without
 adding polling, retries, autonomous discovery, or a second domain owner.
 
-The CLI consumes a complete explicit prepare JSON file. It never invents
-paper-policy defaults. Without provider confirmation it performs readiness and
-no-I/O validation, then fails closed before trusted prepare/provider access.
+The CLI consumes a complete explicit prepare JSON file and an explicit expected
+deployment environment. It never invents paper-policy defaults. Authenticated
+readiness must report that exact environment before validation or any provider
+access. Without provider confirmation it then performs no-I/O validation and
+fails closed before trusted prepare/provider access.
 
 The validation call is the existing authenticated no-I/O canonical payload
 preflight. It does not probe Solana/CoinGecko and does not mutate an operator
@@ -35,6 +37,7 @@ export OPERATOR_BEARER_TOKEN='set-in-secret-storage'
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
+  --expected-environment staging \
   --preflight-only
 ```
 
@@ -44,6 +47,7 @@ Full explicit controlled-paper sequence:
 uv run python scripts/operator_paper_smoke.py \
   --base-url https://your-controlled-paper-host.example \
   --prepare-payload /secure/path/prepare.json \
+  --expected-environment staging \
   --confirm-provider-prepare \
   --confirm-run \
   --confirm-persist
@@ -79,8 +83,9 @@ harness performs exactly:
 8. one GET durable readback.
 
 The readiness endpoint performs no provider connectivity probe; it reports only
-configured application/database/operator service readiness. If readiness is not
-`READY`, the harness stops before validation or prepare.
+configured application/database/operator service readiness and the application
+environment. If readiness is not `READY`, or if its environment does not exactly
+match `--expected-environment`, the harness stops before validation or prepare.
 
 The validation endpoint performs no provider/source I/O and creates no case. If
 the explicit payload is not `VALID`, the harness stops before prepare. The
