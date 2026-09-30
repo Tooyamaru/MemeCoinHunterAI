@@ -1,3 +1,13 @@
+## 2026-09-30 — Single-Process Runtime Environment Identity Guard
+
+- **LAUNCH IDENTITY:** `scripts/operator_single_process_runtime.py` now requires explicit `--expected-environment` from the existing application environment vocabulary.
+- **FAIL-CLOSED:** If `APP_ENV` does not exactly match the expected environment, local runtime readiness fails before Uvicorn can start.
+- **NO-PROVIDER:** The environment check is local configuration validation only and performs no Solana/CoinGecko connectivity probe.
+- **PROCESS INVARIANT:** Successful launch still hardcodes one Uvicorn worker with reload disabled.
+- **CONSISTENCY:** The runtime launcher and the operator smoke now share the same explicit deployment-environment intent before the controlled-paper provider gate.
+- **NOT EXECUTED:** No provider-backed smoke is executed by this change.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Operator Smoke Environment Identity Guard
 
 - **EXPECTED ENVIRONMENT:** The smoke CLI now requires an explicit `--expected-environment` value from the current application environment vocabulary: development, test, staging, or production.
