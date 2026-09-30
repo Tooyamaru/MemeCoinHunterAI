@@ -59,6 +59,23 @@ Do not run the provider-backed smoke against the current autoscale topology.
 Select/provision a known single-process environment first. This packet does not
 silently change the deployment type or cost model.
 
+A portable repository-owned option is now available for a local or VM host:
+
+```bash
+uv run python scripts/operator_single_process_runtime.py --check-only
+uv run python scripts/operator_single_process_runtime.py \
+  --host 127.0.0.1 \
+  --port 8000
+```
+
+The check-only command validates the required database/operator/Solana/CoinGecko
+configuration without provider connectivity. The launch command then starts the
+existing FastAPI app with exactly one Uvicorn worker and reload disabled. It
+does not run the smoke itself and does not authorize provider access.
+
+For that local path, use `http://127.0.0.1:8000` as the smoke base URL. The
+smoke harness permits plain HTTP only for localhost/loopback targets.
+
 ## Deployment preconditions
 
 Before any provider-backed prepare is authorized:

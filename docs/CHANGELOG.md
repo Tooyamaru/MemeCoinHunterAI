@@ -1,3 +1,14 @@
+## 2026-09-30 — Portable Single-Process Smoke Runtime
+
+- **LAUNCHER:** Added `scripts/operator_single_process_runtime.py` as a portable one-process launcher for the controlled-paper smoke environment.
+- **NO-PROVIDER CHECK:** `--check-only` validates required local configuration without starting Uvicorn and without probing Solana/CoinGecko connectivity.
+- **FAIL-CLOSED CONFIG:** Requires database, operator bearer, Solana RPC, and CoinGecko demo-key configuration; staging/production additionally require `OPERATOR_PROCESS_LOCAL_REGISTRY_ACK=true`.
+- **PROCESS INVARIANT:** Launch path hardcodes exactly one Uvicorn worker with reload disabled.
+- **SECRET SAFETY:** Readiness output exposes only boolean/configuration status and never secret values or credential-bearing URLs.
+- **TOPOLOGY:** This provides a qualifying local/VM path without changing the repository's Replit autoscale deployment target, which remains non-qualifying for the current process-local case contract.
+- **NOT EXECUTED:** No provider-backed smoke is executed by this change.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-30 — Controlled-Paper Smoke Deployment Topology Blocker
 
 - **REPOSITORY FACT:** Current root `.replit` declares `deploymentTarget = "autoscale"`.
