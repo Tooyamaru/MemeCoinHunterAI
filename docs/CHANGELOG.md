@@ -1,3 +1,12 @@
+## 2026-09-30 — Controlled-Paper Smoke Offline Hardening Closure
+
+- **CLOSURE:** Offline hardening of the explicit controlled-paper smoke harness is complete through PR #117 and main CI PASS.
+- **VERIFIED BOUNDARIES:** Readiness, no-I/O validation, provider-backed prepare or bounded STOP, first review, run-once, post-run review, persist-once, and durable RTI-03 readback all fail closed on their governed contracts and required identity/simulation/digest projections.
+- **PROCESS MODEL:** The current phase intentionally retains one stable application process for each active case; cross-process/restart-safe active-case reconstruction is not claimed.
+- **NEXT GATE:** The next bounded step is one explicit provider-backed controlled-paper smoke in a known single-process environment with intentionally available runtime secrets and separate operational authorization.
+- **NOT EXECUTED:** This closure does not execute a provider call, mutate a real economic position, open a wallet/signing boundary, or authorize live trading.
+- **AUTHORITY:** P08 G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
 ## 2026-09-29 — Operator Smoke Preparation STOP Proof
 
 - **STOP CONTRACT:** A provider-backed `PREPARATION_STOPPED` response is accepted only under `p01-oaf-01-post-prepare-v1`.
