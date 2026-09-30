@@ -29,7 +29,9 @@ def _prepare_payload():
     }
 
 
-def _config(*, provider=True, run=False, persist=False, preflight=False):
+def _config(*, provider=None, run=False, persist=False, preflight=False):
+    if provider is None:
+        provider = not preflight
     return SmokeConfig(
         base_url="https://operator.example",
         token="test-token",
