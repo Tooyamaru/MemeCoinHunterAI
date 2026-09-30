@@ -1,6 +1,6 @@
 # P01-OAF-01 — Provider-Backed Controlled-Paper Smoke Execution Packet
 
-Status: OPERATIONAL PREPARATION COMPLETE / EXECUTION NOT AUTHORIZED BY THIS DOCUMENT
+Status: OPERATIONAL PREPARATION CLOSED / EXECUTION NOT AUTHORIZED BY THIS DOCUMENT
 
 ## Purpose
 
@@ -213,6 +213,14 @@ Stop the operational attempt immediately if any of the following occurs:
 - durable readback does not return the exact persisted lifecycle root.
 
 No automatic retry is permitted by this gate.
+
+## Offline preparation closure
+
+Repository-owned preparation for this gate is closed for the current
+single-process scope. The launcher, readiness, no-provider validation, explicit
+provider confirmation, prepare/review/run/persist continuity checks, and durable
+readback verification are in place. No additional offline code task is selected
+before execution.
 
 ## Closure criterion for the operational gate
 
