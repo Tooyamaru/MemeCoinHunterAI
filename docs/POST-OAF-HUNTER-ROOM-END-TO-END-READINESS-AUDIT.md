@@ -1,6 +1,6 @@
 # Post-OAF / Hunter Room End-to-End Readiness Audit
 
-Status: AUDIT COMPLETE / BOUNDED OPERATOR E2E VERIFIED / REAL-ENVIRONMENT CONTROLLED-PAPER SMOKE NEXT / NO NEW ECONOMIC AUTHORITY
+Status: OFFLINE HARDENING CLOSED / BOUNDED OPERATOR E2E VERIFIED / REAL-ENVIRONMENT CONTROLLED-PAPER SMOKE NEXT / NO NEW ECONOMIC AUTHORITY
 
 Repository checkpoint audited: `1163df00f3d02de1f635dbf399517dc96128b0d9` (`main` after PR #92).
 
@@ -49,8 +49,9 @@ bounded operator/deployment hardening:
   simulation-only state, and explicit non-empty reason codes before a bounded
   STOP is accepted.
 
-The remaining operational gap is no longer production packaging or smoke-harness
-preflight parity. It is one explicit provider-backed controlled-paper smoke
+Offline smoke-harness hardening is now closed through PR #117 with main CI PASS.
+The remaining operational gap is no longer production packaging, contract
+hardening, or smoke-harness preflight parity. It is one explicit provider-backed controlled-paper smoke
 sequence in a known single-process environment when separately authorized and
 when runtime secrets are intentionally available. The smoke has NOT YET BEEN
 EXECUTED.
