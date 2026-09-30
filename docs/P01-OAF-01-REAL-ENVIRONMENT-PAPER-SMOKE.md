@@ -1,6 +1,6 @@
 # P01-OAF-01 — Real-Environment Controlled-Paper Smoke Harness
 
-Status: IMPLEMENTATION / EXPLICIT OPERATOR ACTION ONLY
+Status: OFFLINE HARDENING COMPLETE / EXPLICIT OPERATOR ACTION ONLY
 
 ## Purpose
 
@@ -114,6 +114,14 @@ and keep the run artifact count equal to both the returned artifact list and
 the persistence artifact count. Any contract, identity, path, artifact-count,
 or durable-storage mismatch stops immediately. Transport/HTTP/schema failures
 also stop immediately.
+
+## Offline Closure
+
+The harness is considered offline-hardening complete for the current governed
+single-process controlled-paper scope. The remaining verification is operational:
+one separately authorized provider-backed smoke in a known single-process
+environment with intentionally available runtime secrets. No provider-backed
+smoke is performed by this document or by repository CI.
 
 ## Boundary
 
