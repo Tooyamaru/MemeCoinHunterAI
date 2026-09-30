@@ -143,6 +143,15 @@ def run_smoke(
         raise OperatorSmokeError("operator readiness unexpectedly checked provider connectivity")
     if readiness.get("simulation_only") is not True:
         raise OperatorSmokeError("operator readiness lost simulation-only boundary")
+    expected_readiness_checks = {
+        "database": "connected",
+        "case_registry": "enabled",
+        "prepare_service": "configured",
+        "run_service": "configured",
+        "persist_service": "configured",
+    }
+    if readiness.get("checks") != expected_readiness_checks:
+        raise OperatorSmokeError("operator readiness service checks mismatch")
 
     validation_status, validation = request_json(
         "POST",
