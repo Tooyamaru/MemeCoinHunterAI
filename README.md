@@ -35,8 +35,7 @@ single-process scope. The repository now includes
 `scripts/operator_single_process_runtime.py`, which requires an explicit
 expected environment to match `APP_ENV`, validates the required runtime
 configuration without provider connectivity, and launches exactly one Uvicorn
-worker for a controlled local/VM smoke host. The remaining verification
-is one separately authorized provider-backed controlled-paper smoke. The controlled-paper smoke CLI also
+worker for a controlled local/VM smoke host. Offline operational preparation is now closed for this single-process scope; the remaining verification is one separately authorized provider-backed controlled-paper smoke. The controlled-paper smoke CLI also
 supports a no-provider `--preflight-only` mode
 that stops after authenticated readiness and canonical payload validation, and
 fails closed if the preflight contract, safety claims, deployment environment,
