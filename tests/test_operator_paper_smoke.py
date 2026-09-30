@@ -29,12 +29,13 @@ def _prepare_payload():
     }
 
 
-def _config(*, run=False, persist=False, preflight=False):
+def _config(*, provider=True, run=False, persist=False, preflight=False):
     return SmokeConfig(
         base_url="https://operator.example",
         token="test-token",
         prepare_payload=_prepare_payload(),
         timeout_seconds=5,
+        confirm_provider_prepare=provider,
         confirm_run=run,
         confirm_persist=persist,
         preflight_only=preflight,
@@ -105,6 +106,32 @@ def _review_ready(handle="opaque", case_digest=DIGEST_A):
         "simulation_only": True,
         "source_label": "historical_price_proxy_and_explicit_simulation_assumptions",
     }
+
+
+def test_provider_prepare_requires_explicit_confirmation_after_safe_preflight():
+    calls = []
+    responses = [_ready(), _valid()]
+
+    def request(method, url, token, payload, timeout):
+        calls.append((method, url, payload))
+        return responses[len(calls) - 1]
+
+    with pytest.raises(
+        OperatorSmokeError,
+        match="confirm-provider-prepare",
+    ):
+        run_smoke(_config(provider=False), request_json=request)
+
+    assert len(calls) == 2
+    assert [call[0] for call in calls] == ["GET", "POST"]
+
+
+def test_run_or_persist_confirmation_requires_provider_prepare_confirmation():
+    with pytest.raises(OperatorSmokeError, match="requires --confirm-provider-prepare"):
+        _config(provider=False, run=True)
+
+    with pytest.raises(OperatorSmokeError, match="requires --confirm-provider-prepare"):
+        _config(provider=False, run=True, persist=True)
 
 
 def test_preflight_only_stops_after_readiness_and_validation_without_prepare():
