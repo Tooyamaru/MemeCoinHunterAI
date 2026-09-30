@@ -1,3 +1,9 @@
+## 2026-09-30 — Post-Operator Controlled-Paper Dependency Review
+
+- **STATUS:** Documentation-only owner-path audit after PR #126. Offline controlled-paper smoke preparation closed; provider-backed operational smoke remains separately authorized and unexecuted.
+- **NEXT GATE:** Paper-only single-cycle composition specification using existing P02/P03/P04/P05/P06/Risk/P07/OAF owners, subject to controller decisions on discovery-source authority, candidate/pool selection and unattended trigger/service access. No scheduler or autonomous runtime implemented.
+- **PHASES:** P03/P04 phase exit still has substantive uncovered safety/feature scope; no governance-only phase closure. G2 settlement owner/endpoint unresolved; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-09-30 — Provider-Backed Smoke Operational Preparation Closure
 
 - **CLOSURE:** Offline operational preparation for the current single-process controlled-paper provider-backed smoke gate is complete through PR #125.
