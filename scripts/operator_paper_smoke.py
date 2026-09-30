@@ -34,6 +34,7 @@ class SmokeConfig:
     token: str
     prepare_payload: dict[str, Any]
     timeout_seconds: float
+    confirm_provider_prepare: bool = False
     confirm_run: bool = False
     confirm_persist: bool = False
     preflight_only: bool = False
@@ -54,9 +55,15 @@ class SmokeConfig:
             raise OperatorSmokeError("timeout must be positive")
         if self.confirm_persist and not self.confirm_run:
             raise OperatorSmokeError("--confirm-persist requires --confirm-run")
-        if self.preflight_only and (self.confirm_run or self.confirm_persist):
+        if (self.confirm_run or self.confirm_persist) and not self.confirm_provider_prepare:
             raise OperatorSmokeError(
-                "--preflight-only cannot be combined with run/persist confirmation"
+                "run/persist confirmation requires --confirm-provider-prepare"
+            )
+        if self.preflight_only and (
+            self.confirm_provider_prepare or self.confirm_run or self.confirm_persist
+        ):
+            raise OperatorSmokeError(
+                "--preflight-only cannot be combined with provider/run/persist confirmation"
             )
 
 
@@ -171,6 +178,10 @@ def run_smoke(
 
     if config.preflight_only:
         return result
+    if not config.confirm_provider_prepare:
+        raise OperatorSmokeError(
+            "--confirm-provider-prepare is required before trusted prepare/provider access"
+        )
 
     prepare_status, prepare = request_json(
         "POST",
@@ -415,6 +426,14 @@ def _parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--confirm-provider-prepare",
+        action="store_true",
+        help=(
+            "Explicitly authorize the one bounded trusted prepare/provider call "
+            "after readiness + no-I/O validation."
+        ),
+    )
+    parser.add_argument(
         "--confirm-run",
         action="store_true",
         help="Explicitly authorize the one-shot controlled-paper run transition.",
@@ -437,6 +456,7 @@ def main() -> int:
             token=token,
             prepare_payload=payload,
             timeout_seconds=args.timeout_seconds,
+            confirm_provider_prepare=args.confirm_provider_prepare,
             confirm_run=args.confirm_run,
             confirm_persist=args.confirm_persist,
             preflight_only=args.preflight_only,
