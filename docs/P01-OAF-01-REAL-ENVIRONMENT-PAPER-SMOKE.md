@@ -115,6 +115,16 @@ the persistence artifact count. Any contract, identity, path, artifact-count,
 or durable-storage mismatch stops immediately. Transport/HTTP/schema failures
 also stop immediately.
 
+## Operational execution packet
+
+The exact runtime configuration, no-provider preflight, provider-backed
+cardinality, mandatory STOP conditions, and evidence-retention checklist for the
+next separately authorized operational gate are recorded in
+`docs/P01-OAF-01-PROVIDER-BACKED-SMOKE-EXECUTION-PACKET.md`.
+
+That packet is preparation only. It does not itself authorize a provider-backed
+invocation.
+
 ## Offline Closure
 
 The harness is considered offline-hardening complete for the current governed
