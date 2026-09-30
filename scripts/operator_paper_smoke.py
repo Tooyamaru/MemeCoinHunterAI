@@ -53,17 +53,17 @@ class SmokeConfig:
             raise OperatorSmokeError("prepare payload must be a non-empty JSON object")
         if self.timeout_seconds <= 0:
             raise OperatorSmokeError("timeout must be positive")
-        if self.confirm_persist and not self.confirm_run:
-            raise OperatorSmokeError("--confirm-persist requires --confirm-run")
-        if (self.confirm_run or self.confirm_persist) and not self.confirm_provider_prepare:
-            raise OperatorSmokeError(
-                "run/persist confirmation requires --confirm-provider-prepare"
-            )
         if self.preflight_only and (
             self.confirm_provider_prepare or self.confirm_run or self.confirm_persist
         ):
             raise OperatorSmokeError(
                 "--preflight-only cannot be combined with provider/run/persist confirmation"
+            )
+        if self.confirm_persist and not self.confirm_run:
+            raise OperatorSmokeError("--confirm-persist requires --confirm-run")
+        if (self.confirm_run or self.confirm_persist) and not self.confirm_provider_prepare:
+            raise OperatorSmokeError(
+                "run/persist confirmation requires --confirm-provider-prepare"
             )
 
 
