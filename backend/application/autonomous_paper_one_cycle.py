@@ -194,7 +194,11 @@ class AutonomousPaperOneCycleService:
                     raise ValueError("safety source identity mismatch")
                 collection.__post_init__()
                 for item in collection.evidence:
-                    if item.p02_reference is None or item.p02_reference.state_digest != snapshot.predecessor.state_digest:
+                    if item.p02_reference is None or (
+                        item.p02_reference.state_digest != snapshot.predecessor.state_digest
+                        or item.p02_reference.state_version != snapshot.predecessor.state_version
+                        or item.p02_reference.contract_version != snapshot.predecessor.materializer_contract_version
+                    ):
                         raise ValueError("safety evidence lacks exact discovery lineage")
                     fresh(item.observed_at, item.observed_at, request.reference_time, request.freshness_policy)
                 evaluation = evaluate_safety_evidence(collection, evaluation_timestamp=request.evaluated_at)

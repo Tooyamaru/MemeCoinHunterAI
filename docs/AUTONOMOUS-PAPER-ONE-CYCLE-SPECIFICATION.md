@@ -1,7 +1,7 @@
 # Autonomous paper one-cycle — provider-neutral V1
 
 Baseline: `main` `a07b9a5f19a1fedbbea4f2145ee8c9812a7242e4`, after PR #129.
-Status: IMPLEMENTED / OFFLINE VERIFICATION IN PROGRESS / CI AND MERGE PENDING.
+Status: IMPLEMENTED / OFFLINE CONTRACT COVERAGE VERIFIED. PR #130 tracks publication and exact-head Python 3.13/TypeScript CI; both jobs are mandatory before merge.
 Authority: controller amendment in `Pasted text(3).txt`, 2026-10-01 WIB, authorizes specification, provider-neutral discovery/pool owners, thin application composition, deterministic offline tests and normal PR/CI/merge workflow. It supersedes the unresolved decision slots in PR #128/#129 for this bounded implementation only.
 
 ## Source and admission contracts

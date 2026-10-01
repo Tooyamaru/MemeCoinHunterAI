@@ -370,3 +370,18 @@ def test_production_modules_have_no_operational_wiring():
         tree = ast.parse(Path(path).read_text())
         names = {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
         assert not names.intersection({"requests", "httpx", "urllib", "threading", "schedule", "sleep", "create_task"})
+
+
+@pytest.mark.asyncio
+async def test_safety_reference_contract_mismatch_stops_before_pool():
+    sources = Sources()
+    original = sources.evidence_once
+    def wrong_reference(candidate, snapshot, **kwargs):
+        collection = original(candidate, snapshot, **kwargs)
+        item = collection.evidence[0]
+        item = replace(item, p02_reference=replace(item.p02_reference, contract_version="wrong-version"))
+        return replace(collection, evidence=(item,))
+    sources.evidence_once = wrong_reference
+    result = await service(sources).run(command())
+    assert result.outcome is CycleOutcome.INVALID_INPUT
+    assert sources.calls == [("discovery", None), ("safety", TOKEN)]

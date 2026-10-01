@@ -3,7 +3,7 @@
 - Controller amendment resolves PR #129 discovery/pool/score-order and application invocation decisions.
 - Added bounded source contracts, P02 admission/materialization, canonical liquidity USD pool selection and thin `AutonomousPaperOneCycleService`.
 - Reuses paired P03, RTI-11/P04/P05, PFX/P06/Risk, PFS/CIP/OCI/OSC/P07 and RTI-03 exact persistence/readback; no closed owner changes.
-- Offline verification in progress; exact-head CI and merge pending. No operational provider request, retry, scheduler, wallet or economic authority. P03/P04 overall remain open; G2/G3/G4/P09 unchanged.
+- Offline contract coverage verified; PR #130 records publication and exact-head CI evidence. Both Python 3.13 and TypeScript CI must pass before merge. No operational provider request, retry, scheduler, wallet or economic authority. P03/P04 overall remain open; G2/G3/G4/P09 unchanged.
 
 ## 2026-10-01 WIB — Autonomous Paper One-Cycle Owner Gap Decision Packet
 

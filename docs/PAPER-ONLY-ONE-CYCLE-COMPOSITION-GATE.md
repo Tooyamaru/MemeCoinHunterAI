@@ -1,6 +1,6 @@
 # Paper-only one-cycle composition — bounded specification gate
 
-**2026-10-01 controller amendment:** The historical decision hold below is superseded for the bounded provider-neutral gate by `AUTONOMOUS-PAPER-ONE-CYCLE-SPECIFICATION.md`. Discovery/pool contracts and application service are implemented with offline verification/CI pending. No concrete provider or operational call is authorized by this amendment.
+**2026-10-01 controller amendment:** The historical decision hold below is superseded for the bounded provider-neutral gate by `AUTONOMOUS-PAPER-ONE-CYCLE-SPECIFICATION.md`. Discovery/pool contracts and application service are implemented with verified offline contract coverage; PR #130 tracks publication and CI evidence. No concrete provider or operational call is authorized by this amendment.
 
 **Baseline:** GitHub `main` at `4d383e40e052fd58199cc8ec64830b552b8475b8` (post-operator dependency review, PR #127).
 **Status:** DRAFT CONTRACT / CONTROLLER DECISIONS REQUIRED / RUNTIME NOT AUTHORIZED.
