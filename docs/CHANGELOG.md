@@ -1,3 +1,11 @@
+## 2026-10-01 WIB — Concrete Provider Source Mapping Audit and Decision
+
+- PR #130 merged through the real GitHub merge endpoint at `c822e1300df67a8aaf1e786712ba76cb879daaf4`, guarding exact head `fb7222e0052780c26a9d5b01cd1fba0dcec9ec71`. PR-head CI #529 PASS: 1,863 Python 3.13 tests and TypeScript checks/builds; post-merge main CI tracked separately in run `36829533386`.
+- Bounded audit of existing DexScreener listing/inspection/temporal/transport, selected-mint Solana source and exact-pool CoinGecko owners found missing concrete discovery/liquidity source observation timestamps. Receipt/creation/candle clocks cannot timestamp unrelated source facts.
+- Two deterministic local probes confirm the current canonical source contracts reject missing discovery/pool source time. No runtime code/tests were changed and no positive provider fixture was invented.
+- Added `AUTONOMOUS-PAPER-PROVIDER-SOURCE-MAPPING-DECISION.md` with evidence, three bounded controller directions, exact authority needed and source-anchored technical preference. Adapter implementation BLOCKED pending source-time/freshness selection. This documentation-only packet is required by the controller's explicit blocker STOP condition.
+- Updated PROJECT_STATE and autonomous specification. No provider calls/secrets, smoke/cycle, scheduler, retry, wallet or economic authority; no MASTER_BLUEPRINT change. P03/P04 overall open; historical progress estimates unchanged; G2/G3/G4/P09 unchanged.
+
 ## 2026-10-01 WIB — Provider-neutral Autonomous Paper One-Cycle
 
 - Controller amendment resolves PR #129 discovery/pool/score-order and application invocation decisions.

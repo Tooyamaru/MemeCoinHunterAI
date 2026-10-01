@@ -1,7 +1,7 @@
 # Autonomous paper one-cycle — provider-neutral V1
 
 Baseline: `main` `a07b9a5f19a1fedbbea4f2145ee8c9812a7242e4`, after PR #129.
-Status: IMPLEMENTED / OFFLINE CONTRACT COVERAGE VERIFIED. PR #130 tracks publication and exact-head Python 3.13/TypeScript CI; both jobs are mandatory before merge.
+Status: IMPLEMENTED / MERGED via PR #130 at `c822e1300df67a8aaf1e786712ba76cb879daaf4`. Exact-head CI #529 completed successfully for Python 3.13 (1,863 tests) and TypeScript checks/builds. Post-merge main CI is tracked separately in run `36829533386`; no pending result is claimed as success.
 Authority: controller amendment in `Pasted text(3).txt`, 2026-10-01 WIB, authorizes specification, provider-neutral discovery/pool owners, thin application composition, deterministic offline tests and normal PR/CI/merge workflow. It supersedes the unresolved decision slots in PR #128/#129 for this bounded implementation only.
 
 ## Source and admission contracts
@@ -66,3 +66,7 @@ Underlying reasons remain in bounded stage evidence. Source/owner exceptions nev
 Offline tests use actual canonical P02/P03/P04/P05/P06/Risk/PFS/CIP/OCI/OSC/P07/RTI owners, injected deterministic facts and SQLite durable storage. They prohibit socket connections and verify identity, ordering/duplicates/cardinality, liquidity/ties, safety and decision/risk vetoes, score comparison/ties, mutation budgets, persistence failures and exact readback.
 
 This milestone does not close P03/P04 overall, execute provider-backed smoke, or establish live readiness. Historical whole-program estimates are unchanged; no autonomous production percentage is justified by fake-source success. The next gate is separately authorized concrete source/provider mapping and operational verification of its fact contracts, budgets and comparable evidence. The existing controlled-paper provider-backed smoke remains a separate authorized operational decision. G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED.
+
+## Concrete source reconciliation after PR #130
+
+The controller handover of 2026-10-01 WIB authorizes bounded offline source audit, specification and compatible injected-transport adapters, but forbids operational provider requests and secrets. The audit in `docs/AUTONOMOUS-PAPER-PROVIDER-SOURCE-MAPPING-DECISION.md` finds a real missing source clock in existing DexScreener discovery and liquidity facts. Current V1 source freshness remains mandatory; receipt time, pair creation time and a provenance digest cannot establish when current liquidity was observed. No concrete adapters are implemented. The next gate is a controller source-time/freshness decision; this does not reopen the resolved provider-neutral selection/order decisions or close P03/P04 overall.
