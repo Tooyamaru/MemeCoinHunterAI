@@ -1,8 +1,14 @@
 # Autonomous paper — concrete source mapping decision
 
 Baseline: PR #130 merged at `c822e1300df67a8aaf1e786712ba76cb879daaf4`.
-Status: BOUNDED SOURCE AUDIT COMPLETE / PROVIDER ADAPTER IMPLEMENTATION BLOCKED / CONTROLLER SOURCE-TIME DECISION REQUIRED.
+Status: OPTION A SELECTED / OFFLINE SOURCE SPECIFICATION PARTIAL / JOINT POOL-USD AUTHORITY BLOCKED / IMPLEMENTATION STOPPED.
 Authority: controller handover `Pasted text(4).txt`, 2026-10-01 WIB. Offline adapter specification, implementation and fixture tests are authorized only when the existing source facts safely satisfy the canonical contracts. Operational provider calls and secrets are explicitly unauthorized.
+
+## Current controller decision after PR #131
+
+Controller `Pasted text(5).txt` selects Option A, preserves original-source freshness, rejects receipt-time replacement and authorizes bounded offline audit/specification plus implementation only when exact authorities are established. Baseline main is `9d991d37db233389aa6cc36986d7a2a8081c11c7`; PR #130/#131 merged, exact main CI [533](https://github.com/Tooyamaru/MemeCoinHunterAI/actions/runs/36834903809) completed/success for Python 3.13 (1,863 passed) and TypeScript.
+
+The current source design and narrower decision packet are in `AUTONOMOUS-PAPER-SOURCE-AUTHORITY-SPECIFICATION.md`: one finalized-block mint-initialization discovery with explicit method/byte/slot caps; pinned Raydium CPMM reserve candidate; genuine timestamped CoinGecko USD candle capability; conditional freshness/skew/net-reserve formula/rounding/lineage requirements. The joint bounded pool-universe and pre-ranking USD valuation authority is not selected. Implementation remains stopped under the controller's explicit source-authority STOP condition; no interfaces or fake-positive adapters are added. Preferred next direction is A1 event-scoped CPMM plus two-sided CoinGecko candle USD, subject to explicit universe/model/budget decisions. The original A/B/C packet below is historical; A is now selected and B is rejected.
 
 ## Verified capability and publication
 
@@ -10,7 +16,7 @@ PR #130 was merged through GitHub's real merge endpoint with expected head `fb72
 
 `AutonomousPaperOneCycleService`, `BoundedDiscoveryOwner` and `BoundedPoolCandidateOwner` are now on main. Their provider-neutral contracts, selection policy, Risk Governor veto, simulation-only lifecycle and exact persistence/readback remain unchanged. The older PR #129 discovery/pool/score-order decision is resolved for provider-neutral composition; the blocker below concerns concrete source facts only.
 
-## Exact blocker and repository evidence
+## Historical original source-clock blocker and repository evidence
 
 | Required fact | Audited owner and evidence | Mapping result |
 | --- | --- | --- |
@@ -25,7 +31,7 @@ The official [DexScreener API reference](https://docs.dexscreener.com/api/refere
 
 Two deterministic local probes confirmed that V1 rejects missing discovery event time and missing pool observation time with `CycleSourceError("invalid source clock")`. They used constructed facts only and performed no network access. This is a genuine missing fact, not a test or adapter parsing defect.
 
-## Controller options
+## Original controller options (A subsequently selected)
 
 | Option | Concrete direction using represented providers/owners | Tradeoff and exact authorization needed |
 | --- | --- | --- |
@@ -33,12 +39,12 @@ Two deterministic local probes confirmed that V1 rejects missing discovery event
 | B — receipt-observed listing/snapshot policy | Reuse DexScreener profiles plus token pairs, with an explicitly new snapshot admission policy that distinguishes adapter observation/receipt recency from UNKNOWN provider update age. | Smallest reuse path, weaker freshness guarantee. Requires an explicit controller amendment to the autonomous source contract and acceptance policy; it cannot be implemented by filling current `event_time`/`observed_at` with receipt time. Preserve original P02/P03 owners and UNKNOWN provenance, define whether such snapshots are acceptable for paper selection, and keep independent source-backed P03 evidence mandatory. Authorize offline specification first; implementation only after that contract is reconciled. |
 | C — CoinGecko source-authority audit | Reuse the represented CoinGecko provider family and audit its documented network new-pools and token-pools REST contracts for a bounded discovery/pool mapping. | One provider family may cover both fact types, but these are new owners. `pool_created_at` and reserve values alone do not establish current liquidity observation time. Authorize an offline endpoint/field/time/identity/budget specification; do not assume the existing exact-pool OHLCV mapping covers these fields. Implementation remains conditional on proof of the required clocks. No API key or provider call is authorized. |
 
-Option A is preferred when preserving V1's original-source freshness is mandatory. Option B is the least implementation work only if the controller explicitly accepts its weaker freshness semantics. Option C is a bounded alternative audit, not a solved timestamp mapping. No option is silently selected or implemented by this packet.
+Option A is preferred when preserving V1's original-source freshness is mandatory. Option B is the least implementation work only if the controller explicitly accepts its weaker freshness semantics. Option C is a bounded alternative audit, not a solved timestamp mapping. The original packet selected no option. The subsequent controller explicitly selected A, as recorded above; this does not silently select its unresolved joint pool/USD source contract.
 
-## State, scope and next gate
+## Current state, scope and next gate
 
-- Concrete discovery: BLOCKED; preferred existing DexScreener listing cannot satisfy current source-time requirements.
-- Concrete pools: BLOCKED; DexScreener provides liquidity USD but no documented observation timestamp for that field.
+- Concrete discovery: one-finalized-block mint event design SPECIFIED in the Option A partial specification; adapter NOT IMPLEMENTED. DexScreener remains unsuitable for original-source time.
+- Concrete pools/USD: BLOCKED on joint bounded universe/reserve and pre-ranking valuation authority. Raydium CPMM is an audited reserve candidate; CoinGecko is a genuine timestamped USD candidate, not yet the selected joint owner. DexScreener original liquidity update time remains unavailable.
 - Provider-neutral cycle: IMPLEMENTED / MERGED; offline contract coverage and PR-head CI PASS. This does not claim provider-backed operational success.
 - Provider-bound adapters/contracts: none created. Do not add a fake positive adapter whose timestamp fields merely conceal absent source facts.
 - P03/P04 overall remain open. No new residual P03/P04 task is selected; this source-time decision is the current upstream blocker.
@@ -46,4 +52,4 @@ Option A is preferred when preserving V1's original-source freshness is mandator
 - No runtime secrets/API keys, operational DexScreener/CoinGecko/Solana requests, provider-backed cycle/smoke, polling, retry, scheduler, wallet/signing, DEX execution or settlement occurred. GitHub operations and public documentation lookup are distinct from operational provider activity.
 - G2 remains BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 remain NOT AUTHORIZED. `MASTER_BLUEPRINT.md` is unchanged.
 
-Exact next gate: controller selection of the source-time/freshness authority in A, B or C, followed by the selected bounded offline specification. Only a demonstrably compatible mapping may then proceed to injected-transport adapters, contract/integration fixtures and PR/CI/merge. Operational provider verification remains separately unauthorized.
+Exact current next gate: decide the bounded pool-universe coverage and pre-ranking USD valuation/model/request authority in §7 of `AUTONOMOUS-PAPER-SOURCE-AUTHORITY-SPECIFICATION.md`, then complete that joint offline source specification. Option A is already selected; do not request the original freshness decision again. Only a fully established compatible authority may proceed to injected contracts/adapters and meaningful fixtures. Operational provider verification remains separately unauthorized.

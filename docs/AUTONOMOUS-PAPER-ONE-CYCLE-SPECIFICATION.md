@@ -43,7 +43,7 @@ Only `OBSERVATION_PRODUCED` lifecycle output is persistence-eligible for this cy
 
 | Operation | Maximum per invocation |
 | --- | ---: |
-| Discovery source requests | 1 |
+| Discovery source invocations | 1 (underlying concrete RPC budget must be explicit) |
 | Raw discovery observations | 64 |
 | Canonical candidates considered | 5 |
 | P03 evidence collections | 5 (one per candidate) |
@@ -69,4 +69,4 @@ This milestone does not close P03/P04 overall, execute provider-backed smoke, or
 
 ## Concrete source reconciliation after PR #130
 
-The controller handover of 2026-10-01 WIB authorizes bounded offline source audit, specification and compatible injected-transport adapters, but forbids operational provider requests and secrets. The audit in `docs/AUTONOMOUS-PAPER-PROVIDER-SOURCE-MAPPING-DECISION.md` finds a real missing source clock in existing DexScreener discovery and liquidity facts. Current V1 source freshness remains mandatory; receipt time, pair creation time and a provenance digest cannot establish when current liquidity was observed. No concrete adapters are implemented. The next gate is a controller source-time/freshness decision; this does not reopen the resolved provider-neutral selection/order decisions or close P03/P04 overall.
+The controller handover of 2026-10-01 WIB authorizes bounded offline source audit, specification and compatible injected-transport adapters, but forbids operational provider requests and secrets. The audit in `docs/AUTONOMOUS-PAPER-PROVIDER-SOURCE-MAPPING-DECISION.md` finds a real missing source clock in existing DexScreener discovery and liquidity facts. Current V1 source freshness remains mandatory; receipt time, pair creation time and a provenance digest cannot establish when current liquidity was observed. No concrete adapters are implemented. The subsequent controller explicitly selects source-anchored Option A and rejects receipt-time replacement. `docs/AUTONOMOUS-PAPER-SOURCE-AUTHORITY-SPECIFICATION.md` records a partial offline design: discovery is one finalized block with three bounded RPC methods; canonical bounded pool enumeration/reserve and pre-ranking USD valuation authority remain unresolved. The next gate is its joint pool-universe/USD-model/budget decision, not the original A/B/C freshness selection. Conditional time/formula proposals are not an active owner amendment. No source interfaces/adapters or positive provider fixtures were created. This does not reopen the resolved provider-neutral selection/order decisions or close P03/P04 overall.

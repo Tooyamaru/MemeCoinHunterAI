@@ -1,3 +1,12 @@
+## 2026-10-01 WIB — Option A Offline Source Authority and Joint Pool/USD Blocker
+
+- Controller explicitly selects source-anchored Option A; receipt-time replacement and operational provider access remain unauthorized. Baseline main `9d991d37db233389aa6cc36986d7a2a8081c11c7` and CI #533 verified: 1,863 Python 3.13 tests and TypeScript PASS.
+- Added partial `AUTONOMOUS-PAPER-SOURCE-AUTHORITY-SPECIFICATION.md`: exact one-finalized-block mint discovery, event/receipt identity, finite three-method/one-slot/byte budgets, canonical P02 selection and deterministic STOP semantics.
+- Audited pinned Raydium CPMM reserve/fee source and standard RPC enumeration limitations. Existing CoinGecko provides genuine timestamped USD candles, but no selected joint bounded pool/reserve and pre-ranking two-sided valuation owner is established.
+- Recorded conditional 180-second freshness, 120-second conservative candle-interval skew, net two-reserve USD sum, exact integer/rational arithmetic and six-place final round-down, reproducible predecessor lineage and explicit candidate/failure budgets. These proposals do not amend current runtime owners.
+- Narrow A1/A2/A3 decision packet selects A1 as preferred next offline design, with pool-universe/model/request decisions still required. Implementation STOPPED per controller condition; no fabricated source clocks, interfaces/adapters, or positive provider fixtures. Documentation-only validation; full exact-head/main CI publication evidence belongs in the milestone PR.
+- Updated current PROJECT_STATE, existing source decision and cycle specification coherently. No MASTER_BLUEPRINT change, operational provider request, secret, smoke/cycle, scheduler, wallet or economic authority. P03/P04 overall and historical progress estimates unchanged; G2/G3/G4/P09 unchanged.
+
 ## 2026-10-01 WIB — Concrete Provider Source Mapping Audit and Decision
 
 - PR #130 merged through the real GitHub merge endpoint at `c822e1300df67a8aaf1e786712ba76cb879daaf4`, guarding exact head `fb7222e0052780c26a9d5b01cd1fba0dcec9ec71`. PR-head CI #529 PASS: 1,863 Python 3.13 tests and TypeScript checks/builds; post-merge main CI tracked separately in run `36829533386`.
