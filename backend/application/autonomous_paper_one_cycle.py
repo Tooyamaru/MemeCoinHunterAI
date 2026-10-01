@@ -243,7 +243,10 @@ class AutonomousPaperOneCycleService:
                 # Check exact numerical rules, common clocks, feature versions and
                 # candle window. Never compare candidate-specific scales/windows.
                 observations = result.diagnostic.diagnostic.market.observations
-                features = result.composition.feature_snapshots
+                # Canonical P05 snapshots may be ordered by their candidate-bound
+                # digest. Compare policy sets by feature identity, not digest order.
+                features = sorted(result.composition.feature_snapshots,
+                                  key=lambda f: (f.feature_id, f.feature_version))
                 if any(f.freshness_policy != request.freshness_policy or f.reference_time != request.reference_time for f in features):
                     raise ValueError("incomparable feature freshness/reference")
                 key = (score.ruleset.digest, score.contract_version, score.evaluator_version,
