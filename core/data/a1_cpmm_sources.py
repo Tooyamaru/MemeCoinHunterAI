@@ -190,7 +190,10 @@ def map_discovery(envelopes, *, reference_time, policy):
     transactions_seen = {}
     instruction_count = 0
     for tx in txs:
-        _require(type(tx) is dict and tx.get("version", "legacy") in ("legacy", 0), "UNSUPPORTED_TRANSACTION_VERSION")
+        _require(type(tx) is dict, "UNSUPPORTED_TRANSACTION_VERSION")
+        version = tx.get("version", "legacy")
+        _require(version == "legacy" or type(version) is int and version == 0,
+                 "UNSUPPORTED_TRANSACTION_VERSION")
         meta, transaction = tx.get("meta"), tx.get("transaction")
         _require(type(meta) is dict and "err" in meta and type(transaction) is dict, "INCOMPLETE_TRANSACTION")
         if meta["err"] is not None:

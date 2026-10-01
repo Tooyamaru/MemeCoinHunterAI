@@ -205,6 +205,9 @@ class A1SourceTests(unittest.TestCase):
         tx = transaction()
         tx["meta"]["innerInstructions"] = None
         self.rejected(lambda: facts(discovery_envelopes([tx])), "INNER_RECORDING_REQUIRED")
+        for version in (False, True, "0", 1):
+            tx=transaction();tx["version"]=version
+            self.rejected(lambda:facts(discovery_envelopes([tx])), "UNSUPPORTED_TRANSACTION_VERSION")
 
     def test_duplicate_event_collapse_and_conflicting_pool_fail_closed(self):
         tx = transaction()
