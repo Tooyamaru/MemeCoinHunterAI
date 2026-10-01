@@ -1,3 +1,11 @@
+## 2026-10-01 WIB — A1 Offline CPMM/Candle Source Mapping
+
+- Continued preferred A1 under controller continuation; baseline PR #132/main `0669f0f1f6d16f205285130a3fc5d995cd4080be`, post-main CI #535 PASS (1,863 Python tests and TypeScript).
+- Added pure supplied-envelope CPMM swap discovery, pinned legacy reserve decoder with protocol/fund/creator fee subtraction, separate two-sided CoinGecko USD candle valuation, immutable calculation lineage and one-shot injected source interfaces. Event-scoped pools replace the earlier mint-initialization proposal; no complete-global coverage claim.
+- 25 synthetic offline tests use independently packed Rust-field layouts, actual P02 admission and forbidden sockets; cover original clocks, identities, cardinality/deadline/bytes, arithmetic, lineage, failures and no retry. Local unittest PASS; exact-head/main CI publication evidence is recorded in the milestone PR.
+- Fixed a demonstrated pool-selection Decimal precision regression with exact `copy_negate()`; policy remains highest USD then lexical address.
+- Updated current state and source/cycle specifications while preserving older audit history. No default/runtime wiring, transport/provider request/key, operational smoke/cycle, scheduler or wallet authority. Deployment/cluster evidence and collection/reference lifecycle remain open. P03/P04 overall, historical percentages and G2/G3/G4/P09 unchanged; MASTER_BLUEPRINT untouched.
+
 ## 2026-10-01 WIB — Option A Offline Source Authority and Joint Pool/USD Blocker
 
 - Controller explicitly selects source-anchored Option A; receipt-time replacement and operational provider access remain unauthorized. Baseline main `9d991d37db233389aa6cc36986d7a2a8081c11c7` and CI #533 verified: 1,863 Python 3.13 tests and TypeScript PASS.

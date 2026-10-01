@@ -249,4 +249,6 @@ class BoundedPoolCandidateOwner:
             if previous is not None and previous != pool:
                 raise CycleSourceError("contradictory duplicate pool")
             valid[pool.pool_address] = pool
-        return min(valid.values(), key=lambda p: (-p.liquidity_usd, p.pool_address)) if valid else None
+        # Unary minus rounds Decimal under the ambient context. Sign-copying
+        # preserves exact six-place source valuations before the tie-break.
+        return min(valid.values(), key=lambda p: (p.liquidity_usd.copy_negate(), p.pool_address)) if valid else None
