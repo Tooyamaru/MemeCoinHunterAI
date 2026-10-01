@@ -1,5 +1,13 @@
 # Autonomous paper — concrete source mapping decision
 
+## Current A1 offline continuation
+
+Main `0669f0f1f6d16f205285130a3fc5d995cd4080be` / PR #132 / exact post-main CI #535 verified. Controller “Lanjutkan pengerjaan nya” continues preferred A1 within the already authorized offline scope. The concrete source facts and injected mappers are specified in `AUTONOMOUS-PAPER-A1-OFFLINE-MAPPING-SPECIFICATION.md`: bounded successful legacy CPMM swaps, common fee-adjusted reserve snapshot, and separate exact-mint two-sided latest closed-candle USD. 25 synthetic tests pass with network prohibited. Runtime policy requires explicit universe/model acceptance; no transport/default source/application wiring exists. Original-time freshness is preserved. Operational binding, deployment/cluster proof, aggregate collection/reference lifecycle and provider-backed verification remain open.
+
+The statements below that no adapters exist or the joint offline specification is blocked describe the earlier PR #131/#132 audit, not the current selected A1 slice. Historical progress estimates and G2/G3/G4/P09 authority are unchanged.
+
+## Historical source-clock audit and decision packet
+
 Baseline: PR #130 merged at `c822e1300df67a8aaf1e786712ba76cb879daaf4`.
 Status: OPTION A SELECTED / OFFLINE SOURCE SPECIFICATION PARTIAL / JOINT POOL-USD AUTHORITY BLOCKED / IMPLEMENTATION STOPPED.
 Authority: controller handover `Pasted text(4).txt`, 2026-10-01 WIB. Offline adapter specification, implementation and fixture tests are authorized only when the existing source facts safely satisfy the canonical contracts. Operational provider calls and secrets are explicitly unauthorized.

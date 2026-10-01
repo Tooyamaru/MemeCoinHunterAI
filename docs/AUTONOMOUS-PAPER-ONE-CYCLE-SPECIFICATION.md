@@ -1,5 +1,9 @@
 # Autonomous paper one-cycle — provider-neutral V1
 
+## Current concrete A1 offline source slice
+
+`docs/AUTONOMOUS-PAPER-A1-OFFLINE-MAPPING-SPECIFICATION.md` supersedes the earlier source-mapping blocker for the selected narrow offline A1 path: one finalized-block legacy CPMM swap universe, common net-reserve snapshot and exact two-sided latest closed-candle USD, supplied through injected one-shot interfaces. Original block/candle clocks and explicit scope/model acceptance are mandatory. 25 synthetic source tests verify parser/lineage/budget/failure boundaries and actual P02 admission. Highest liquidity is within that event-scoped set; no global pool completeness is claimed. A one-line exact Decimal sign-copy correction preserves existing pool ranking under ambient precision changes. No application/transport/source-policy wiring, operational provider request, smoke/cycle or phase closure occurs. Operational binding/reference collection and deployment/cluster evidence remain the next separate gate. Prior no-adapter/source-blocker statements below are historical.
+
 Baseline: `main` `a07b9a5f19a1fedbbea4f2145ee8c9812a7242e4`, after PR #129.
 Status: IMPLEMENTED / MERGED via PR #130 at `c822e1300df67a8aaf1e786712ba76cb879daaf4`. Exact-head CI #529 completed successfully for Python 3.13 (1,863 tests) and TypeScript checks/builds. Post-merge main CI is tracked separately in run `36829533386`; no pending result is claimed as success.
 Authority: controller amendment in `Pasted text(3).txt`, 2026-10-01 WIB, authorizes specification, provider-neutral discovery/pool owners, thin application composition, deterministic offline tests and normal PR/CI/merge workflow. It supersedes the unresolved decision slots in PR #128/#129 for this bounded implementation only.

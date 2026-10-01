@@ -1,5 +1,11 @@
 # Autonomous paper — Option A offline source authority
 
+## Current A1 continuation checkpoint
+
+Controller continuation “Lanjutkan pengerjaan nya” advances the preferred A1 **offline** direction. `AUTONOMOUS-PAPER-A1-OFFLINE-MAPPING-SPECIFICATION.md` now establishes one finalized-block legacy CPMM **swap** universe, pinned fee-adjusted reserve mapping and separate two-sided closed-candle USD valuation, with explicit model opt-ins, original clocks and finite supplied-envelope limits. Injected mappers and 25 synthetic tests are implemented; no transport/application wiring, deployment attestation, operational requests or provider-backed verification. The prior mint-initialization discovery proposal and PARTIAL/BLOCKED implementation status below are historical and superseded only for this selected narrow offline A1 slice. Complete global pool coverage remains unclaimed; operational authority and G2/G3/G4/P09 are unchanged.
+
+## Historical PR #132 partial audit and decision packet
+
 Baseline: GitHub main `9d991d37db233389aa6cc36986d7a2a8081c11c7` (PR #130/#131 merged). Exact baseline main CI [533](https://github.com/Tooyamaru/MemeCoinHunterAI/actions/runs/36834903809) completed/success for Python 3.13 and TypeScript.
 
 Authority: controller `Pasted text(5).txt`, 2026-10-01 WIB, selects Option A and forbids operational provider requests/secrets. Status: DISCOVERY DESIGN SPECIFIED / JOINT POOL-USD AUTHORITY BLOCKED / PARTIAL SPECIFICATION / IMPLEMENTATION STOPPED. This is a concrete discovery design plus conditional requirements and a decision packet, not an implementation-ready specification of the entire source chain. The controller-selected original-source freshness guarantee is preserved.
