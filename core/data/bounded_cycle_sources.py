@@ -6,7 +6,7 @@ Each invocation owns fresh P02 state and never resumes a previous cycle.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 import hashlib
 import json
@@ -203,9 +203,21 @@ class CanonicalPoolObservation:
         fresh(self.observed_at, self.received_at, reference_time, freshness_policy)
 
     def target(self):
-        digest = hashlib.sha256(json.dumps({
-            name: str(getattr(self, name)) for name in self.__dataclass_fields__
-        }, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        material = {name: str(getattr(self, name)) for name in self.__dataclass_fields__}
+        # Equal facts must retain the same provenance regardless of which
+        # duplicate arrived last. Avoid Decimal.normalize's ambient context.
+        sign, digits, exponent = self.liquidity_usd.as_tuple()
+        coefficient = "".join(map(str, digits))
+        trimmed = coefficient.rstrip("0")
+        material["liquidity_usd"] = (
+            ("-" if sign else "") + trimmed + "e" + str(exponent + len(coefficient) - len(trimmed))
+            if trimmed else "0"
+        )
+        for name in ("observed_at", "received_at"):
+            material[name] = getattr(self, name).astimezone(timezone.utc).isoformat()
+        digest = hashlib.sha256(json.dumps(
+            material, sort_keys=True, separators=(",", ":")
+        ).encode()).hexdigest()
         return ExactPoolDiagnosticTarget(
             chain_id=self.chain_id, token_mint=self.token_mint,
             pool_address=self.pool_address, base_mint=self.base_mint, quote_mint=self.quote_mint,

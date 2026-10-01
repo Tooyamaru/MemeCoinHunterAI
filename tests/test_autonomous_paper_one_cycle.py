@@ -1,6 +1,6 @@
 """Offline full canonical owner chain with bounded injected facts and SQLite."""
 from dataclasses import replace
-from datetime import timedelta
+from datetime import timedelta, timezone
 from decimal import Decimal
 import json
 import socket
@@ -107,6 +107,22 @@ def pool(token=TOKEN, address=POOL, liquidity=Decimal("100")):
     return CanonicalPoolObservation("solana", token, address, token, QUOTE, liquidity,
                                     "offline-pool", "pool:reference", REFERENCE - timedelta(seconds=5),
                                     REFERENCE - timedelta(seconds=1))
+
+
+def test_equivalent_duplicate_pool_provenance_is_order_independent():
+    sources = Sources()
+    candidate = SimpleNamespace(chain_id="solana", token_mint=TOKEN)
+    first = pool(liquidity=Decimal("100"))
+    offset = timezone(timedelta(hours=7))
+    second = replace(first, liquidity_usd=Decimal("100.00"),
+                     observed_at=first.observed_at.astimezone(offset),
+                     received_at=first.received_at.astimezone(offset))
+    targets = []
+    for values in ((first, second), (second, first)):
+        sources.pool_values[TOKEN] = values
+        targets.append(BoundedPoolCandidateOwner(sources).select(
+            candidate, reference_time=REFERENCE, freshness_policy=FRESHNESS).target())
+    assert targets[0] == targets[1]
 
 
 def factory(rti11, request, *, blocked=False, reject=False):
