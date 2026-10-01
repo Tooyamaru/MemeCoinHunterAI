@@ -115,7 +115,18 @@ from backend.application.market_to_opportunity_composition import (
     P01Rti11CompositionResult,
 )
 
+from backend.application.autonomous_paper_one_cycle import (
+    AutonomousPaperOneCycleService,
+    AutonomousPaperCycleRequest,
+    AutonomousPaperCycleResult,
+    CycleOutcome,
+)
+
 __all__ = [
+    "AutonomousPaperOneCycleService",
+    "AutonomousPaperCycleRequest",
+    "AutonomousPaperCycleResult",
+    "CycleOutcome",
     "P01_OCI_01_CONTRACT_VERSION",
     "PreparedPaperInvocationOutcome",
     "P01Oci01Request",
