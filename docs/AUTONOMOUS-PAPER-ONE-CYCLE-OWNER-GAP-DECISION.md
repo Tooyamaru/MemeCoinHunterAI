@@ -1,5 +1,7 @@
 # Autonomous paper one-cycle — canonical discovery and pool decision packet
 
+**2026-10-01 controller amendment:** The historical decision hold below is superseded for the bounded provider-neutral gate by `AUTONOMOUS-PAPER-ONE-CYCLE-SPECIFICATION.md`. Discovery/pool contracts and application service are implemented with offline verification/CI pending. No concrete provider or operational call is authorized by this amendment.
+
 **Baseline:** GitHub `main` `a1907061071f8b6e7d2d1c3f27ff6f68cb3d347b` (PR #128 merged, main CI pass).
 **Status:** BOUNDED OWNER AUDIT COMPLETE / IMPLEMENTATION STOPPED / CONTROLLER DECISION REQUIRED.
 **Scope:** reconcile the controller's one-shot paper-cycle decision with existing owners. This is an audit and decision packet, not a completed implementation specification or runtime authorization.
