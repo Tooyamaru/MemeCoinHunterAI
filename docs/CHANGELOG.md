@@ -1,3 +1,12 @@
+## 2026-10-02 WIB — A1 Offline Transport/Collection Milestone Closure
+
+- PR #134 merged at fetched/verified main `04d93019e4a6492be2a32b3553296569fb0e7704`; its tree exactly matches audited head `00b1b2f68f437f8ef9a46b4c7529471d2197c4a0`.
+- Exact PR-head CI #541 / run `36943355971` PASS: 1,951 Python tests / 86 subtests and TypeScript checks/builds. Continuation regression PASS: 121 Python tests / 86 subtests; module compilation and whitespace PASS.
+- Verified post-merge main CI #542 / run `36962872735` SUCCESS on `04d93019e4a6492be2a32b3553296569fb0e7704`: Python 3.13 and TypeScript checks/builds PASS. A1 offline transport/collection implementation milestone CLOSED on merged implementation, exact implementation/main CI and documented closure evidence; no successor gate started.
+- Checkpoint CI #545 / run `36963254253` SUCCESS applies only to old documentation head `1c3b5a4dd4cd50c54c42f1ca85458bade59e193b`. Amended PR #135 requires fresh exact-head CI and final post-merge main verification; old checkpoint CI is not proof of the amended head.
+- Bounded 16-file audit found no merge blocker, committed credential artifact, provider network default, retry/scheduler, Risk bypass or live-money authority. Existing owners, MASTER_BLUEPRINT and historical progress unchanged; LEVEL 2 remains NOT VERIFIED; offline fixtures are not operational-provider proof.
+- No operational provider request, secret, smoke/cycle, wallet/signing/broadcast/DEX/settlement or economic authority. G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-10-01 WIB — A1 Bounded Collection, Dedup, Budget and Verification Preparation
 
 - Verified main `30b381ec276c79752670f4330540e3b4fad8527b`, PR #132/#133 merged, post-main CI #538 PASS: 1,888 Python tests and TypeScript.
