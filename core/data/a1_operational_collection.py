@@ -84,7 +84,11 @@ class A1CollectionContext:
         return {f.name: getattr(self, f.name) for f in fields(self) if f.name != "collection_digest"}
 
     def validate(self):
-        mapping._require(self.contract_version == VERSION and self.transport_contract_version == TRANSPORT_VERSION,
+        self._validate(VERSION)
+
+    def _validate(self, version):
+        # Shared complete-ledger checks. The v1 public validator stays strict.
+        mapping._require(self.contract_version == version and self.transport_contract_version == TRANSPORT_VERSION,
                          "COLLECTION_CONTRACT")
         mapping._require(self.intended_chain_identity == MAINNET_GENESIS_HASH
                          and self.cluster.genesis_hash == MAINNET_GENESIS_HASH
@@ -129,10 +133,14 @@ class A1CollectionPacket:
 
     def replay_sources(self):
         """Fresh one-shot mapper instances; the packet has no transport reference."""
+        return self._replay_stage(self.context.requests)
+
+    def _replay_stage(self, stage_records):
+        """Pure A1-stage checks; common packets validate global coverage separately."""
         self.context.validate()
         mapping._require(self.policy == self.context.policy, "COLLECTION_POLICY_LINEAGE")
         reference = self.context.reference_time
-        records = {r.request_identity:r for r in self.context.requests}
+        records = {r.request_identity:r for r in stage_records}
         envelopes = (*self.verification_envelopes,*self.discovery_envelopes,
                      *(e for _,es in self.reserve_envelopes for e in es))
         mapping._require(len({e.request_id for e in envelopes}) == len(envelopes), "COLLECTION_RPC_DUPLICATE")
@@ -215,6 +223,30 @@ class A1OperationalCollectionService:
         self.failure_reason = None
         self.packet = None
 
+    def _make_ledger(self, started):
+        return A1BudgetLedger(self.budget, self.collection_id, started, self.rpc_endpoint, COINGECKO_ORIGIN)
+
+    def _collect_extra_stage(self, transport, next_id, facts, tokens, records):
+        return next_id
+
+    def _closed(self):
+        pass
+
+    def _sealed(self):
+        pass
+
+    def _make_context(self, material):
+        return A1CollectionContext(**material, collection_digest=_digest(material))
+
+    def _make_packet(self, context, verification, discovery, reserves, valuations):
+        return A1CollectionPacket(context, self.policy, verification, discovery, reserves, valuations)
+
+    def _success(self):
+        self.status = "COLLECTION_COMPLETED"
+
+    def _stopped(self):
+        self.status = "COLLECTION_STOPPED"
+
     def collect_once(self):
         mapping._require(not self.called, "SECOND_COLLECTION_FORBIDDEN")
         self.called = True
@@ -222,7 +254,7 @@ class A1OperationalCollectionService:
         ledger = None
         try:
             started = mapping._utc(self.clock())
-            ledger = A1BudgetLedger(self.budget, self.collection_id, started, self.rpc_endpoint, COINGECKO_ORIGIN)
+            ledger = self._make_ledger(started)
             transport = A1BoundedTransport(rpc_endpoint=self.rpc_endpoint, opener=self.opener, clock=self.clock, ledger=ledger)
             elapsed = started - mapping._EPOCH
             cutoff = (elapsed.days * 86400 + elapsed.seconds) // 60 * 60
@@ -296,10 +328,13 @@ class A1OperationalCollectionService:
                         end = begin + timedelta(seconds=60)
                         mapping._require(max(abs(reserve.observed_at-begin), abs(reserve.observed_at-end))
                                          <= self.policy.max_skew, "RESERVE_PRICE_SKEW")
+            self._collect_extra_stage(transport, next_id, facts, tokens, records)
+            self._closed()
             completed = mapping._utc(self.clock())
             # This is the single final T. A cutoff change is terminal, never a recollection/retry.
             reuse = registry.seal(completed)
             snapshot = ledger.seal(completed)
+            self._sealed()
             cluster = verify_cluster(genesis, reference_time=completed)
             program = verify_program(probe, program_snapshot, reference_time=completed)
             final_facts = mapping.map_discovery(discovery_envelopes, reference_time=completed, policy=self.policy)
@@ -323,18 +358,21 @@ class A1OperationalCollectionService:
                 reference_time=completed,planned_cutoff=cutoff,requests=tuple(records),reuse=reuse,budget=snapshot,
                 policy=self.policy,operational_budget=self.budget,cluster=cluster,program=program,
                 transport_contract_version=TRANSPORT_VERSION,contract_version=VERSION)
-            context = A1CollectionContext(**material,collection_digest=_digest(material))
+            context = self._make_context(material)
             context.validate()
-            packet = A1CollectionPacket(context,self.policy,(genesis,probe,program_snapshot),
+            packet = self._make_packet(context,(genesis,probe,program_snapshot),
                 discovery_envelopes,tuple(reserve_sets),tuple(valuations))
             packet.replay_sources()
-            self.packet, self.status = packet, "COLLECTION_COMPLETED"
+            self.packet = packet
+            self._success()
             return packet
         except mapping.A1SourceError as exc:
             if ledger is not None: ledger.abort()
-            self.failure_reason, self.status = str(exc), "COLLECTION_STOPPED"
+            self.failure_reason = str(exc)
+            self._stopped()
             raise
         except Exception:
             if ledger is not None: ledger.abort()
-            self.failure_reason, self.status = "COLLECTION_FAILED", "COLLECTION_STOPPED"
+            self.failure_reason = "COLLECTION_FAILED"
+            self._stopped()
             raise mapping.A1SourceError("COLLECTION_FAILED") from None

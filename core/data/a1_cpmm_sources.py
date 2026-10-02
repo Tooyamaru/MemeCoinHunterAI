@@ -13,6 +13,7 @@ from fractions import Fraction
 import base64
 import hashlib
 import json
+import math
 import struct
 
 from core.data.bounded_cycle_sources import (
@@ -107,16 +108,30 @@ class RpcEnvelope:
     body: bytes = field(repr=False)
 
     def read(self, method, params, reference, limit):
+        return self._read(method, params, reference, limit, timedelta(seconds=10))
+
+    def read_safety(self, method, params, reference, limit):
+        # Separate safety profile; standalone A1 retains its ten-second deadline.
+        _require(method in ("getAccountInfo", "getTokenLargestAccounts", "getTokenSupply", "getBlockTime")
+                 and type(limit) is int and 0 < limit <= 262144, "SAFETY_RPC_PROFILE")
+        return self._read(method, params, reference, limit, timedelta(seconds=30))
+
+    def _read(self, method, params, reference, limit, deadline):
         _require(type(self) is RpcEnvelope and self.method == method
                  and self.params_json == json.dumps(params, sort_keys=True, separators=(",", ":")), "RPC_REQUEST_BINDING")
         start, received, reference = map(_utc, (self.started_at, self.received_at, reference))
-        _require(start <= received <= reference and received - start <= timedelta(seconds=10), "RPC_RECEIPT_OR_DEADLINE")
+        _require(start <= received <= reference and received - start <= deadline, "RPC_RECEIPT_OR_DEADLINE")
         _require(type(self.body) is bytes and 0 < len(self.body) <= limit, "RPC_BYTE_BUDGET")
         _require(type(self.request_id) is int and 0 < self.request_id < 2**31, "RPC_REQUEST_ID")
         try:
             def bad_constant(_):
                 raise A1SourceError("INVALID_JSON_NUMBER")
-            data = json.loads(self.body, object_pairs_hook=_pairs, parse_constant=bad_constant)
+            def finite_float(text):
+                value = float(text)
+                _require(math.isfinite(value), "INVALID_JSON_NUMBER")
+                return value
+            data = json.loads(self.body, object_pairs_hook=_pairs, parse_constant=bad_constant,
+                              parse_float=finite_float)
             _require(type(data) is dict and set(data) == {"jsonrpc", "id", "result"}
                      and data["jsonrpc"] == "2.0" and type(data["id"]) is int
                      and data["id"] == self.request_id, "RPC_UNAVAILABLE_OR_MALFORMED")
