@@ -1,3 +1,12 @@
+## 2026-10-01 WIB — A1 Bounded Collection, Dedup, Budget and Verification Preparation
+
+- Verified main `30b381ec276c79752670f4330540e3b4fad8527b`, PR #132/#133 merged, post-main CI #538 PASS: 1,888 Python tests and TypeScript.
+- Added injected bounded HTTP/RPC, no retry/redirect/default network, strict ID/JSON/HTTP/deadline/byte rejection; immutable completed-collection reference T and body/request/receipt lineage replay through unchanged A1/P02 owners.
+- Exact per-collection request registry reduces tight attainable valuation bound 128 to 64 (old loose disclosure 200). Immutable budget reserves every call before transport; collection 16 RPC/80 HTTP, whole-cycle disclosure 46 RPC/69 CoinGecko/115 HTTP and 86,597,632 bytes including future selected safety/RTI-11 scopes.
+- Mandatory genesis hash and Raydium executable/loader-v3 ProgramData LEVEL 1 before source admission; no deployed binary/source equivalence claim. Manifest-only check-only has no provider or launch switch and no secret access.
+- Deterministic transport/collection/dedup/budget/verification/preflight tests and fake-provider canonical paper SQLite persist/readback plus Risk veto. Exact-head and post-merge CI evidence belongs to the milestone PR.
+- Operational P03/RTI-11 precollection/replay, durable audit linkage, actual account quota/latency and qualifying runtime evidence remain the next separately governed provider preparation gate. Zero operational provider calls/secrets, no smoke/cycle/scheduler/wallet; P03/P04 overall, estimates, MASTER_BLUEPRINT and G2/G3/G4/P09 unchanged.
+
 ## 2026-10-01 WIB — A1 Offline CPMM/Candle Source Mapping
 
 - Continued preferred A1 under controller continuation; baseline PR #132/main `0669f0f1f6d16f205285130a3fc5d995cd4080be`, post-main CI #535 PASS (1,863 Python tests and TypeScript).
