@@ -10,6 +10,7 @@ from core.data.bounded_cycle_sources import (
     BoundedDiscoveryOwner, BoundedPoolCandidateOwner, CycleSourceError,
     CycleSourceUnavailable, DiscoverySnapshot, DiscoveredCandidate, fresh, aware, text,
 )
+from core.data.a1_p03_collection import ExactDiscoveryBinding
 from core.data.contracts import FreshnessPolicy
 from core.risk.safety_evidence import SafetyEvidenceCollection, EligibilityStatus
 from core.risk.safety_evaluation import evaluate_safety_evidence
@@ -141,7 +142,7 @@ class AutonomousPaperOneCycleService:
                  safety: SafetySource, market, paper_request_factory: Callable,
                  persistence, pfx=None, pfs=None, cip=None, invocation=None):
         self.discovery, self.pools, self.safety, self.market = discovery, pools, safety, market
-        if type(discovery) is not BoundedDiscoveryOwner or type(pools) is not BoundedPoolCandidateOwner:
+        if type(discovery) not in (BoundedDiscoveryOwner, ExactDiscoveryBinding) or type(pools) is not BoundedPoolCandidateOwner:
             raise ValueError("canonical bounded source owners required")
         self.factory, self.persistence = paper_request_factory, persistence
         self.pfx = pfx or PrevalidatedDecisionRiskCapitalPrefixService()

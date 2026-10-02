@@ -12,7 +12,7 @@ import hashlib
 import json
 from urllib.parse import urlsplit
 
-from core.data.a1_cpmm_sources import A1SourceError, RpcEnvelope, _utc
+from core.data.a1_cpmm_sources import A1SourceError, RpcEnvelope, _utc, _decode, _slot
 
 TRANSPORT_VERSION = "a1-injected-bounded-transport-v1"
 _READ_CHUNK = 65536
@@ -90,6 +90,7 @@ class A1BoundedTransport:
                  and callable(getattr(ledger, "abort", None)), "INJECTED_TRANSPORT_REQUIRED")
         A1HttpRequest("solana", rpc_endpoint, "POST", b"{}", timedelta(seconds=10), 8192)
         self.rpc_endpoint, self.opener, self.clock, self.ledger = rpc_endpoint, opener, clock, ledger
+        self._rpc_ids = set()
 
     def http(self, request):
         _require(type(request) is A1HttpRequest, "CANONICAL_TRANSPORT_REQUEST")
@@ -158,6 +159,7 @@ class A1BoundedTransport:
     def rpc(self, method, params, *, request_id, timeout=timedelta(seconds=10), max_bytes=8192):
         _require(type(method) is str and method in _METHODS and type(params) is list and type(request_id) is int
                  and 0 < request_id < 2**31, "RPC_REQUEST_CONFIG")
+        self._rpc_ids.add(request_id)
         try:
             params_json = json.dumps(params, sort_keys=True, separators=(",", ":"), allow_nan=False)
             body = json.dumps({"jsonrpc": "2.0", "id": request_id, "method": method, "params": params},
@@ -172,3 +174,36 @@ class A1BoundedTransport:
             self.ledger.abort()
             raise
         return envelope
+
+    def rpc_safety(self, method, params, *, request_id, timeout, max_bytes):
+        """Only finalized P03 reads/time lookups, charged to the safety kind."""
+        try:
+            validate_safety_params(method, params)
+            _require(type(request_id) is int and 0 < request_id < 2**31
+                     and request_id not in self._rpc_ids, "RPC_ID_REUSE")
+            _require(type(max_bytes) is int and 0 < max_bytes <= 262144, "SAFETY_BYTE_CONFIG")
+            self._rpc_ids.add(request_id)
+            body = json.dumps({"jsonrpc":"2.0", "id":request_id, "method":method, "params":params},
+                              sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+            receipt = self.http(A1HttpRequest("safety", self.rpc_endpoint, "POST", body, timeout, max_bytes))
+            envelope = RpcEnvelope(method, json.dumps(params, sort_keys=True, separators=(",", ":")),
+                                   request_id, receipt.started_at, receipt.received_at, receipt.body)
+            envelope.read_safety(method, params, receipt.received_at, max_bytes)
+            return envelope
+        except A1SourceError:
+            self.ledger.abort()
+            raise
+
+
+def validate_safety_params(method, params):
+    _require(type(method) is str and method in
+        ("getAccountInfo", "getTokenLargestAccounts", "getTokenSupply", "getBlockTime")
+        and type(params) is list, "SAFETY_RPC_PROFILE")
+    if method == "getBlockTime":
+        _require(len(params) == 1, "SAFETY_RPC_PARAMS")
+        _slot(params[0])
+    else:
+        config = {"commitment":"finalized"}
+        if method == "getAccountInfo": config["encoding"] = "jsonParsed"
+        _require(len(params) == 2 and type(params[1]) is dict and params[1] == config, "SAFETY_RPC_PARAMS")
+        _decode(params[0], 32)

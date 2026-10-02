@@ -1,5 +1,13 @@
 ## 2026-10-02 WIB — A1 P03 Safety Precollection / Exact-Predecessor Specification
 
+## 2026-10-02 — A1 P03 offline safety precollection and exact replay
+
+- Implemented `a1-p03-safety-precollection-replay-v1` under NEW explicit controller authorization, based on verified main `baf27d47eba399066555e03323c0c03d0a9b0182` (spec PR #137; exact-head CI #551 and main CI #552 PASS).
+- Added one shared pre-T A1/P03 session, immutable common packet, exact physical-ledger coverage and narrow pure A1 stage hooks while preserving standalone A1 v1 behavior. Safety uses an explicit four-method profile with <=30 charged RPC, <=30s / <=256 KiB, no cross-mint lookup cache, source/receipt clock separation and one final T inside unchanged whole-cycle budgets.
+- Added a once-only canonical discovery binding retaining its actual returned snapshot/predecessor and evidence-only replay through the existing P03 mapper. The existing cycle admits only this specific wrapper alongside its canonical owner; evaluation/eligibility remain once per candidate and Risk authority is unchanged.
+- Offline verification: 58 focused contract tests and 2 source-backed fake-wire/real-paper-owner integration tests PASS; 269 relevant regression tests / 86 subtests PASS under Python 3.13; compilation and whitespace PASS. Branch `feature/a1-p03-safety-precollection-replay`. Exact PR/head/CI/merge are separate GitHub workflow evidence.
+- No operational adapter qualification, market-provider request, new diagnostic production replay, collection-audit persistence, runtime/database attestation, wallet/signing/broadcast/live money or later gate. P03/P04 overall and historical progress unchanged; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED. After verified landing, only a bounded dependency review is authorized.
+
 - Verified review PR #136 MERGED at main `9136242516449cd26e0e176834d4c7ddc1151f4d`; exact head `8057e78953de7bcc9097b091782f4063b5a352bd` CI #549 / run `36974451027` SUCCESS; post-merge main CI #550 / run `36987290844` SUCCESS, Python and TypeScript PASS.
 - Controller selected SPECIFICATION-ONLY P03 raw safety precollection and exact A1 predecessor replay with the necessary common pre-T session/ledger/freeze. Added `AUTONOMOUS-PAPER-A1-P03-SAFETY-PRECOLLECTION-SPECIFICATION.md`; formal contract COMPLETE, implementation NOT AUTHORIZED.
 - Locked <=5 selected mints, <=30 safety RPC including block-time lookups, explicit safety method/kind profile, <=30s / <=256 KiB and unchanged whole-cycle 46 RPC + 69 CoinGecko / 115 HTTP / 86,597,632 reserved bytes. No budget enlargement.
