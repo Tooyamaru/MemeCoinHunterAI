@@ -1,3 +1,12 @@
+## 2026-10-02 WIB — A1 P03 Safety Precollection / Exact-Predecessor Specification
+
+- Verified review PR #136 MERGED at main `9136242516449cd26e0e176834d4c7ddc1151f4d`; exact head `8057e78953de7bcc9097b091782f4063b5a352bd` CI #549 / run `36974451027` SUCCESS; post-merge main CI #550 / run `36987290844` SUCCESS, Python and TypeScript PASS.
+- Controller selected SPECIFICATION-ONLY P03 raw safety precollection and exact A1 predecessor replay with the necessary common pre-T session/ledger/freeze. Added `AUTONOMOUS-PAPER-A1-P03-SAFETY-PRECOLLECTION-SPECIFICATION.md`; formal contract COMPLETE, implementation NOT AUTHORIZED.
+- Locked <=5 selected mints, <=30 safety RPC including block-time lookups, explicit safety method/kind profile, <=30s / <=256 KiB and unchanged whole-cycle 46 RPC + 69 CoinGecko / 115 HTTP / 86,597,632 reserved bytes. No budget enlargement.
+- Specified a new combined packet with exact ledger coverage while preserving legacy v1 behavior; one canonical discovery delegation and exact returned snapshot binding; evidence-only replay reuses existing P03 mapping, evaluation and eligibility without a second P02 or duplicate P03 evaluation. Source clocks, receipt lineage, final T and terminal STOP remain explicit.
+- Future offline acceptance cases are documented, not implemented. Specification PR/CI/merge are separate GitHub workflow facts; no new local Python/TypeScript test claim. Stop after specification merge and new-main CI PASS for separate implementation authorization.
+- Only specification/state/changelog changed. No source/test/dependency/workflow/MASTER_BLUEPRINT change, provider request, operational adapter, diagnostic implementation, durable audit, wallet/signing/broadcast/DEX/settlement/live authority or external integration. Risk remains independent/mandatory/higher authority; LEVEL 2 NOT VERIFIED; P03/P04 and historical progress unchanged; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+
 ## 2026-10-02 WIB — Bounded Post-A1 Dependency Review
 
 - Verified PR #135 final head/exact CI #547, actual merge/main `2e4b5c847d458ece293f6889f8e782b3df0c867d` and post-merge main CI #548 SUCCESS for Python and TypeScript before review. A1 offline transport/collection closure fully landed.
