@@ -11,6 +11,7 @@ from core.data.bounded_cycle_sources import (
     CycleSourceUnavailable, DiscoverySnapshot, DiscoveredCandidate, fresh, aware, text,
 )
 from core.data.a1_p03_collection import ExactDiscoveryBinding
+from core.data.a1_rti11_collection import ExactPoolBinding, RTI11DiagnosticReplay, DiagnosticSafetyReplay
 from core.data.contracts import FreshnessPolicy
 from core.risk.safety_evidence import SafetyEvidenceCollection, EligibilityStatus
 from core.risk.safety_evaluation import evaluate_safety_evidence
@@ -142,8 +143,15 @@ class AutonomousPaperOneCycleService:
                  safety: SafetySource, market, paper_request_factory: Callable,
                  persistence, pfx=None, pfs=None, cip=None, invocation=None):
         self.discovery, self.pools, self.safety, self.market = discovery, pools, safety, market
-        if type(discovery) not in (BoundedDiscoveryOwner, ExactDiscoveryBinding) or type(pools) is not BoundedPoolCandidateOwner:
+        if type(discovery) not in (BoundedDiscoveryOwner, ExactDiscoveryBinding) or type(pools) not in (BoundedPoolCandidateOwner, ExactPoolBinding):
             raise ValueError("canonical bounded source owners required")
+        if type(pools) is ExactPoolBinding or type(market) is RTI11DiagnosticReplay:
+            if not (type(discovery) is ExactDiscoveryBinding and type(safety) is DiagnosticSafetyReplay
+                    and type(pools) is ExactPoolBinding and type(market) is RTI11DiagnosticReplay
+                    and pools.binding is market.binding is discovery
+                    and pools.safety is market.safety is safety and market.pools is pools
+                    and safety._binding is discovery):
+                raise ValueError("one connected diagnostic replay graph required")
         self.factory, self.persistence = paper_request_factory, persistence
         self.pfx = pfx or PrevalidatedDecisionRiskCapitalPrefixService()
         self.pfs = pfs or PaperFactSourcingService()
@@ -212,6 +220,8 @@ class AutonomousPaperOneCycleService:
                 try:
                     pool = self.pools.select(candidate, reference_time=request.reference_time, freshness_policy=request.freshness_policy)
                 except CycleSourceError:
+                    if type(self.pools) is ExactPoolBinding:
+                        raise
                     evidence.append(CycleEvidence(stage, "INVALID", ("INVALID_POOL_FACTS",), candidate.candidate_id))
                     continue
                 if pool is None:
@@ -231,6 +241,8 @@ class AutonomousPaperOneCycleService:
                     evaluation_id=request.invocation_id,
                 )
                 diagnostics += 1
+                if type(self.market) is RTI11DiagnosticReplay:
+                    self.market.bind_upstream(candidate, snapshot, collection, evaluation, eligibility, pool, market_request)
                 result = self.market.compose(market_request)
                 if type(result) is not P01Rti11CompositionResult or result.request is not market_request:
                     raise ValueError("market owner did not preserve exact request")
