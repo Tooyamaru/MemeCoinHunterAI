@@ -226,7 +226,8 @@ class A1OperationalCollectionService:
     def _make_ledger(self, started):
         return A1BudgetLedger(self.budget, self.collection_id, started, self.rpc_endpoint, COINGECKO_ORIGIN)
 
-    def _collect_extra_stage(self, transport, next_id, facts, tokens, records):
+    def _collect_extra_stage(self, transport, next_id, facts, tokens, records,
+                             *, reserve_sets, registry, started):
         return next_id
 
     def _closed(self):
@@ -328,7 +329,8 @@ class A1OperationalCollectionService:
                         end = begin + timedelta(seconds=60)
                         mapping._require(max(abs(reserve.observed_at-begin), abs(reserve.observed_at-end))
                                          <= self.policy.max_skew, "RESERVE_PRICE_SKEW")
-            self._collect_extra_stage(transport, next_id, facts, tokens, records)
+            self._collect_extra_stage(transport, next_id, facts, tokens, records,
+                                      reserve_sets=tuple(reserve_sets), registry=registry, started=started)
             self._closed()
             completed = mapping._utc(self.clock())
             # This is the single final T. A cutoff change is terminal, never a recollection/retry.

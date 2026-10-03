@@ -64,12 +64,16 @@ class CommonCollectionContext(A1CollectionContext):
     source_contract_version: str = "bounded-paper-cycle-source-v1"
 
     def validate(self):
+        self._validate_common(VERSION, ("solana", "valuation", "safety"))
+
+    def _validate_common(self, version, admitted_stages):
+        """Full global accounting; public v1 retains its original stage set."""
         m._require(type(self.requests) is tuple and type(self.reuse) is tuple
             and type(self.budget) is A1BudgetSnapshot and type(self.budget.attempts) is tuple
             and type(self.policy) is m.A1Policy
             and all(type(r) is A1CollectionRequestRecord and type(r.wire_request) is A1HttpRequest for r in self.requests),
             "P03_IMMUTABLE_CONTEXT")
-        self._validate(VERSION)
+        self._validate(version)
         m._require(self.mapper_contract_version == m.VERSION
             and self.source_contract_version == "bounded-paper-cycle-source-v1", "P03_SOURCE_VERSION")
         _policy(self.freshness_policy, self.max_top_holder_fraction, self.safety_timeout, self.safety_max_bytes)
@@ -91,7 +95,7 @@ class CommonCollectionContext(A1CollectionContext):
         m._require(ledger.seal(self.reference_time) == self.budget, "P03_BUDGET_LINEAGE")
         m._require(sum(a.kind == "solana" for a in self.budget.attempts) <= 16
             and sum(a.kind == "safety" for a in self.budget.attempts) <= 30
-            and all(a.kind in ("solana", "valuation", "safety") for a in self.budget.attempts),
+            and all(a.kind in admitted_stages for a in self.budget.attempts),
             "P03_STAGE_BUDGET")
 
 
@@ -216,6 +220,11 @@ class CommonCollectionPacket:
     def validate(self):
         c = self.context
         m._require(type(c) is CommonCollectionContext and self.contract_version == VERSION, "P03_COMMON_CONTRACT")
+        return self._validate_stages()
+
+    def _validate_stages(self):
+        """Pure A1/P03 ownership checks under an already exact global context."""
+        c = self.context
         c.validate()
         m._require(type(self.a1) is A1CollectionPacket
             and type(self.a1.verification_envelopes) is tuple
@@ -231,8 +240,8 @@ class CommonCollectionPacket:
             *self.a1.discovery_envelopes, *(e for _,es in self.a1.reserve_envelopes for e in es))}
         lengths.update({"usd:"+v.key.request_digest:len(v.response.body) for v in self.a1.valuations})
         m._require(all(a.response_bytes == lengths[r.request_identity] for r,a in zip(c.requests,c.budget.attempts)
-                       if r.scope != "safety"), "P03_A1_BODY_LENGTH")
-        a1_records = tuple(r for r in c.requests if r.scope != "safety")
+                       if r.scope in ("solana", "valuation")), "P03_A1_BODY_LENGTH")
+        a1_records = tuple(r for r in c.requests if r.scope in ("solana", "valuation"))
         self.a1._replay_stage(a1_records)
         facts = m.map_discovery(self.a1.discovery_envelopes, reference_time=c.reference_time, policy=c.policy)
         tokens = sorted({s for sw in facts.swaps for s in (sw.mint_0, sw.mint_1)})[:5]
@@ -322,7 +331,8 @@ class A1P03CollectionService(A1OperationalCollectionService):
         self._check_configuration()
         return _CommonLedger(self.budget, self.collection_id, started, self.rpc_endpoint, COINGECKO_ORIGIN)
 
-    def _collect_extra_stage(self, transport, next_id, facts, tokens, records):
+    def _collect_extra_stage(self, transport, next_id, facts, tokens, records,
+                             *, reserve_sets, registry, started):
         events = {o.raw_event.payload["token_identity"]:o.raw_event.source_event_id for o in facts.batch.observations}
         self._manifest = tuple((mint,events[mint]) for mint in tokens)
         self._scope_digest = facts.scope_digest
