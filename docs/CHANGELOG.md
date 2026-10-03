@@ -1,3 +1,12 @@
+## 2026-10-03 WIB — WORK FAST MODE bounded CI trigger optimization
+
+- Gate 0 verified: PR #141 MERGED / CLOSED at main `32074700bf677c29f181c7fd49172fd130edad20`, exact implementation head `6dd62c8ab70a426726effec550318574b6bead00`; exact-head push CI #562 / run `37106925352` and PR CI #563 / run `37106955278` SUCCESS; post-merge main CI #564 / run `37109887399` SUCCESS, Python 3.13 and TypeScript PASS. Two-stage RTI-11 offline micro-batch COMPLETE / MERGED / POST-MERGE CI PASS. No separate closure PR.
+- Restrict full CI `push` to `main`; retain full `pull_request` validation targeting `main`. Remove duplicate full push runs for `feature/**`, `fix/**`, `chore/**` and `wip/**`. Both prior implementation runs #562/#563 used the same head, demonstrating the old duplication. Runtime behavior of the proposed workflow remains subject to its own GitHub CI/landing evidence.
+- Preserve both Python/TypeScript job IDs and names, parallel execution, full validation commands, whitespace, permissions, timeouts, locked uv/pnpm installs, existing dependency caches and superseded-run concurrency. No path-based test skipping, reduced docs CI, new action/dependency or protection-setting change.
+- Reconcile current state and the existing workflow guide: focused/relevant local checks, full suites in GitHub CI, one PR deliverable and STOP once its CI starts. Branch `chore/ci-fast-mode` starts from the verified main above; PR/head/run are separate publication facts.
+- Local validation PASS: strict YAML parsing/duplicate-key checks, structural equality outside the four removed push filters, main/PR/development trigger matrix, unchanged unconditional parallel required-capable jobs, exact four-file scope and `git diff --check`. Full suites are delegated to GitHub CI; no local full repository regression repeated.
+- Only CI workflow and relevant documentation change. Production, provider and Risk code, MASTER_BLUEPRINT, historical phase progress and G2/G3/G4/P09 remain unchanged. No provider request, credential, wallet/signing/broadcast/DEX/settlement/live authority.
+
 ## 2026-10-03 WIB — RTI-11 offline diagnostic precollection / exact pure replay implementation
 
 - Specification PR #140 MERGED at `212851d119e91d771f854b6ca84fddcff6ef992f`; exact head `d2e71f13e0ca2809cdea75befc34e6875578cfe7`, push CI #559 / run `37097414410` and PR CI #560 / run `37097432264` SUCCESS; post-merge main CI #561 / run `37100475788` SUCCESS, Python 3.13 and TypeScript PASS. A NEW implementation branch starts only from that verified main.

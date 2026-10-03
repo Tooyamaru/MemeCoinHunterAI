@@ -18,7 +18,8 @@ authority.
    `chore/...`.
 4. Inspect only files relevant to the authorized task.
 5. Implement the smallest scoped change and its tests.
-6. Run focused checks locally, followed by the applicable full checks.
+6. Run focused checks and relevant regressions locally; GitHub CI runs the full
+   required suites.
 7. Push the branch and open a pull request against `main`.
 8. Require the GitHub Actions checks to pass before merge.
 9. Use ChatGPT/Work for runtime, UI, or integration validation when supported.
@@ -30,8 +31,16 @@ authority.
 
 ## Required automated checks
 
-The `CI` workflow runs on pull requests to `main` and on pushes to maintained
-development branch families.
+The `CI` workflow runs full validation on pull requests to `main` and on pushes
+to `main`. Ordinary development-branch pushes do not start a second full run;
+opening or updating the pull request provides PR validation, and merging
+provides a separate post-merge main run. The Python and TypeScript job names and
+validation commands remain unchanged, so they remain available as required
+checks. Both jobs run independently in parallel.
+
+The existing uv and pnpm dependency caches and locked installs are retained.
+Existing concurrency cancels superseded runs on the same PR ref or branch ref;
+it does not substitute PR validation for post-merge main validation.
 
 - Python: locked `uv` environment on Python 3.13 and the full pytest suite.
 - TypeScript: frozen pnpm 10.28.0 installation, workspace typechecks, and
@@ -48,13 +57,20 @@ Development uses one primary agent by default. Additional agents are justified
 only when independent parallel work has a measured benefit; they are not the
 default for routine inspection, implementation, testing, or documentation.
 
+In WORK FAST MODE, one Work session produces one scoped deliverable. After
+focused validation, publish one PR and stop as soon as its CI starts. Record
+the exact head and run for the controller to check separately. Merge still
+requires review and exact-head Python/TypeScript PASS, followed by verification
+of the exact post-merge main run. Do not wait for CI completion in that Work
+session or create an unnecessary closure PR.
+
 To reduce repeated context and tool usage:
 
 1. work on one governed gate at a time;
 2. inspect only the current task's listed files;
 3. batch related read-only checks when safe;
-4. run focused tests during iteration and the full required suite once before
-   code merge;
+4. run focused tests and relevant regressions locally; let GitHub CI run the
+   full required suites before code merge;
 5. do not rerun the full suite for documentation-only changes unless CI or the
    changed workflow requires it;
 6. update `PROJECT_STATE.md` as soon as a milestone changes; and
