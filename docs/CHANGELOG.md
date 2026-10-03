@@ -1,3 +1,11 @@
+## 2026-10-03 WIB — RTI-11 diagnostic precollection / pure replay specification
+
+- NEW controller two-stage micro-batch: formal specification, then offline implementation only after spec merge and exact main CI PASS; STOP after implementation merge/main CI PASS.
+- Verified starting main `3ffde8757bc7fb6883bf108f4c7f3e2f1c2cbb78`; no open PR; main CI #558 / run `37040167787` SUCCESS, Python 3.13 and TypeScript PASS.
+- Added `a1-rti11-diagnostic-precollection-replay-v1`: complete raw possible-target coverage before one common ledger close/seal/freeze; exact A1 raw candle reuse; at most five independent diagnostic requests, oversized coverage STOP without duplicate/pre-T pool selection or budget increase.
+- Exact original P02/P03/pool/request binding and source/body/receipt/window lineage; pure replay through existing RTI-11/P04/P05 owners, unchanged Risk authority and legacy v1 coverage. Acceptance plan specified, not implemented in this PR.
+- Only specification/state/changelog changed. No provider request/secret, operational qualification, durable audit, wallet/signing/broadcast/live authority, later gate or progress change; G2/G3/G4/P09 unchanged. PR/CI landing evidence is separate from specification completion.
+
 ## 2026-10-02 — A1 P03 offline implementation closure and bounded review
 
 - PR #138 MERGED / CLOSED; exact head `d5b144ac22d5da56e6da5c5233851265917b9c40`; exact-head push CI #554 / run `37025114858` and PR CI #555 / run `37025119666` SUCCESS; merge/main `652ec1c32c6ed01beff8e088932b97caab4d1751`; post-merge main CI #556 / run `37030291596` SUCCESS. Python 3.13 and TypeScript checks/builds PASS in all three runs. The tested local tree, exact PR-head tree and landed implementation tree are identical: `9e967879698e9e64c07f83172c5a504dd9032919`.
