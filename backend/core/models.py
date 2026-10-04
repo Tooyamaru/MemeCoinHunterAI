@@ -96,3 +96,26 @@ class PaperLifecycleArtifact(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
+class A1CollectionAudit(Base):
+    """One immutable source-audit attachment to an existing lifecycle root."""
+
+    __tablename__ = "a1_collection_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    run_id: Mapped[int] = mapped_column(
+        ForeignKey("paper_lifecycle_runs.id", ondelete="RESTRICT"), unique=True
+    )
+    contract_version: Mapped[str] = mapped_column(String(64))
+    lifecycle_result_digest: Mapped[str] = mapped_column(String(64), unique=True)
+    collection_id: Mapped[str] = mapped_column(String(128))
+    packet_digest: Mapped[str] = mapped_column(String(64))
+    collection_digest: Mapped[str] = mapped_column(String(64))
+    selected_rti11_digest: Mapped[str] = mapped_column(String(64))
+    payload_digest: Mapped[str] = mapped_column(String(64))
+    audit_digest: Mapped[str] = mapped_column(String(64), unique=True)
+    canonical_payload: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
