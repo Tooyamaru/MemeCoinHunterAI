@@ -37,6 +37,15 @@ This storage is an audit snapshot, not a live position, wallet, settlement,
 economic-result, dashboard, or complete replay-input store. Database timestamps
 are operational metadata only and never become domain or learning facts.
 
+A1-AUD-01 adds a separate explicit source-audit attachment after a successful
+canonical lifecycle is already persisted. `a1_collection_audits` holds one
+immutable canonical packet/raw-byte/binding snapshot and its lifecycle link in
+one row. The existing RTI-03 root and 13 artifact kinds are unchanged. Exact
+duplicates are idempotent; disagreements fail closed; audit rollback preserves
+the independently completed lifecycle. Audit readback checks both source
+integrity and the exact existing lifecycle bundle. It never reconstructs an
+active case or restarts owners. There is no automatic cycle or API wiring.
+
 ## Migrations
 
 Alembic configuration lives in `alembic.ini`, `migrations/env.py`, and
@@ -44,6 +53,12 @@ Alembic configuration lives in `alembic.ini`, `migrations/env.py`, and
 `backend.core.models.Base.metadata`. The initial revision creates only
 `system_metadata`; revision `0002_paper_lifecycle` creates only the two
 controlled paper-lifecycle tables and their identity/order constraints.
+Revision `0003_a1_collection_audit` creates only the separate audit/link table,
+with a RESTRICT foreign key and unique run/lifecycle/audit identities. Upgrade,
+downgrade and re-upgrade are tested against a populated temporary SQLite
+database. No operational PostgreSQL migration is applied or qualified by this
+offline work. See the A1 durable-audit linkage specification for the full
+capture, idempotence, corruption and transaction contract.
 Migration commands use `DATABASE_URL`; no credentials are stored in source.
 
 ## Test database

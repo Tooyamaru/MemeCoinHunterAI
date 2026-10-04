@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.models import (
+    A1CollectionAudit,
     PaperLifecycleArtifact,
     PaperLifecycleRun,
     SystemMetadata,
@@ -93,3 +94,23 @@ class PaperLifecycleRepository:
         )
         await session.flush()
         return run
+
+
+class A1CollectionAuditRepository:
+    """Append/read only; never alter the canonical lifecycle artifact bundle."""
+
+    async def get(self, session: AsyncSession, lifecycle_result_digest: str) -> A1CollectionAudit | None:
+        result = await session.execute(
+            select(A1CollectionAudit).where(
+                A1CollectionAudit.lifecycle_result_digest == lifecycle_result_digest
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def insert(
+        self, session: AsyncSession, *, run_id: int, values: Mapping[str, Any]
+    ) -> A1CollectionAudit:
+        record = A1CollectionAudit(run_id=run_id, **dict(values))
+        session.add(record)
+        await session.flush()
+        return record
