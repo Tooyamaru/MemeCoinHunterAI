@@ -4,7 +4,16 @@ Status: implemented and tested offline. No provider request or secret has been u
 
 ## Injected transport
 
-`A1BoundedTransport` requires an opener, aware monotone clock and collection ledger. It contains no network implementation/default opener. Immutable requests require HTTPS, no URL userinfo, explicit positive timeout and response cap, zero retry and redirects disabled. Fixed safe headers contain no credentials. The opener receives the exact timeout and immutable no-redirect contract; future operational adapters must independently demonstrate that they honor it before authorization. A malicious injected callable is outside the contract.
+`A1BoundedTransport` requires an opener, aware monotone clock and collection ledger. It contains no network implementation/default opener. Immutable requests require HTTPS, no URL userinfo, explicit positive timeout and response cap, zero retry and redirects disabled. Fixed safe headers contain no credentials. The opener receives the exact timeout and immutable no-redirect contract; operational behavior must independently be qualified before provider authorization. A malicious injected callable is outside the contract.
+
+A1-HTTP-01 adds a separately constructed `A1HttpAdapter`, tested offline with
+fake connections and stdlib HTTP framing, without changing this owner or wiring
+a default. Its fixed same-origin private RPC route and Demo header remain
+outside canonical requests/audit. The public endpoint is a sanitized logical
+route, not the complete authenticated physical request. See
+`AUTONOMOUS-PAPER-A1-HTTP-ADAPTER-SPECIFICATION.md` for exact read-only routing,
+deadline/byte/cleanup contracts and limits. Offline adapter conformance is not
+real endpoint, quota/latency or runtime qualification.
 
 Only the bounded Solana methods are admitted; collection uses `getGenesisHash`, `getSlot`, `getBlock`, `getBlockTime`, `getMultipleAccounts`. IDs are explicit and unique within a collection. Existing strict `RpcEnvelope.read` rejects malformed/duplicate-key JSON, wrong ID and RPC errors. HTTP status other than 200 and changed final URL fail closed. Streaming reads enforce the sentinel byte cap and clock checks around opener/read; failed attempts remain charged and close the ledger. No fallback, switching, pagination, background I/O or retry exists.
 

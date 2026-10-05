@@ -21,3 +21,4 @@
 19. Avoid unnecessary dependency installation.
 20. Do not implement future phases prematurely.
 21. `docs/MASTER_BLUEPRINT.md` must not be substantially changed without explicit approval.
+22. Batch administrative documentation and state reconciliation with the next substantive milestone instead of separate micro-step or closure PRs. Keep repository state truthful: evidence pending at a source checkpoint must stay explicitly pending until verified. Safety, authority, Risk Governor, provider/live authorization, credential policy, and material architecture changes must be documented in the same PR that changes them and must never be deferred.
