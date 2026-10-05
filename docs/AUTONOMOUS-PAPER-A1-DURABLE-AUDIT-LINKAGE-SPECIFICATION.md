@@ -2,7 +2,13 @@
 
 Contract: `a1-durable-collection-audit-v1`.
 
-Status: OFFLINE IMPLEMENTED / LOCAL VALIDATION PASS / PR CI PENDING.
+Status: OFFLINE IMPLEMENTED / MERGED / POST-MERGE CI PASS.
+PR #143 MERGED / CLOSED; exact head
+`3e371a1c53c28d0bf15585458a4f5ff7940c6f8f`, PR CI #567 /
+`37195942557` SUCCESS. Main `8b549e599038c8418589baae16fc303b5e8c36ac`;
+post-main CI #568 / `37212294693` SUCCESS, Python 3.13 and TypeScript PASS.
+This evidence is reconciled with the next substantive A1-HTTP-01 batch;
+operational migration and runtime/database qualification remain unperformed.
 Starting main: `981f16c4fc34b41bf7f19b4075c52a03caabfe1a`; PR #142 merged,
 post-merge CI #566 / `37116227151` SUCCESS, Python 3.13 and TypeScript PASS.
 
@@ -127,5 +133,5 @@ Python 3.13.15: 38 audit cases plus 2 migration cases PASS in bounded focused
 runs, including the final 11-case linkage recheck. Relevant A1/P03/RTI-11,
 RTI-03 write/query/catalog and foundation regressions: 219 tests PASS.
 Compilation, whitespace and bounded source/governance audit PASS. Full suites
-are delegated to exact-head PR CI. Publication, merge and operational database
-migration remain separate unverified facts at this source checkpoint.
+were delegated to exact-head PR CI, now verified together with post-merge main
+CI above. Operational database migration remains separate and unperformed.
