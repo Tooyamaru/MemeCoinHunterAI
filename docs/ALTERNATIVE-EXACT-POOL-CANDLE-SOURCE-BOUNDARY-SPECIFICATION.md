@@ -1,0 +1,233 @@
+# Alternative exact-pool candle source boundary
+
+## 1. Status, decision and authority
+
+- Milestone: **P04-ACS-01**.
+- Proposed contract: **`alternative-exact-pool-candle-source-v1`**.
+- Status: **SPECIFICATION ONLY / CANDIDATE NOT QUALIFIED / IMPLEMENTATION NOT AUTHORIZED**.
+- Verified baseline: main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`; PR #144 MERGED / CLOSED; main CI #570 / `37254641401` SUCCESS for Python 3.13, whitespace and TypeScript; no competing open PR at startup.
+- Controller authority: 2026-10-05 WORK FAST MODE successor specification and batched `PROJECT_STATE.md` reconciliation in one PR. This authority permits public documentation lookup, not operational provider access.
+
+Decision: **NEW PROVIDER BOUNDARY / SPECIFICATION REQUIRED**. Bitquery Crypto Price API `Trading.Pairs` is the single conditional candidate selected for this specification. It is not an implemented, authorized or qualified substitute. Existing RTI-11 acceptance is CoinGecko-specific; changing a URL or transport cannot make alternative evidence admissible. A narrow, explicitly versioned source seam is required before future integration.
+
+The boundary accepts three factual, unique, contiguous, closed one-minute candles for one already-selected exact pool and price orientation. It preserves original source times and honest provider provenance. It does not discover, rank or replace targets, supply safety evidence, select investments, or authorize a paper cycle.
+
+Risk Governor remains **INDEPENDENT / MANDATORY / HIGHER AUTHORITY THAN DECISION ENGINE / AI**. G2 remains **BLOCKED / UNRESOLVED / NOT AUTHORIZED**. G3/G4/P09 remain **NOT AUTHORIZED**.
+
+## 2. Why continuation needs a new boundary
+
+The controller reports successful local Windows staging runtime, PostgreSQL/schema and authenticated readiness checks, working Solana access, and CoinGecko HTTP 200/authentication/transport. Work did not repeat those operational checks. The reported provider-backed prepare stopped with `PREPARATION_STOPPED` / `DIAGNOSTIC_NOT_PRODUCED`; no run/persist was executed.
+
+| Reported pool label | Raw candle timestamps | Canonical obstruction |
+| --- | --- | --- |
+| UWU/SOL | `[1791170580, 1791170580, 1791113520]` | Two unique timestamps; remaining spacing 57,060 seconds |
+| BONK/SOL | `[1791195120, 1791195120, 1791194220]` | Two unique timestamps; remaining spacing 900 seconds |
+
+These labels are incident context, not authorized public target identities. The timestamps are controller-reported reproduction facts, not independently captured responses or current wall-clock evidence. They demonstrate why those responses cannot be admitted; they do not establish a global CoinGecko outage or a permanent service guarantee change.
+
+CoinGecko's documented Demo profile supports minute/aggregate=1, an exclusive `before_timestamp`, explicit mint orientation, USD and `include_empty_intervals=false`. With empty intervals excluded, a quiet market can have gaps. Neither that profile nor HTTP 200 proves three contiguous factual minutes. No documented parameter correction establishes that duplicate rows can be repaired safely. Enabling empty intervals would allow fabricated carry-forward candles and is rejected. Deduplication, gap filling, older-window substitution and random-pool trials are not continuations of this contract.
+
+### Bounded repository evidence
+
+| Existing owner/reference | Finding |
+| --- | --- |
+| `core/data/coingecko_onchain_ohlcv.py`; P04-LME-01 specification | Owns a CoinGecko request, raw-response admission, fixed provider/version provenance and P02 materialization. It correctly rejects duplicate/non-contiguous evidence. Bitquery is already mentioned as a future independent audit/backfill candidate, not a V1 runtime path. |
+| `core/data/coingecko_onchain_transport.py`, `coingecko_onchain_diagnostic.py`, `coingecko_onchain_orchestration.py`; P04-LME-02 | Bounded explicit CoinGecko transport and exact-pool controlled diagnostic; no alternate candle source. |
+| `core/signals/price_direction_policy.py` | Re-admits raw CoinGecko facts and pins CoinGecko signal provenance; a caller-supplied success label cannot bypass admission. |
+| `backend/application/market_to_opportunity_composition.py`; P01-RTI-11 specification | Request construction and `_diagnostic_success` pin CoinGecko request/provider/adapter/endpoint identity and original observation/signal lineage. |
+| `core/data/a1_rti11_collection.py`; A1 RTI-11 precollection specification | Pre-T facts, request/reuse keys and pure replay are CoinGecko-bound. Source substitution would require a versioned collection/replay integration, not mutation of a sealed V1 packet. |
+| `core/data/a1_cpmm_sources.py`; A1 provider-source mapping/preparation | Two-sided USD valuation also consumes the CoinGecko candle contract. Replacing diagnostic evidence alone does not unblock A1 valuation or qualify the whole cycle. |
+| `core/data/bounded_cycle_sources.py` | Provider-neutral discovery/pool-candidate abstractions preserve exact targets; they are not a provider-neutral candle admission owner. |
+| `core/data/dexscreener_inspection.py` | Snapshot/identity inspection does not produce the required three original-time candle facts. |
+
+No existing reusable alternative exact-pool OHLCV implementation was found in this bounded review. Closed P02/P03/P04/P05, Risk, paper lifecycle, persistence and audit owners retain their existing authority.
+
+## 3. Candidate audit and unresolved capability gates
+
+The candidate is **Bitquery `Trading.Pairs` over one HTTP GraphQL query**, not its blended `Trading.Tokens`/`Currencies` price, rank-1/top-market selection, subscription, Kafka feed, or legacy archive/backfill path. Official documentation distinguishes pool, venue and token/quote identities and exposes interval and OHLC fields. For Solana, `Pool.Address` and `Market.Address` identify the pool; `Market.Program` identifies its program. The portable exact-pool key is `Pool.Address`. A venue name alone is insufficient.
+
+The documented USD construction is materially relevant: Bitquery normalizes the quote side, applies its price-index rules, and describes current quote valuation in pool-price normalization. Its token/quote orientation follows provider rules. These properties must remain visible, not be called CoinGecko semantics or proof of historical trade-time USD prices.
+
+| Candidate surface | Decision |
+| --- | --- |
+| Bitquery `Trading.Pairs`, explicitly filtered exact Solana pool/token/quote/60-second interval | Conditional candidate for this boundary; account, coverage, orientation and closed-window semantics still require proof. |
+| Bitquery `Trading.Tokens` or `Currencies`, rank-1/top-market selection | Excluded: can aggregate or change market authority rather than bind the supplied pool. |
+| Bitquery legacy Solana archive/combined trade aggregation | Not selected: current official Solana documentation warns about incomplete historical coverage; fresh qualification would need a different bounded trade-aggregation contract. |
+| CoinGecko Pro or another pool/profile of the existing Demo source | Not selected: no evidence that an account/host change cures this conformance failure. No new target trial is authorized. |
+| Repository DexScreener snapshots | Excluded: do not supply this candle/time contract. |
+
+**Documentation is candidate evidence, not capability qualification.** Before any candidate runtime implementation is selected, a controller-reviewed capability record must resolve:
+
+1. Exact selected CPMM pool coverage, token/quote orientation and returned identity fields on the intended account/product.
+2. Whether three returned 60-second OHLC rows represent actual eligible trades within their respective intervals, without empty-interval carry-forward, rolling-hour replacement or cross-pool OHLC blending. Positive reported volume alone does not prove this.
+3. Whether the historical interval's OHLC and USD construction respect the cutoff. If later trades or later quote repricing determine a claimed closed-window value, this profile is **INCOMPATIBLE**. A later receipt is permitted; later market input is not. Do not change cutoff semantics to accommodate it.
+4. The provider's USD conversion/filter model and any upstream quote-source authority. Controller acceptance of that model is required; unavailable construction time or ambiguous semantics remain **CAPABILITY_UNVERIFIED**, not a synthetic source timestamp.
+5. A fixed query/response schema, absolute interval filtering, completeness/truncation semantics, query cost, account entitlement and bounded limits. A wider lookup, pagination or schema-introspection request is not implicitly permitted.
+
+This specification is coherent as a fail-closed admission boundary even while its candidate remains conditional. It does not assert that Bitquery currently satisfies items 1–5. If they cannot be established, stop at this boundary; do not implement a fake-positive adapter or silently choose a second provider.
+
+## 4. Source authority and immutable request identity
+
+The following are proposed identifiers, not existing runtime registrations:
+
+| Field | Required binding |
+| --- | --- |
+| Boundary contract | `alternative-exact-pool-candle-source-v1` |
+| Provider authority | `bitquery` |
+| Source profile | `bitquery-trading-pairs-60s-usd-v1` |
+| Adapter contract | `bitquery-exact-pool-candle-adapter-v1` |
+| Logical endpoint version | `bitquery-http-graphql-trading-pairs-v1` |
+| Logical method/host/path | HTTP `POST`, `https://streaming.bitquery.io/graphql` |
+| Operation kind | One read-only GraphQL query; no mutation, subscription or batching |
+| Price construction | Explicit Bitquery pair-level USD OHLC model, identified by a reviewed capability-record digest |
+
+Source selection must be explicit and controller-approved before collection. The server-owned profile pins the host/path, operation, allowed fields, schema revision/profile and limits. A caller cannot supply an arbitrary URL/query or self-register a provider by changing a string. Unknown or unapproved profiles stop before I/O.
+
+Each request binds boundary/provider/profile/adapter/endpoint versions; operation name and exact UTF-8 query SHA-256; canonical public variables SHA-256; original target reference ID/digest/version; complete target identities and orientation; reference/cutoff/window; freshness policy; and effective timeout/body/request limits. A request digest covers that complete descriptor. Stable canonical JSON uses sorted keys, UTF-8, compact separators, UTC times and finite decimal strings; credentials are absent.
+
+The future implementation must freeze a literal reviewed operation and response-field/schema mapping under this profile. Those query/schema digests are **PENDING** in this specification; no runnable request or verified schema snapshot is fabricated. Schema/operation changes require a new reviewed profile/version, not automatic introspection or field guessing.
+
+For a future separately authorized collector, the proposed configuration name is **`BITQUERY_ACCESS_TOKEN`** only. An intentionally provisioned bearer token is injected exclusively at the pinned TLS host. No credential value enters source, request digests, packet, logs, errors or PRs. Account authentication, token acquisition/refresh, billing and operational use are not authorized here. No environment proxy, redirect, alternate host or transport fallback is allowed.
+
+## 5. Exact target and orientation
+
+Input is one existing canonical target plus its original P02 predecessor and P03 safety/eligibility lineage. The public tuple is:
+
+`(chain_id, pool_address, token_mint, base_mint, quote_mint, expected_program_id, target_reference_id, target_digest, target_contract_version)`.
+
+- `chain_id` is exactly the repository's Solana identity. A documented profile maps it explicitly to Bitquery's `Solana` network; no symbol/chain alias inference is accepted.
+- Pool/mint/program strings retain their exact case-sensitive public address identity. Base and quote are distinct and come from the original target owner; the candle adapter does not discover or recompute them.
+- The bounded initial candidate orientation requires `token_mint == base_mint`. Returned `Token.Address` must equal that mint and `QuoteToken.Address` must equal the original quote mint. A quote-side token target is unsupported by this initial profile and stops before I/O; there is no inversion, orientation guessing or replacement mint.
+- Every row must bind `Pool.Address == pool_address`, `Market.Address == pool_address`, the expected Solana network and the exact expected CPMM program. Missing or conflicting fields fail. A name such as “Raydium” cannot replace the program address.
+- Program identity is checked against the already-established original source-verification authority. Bitquery's identity field does not establish genesis, executable/ProgramData verification, on-chain pool ownership or LEVEL 2. This candle boundary does not add an RPC request to obtain them.
+
+The query filters the exact pool, token, quote, network/program, denomination and absolute window. It must not use ranking, `limitBy`, “latest token price”, discovery or mixed pools. All returned rows undergo identity checks; an unrelated row cannot be discarded to manufacture a valid packet. If the schema cannot express the bounded target and window, capability remains unverified and collection stops.
+
+## 6. Factual candle and temporal admission
+
+Freeze an explicit timezone-aware UTC `reference_time = R` before the first attempt. Let `C` be R truncated to its UTC minute. The only admitted candle starts are:
+
+`[C - 180 seconds, C - 120 seconds, C - 60 seconds]`.
+
+The requested interval window is `[C - 180 seconds, C)`. This does not authorize shifting R to find history. `Interval.Time.Start`, `End` and `Duration` supply the candle interval; neither receipt time nor `Block.Time` is substituted for its start.
+
+Admission requires all of the following:
+
+1. Exactly three original rows with unique, integral minute-aligned UTC starts; duration exactly 60 seconds; end exactly start + 60 seconds. Raw order must be monotonic ascending or descending. Only after uniqueness/order/spacing validation may the adapter order the three rows ascending.
+2. Starts equal the complete requested set, with adjacent spacing exactly 60 seconds. All starts are strictly below C; the latest end equals C. Every interval is closed at receipt (`end <= received_at`). A missing minute, older third candle, extra row or forming candle fails; no deduplication, truncation-to-three, resampling, interpolation or gap fill.
+3. Three genuine provider OHLC rows backed by actual eligible trades within those intervals, according to the approved capability record. Require positive finite reported base and USD volume and `Price.IsQuotedInUsd == true`, but never treat those fields alone as proof of factual/no-fill construction.
+4. OHLC/volume are exact finite decimal values, never booleans, NaN or infinity. Prices are positive; low <= open/close <= high; volume is not fabricated. Provider decimal strings or JSON numeric tokens are mapped losslessly according to the pinned schema, not through binary float conversion.
+5. Original source observation time remains the candle start, preserving existing P02 observation semantics. The separate candle end, provider construction semantics and source receipt clocks remain in provenance. An absent provider update/conversion timestamp is explicitly absent; it cannot be filled with receipt time.
+6. An explicit finite positive `FreshnessPolicy.stale_after` applies to **each** candle's original start at the supplied admission/evaluation time and, where applicable, final collection reference T. Negative age, expired oldest evidence, clock contradiction or cross-owner freshness/skew failure rejects the entire packet. No widening the policy to force admission.
+7. UTC chronology is checked: R <= request start <= receipt <= processing <= evaluation. Independent monotonic elapsed time enforces the deadline. Retained clocks are observations, not defaults read during replay.
+8. Only market inputs before C may determine the candle. Post-cutoff trade/quote construction, stale or future facts, unknown closed-window semantics and unsupported provider schema fail closed even if row timestamps look valid.
+
+Observations are materialized through the existing P02-T07/T08/T09 owners using the exact original predecessor and explicit clocks/policy. All three must be admitted before any successful diagnostic/signal result. No partial observation collection is usable. PRICE_DIRECTION_1M retains the existing exact-decimal comparison of the final two admitted closes; this grants no new decision/economic meaning.
+
+## 7. Budget, transport and no-retry policy
+
+These are proposed **maximums for one alternative-source diagnostic incidence**, not operational authorization or a proven service SLA. A lower caller or existing aggregate limit wins.
+
+| Limit | Hard maximum |
+| --- | --- |
+| Physical provider attempts | 1 HTTP GraphQL POST |
+| Provider query operations | 1 read-only query, one exact target/window |
+| Request body | 32,768 bytes |
+| Response body | 1,048,576 bytes (1 MiB) |
+| Per-attempt / total provider execution deadline | 10 seconds, including connection, headers and bounded body read |
+| Returned rows requested | At most 4 as an overflow sentinel; exactly 3 admissible |
+| Redirect, retry, fallback, token-refresh, pagination, polling | 0 |
+
+The fourth-row sentinel detects overflow rather than selecting the first three. An extra row fails. The approved schema must establish whether a capped result can conceal additional rows; ambiguous server truncation/completeness is a capability STOP. The consumer may read at most one extra body byte to detect oversize; that byte is not admitted evidence. Interrupted/partial content or a declared-length mismatch fails. No automatic decompression or content transformation may bypass byte accounting or alter the digest of admitted bytes.
+
+Reserve the entire permitted response cap and charge the physical attempt before I/O. Failed/denied attempts remain charged. A deadline miss is terminal; do not launch a replacement request. HTTP 200 with GraphQL `errors`, partial `data`, wrong content/schema, invalid UTF-8/JSON, duplicate object keys or non-finite JSON numbers is not success. Transport must check pinned TLS destination, status, bounded size, framing/truncation and complete response before admission; no raw provider error text is surfaced.
+
+Future embedding cannot enlarge the existing A1 whole-cycle call/byte/time limits or silently reclassify Bitquery POST as CoinGecko GET. A concrete versioned aggregate budget must be reviewed before that embedding. This one-request contract proves nothing about the historical 46 RPC + 69 CoinGecko / 115-request cycle budget, its 86,597,632-byte cap or 180-second ceiling.
+
+## 8. Receipt packet, provenance and deterministic replay
+
+The source boundary produces an immutable raw-fact receipt, not a caller-asserted accepted diagnostic. It retains:
+
+- The complete public request descriptor/digest from section 4 and original target/predecessor/safety lineage references.
+- Exact response bytes, SHA-256 and byte count, content/schema profile, bounded HTTP status/result category, attempt number/count and monotonic duration.
+- Original request-start and full-body-receipt UTC timestamps, supplied processing/evaluation times, R/C/window, freshness policy and effective limits.
+- Each original candle start/end and explicit provider/model identity; query/variables/schema/capability-record versions and digests.
+- A provider-issued response/request identifier only when documented and safe. Absence is marked `ABSENT`; the application's request digest must not be presented as a provider-issued ID.
+- Deterministic bounded outcome/reason codes. Provider credentials, authorization headers, private routing, account details and raw exception/error text are excluded.
+
+The raw body is never logged. If response/header retention risks exposing a credential, stop and do not publish/persist that body. A body hash establishes byte lineage, not authenticity, completeness, LEVEL 2 or independent provider attestation.
+
+Pure admission/replay reparses the retained original bytes, verifies their digest and exact request/target/profile/clock bindings, and invokes the existing P02 owners. It reads no environment, clock or network and trusts no pre-asserted `PRODUCED` flag. Successful PRICE_DIRECTION_1M evidence and provenance carry `source_id=bitquery`, the exact source profile/adapter/endpoint/model/request/response identities and the admitted observation digests. They never carry CoinGecko provider IDs, request metadata or a CoinGecko adapter version.
+
+Source substitution is an explicit new request with different provenance and digest. It is not a retry/fallback after CoinGecko failure. Identical payload bytes from two providers remain different source evidence. Any reuse key must include provider/profile/operation/variables/target/orientation/cutoff/freshness/limit/clock-context equality and preserve the original receipt; cross-provider cache reuse is forbidden.
+
+## 9. Narrow RTI-11 compatibility seam
+
+The future proposed seam contract is **`p01-rti-11-candle-source-v2`**. It is a companion opt-in request/result path, not permission to reinterpret `p01-rti-11-v1` or to relabel a Bitquery response as `OhlcvResponse`.
+
+The seam is necessary at three tightly coupled points:
+
+1. Replace the alternative path's CoinGecko-only request/envelope check with a typed, server-approved candle-source request/receipt binding and the strict raw admission in sections 4–8. Legacy V1 keeps its exact classes, profile and validation.
+2. Apply the existing PRICE_DIRECTION_1M arithmetic to actual newly admitted observations while carrying the honest source binding. Never overwrite the existing CoinGecko policy's provider constant globally or accept externally supplied signal facts as canonical.
+3. Add a source-aware RTI-11 diagnostic-success/lineage check for the companion request/result. Preserve exact candidate/target/P02/P03 handoff, one diagnostic admission, all-or-nothing observation/signal linkage, one existing canonical P04-to-P05 producer delegation and the current STOP boundary. An arbitrary callback declaring success is not a source authority.
+
+The source-selection descriptor participates in the new request and result canonical digests. Legacy V1 representations, digests, stored results, rejection behavior and tests must remain unchanged. Existing P04/P05 domain owners and Risk are reused without changed acceptance or economic semantics. V2 wrappers cannot masquerade as V1 objects. OAF, downstream RTI callers and persistence consumers must continue rejecting unsupported versions until an explicitly reviewed compatibility integration is authorized; no automatic rollout is implied.
+
+For A1, existing `a1-rti11-diagnostic-precollection-replay-v1`, packet membership/hash checks, CoinGecko request keys, host/method restrictions and durable audit identities remain unchanged. A later separately approved integration must version alternative raw receipts, ledger/source keys and replay/audit lineage, collect before irreversible seal T, and replay only the original retained facts afterward. No post-T I/O or clock/environment refresh is permitted. Preserve the bounded diagnostic-target cap, original P02/P03 target bindings, independent Risk veto and paper/audit consistency. This document does not define a replacement autonomous graph or authorize editing those owners.
+
+**Remaining independent blocker:** A1's two-sided latest-closed-candle USD valuation still uses CoinGecko. This diagnostic source boundary neither substitutes those valuation facts nor proves an autonomous-paper cycle ready.
+
+## 10. Deterministic fail-closed results
+
+All non-success outcomes expose only stable reason codes and safe public binding/digest metadata. They emit no usable observations, signal or opportunity composition. No outcome schedules corrective work or retries.
+
+| Outcome | Representative reason codes |
+| --- | --- |
+| `SOURCE_NOT_AUTHORIZED` | `UNAPPROVED_SOURCE_PROFILE`, `UNAPPROVED_SOURCE_SUBSTITUTION` |
+| `CAPABILITY_UNVERIFIED` | `SCHEMA_NOT_PINNED`, `FACTUAL_CANDLE_SEMANTICS_UNPROVEN`, `USD_CUTOFF_SEMANTICS_UNPROVEN`, `COMPLETENESS_UNPROVEN` |
+| `CONFIGURATION_INVALID` | `INVALID_TARGET_BINDING`, `UNSUPPORTED_ORIENTATION`, `INVALID_CLOCK_OR_LIMIT`, `CREDENTIAL_UNAVAILABLE` |
+| `TRANSPORT_REJECTED` | `AUTHENTICATION_FAILED`, `RATE_LIMITED`, `QUOTA_REFUSED`, `REDIRECT_FORBIDDEN`, `UNEXPECTED_HOST`, `TIMEOUT`, `CONNECTION_FAILED` |
+| `RESPONSE_REJECTED` | `RESPONSE_TOO_LARGE`, `TRUNCATED_RESPONSE`, `INVALID_JSON`, `GRAPHQL_ERRORS`, `UNSUPPORTED_RESPONSE_SCHEMA`, `SECRET_EXPOSURE_RISK` |
+| `IDENTITY_MISMATCH` | `POOL_MISMATCH`, `PROGRAM_MISMATCH`, `TOKEN_MISMATCH`, `BASE_QUOTE_MISMATCH`, `SOURCE_BINDING_MISMATCH`, `RESPONSE_DIGEST_MISMATCH` |
+| `CONTRADICTORY_EVIDENCE` | `CONFLICTING_DUPLICATE_CANDLE`, `CONFLICTING_INTERVAL_OR_PRICE_FACTS` |
+| `TEMPORAL_INVALID` | `DUPLICATE_CANDLE_TIMESTAMP`, `NON_MONOTONIC_CANDLES`, `UNALIGNED_INTERVAL`, `FUTURE_EVIDENCE`, `OPEN_CANDLE`, `CUTOFF_VIOLATION`, `CLOCK_CONTRADICTION`, `STALE_EVIDENCE` |
+| `INSUFFICIENT_HISTORY` | `MISSING_CANDLE`, `NON_CONTIGUOUS_CANDLES`, `WRONG_REQUESTED_WINDOW`, `NO_FACTUAL_TRADE_EVIDENCE` |
+| `ADMISSION_REJECTED` | `INVALID_OHLC_OR_VOLUME`, `EXTRA_CANDLE`, `P02_ADMISSION_REJECTED`, `PREDECESSOR_OR_SAFETY_LINEAGE_MISMATCH` |
+| `PRODUCED` | No reason codes; all three factual observations and honest signal provenance present |
+
+Validation order is fixed: authorization/capability/configuration; transport/byte/JSON/schema; request and row identities/digests; numeric and interval structure; conflicting duplicate facts; duplicate/order/closed/cutoff checks; requested count/contiguity/freshness; original owner admission. Within a stage use the listed canonical field order and stable reason-code order. Conflicting rows for one timestamp are contradictory evidence; identical duplicates are temporal invalidity. Either rejects the full packet. Failed transport stops before attempting semantic interpretation of partial bytes.
+
+## 11. Future acceptance evidence and next governed step
+
+No executable tests or runtime adapter are added by this specification. A later explicitly authorized offline implementation must demonstrate, with original local fixtures and network prohibited:
+
+- Three valid exact-window rows admit through actual P02 owners; honest source/receipt/query/digest lineage survives signal and companion RTI-11 checks.
+- Both controller-reported duplicate/gap timestamp sequences reject, including identical and conflicting duplicate values. Three unique but non-contiguous rows also reject.
+- Wrong pool/program/mint/quote, changing orientation, USD=false, fabricated empty candles, unsupported USD construction, stale/future/post-cutoff/open candles and altered hashes reject without partial output.
+- Oversize/truncated bodies, invalid JSON, partial GraphQL errors, redirect/auth/quota/timeout/connection errors and unsafe credential retention stop after at most one attempted POST.
+- Provider/source/version changes alter digests; there is no cross-source reuse, hidden retry/fallback or post-T I/O. Existing CoinGecko V1 behavior and canonical digests remain unchanged.
+- Original P02/P03/P04/P05 and independent Risk authority remain intact. Tests of future A1 integration must preserve sealed replay and audit lineage; source-only fixture success is not cycle qualification.
+
+The **first next controller decision** is review/accept this contract and the candidate's disclosed USD/orientation model, and resolve the capability record in section 3. Only then may the controller select a bounded offline adapter/admission plus companion-seam implementation batch. An operational account/target qualification needs its own explicit request budget, environment, public identities and authorization afterward. Merging this specification grants none of those permissions.
+
+| Activity | Authority in this milestone |
+| --- | --- |
+| Bounded repository/public-documentation audit, this specification, state reconciliation, one PR | AUTHORIZED |
+| Provider runtime/adapters, RTI-11 acceptance changes, A1 source/replay/audit integration | NOT AUTHORIZED |
+| Real Bitquery/CoinGecko/Solana calls, credential use, token refresh, account purchase, migration | NOT AUTHORIZED |
+| Provider-backed prepare, paper run/persist, full cycle, automatic discovery/polling/retry, scheduler/worker loop | NOT AUTHORIZED |
+| Wallet/signing/broadcast/DEX execution/settlement/live or real-money autonomous trading | NOT AUTHORIZED / DISABLED |
+| G2; G3/G4/P09; MASTER_BLUEPRINT change | BLOCKED / NOT AUTHORIZED |
+
+## 12. Authoritative documentation reviewed
+
+Review date: **2026-10-05 UTC**. These references inform candidate selection; they are mutable provider documentation, not a pinned schema, executed query or qualification receipt.
+
+- [CoinGecko Demo pool OHLCV](https://docs.coingecko.com/demo/reference/pool-ohlcv-contract-address): request/time/orientation and empty-interval behavior.
+- [Bitquery Crypto Price API](https://docs.bitquery.io/docs/trading/crypto-price-api/): product and interval scope.
+- [Bitquery Pairs](https://docs.bitquery.io/docs/trading/crypto-price-api/pairs/): pool/venue/quote identity and response fields.
+- [Bitquery OHLC API](https://docs.bitquery.io/docs/trading/crypto-price-api/crypto-ohlc-candle-k-line-api/): pair versus blended-token OHLC surfaces.
+- [Bitquery Price Index Algorithm](https://docs.bitquery.io/docs/trading/crypto-price-api/price-index-algorithm/): filtering, weighting and quote normalization limitations.
+- [Bitquery base/quote design](https://docs.bitquery.io/docs/trading/crypto-price-api/in-depth/): provider orientation rules.
+- [Bitquery Solana DEX trades](https://docs.bitquery.io/docs/blockchain/Solana/solana-dextrades/): historical coverage caveats.
+- [Bitquery authorization](https://docs.bitquery.io/docs/authorization/how-to-generate/): GraphQL endpoint and bearer authentication; no credential/token operation performed.

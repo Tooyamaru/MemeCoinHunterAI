@@ -7,8 +7,10 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 ## Project
 
 - **Project name:** Meme Coin Hunter AI
-- **Current phase:** A1/P03/RTI-11 and A1-AUD-01 offline milestones MERGED / POST-MERGE CI PASS; CI Fast Mode LANDED; A1-HTTP-01 explicit adapter OFFLINE IMPLEMENTED / LOCAL VALIDATION PASS / PR CI PENDING; operational qualification remains separate; P08 G2 separately blocked
-- **Current governed task:** Controller 2026-10-05 PIPELINE FAST MODE / BATCHED DEVELOPMENT selects A1-HTTP-01 (`a1-explicit-http-adapter-v1`) after bounded post-A1-AUD review, on `feature/a1-http-adapter-conformance` from verified main `8b549e599038c8418589baae16fc303b5e8c36ac`. ONE batch contains review/specification, explicit concrete HTTP opener, focused/full-owner integration tests and batched documentation. Preserve all closed owners; no default application/CLI/API wiring, provider request, operational migration or runtime launch. Full suites in GitHub CI; publish only on baseline CI PASS and STOP when exact-head PR CI starts.
+- **Current phase:** A1/P03/RTI-11, A1-AUD-01 and A1-HTTP-01 MERGED / POST-MERGE MAIN CI PASS; operational exact-pool candle qualification STOPPED on controller-reported CoinGecko conformance failure; P04-ACS-01 alternative candle boundary SPECIFICATION ONLY / candidate NOT QUALIFIED; P08 G2 separately blocked
+- **Current governed task:** Controller 2026-10-05 WORK FAST MODE authorizes only P04-ACS-01 successor specification (`alternative-exact-pool-candle-source-v1`) and batched state reconciliation, on `docs/alternative-exact-pool-candle-source` from verified GitHub main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`. Bitquery `Trading.Pairs` is a conditional candidate, not a qualified runtime. Specify a narrow provider-neutral companion RTI-11 seam; do not implement or change acceptance code. Publish one substantive specification PR after focused documentation validation; full suites belong to GitHub CI; STOP when exact-head PR CI starts.
+- **Completed A1-HTTP-01 milestone:** PR #144 MERGED / CLOSED; exact PR head `cf4ed0495baa6ba144e1b71ec4bbc155e89eb7f7`; verified main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`, tree `fb4bfccfa6ca2a4dd58038470f6a859b5b8d1de3`. Post-main CI #570 / `37254641401` SUCCESS for Python 3.13, whitespace and TypeScript. Startup found no competing open PR. Contract `a1-explicit-http-adapter-v1` is landed; this workflow evidence is not provider qualification.
+- **Current operational evidence:** CONTROLLER-REPORTED Windows local staging runtime, PostgreSQL/Alembic head, single-process authenticated readiness and no-provider validation PASS; Solana access and mint snapshot PASS. Work did not repeat these checks or use PC credentials. CoinGecko HTTP/auth/transport succeeds but reported UWU/SOL and BONK/SOL responses contain duplicate and non-contiguous candle timestamps. Latest provider-backed prepare: `PREPARATION_STOPPED` / `DIAGNOSTIC_NOT_PRODUCED`. Fail-closed validation is preserved; no run/persist or live action reported. Alternative-source capability, whole-cycle quota, A1 two-sided USD valuation and provider-backed paper readiness remain unproven.
 - **Completed A1-AUD-01 milestone:** PR #143 MERGED / CLOSED; exact head `3e371a1c53c28d0bf15585458a4f5ff7940c6f8f`, PR CI #567 / `37195942557` SUCCESS. Verified main `8b549e599038c8418589baae16fc303b5e8c36ac`, tree `6d38fd71f20e108078edb60b558a0cf36928de78` matches the tested implementation. Post-main CI #568 / `37212294693` SUCCESS, Python 3.13, TypeScript and whitespace PASS. Offline durable source audit/linkage is landed; operational migration/database qualification remain unperformed. No closure PR.
 - **Completed RTI-11 micro-batch:** Specification PR #140 MERGED at `212851d119e91d771f854b6ca84fddcff6ef992f`; exact-head push CI #559 / run `37097414410` and PR CI #560 / run `37097432264` SUCCESS on `d2e71f13e0ca2809cdea75befc34e6875578cfe7`; post-merge main CI #561 / run `37100475788` SUCCESS. Implementation PR #141 MERGED / CLOSED; exact implementation head `6dd62c8ab70a426726effec550318574b6bead00`; push CI #562 / run `37106925352` and PR CI #563 / run `37106955278` SUCCESS; merge/current main `32074700bf677c29f181c7fd49172fd130edad20`; post-merge main CI #564 / run `37109887399` SUCCESS. Python 3.13 and TypeScript PASS in the implementation and post-merge runs. Landed tree `3bb1281b0235fd2e2a792d0eab656c816a4b7252` matches the tested implementation. Contract `a1-rti11-diagnostic-precollection-replay-v1` is fully landed offline; no provider/live authority or follow-up operational qualification is implied.
 - **Historical A1/P03 governed task status:** PR #134 MERGED at verified main `04d93019e4a6492be2a32b3553296569fb0e7704`; exact PR head `00b1b2f68f437f8ef9a46b4c7529471d2197c4a0`, CI #541 / run `36943355971` PASS (1,951 Python tests / 86 subtests and TypeScript). Continuation regression: 121 Python tests / 86 subtests PASS; compilation and whitespace PASS. Post-merge main CI #542 / run `36962872735` PASS: Python 3.13 and TypeScript checks/builds. A1 OFFLINE TRANSPORT/COLLECTION MILESTONE CLOSED on merged implementation, exact implementation CI, verified post-merge main CI and this documented closure evidence. PR #135 MERGED: final documentation head `8cafd868a89f99fa918912a1ca68a4dea1fc52cc`, exact-head CI #547 / run `36966905725` SUCCESS (Python and TypeScript); actual merge/main `2e4b5c847d458ece293f6889f8e782b3df0c867d`, post-merge main CI #548 / run `36970039513` SUCCESS (Python and TypeScript). Closure documentation fully landed and verified. Old checkpoint CI #545 applies only to old head `1c3b5a4dd4cd50c54c42f1ca85458bade59e193b`. Bounded dependency review PR #136 MERGED at main `9136242516449cd26e0e176834d4c7ddc1151f4d`; exact head `8057e78953de7bcc9097b091782f4063b5a352bd`, CI #549 / run `36974451027` SUCCESS; post-merge main CI #550 / run `36987290844` SUCCESS, Python/TypeScript PASS. Review fully landed. The formal P03 specification landed through PR #137 at starting main `baf27d47eba399066555e03323c0c03d0a9b0182`; exact head `aebefe76c802be2c9fd846fbf6080f88b053d784`, CI #551 / run `36992923714` SUCCESS and post-main CI #552 / run `36997006649` SUCCESS, Python/TypeScript PASS. A NEW controller instruction of 2026-10-02 WIB explicitly authorizes only its offline/injected implementation. PR #138 MERGED / CLOSED; exact head `d5b144ac22d5da56e6da5c5233851265917b9c40`; exact-head push CI #554 / run `37025114858` and PR CI #555 / run `37025119666` SUCCESS; merge/main `652ec1c32c6ed01beff8e088932b97caab4d1751`; post-merge main CI #556 / run `37030291596` SUCCESS. Python 3.13 and TypeScript checks/builds PASS in all three runs. The tested local tree, exact PR-head tree and landed implementation tree are identical: `9e967879698e9e64c07f83172c5a504dd9032919`. A1 P03 OFFLINE IMPLEMENTATION MILESTONE CLOSED; operational provider execution remains NOT AUTHORIZED. Formal contract remains in `docs/AUTONOMOUS-PAPER-A1-P03-SAFETY-PRECOLLECTION-SPECIFICATION.md`; its original specification-only authority statement is historical and is superseded only for this narrowly authorized offline implementation. PR/head/merge/main CI are separate GitHub workflow evidence, not a provider-readiness claim. BASELINE VERIFIED: main `30b381ec276c79752670f4330540e3b4fad8527b`, PR #132/#133 merged; exact post-main CI #538 PASS (1,888 Python tests / TypeScript). OFFLINE IMPLEMENTATION: injected zero-retry/no-redirect bounded transport, completed collection/T lifecycle, immutable packet lineage, exact collection-local valuation dedup, pre-call budget, mandatory genesis/program LEVEL 1 verification, declarative --check-only preflight and fake full-chain paper persistence/readback/Risk veto. Tight valuation worst case 128 -> 64 (old loose disclosure 200); collection 16 RPC + 64 OHLCV = 80 HTTP; whole-cycle reservation 46 RPC + 69 OHLCV/diagnostics = 115 HTTP, 86,597,632 bytes with selected safety cap <=256 KiB. Exact CI/merge evidence belongs to the milestone PR. Actual operational adapters, production RTI-11 diagnostic precollection/replay, durable collection audit packet and provider quota/latency remain gates. No provider call/secret/smoke/cycle; LEVEL 2 NOT VERIFIED. P03/P04 overall and historical estimates unchanged; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
@@ -98,7 +100,7 @@ Read `REPLIT_RULES.md` first. Use this file as the authoritative current develop
 
 ## Current objective
 
-Remove duplicate full feature-push/PR CI through a bounded trigger change, preserving full PR and post-merge main validation. RTI-11 Gate 0 is COMPLETE / MERGED / POST-MERGE CI PASS on exact main `32074700bf677c29f181c7fd49172fd130edad20`. Publish one CI optimization PR, record its exact head/run and STOP immediately after CI starts. Historical owners, Risk authority and governance status remain unchanged.
+Specify one honest alternative exact-pool candle source boundary after the controller-reported CoinGecko conformance STOP. P04-ACS-01 selects conditional Bitquery `Trading.Pairs` candidate evidence and specifies strict factual/unique/contiguous/closed-minute admission, original-time freshness, visible provider provenance, a one-attempt budget and a narrow opt-in RTI-11 companion seam. No provider runtime or acceptance implementation is authorized. Retain all closed owners and independent Risk; publish one specification/state PR and STOP when exact-head CI starts.
 
 P07 architecture review has passed, and P07-T01 through P07-T07 are COMPLETE /
 CLOSED / AUDITED PASS. P07 is now COMPLETE / CLOSED / AUDITED PASS.
@@ -777,27 +779,33 @@ functionality was introduced.
 
 ## Relevant files for current task
 
-- `core/data/a1_http_adapter.py`
-- `tests/test_a1_http_adapter.py`
-- `tests/test_a1_http_adapter_integration.py`
-- `docs/AUTONOMOUS-PAPER-A1-HTTP-ADAPTER-SPECIFICATION.md`
-- `docs/AUTONOMOUS-PAPER-A1-PROVIDER-EXECUTION-PREPARATION.md`
-- `docs/AUTONOMOUS-PAPER-A1-TRANSPORT-COLLECTION-SPECIFICATION.md`
-- `docs/AUTONOMOUS-PAPER-A1-DURABLE-AUDIT-LINKAGE-SPECIFICATION.md`
-- `REPLIT_RULES.md`
+Write scope for P04-ACS-01:
+
+- `docs/ALTERNATIVE-EXACT-POOL-CANDLE-SOURCE-BOUNDARY-SPECIFICATION.md`
 - `PROJECT_STATE.md`
-- `docs/CHANGELOG.md`
 
-Read-only owner/acceptance references for this batch:
+Read-only owner/acceptance references for this bounded audit:
 
-- `core/data/a1_bounded_transport.py`
-- `core/data/a1_collection_budget.py`
-- `core/data/coingecko_onchain_transport.py`
+- `REPLIT_RULES.md`
 - `core/data/coingecko_onchain_ohlcv.py`
-- `backend/application/a1_collection_audit.py`
-- `tests/test_a1_collection_audit.py`
-- `tests/test_a1_collection_audit_migration.py`
-- `docs/P01-OAF-01-PROVIDER-BACKED-SMOKE-EXECUTION-PACKET.md`
+- `core/data/coingecko_onchain_transport.py`
+- `core/data/coingecko_onchain_diagnostic.py`
+- `core/data/coingecko_onchain_orchestration.py`
+- `core/signals/price_direction_policy.py`
+- `backend/application/market_to_opportunity_composition.py`
+- `core/data/a1_rti11_collection.py`
+- `core/data/a1_cpmm_sources.py`
+- `core/data/bounded_cycle_sources.py`
+- `core/data/dexscreener_inspection.py`
+- `docs/P04-LME-01-LIVE-MARKET-EVIDENCE-SPECIFICATION.md`
+- `docs/P04-LME-02-TRANSPORT-DIAGNOSTIC-SPECIFICATION.md`
+- `docs/P01-RTI-11-BOUNDED-CALLER-DIRECTED-MARKET-TO-OPPORTUNITY-COMPOSITION-SPECIFICATION.md`
+- `docs/AUTONOMOUS-PAPER-A1-RTI11-DIAGNOSTIC-PRECOLLECTION-SPECIFICATION.md`
+- `docs/AUTONOMOUS-PAPER-PROVIDER-SOURCE-MAPPING-DECISION.md`
+- `docs/AUTONOMOUS-PAPER-A1-PROVIDER-EXECUTION-PREPARATION.md`
+- `docs/AUTONOMOUS-PAPER-A1-HTTP-ADAPTER-SPECIFICATION.md`
+
+Public documentation references and unresolved candidate capabilities are recorded in the new specification. No operational provider access is authorized.
 
 The retained references below belong to earlier tasks and do not expand the current scope.
 
@@ -1036,6 +1044,8 @@ OSP. P01-OSC-02 implementation is NOT AUTHORIZED by this checkpoint.
 
 ## Next action
 
+The retained paragraphs in this section are historical task checkpoints, not the current execution instruction. The current P04-ACS-01 gate is under **Next task** below.
+
 P01-OSC-02 is COMPLETE / CLOSED / CI PASS. The bounded post-OSC-02 review
 selected P01-PFX-01 as the smallest missing prefix composition: exact RTI-11
 through RTI-12 and RTI-13, then one exact decision-bound Risk/Capital policy
@@ -1083,17 +1093,21 @@ access, economic realization, or live execution.
 
 ## Next task
 
-A1-HTTP-01 is selected by the controller's 2026-10-05 one-batch authority. Startup read current-main rules/state, verified main `8b549e599038c8418589baae16fc303b5e8c36ac`, PR #143 MERGED / CLOSED and no competing open PR. CI #568 / `37212294693` SUCCESS for Python 3.13, TypeScript and whitespace; publication baseline is PASS.
+P04-ACS-01 is the controller-selected **specification-only** continuation. Startup read current-main rules/state, verified GitHub main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`, PR #144 MERGED / CLOSED and no competing open PR. Main CI #570 / `37254641401` SUCCESS for Python 3.13, whitespace and TypeScript. The former A1-HTTP-01 publication instruction is fulfilled; no closure PR is needed.
 
-Bounded post-A1-AUD review confirms the offline A1/P03/RTI-11 collection/replay and A1-AUD source audit/lifecycle chain is landed. The smallest remaining implementable blocker is the absent concrete A1 HTTP opener: existing transport requires injected behavior and common collection permits only a sanitized RPC origin, while actual RPC routing and CoinGecko authentication must stay outside durable evidence. The earlier source-backed dependency review explicitly permits offline adapter conformance before separate real endpoint qualification. No extra declarative readiness abstraction or owner redesign is selected.
+Formal boundary: `docs/ALTERNATIVE-EXACT-POOL-CANDLE-SOURCE-BOUNDARY-SPECIFICATION.md`, `alternative-exact-pool-candle-source-v1`. Decision: **NEW PROVIDER BOUNDARY / SPECIFICATION REQUIRED**. Existing candle admission, signal provenance, RTI-11 success checks and A1 replay bind CoinGecko. No existing alternate exact-pool candle implementation is reusable without a new honest source boundary.
 
-Formal review/contract: `docs/AUTONOMOUS-PAPER-A1-HTTP-ADAPTER-SPECIFICATION.md`, `a1-explicit-http-adapter-v1`. `A1HttpAdapter` is explicitly constructed/injected, frozen/redacted and no-contact at construction. It pins one same-origin private RPC route and canonical Demo OHLCV profile, rejects noncanonical/mutating RPC envelopes, reuses existing safety parameter validation, injects Demo auth only at its pinned host, uses verified TLS without environment proxy/redirect/retry/fallback, and enforces remaining monotonic deadlines, bounded read1/sentinel/truncation checks and cleanup. Canonical requests, receipt/source clocks, aggregate ledger and all closed owners remain unchanged. Public endpoint identity denotes the sanitized logical route, not complete authenticated wire/account attestation. No default application or CLI/API wiring.
+Bitquery Crypto Price API `Trading.Pairs` is the sole conditional candidate. Select one explicit pool/token/quote/network/program and 60-second window; forbid blended-token prices, rank-1/top-market substitution, subscriptions, retry/fallback and archive backfill. Require three factual unique contiguous closed candles, exact original-time cutoff/freshness, raw response/request digests and visible provider/model provenance. Proposed companion seam: `p01-rti-11-candle-source-v2`; existing CoinGecko V1 objects, acceptance, digests and closed owners remain unchanged.
 
-Local Python 3.13.15 verification: 69 focused tests PASS (67 adapter + two full-owner paper/audit/Risk integration cases), retaining 21 fake physical attempts and successful exact lifecycle/audit readback or zero rows after independent Risk veto. Relevant regressions: 275 tests / 44 subtests PASS across bounded runs (253 / 27 for transport/budget/collection/persistence/foundation; 22 / 17 for paper Risk/preflight/migration). Stdlib HTTP framing uses fake sockets; all real network access is blocked. Locked environment check, compilation, whitespace and exact scope PASS. Existing Starlette/Alembic deprecation warnings are non-failing. No full local suite, real credential lookup, provider call, operational migration or runtime launch.
+**Capability STOP remains:** selected CPMM coverage/orientation, factual interval construction, historical USD/cutoff semantics, schema/completeness and account cost/entitlement are NOT QUALIFIED. Provider documentation describes quote normalization; it does not independently prove this contract. No implementation may conceal absent source clocks, use post-cutoff quote repricing, deduplicate or fill gaps. Alternative diagnostic evidence also does not replace A1's CoinGecko two-sided USD valuation.
 
-One substantive PR includes this review/specification/source/tests and batched reconciliation of state, CHANGELOG, affected preparation/transport/audit docs and the narrow REPLIT_RULES documentation batching rule. Safety/authority/Risk/credential/material-architecture changes must be documented in the same PR and never deferred; pending CI facts remain explicitly pending. A1-HTTP publication/exact-head CI/landing are separate unverified workflow facts at this source checkpoint. Do not create micro-step review, specification or closure PRs.
+This source checkpoint contains one new formal specification and batched state reconciliation per Rule 22. Local focused documentation validation PASS: required boundary/authority sections, repository references, Markdown/link structure, reported timestamp spacing and exact two-file scope; `git diff --check` PASS. No executable tests or full local Python/TypeScript suites were run; GitHub CI owns full-suite verification. PR number, exact new head, PR CI and merge remain **PENDING** at this document's source checkpoint and must not be marked PASS in advance.
 
-Next action: recheck baseline main/CI/no competing PR -> publish ONE verified A1-HTTP-01 PR -> confirm exact-head PR CI starts -> STOP immediately. Controller verifies completion/merge separately. After landing, listed remaining provider/account quota/shared-use/latency and actual endpoint/runtime/database evidence require a concrete operational packet and separate authorization. The older selected-mint OAF smoke does not prove the common A1 audit chain. No operational authority follows from this offline batch. Risk remains INDEPENDENT / MANDATORY / HIGHER AUTHORITY; LEVEL 2, P03/P04 overall and historical progress unchanged; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+Next action: validate the two-file documentation batch -> recheck main/CI/no competing PR -> publish ONE specification PR -> confirm exact-head PR CI starts -> **STOP immediately**. Controller checks CI/merge separately. No merge or closure PR is authorized in this turn.
+
+Next controller decision after specification review: accept the disclosed candidate model and resolve its capability record; only then explicitly select a bounded offline source-adapter/admission plus companion-seam implementation batch. Real account/target qualification requires a separate concrete execution packet/authorization. This specification does not carry over former operational request authorizations to a new provider.
+
+No code, tests, dependency/schema changes, credentials, provider calls, migration, provider-backed prepare/run/persist, scheduler/worker, wallet/signing/broadcast/DEX/settlement/live trading or MASTER_BLUEPRINT changes are included. Risk remains INDEPENDENT / MANDATORY / HIGHER AUTHORITY; LEVEL 2 and full-cycle quota readiness remain unverified; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
 
 ### Completed RTI-11 implementation evidence
 
@@ -1105,7 +1119,7 @@ The pure graph retains original canonical P02/P03/pool/request objects and full 
 
 Local evidence: 106 focused tests PASS (92 contract/unit and 14 integration cases), including actual autonomous one-cycle paper persist/readback and independent Risk veto with synthetic pre-T wire facts; 474 relevant A1/P02/P03/RTI-11/LME/P04/P05/Risk/paper/persistence regression tests and 69 subtests PASS under Python 3.13.15; module compilation and whitespace PASS. These are offline fixtures, not provider endpoint qualification or runtime/database attestation. Implementation landing is COMPLETE; exact PR/head/CI/merge evidence is recorded in the current checkpoint above.
 
-Historical A1-AUD publication instruction is fulfilled by PR #143 and verified CI #567/#568. Current next safe action is the A1-HTTP-01 one-batch publication gate above. Controller verifies CI/merge separately. Any new commit requires new exact-head validation. No provider adapter/smoke, quota/latency, operational migration, runtime/database qualification or successor. Risk remains INDEPENDENT / MANDATORY / HIGHER AUTHORITY; LEVEL 2, P03/P04 overall and historical progress unchanged; G2 BLOCKED / UNRESOLVED / NOT AUTHORIZED; G3/G4/P09 NOT AUTHORIZED.
+Historical A1-AUD and A1-HTTP publication instructions are fulfilled by PR #143/#144 and verified post-main CI #568/#570. The current next action is the P04-ACS-01 specification-only publication gate above. Controller verifies PR CI/merge separately. New source/runtime integration, provider calls, migrations and paper execution require explicit future authority. Risk and G2/G3/G4/P09 remain unchanged.
 
 P01-RTI-04 through P01-RTI-16 are complete, closed, merged, and CI-verified.
 The bounded in-memory chain stops naturally at RTI-16; no RTI-17 or other
