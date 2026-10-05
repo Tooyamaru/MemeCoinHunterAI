@@ -5,8 +5,9 @@
 - Milestone: **P04-ACS-01**.
 - Proposed contract: **`alternative-exact-pool-candle-source-v1`**.
 - Status: **SPECIFICATION ONLY / CANDIDATE NOT QUALIFIED / IMPLEMENTATION NOT AUTHORIZED**.
-- Verified baseline: main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`; PR #144 MERGED / CLOSED; main CI #570 / `37254641401` SUCCESS for Python 3.13, whitespace and TypeScript; no competing open PR at startup.
-- Controller authority: 2026-10-05 WORK FAST MODE successor specification and batched `PROJECT_STATE.md` reconciliation in one PR. This authority permits public documentation lookup, not operational provider access.
+- Original specification baseline: main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`; PR #144 MERGED / CLOSED; main CI #570 / `37254641401` SUCCESS for Python 3.13, whitespace and TypeScript; no competing open PR at startup.
+- Original controller authority: 2026-10-05 WORK FAST MODE successor specification and batched `PROJECT_STATE.md` reconciliation in one PR. This authority permits public documentation lookup, not operational provider access.
+- Current evidence-review authority: 2026-10-05 CAPABILITY-EVIDENCE-ONLY continuation. Substantive official capability facts and state may be recorded together; provider/runtime implementation, acceptance-code changes, credential/account use and operational calls remain NOT AUTHORIZED. See §3.1–3.3.
 
 Decision: **NEW PROVIDER BOUNDARY / SPECIFICATION REQUIRED**. Bitquery Crypto Price API `Trading.Pairs` is the single conditional candidate selected for this specification. It is not an implemented, authorized or qualified substitute. Existing RTI-11 acceptance is CoinGecko-specific; changing a URL or transport cannot make alternative evidence admissible. A narrow, explicitly versioned source seam is required before future integration.
 
@@ -66,6 +67,46 @@ The documented USD construction is materially relevant: Bitquery normalizes the 
 
 This specification is coherent as a fail-closed admission boundary even while its candidate remains conditional. It does not assert that Bitquery currently satisfies items 1–5. If they cannot be established, stop at this boundary; do not implement a fake-positive adapter or silently choose a second provider.
 
+### 3.1 Capability-evidence record — 2026-10-05
+
+Record: **`bitquery-trading-pairs-capability-record-v1`**, documentation-only, **controller acceptance PENDING**. Review baseline: main `4f8fab992ec0acf28f07a99bfc63fff64338001a`; PR #145 MERGED / CLOSED, unchanged head `d3222e0803284f5978cc2214f1f003fc55820e11`; post-main CI #572 / `37313839114` SUCCESS, Python 3.13, whitespace and TypeScript; no competing open PR at startup.
+
+Decision: **B — BITQUERY CONDITIONALLY SUITABLE BUT OFFICIAL CLARIFICATION REQUIRED**. Static official references E1–E15 below support the classified properties; no query, introspection, credential/account operation or provider qualification was performed. `PROVEN` means the expressly scoped documentary property, not tested runtime behavior, intended-account access or availability of three candles on an unspecified target. An example operation does not establish a pinned executable profile. Remaining qualification obligations are stated in every row.
+
+| # | Capability | Classification | Authoritative evidence and remaining gap |
+| --- | --- | --- | --- |
+| 1 | Exact schema/query profile | **NOT PROVEN** | E1 “Schema and Fields” names `Price.Ohlc.{Open,High,Low,Close}`, `Interval.Time.{Start,End,Duration}` and identities; E3 identifies Pairs filter branches and operator families. E2 explicitly types Duration filters as `OLAP_Integer`; E1 defines `IsQuotedInUsd` as Boolean. A complete output SDL, nullability, numeric precision/serialization, timestamp precision, exact absolute interval predicates, immutable provider revision and full operation digest are absent from this record. E3 says leaf paths evolve and recommends introspection, which was not authorized or performed. V2 endpoint naming is not an immutable schema pin. |
+| 2 | Exact pool binding | **PROVEN** — documented filter/identity semantics | E1's pool-key table identifies Solana `Pool.Address` and `Market.Address` as pool identities, and `Market.Program` as the DEX program. Its row-fan-out definition keys rows by market/pool/quote/token/interval. E3 documents exact `is` filters and AND of sibling predicates. This supports one selected-pool binding, without rank/top-market substitution. It proves neither intended-target data availability nor the temporal/authority correctness of upstream USD conversion. |
+| 3 | Raydium CPMM coverage/program | **PROVEN** — documented general coverage | E4 explicitly directs recent CPMM swaps to Trading. E5 “How StonkFun works on-chain” identifies `CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C`; its FAQ links CPMM graduation, indexed programs, per-pool `Trading.Pairs` candles and protocol `raydium_cp_swap`. E1 supplies the program field's meaning. This is program-address evidence, not inference from a DEX name; selected pool/account coverage and returned program equality still require later qualification. No example pool is selected by this audit. |
+| 4 | Original base/quote orientation | **REQUIRES PROVIDER CLARIFICATION** | E1/E7 identify Token as base and QuoteToken as quote; E3 exposes both predicate branches. E7 chooses stable/native quotes and otherwise a dynamic liquidity-based quote. Thus universal immutable orientation is **CONTRADICTED**, while exact predicates plus row checks can reject a mismatch. The literal Solana mint/WSOL representation and availability of the controller's original orientation on the intended product remain unresolved. The caller cannot force a reverse pair, infer an alias or invert candles. |
+| 5 | Factual unique 60-second rows | **PROVEN** — documented construction/no-fill property | E2 “Supported Time Intervals” and “Bucket arithmetic” establish 60-second epoch-aligned sparse buckets with no fabricated empty bars. E1's OHLC field definition limits interval OHLC to trades with known USD values. Together with E1's row key, these resolve the documented interval/no-fill portion of §3 item 2. They do not promise trades in all three requested minutes, account/target coverage, complete ingestion or cutoff-valid USD inputs. Only an actual exact-window receipt could prove three usable rows. |
+| 6 | Historical cutoff/as-of semantics | **REQUIRES PROVIDER CLARIFICATION** | E3 documents absolute time operators, but not an as-of source-availability snapshot. E8/E15 describe pre-aggregated recent Trading history, not immutable knowledge before C. A row-time predicate alone cannot prove all trade/quote facts were available before C, absence of later corrections, or that later computation excludes later inputs. No claim that every historical candle is repriced is justified either. |
+| 7 | USD construction/authority | **REQUIRES PROVIDER CLARIFICATION** | E6 describes hour-window decay weighting, quote valuation at weighting time and a separate external spot pipeline for stablecoins. E1 distinguishes USD mode and quote-unit volume. How these rules apply to historical `Pairs.Price.Ohlc`, construction/input clocks, external quote authority and later recomputation is not established. Pair identity does not make the upstream USD model a same-pool trade-time price. Post-C inputs would make this profile incompatible. |
+| 8 | Completeness/truncation/4-row sentinel | **REQUIRES PROVIDER CLARIFICATION** | E9 defines `limit.count` as a returned-row maximum and a 25,000-row default; E10 describes no total/`hasMore` flag for sweeps. Neither proves completeness of this exact Pairs profile or a stable ingestion snapshot. Four requested rows can expose visible overflow; three returned rows do not attest that a server cap, partial indexing or grouping omitted evidence. No pagination or added count query is authorized. |
+| 9 | Entitlement/quota/cost | **REQUIRES PROVIDER CLARIFICATION** | E12 lists full-schema self-service access, Solana among core chains, a seven-day real-time trial with 1,000 points, personal/commercial license distinctions and recent OHLC retention. E11/E13 describe resource-dependent points; E12 also states five points per real-time call, and E13 states five per realtime cube. The applicable accounting for this exact Trading operation/account must be confirmed. E14 distinguishes quota, rate and shared-compute/entitlement blocks. A one-query attempt is offered in principle; cost, access and completion within 10 seconds/1 MiB remain unqualified. |
+| 10 | A1 two-sided USD valuation | **NOT PROVEN** — independent blocker | Repository `core/data/a1_cpmm_sources.py::_price/map_valuation` require two CoinGecko-typed USD receipts, one per original reserve mint from the same pool/interval. This boundary admits only the original base-token diagnostic. E1 exposes one base-price OHLC and quote volume, not two separately bound historical USD candle receipts. Quote volume or USD/base ratios are not a substitute for the missing quote-side receipt. No A1 valuation replacement or integration is authorized. |
+
+### 3.2 Confirmed interval representation mismatch
+
+**CONTRADICTED:** equating Bitquery's raw `Interval.Time.End` with this contract's exclusive interval boundary. E2 documents an inclusive final second: raw End = Start + Duration - 1 second. For Duration 60, that is Start + 59 seconds; the canonical exclusive end required by §6 remains Start + 60 seconds. These are different representations of an interval, not permission to move a candle or accept an open one.
+
+The intended future mapping must retain raw Start/End/Duration, validate their pinned source semantics, and separately represent the exclusive boundary. This review **does not approve or implement that mapping**; the exact typed mapping requires controller review with the schema/profile record. Until resolved, `CAPABILITY_UNVERIFIED` remains mandatory. No change to OHLC values, starts, 60-second spacing, cutoff, closedness, uniqueness or freshness is proposed.
+
+This evidence batch is substantive under Rule 22: it resolves the documented sparse/no-fill gate and identifies the raw-End mismatch that would otherwise make the proposed profile reject valid provider intervals. It is not a closure-only or clarification-only micro PR. Other capability gates remain open.
+
+### 3.3 Minimal questions requiring an official answer
+
+Answers must identify the precise Trading.Pairs product/revision and distinguish documentary guarantees from account-specific availability. No message to Bitquery is sent by this review.
+
+1. **Pinned profile:** Can Bitquery supply the supported SDL/revision, scalar precision/serialization/nullability, UTC timestamp units, literal mint fields and exact one-operation filter/projection for pool, program, Token, QuoteToken and Duration 60? Which absolute interval predicates implement [C-180s, C), and how do row Block.Time, raw inclusive End and construction time differ? Is a schema/model revision selectable, or must changes force client rejection and a newly reviewed profile?
+2. **Coverage/orientation:** Does that product expose the original selected CPMM pool/program/mint tuple without pool blending or native/WSOL alias substitution, returning pool/program/base/quote identities on every interval? Can the required Token=original base orientation be absent or change, and how is a mismatch represented? Account/target verification must later use separately supplied public identities; this audit supplies none.
+3. **Cutoff:** Does a historical query guarantee only trade and quote-source facts available before C? Can late ingestion, corrections/reorganizations, later trades or recomputation change a closed interval, and is there an as-of cutoff/watermark that proves the required source-availability boundary?
+4. **USD/model:** Are Pairs OHLC extrema/opens/closes derived from eligible trades in that interval or from index/reference-price updates? Which quote-USD sources, weighting/conversion clocks and revisions determine each historical value? Can any input at/after C reprice it? Resolve the filter descriptions: E6 lists only zero/tiny-amount exclusions while E8 also describes MEV/outlier removal. Supply the relevant model/source-clock provenance; unknown upstream timestamps cannot be replaced by receipt time.
+5. **Completeness:** For the fixed target/window, does one ordered query return a complete snapshot, without hidden caps, partial success, extra grouping or pagination? Is `limit.count=4` a reliable overflow sentinel, and what signal distinguishes missing trades from incomplete indexing/truncation? Returning three rows alone is insufficient.
+6. **Account/budget:** Which license/plan, Solana/Trading entitlement and point accounting apply to this exact single query, including timeout/failed attempts? What account-level cost cap/access evidence can be provided without credentials or a purchase? Confirm feasibility under one attempt, 32,768 request bytes, 1,048,576 response bytes and a 10-second deadline. Those are client ceilings, not an assumed provider SLA.
+
+The next controller authorization is to obtain/review these official clarifications, and separately approve any resulting schema/interval/USD model before considering implementation. This PR does not contact the vendor, approve an account, select a target, grant implementation authority or transfer prior operational authorization.
+
 ## 4. Source authority and immutable request identity
 
 The following are proposed identifiers, not existing runtime registrations:
@@ -109,11 +150,11 @@ Freeze an explicit timezone-aware UTC `reference_time = R` before the first atte
 
 `[C - 180 seconds, C - 120 seconds, C - 60 seconds]`.
 
-The requested interval window is `[C - 180 seconds, C)`. This does not authorize shifting R to find history. `Interval.Time.Start`, `End` and `Duration` supply the candle interval; neither receipt time nor `Block.Time` is substituted for its start.
+The requested interval window is `[C - 180 seconds, C)`. This does not authorize shifting R to find history. Original `Interval.Time.Start`, `End` and `Duration` must be retained; neither receipt time nor `Block.Time` is substituted for the start. Here, end means the **canonical exclusive boundary**. Bitquery's documented raw End is inclusive, as recorded in §3.2; a separately reviewed pinned source mapping is still PENDING. Do not compare raw End directly to the exclusive-boundary requirement or treat this evidence review as approval of a mapper.
 
 Admission requires all of the following:
 
-1. Exactly three original rows with unique, integral minute-aligned UTC starts; duration exactly 60 seconds; end exactly start + 60 seconds. Raw order must be monotonic ascending or descending. Only after uniqueness/order/spacing validation may the adapter order the three rows ascending.
+1. Exactly three original rows with unique, integral minute-aligned UTC starts; duration exactly 60 seconds; canonical exclusive end exactly start + 60 seconds. Raw order must be monotonic ascending or descending. Only after uniqueness/order/spacing validation may the adapter order the three rows ascending.
 2. Starts equal the complete requested set, with adjacent spacing exactly 60 seconds. All starts are strictly below C; the latest end equals C. Every interval is closed at receipt (`end <= received_at`). A missing minute, older third candle, extra row or forming candle fails; no deduplication, truncation-to-three, resampling, interpolation or gap fill.
 3. Three genuine provider OHLC rows backed by actual eligible trades within those intervals, according to the approved capability record. Require positive finite reported base and USD volume and `Price.IsQuotedInUsd == true`, but never treat those fields alone as proof of factual/no-fill construction.
 4. OHLC/volume are exact finite decimal values, never booleans, NaN or infinity. Prices are positive; low <= open/close <= high; volume is not fabricated. Provider decimal strings or JSON numeric tokens are mapped losslessly according to the pinned schema, not through binary float conversion.
@@ -231,3 +272,27 @@ Review date: **2026-10-05 UTC**. These references inform candidate selection; th
 - [Bitquery base/quote design](https://docs.bitquery.io/docs/trading/crypto-price-api/in-depth/): provider orientation rules.
 - [Bitquery Solana DEX trades](https://docs.bitquery.io/docs/blockchain/Solana/solana-dextrades/): historical coverage caveats.
 - [Bitquery authorization](https://docs.bitquery.io/docs/authorization/how-to-generate/): GraphQL endpoint and bearer authentication; no credential/token operation performed.
+
+### Capability review evidence IDs
+
+These are static official pages reviewed on 2026-10-05 UTC, with the specific sections named in §3.1. They are not executed queries, immutable SDL snapshots or operational receipts.
+
+| ID | Authoritative page / section used |
+| --- | --- |
+| E1 | [Pairs](https://docs.bitquery.io/docs/trading/crypto-price-api/pairs/): pool keys, row fan-out, denomination, Schema and Fields |
+| E2 | [OHLC](https://docs.bitquery.io/docs/trading/crypto-price-api/crypto-ohlc-candle-k-line-api/): Supported Time Intervals / Bucket arithmetic |
+| E3 | [Trading filters/operators](https://docs.bitquery.io/docs/trading/query-operators/filters-and-operators/): leaf types, sibling AND, branches, evolving leaf set |
+| E4 | [Raydium CPMM](https://docs.bitquery.io/docs/blockchain/Solana/raydium-cpmm-API/): Trading coverage / explicit program filter |
+| E5 | [StonkFun](https://docs.bitquery.io/docs/blockchain/Solana/stonkfun-api/): program-address table and indexed-program/per-pool-candle FAQ |
+| E6 | [Price Index Algorithm](https://docs.bitquery.io/docs/trading/crypto-price-api/price-index-algorithm/): filters, weighting, stablecoin source, quote normalization |
+| E7 | [Base/quote design](https://docs.bitquery.io/docs/trading/crypto-price-api/in-depth/): quote-selection rules |
+| E8 | [Trading data overview](https://docs.bitquery.io/docs/trading/trading-data-overview/): cleaned-trade stream and pre-aggregated OHLC |
+| E9 | [GraphQL limits](https://docs.bitquery.io/docs/graphql/limits/): limit/count/default and pagination caveat |
+| E10 | [Trading sweeps/pagination](https://docs.bitquery.io/docs/trading/query-operators/sweeps-and-pagination/): no total/hasMore and live pagination limitations |
+| E11 | [Billing](https://docs.bitquery.io/docs/plans/how-billing-works/): resource points, plan/chain entitlement, trial and approximate record cap |
+| E12 | [Current pricing](https://bitquery.io/pricing): access/license/trial/rolling-window and real-time-call accounting |
+| E13 | [IDE points](https://docs.bitquery.io/docs/ide/points/): resource accounting, realtime-cube accounting and timeout charges |
+| E14 | [Rate limits](https://docs.bitquery.io/docs/plans/rate-limits/): account rate, shared compute and entitlement blocks |
+| E15 | [Coverage/retention](https://docs.bitquery.io/docs/graphql/data-coverage-retention/): Trading recent-history window and silently shorter out-of-window results |
+
+Supplemental official examples inspected: [Traders API](https://docs.bitquery.io/docs/trading/crypto-trades-api/traders-api/), [historical TradingView guide](https://docs.bitquery.io/docs/usecases/tradingview-subscription-realtime/historical_OHLC/), and [Arc trade guide](https://docs.bitquery.io/docs/blockchain/arc-mainnet/arc-mainnet-trades-api/). Their examples, chart-side bar stitching and other-chain time notes do not prove this pinned Solana profile. The linked generic [schema overview](https://docs.bitquery.io/docs/schema/evm/top/) describes EVM, not a pinned Trading.Pairs SDL. No IDE query, introspection, live Usage API or alternative source was used.
