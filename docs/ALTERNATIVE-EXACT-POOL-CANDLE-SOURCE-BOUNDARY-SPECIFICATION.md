@@ -4,12 +4,12 @@
 
 - Milestone: **P04-ACS-01**.
 - Proposed contract: **`alternative-exact-pool-candle-source-v1`**.
-- Status: **SPECIFICATION ONLY / CANDIDATE NOT QUALIFIED / IMPLEMENTATION NOT AUTHORIZED**.
+- Status: **SPECIFICATION / PUBLIC CAPABILITY REVIEW COMPLETE / CANDIDATE NOT QUALIFIED / HARD_EXTERNAL_BLOCKER**.
 - Original specification baseline: main `62013cba3fd994c0337621c23b4b1f5ee5e2c166`; PR #144 MERGED / CLOSED; main CI #570 / `37254641401` SUCCESS for Python 3.13, whitespace and TypeScript; no competing open PR at startup.
 - Original controller authority: 2026-10-05 WORK FAST MODE successor specification and batched `PROJECT_STATE.md` reconciliation in one PR. This authority permits public documentation lookup, not operational provider access.
-- Current evidence-review authority: 2026-10-05 CAPABILITY-EVIDENCE-ONLY continuation. Substantive official capability facts and state may be recorded together; provider/runtime implementation, acceptance-code changes, credential/account use and operational calls remain NOT AUTHORIZED. See §3.1–3.3.
+- Current continuous-work authority: 2026-10-06 AUTONOMOUS / CONTINUOUS WORK directive authorizes technically justified offline adapter/seam work, specification refinement, PRs, exact-head-CI-gated squash merge and post-main verification. The earlier evidence-only implementation prohibition and STOP-on-CI-start are historical and superseded. No provider-data request, credential/account operation, vendor contact, purchase, operational migration, paper action or live authority is opened. See §3.4 and §11.
 
-Decision: **NEW PROVIDER BOUNDARY / SPECIFICATION REQUIRED**. Bitquery Crypto Price API `Trading.Pairs` is the single conditional candidate selected for this specification. It is not an implemented, authorized or qualified substitute. Existing RTI-11 acceptance is CoinGecko-specific; changing a URL or transport cannot make alternative evidence admissible. A narrow, explicitly versioned source seam is required before future integration.
+Boundary decision: **NEW PROVIDER BOUNDARY / SPECIFICATION REQUIRED**. Bitquery Crypto Price API `Trading.Pairs` remains the strongest conditional candle candidate; it is not an implemented or qualified substitute. Current source-selection decision is **HARD_EXTERNAL_BLOCKER / NO IMPLEMENTATION-READY PROFILE**, after the public/source and alternative review in §3.4. Existing RTI-11 acceptance is CoinGecko-specific; changing a URL or transport cannot make alternative evidence admissible. A narrow, explicitly versioned source seam is required before future integration.
 
 The boundary accepts three factual, unique, contiguous, closed one-minute candles for one already-selected exact pool and price orientation. It preserves original source times and honest provider provenance. It does not discover, rank or replace targets, supply safety evidence, select investments, or authorize a paper cycle.
 
@@ -57,19 +57,19 @@ The documented USD construction is materially relevant: Bitquery normalizes the 
 | CoinGecko Pro or another pool/profile of the existing Demo source | Not selected: no evidence that an account/host change cures this conformance failure. No new target trial is authorized. |
 | Repository DexScreener snapshots | Excluded: do not supply this candle/time contract. |
 
-**Documentation is candidate evidence, not capability qualification.** Before any candidate runtime implementation is selected, a controller-reviewed capability record must resolve:
+**Documentation is candidate evidence, not capability qualification.** Before any candidate runtime implementation is selected, a governed capability record must resolve:
 
 1. Exact selected CPMM pool coverage, token/quote orientation and returned identity fields on the intended account/product.
 2. Whether three returned 60-second OHLC rows represent actual eligible trades within their respective intervals, without empty-interval carry-forward, rolling-hour replacement or cross-pool OHLC blending. Positive reported volume alone does not prove this.
 3. Whether the historical interval's OHLC and USD construction respect the cutoff. If later trades or later quote repricing determine a claimed closed-window value, this profile is **INCOMPATIBLE**. A later receipt is permitted; later market input is not. Do not change cutoff semantics to accommodate it.
-4. The provider's USD conversion/filter model and any upstream quote-source authority. Controller acceptance of that model is required; unavailable construction time or ambiguous semantics remain **CAPABILITY_UNVERIFIED**, not a synthetic source timestamp.
+4. The provider's USD conversion/filter model and any upstream quote-source authority. The selected model must pass the governed capability review within controller-authorized scope; unavailable construction time or ambiguous semantics remain **CAPABILITY_UNVERIFIED**, not a synthetic source timestamp.
 5. A fixed query/response schema, absolute interval filtering, completeness/truncation semantics, query cost, account entitlement and bounded limits. A wider lookup, pagination or schema-introspection request is not implicitly permitted.
 
 This specification is coherent as a fail-closed admission boundary even while its candidate remains conditional. It does not assert that Bitquery currently satisfies items 1–5. If they cannot be established, stop at this boundary; do not implement a fake-positive adapter or silently choose a second provider.
 
 ### 3.1 Capability-evidence record — 2026-10-05
 
-Record: **`bitquery-trading-pairs-capability-record-v1`**, documentation-only, **controller acceptance PENDING**. Review baseline: main `4f8fab992ec0acf28f07a99bfc63fff64338001a`; PR #145 MERGED / CLOSED, unchanged head `d3222e0803284f5978cc2214f1f003fc55820e11`; post-main CI #572 / `37313839114` SUCCESS, Python 3.13, whitespace and TypeScript; no competing open PR at startup.
+Historical record: **`bitquery-trading-pairs-capability-record-v1`**, documentation-only, with **controller acceptance PENDING at that source checkpoint**. The current authority and expanded findings are in §3.4. Review baseline: main `4f8fab992ec0acf28f07a99bfc63fff64338001a`; PR #145 MERGED / CLOSED, unchanged head `d3222e0803284f5978cc2214f1f003fc55820e11`; post-main CI #572 / `37313839114` SUCCESS, Python 3.13, whitespace and TypeScript; no competing open PR at startup.
 
 Decision: **B — BITQUERY CONDITIONALLY SUITABLE BUT OFFICIAL CLARIFICATION REQUIRED**. Static official references E1–E15 below support the classified properties; no query, introspection, credential/account operation or provider qualification was performed. `PROVEN` means the expressly scoped documentary property, not tested runtime behavior, intended-account access or availability of three candles on an unspecified target. An example operation does not establish a pinned executable profile. Remaining qualification obligations are stated in every row.
 
@@ -86,13 +86,13 @@ Decision: **B — BITQUERY CONDITIONALLY SUITABLE BUT OFFICIAL CLARIFICATION REQ
 | 9 | Entitlement/quota/cost | **REQUIRES PROVIDER CLARIFICATION** | E12 lists full-schema self-service access, Solana among core chains, a seven-day real-time trial with 1,000 points, personal/commercial license distinctions and recent OHLC retention. E11/E13 describe resource-dependent points; E12 also states five points per real-time call, and E13 states five per realtime cube. The applicable accounting for this exact Trading operation/account must be confirmed. E14 distinguishes quota, rate and shared-compute/entitlement blocks. A one-query attempt is offered in principle; cost, access and completion within 10 seconds/1 MiB remain unqualified. |
 | 10 | A1 two-sided USD valuation | **NOT PROVEN** — independent blocker | Repository `core/data/a1_cpmm_sources.py::_price/map_valuation` require two CoinGecko-typed USD receipts, one per original reserve mint from the same pool/interval. This boundary admits only the original base-token diagnostic. E1 exposes one base-price OHLC and quote volume, not two separately bound historical USD candle receipts. Quote volume or USD/base ratios are not a substitute for the missing quote-side receipt. No A1 valuation replacement or integration is authorized. |
 
-### 3.2 Confirmed interval representation mismatch
+### 3.2 Resolved inclusive-to-exclusive interval representation
 
-**CONTRADICTED:** equating Bitquery's raw `Interval.Time.End` with this contract's exclusive interval boundary. E2 documents an inclusive final second: raw End = Start + Duration - 1 second. For Duration 60, that is Start + 59 seconds; the canonical exclusive end required by §6 remains Start + 60 seconds. These are different representations of an interval, not permission to move a candle or accept an open one.
+**CONTRADICTED:** equating Bitquery's raw `Interval.Time.End` directly with this contract's exclusive boundary. E2 documents raw End = Start + Duration - 1 second. For Duration 60, raw End is Start + 59 seconds and the canonical exclusive end is Start + 60 seconds.
 
-The intended future mapping must retain raw Start/End/Duration, validate their pinned source semantics, and separately represent the exclusive boundary. This review **does not approve or implement that mapping**; the exact typed mapping requires controller review with the schema/profile record. Until resolved, `CAPABILITY_UNVERIFIED` remains mandatory. No change to OHLC values, starts, 60-second spacing, cutoff, closedness, uniqueness or freshness is proposed.
+The 2026-10-06 deeper review resolves this as a lossless representation mapping, not a candle-semantic incompatibility. Retain raw Start/End/Duration; require integral UTC seconds, Start aligned to 60, Duration = 60 and raw End = Start + 59; then represent canonical exclusive end = raw End + 1 = Start + 60. Reject inconsistent fields, units, unsupported typing or an unpinned profile. Do not move starts, alter prices, resample, deduplicate, fill, extend freshness or change cutoff/closedness. Original raw fields and the mapping/profile remain in provenance.
 
-This evidence batch is substantive under Rule 22: it resolves the documented sparse/no-fill gate and identifies the raw-End mismatch that would otherwise make the proposed profile reject valid provider intervals. It is not a closure-only or clarification-only micro PR. Other capability gates remain open.
+The new controller directive authorizes this narrow offline specification refinement. No runtime mapper or RTI-11 acceptance change is implemented. Exact output SDL/typing, historical USD/source-availability and completeness still require evidence; missing those facts continues to produce `CAPABILITY_UNVERIFIED`. Interval arithmetic alone is not candidate qualification.
 
 ### 3.3 Minimal questions requiring an official answer
 
@@ -105,7 +105,17 @@ Answers must identify the precise Trading.Pairs product/revision and distinguish
 5. **Completeness:** For the fixed target/window, does one ordered query return a complete snapshot, without hidden caps, partial success, extra grouping or pagination? Is `limit.count=4` a reliable overflow sentinel, and what signal distinguishes missing trades from incomplete indexing/truncation? Returning three rows alone is insufficient.
 6. **Account/budget:** Which license/plan, Solana/Trading entitlement and point accounting apply to this exact single query, including timeout/failed attempts? What account-level cost cap/access evidence can be provided without credentials or a purchase? Confirm feasibility under one attempt, 32,768 request bytes, 1,048,576 response bytes and a 10-second deadline. Those are client ceilings, not an assumed provider SLA.
 
-The next controller authorization is to obtain/review these official clarifications, and separately approve any resulting schema/interval/USD model before considering implementation. This PR does not contact the vendor, approve an account, select a target, grant implementation authority or transfer prior operational authorization.
+These six groups were recorded under the historical evidence-only authority. Current offline implementation authority is supplied by the 2026-10-06 directive in §3.4; it does not supply the missing source facts. The deeper public research narrows the actual external evidence gate without sending a vendor message, opening an account or requesting credentials. The interval representation is resolved by §3.2; the remaining profile/cutoff/USD/completeness obligations are not resolved.
+
+### 3.4 Deep public/source and alternative review — 2026-10-06
+
+Current record: **[`exact-pool-candle-source-public-capability-review-v1`](EXACT-POOL-CANDLE-SOURCE-PUBLIC-CAPABILITY-REVIEW.md)**. Verified main `25afac375ad88bac64aa1862ccffb49087048a97`; PR #146 MERGED / CLOSED with unchanged head `329370e41cfcfe9d9bcc6cf48a4a94360f2c8f23`; post-main CI #574 / `37395411420` SUCCESS, Python 3.13, whitespace and TypeScript. No competing open PR at startup.
+
+The record covers all 42 controller-requested Bitquery capability questions, official schema/operator/scalar and SDK/protobuf artifacts, pinned Raydium events/oracle, and alternative candle/raw-trade surfaces. New substantive facts include scoped UTC/RFC3339 scalar semantics and WSOL Token versus Currency identity, the lossless inclusive-End mapping, Dune's interpolated/forward-filled minute USD and delayed Solana curated data, Codex event-based pool-price bars versus trade prices, and paid T+1 CPMM Data Store limitations. No provider/API data or sample dataset was requested.
+
+**Decision: HARD_EXTERNAL_BLOCKER / NO IMPLEMENTATION-READY SOURCE PROFILE.** Bitquery Pairs remains conditional rather than globally rejected. The inspected public response contracts/artifacts do not establish the immutable knowledge-before-C historical trade/quote state, exact historical USD model/clock and complete bounded result needed by this contract. A later response hash, event timestamp, positive volume or three rows cannot prove those predicates. Raw reconstruction additionally needs complete transactions and an independent cutoff-valid USD authority; it does not bypass them. No runtime layer with invented positive fixtures is added.
+
+The smallest next gate is the authoritative supported schema/model plus as-of/input-clock and one-operation completeness evidence bundle in the new record §6. Offline adapter/seam engineering is authorized when technically justified by that evidence; credentials and a latency test cannot substitute for missing internal historical guarantees. A1 two-sided USD remains independent and unqualified. PR/CI/merge evidence for this new batch is separately pending at its source checkpoint; no closure-only PR is required by Rule 22.
 
 ## 4. Source authority and immutable request identity
 
@@ -122,7 +132,7 @@ The following are proposed identifiers, not existing runtime registrations:
 | Operation kind | One read-only GraphQL query; no mutation, subscription or batching |
 | Price construction | Explicit Bitquery pair-level USD OHLC model, identified by a reviewed capability-record digest |
 
-Source selection must be explicit and controller-approved before collection. The server-owned profile pins the host/path, operation, allowed fields, schema revision/profile and limits. A caller cannot supply an arbitrary URL/query or self-register a provider by changing a string. Unknown or unapproved profiles stop before I/O.
+Source selection must be explicit, supported by the governed capability record and within controller-authorized scope before collection. The server-owned profile pins the host/path, operation, allowed fields, schema revision/profile and limits. A caller cannot supply an arbitrary URL/query or self-register a provider by changing a string. Unknown or unapproved profiles stop before I/O.
 
 Each request binds boundary/provider/profile/adapter/endpoint versions; operation name and exact UTF-8 query SHA-256; canonical public variables SHA-256; original target reference ID/digest/version; complete target identities and orientation; reference/cutoff/window; freshness policy; and effective timeout/body/request limits. A request digest covers that complete descriptor. Stable canonical JSON uses sorted keys, UTF-8, compact separators, UTC times and finite decimal strings; credentials are absent.
 
@@ -150,7 +160,7 @@ Freeze an explicit timezone-aware UTC `reference_time = R` before the first atte
 
 `[C - 180 seconds, C - 120 seconds, C - 60 seconds]`.
 
-The requested interval window is `[C - 180 seconds, C)`. This does not authorize shifting R to find history. Original `Interval.Time.Start`, `End` and `Duration` must be retained; neither receipt time nor `Block.Time` is substituted for the start. Here, end means the **canonical exclusive boundary**. Bitquery's documented raw End is inclusive, as recorded in §3.2; a separately reviewed pinned source mapping is still PENDING. Do not compare raw End directly to the exclusive-boundary requirement or treat this evidence review as approval of a mapper.
+The requested interval window is `[C - 180 seconds, C)`. This does not authorize shifting R to find history. Original `Interval.Time.Start`, `End` and `Duration` must be retained; neither receipt time nor `Block.Time` is substituted for the start. Here, end means the **canonical exclusive boundary**. Bitquery's documented raw End is inclusive; §3.2 now defines its lossless mapping. The complete typed provider profile is still PENDING. Do not compare raw End directly to the exclusive boundary, use unsupported field semantics or interpret this specification as an implemented/qualified mapper.
 
 Admission requires all of the following:
 
@@ -161,7 +171,7 @@ Admission requires all of the following:
 5. Original source observation time remains the candle start, preserving existing P02 observation semantics. The separate candle end, provider construction semantics and source receipt clocks remain in provenance. An absent provider update/conversion timestamp is explicitly absent; it cannot be filled with receipt time.
 6. An explicit finite positive `FreshnessPolicy.stale_after` applies to **each** candle's original start at the supplied admission/evaluation time and, where applicable, final collection reference T. Negative age, expired oldest evidence, clock contradiction or cross-owner freshness/skew failure rejects the entire packet. No widening the policy to force admission.
 7. UTC chronology is checked: R <= request start <= receipt <= processing <= evaluation. Independent monotonic elapsed time enforces the deadline. Retained clocks are observations, not defaults read during replay.
-8. Only market inputs before C may determine the candle. Post-cutoff trade/quote construction, stale or future facts, unknown closed-window semantics and unsupported provider schema fail closed even if row timestamps look valid.
+8. Only market inputs available before C may determine the candle, as required by §3. Historical computation/receipt may occur later only if the approved source contract proves the immutable before-C input set and excludes later trade/quote inputs. Post-cutoff market/quote inputs, unknown source-availability semantics, stale or future facts and unsupported schema fail closed even if row timestamps look valid. An event-time filter is not an as-of proof.
 
 Observations are materialized through the existing P02-T07/T08/T09 owners using the exact original predecessor and explicit clocks/policy. All three must be admitted before any successful diagnostic/signal result. No partial observation collection is usable. PRICE_DIRECTION_1M retains the existing exact-decimal comparison of the final two admitted closes; this grants no new decision/economic meaning.
 
@@ -249,12 +259,14 @@ No executable tests or runtime adapter are added by this specification. A later 
 - Provider/source/version changes alter digests; there is no cross-source reuse, hidden retry/fallback or post-T I/O. Existing CoinGecko V1 behavior and canonical digests remain unchanged.
 - Original P02/P03/P04/P05 and independent Risk authority remain intact. Tests of future A1 integration must preserve sealed replay and audit lineage; source-only fixture success is not cycle qualification.
 
-The **first next controller decision** is review/accept this contract and the candidate's disclosed USD/orientation model, and resolve the capability record in section 3. Only then may the controller select a bounded offline adapter/admission plus companion-seam implementation batch. An operational account/target qualification needs its own explicit request budget, environment, public identities and authorization afterward. Merging this specification grants none of those permissions.
+The current controller directive already authorizes technically justified bounded offline adapter/admission and companion-seam work. The first remaining dependency is **external source correctness evidence**, not another engineering permission request: resolve the pinned schema/model, immutable before-C trade/quote inputs and complete bounded retrieval in §3.4's record. Until then, no profile can honestly produce a successful diagnostic. After it is resolved, implement/test within the existing offline authority and prepare the exact operational packet. Real account/target access still needs separately explicit budget, environment, public identities and authorization; a documentation merge is not provider qualification.
 
 | Activity | Authority in this milestone |
 | --- | --- |
-| Bounded repository/public-documentation audit, this specification, state reconciliation, one PR | AUTHORIZED |
-| Provider runtime/adapters, RTI-11 acceptance changes, A1 source/replay/audit integration | NOT AUTHORIZED |
+| Bounded repository/public-documentation audit, justified specification refinement, state reconciliation, PR/CI/guarded merge/main CI | AUTHORIZED |
+| Technically justified offline source adapter/admission and narrow `p01-rti-11-candle-source-v2`, fake/injected transport and tests | AUTHORIZED BY 2026-10-06 DIRECTIVE; SOURCE CORRECTNESS EVIDENCE BLOCKED; NOT IMPLEMENTED |
+| Existing CoinGecko V1/closed acceptance weakening or silent provider/A1 substitution | NOT AUTHORIZED |
+| A1 source/replay/audit replacement | NO QUALIFIED VALUATION PROFILE / NO AUTOMATIC INTEGRATION |
 | Real Bitquery/CoinGecko/Solana calls, credential use, token refresh, account purchase, migration | NOT AUTHORIZED |
 | Provider-backed prepare, paper run/persist, full cycle, automatic discovery/polling/retry, scheduler/worker loop | NOT AUTHORIZED |
 | Wallet/signing/broadcast/DEX execution/settlement/live or real-money autonomous trading | NOT AUTHORIZED / DISABLED |
